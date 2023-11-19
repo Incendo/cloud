@@ -31,9 +31,9 @@ import cloud.commandframework.bukkit.internal.CommandBuildContextSupplier;
 import cloud.commandframework.bukkit.internal.MinecraftArgumentTypes;
 import cloud.commandframework.bukkit.internal.RegistryReflection;
 import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
-import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
-import cloud.commandframework.bukkit.parsers.ItemStackArgument;
-import cloud.commandframework.bukkit.parsers.ItemStackPredicateArgument;
+import cloud.commandframework.bukkit.parsers.EnchantmentParser;
+import cloud.commandframework.bukkit.parsers.ItemStackParser;
+import cloud.commandframework.bukkit.parsers.ItemStackPredicateParser;
 import cloud.commandframework.bukkit.parsers.location.Location2DArgument;
 import cloud.commandframework.bukkit.parsers.location.LocationArgument;
 import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorArgument;
@@ -95,17 +95,17 @@ public final class BukkitBrigadierMapper<C> {
             // Pre-1.19.3
             final Class<? extends ArgumentType<?>> ench = MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft(
                     "item_enchantment"));
-            this.mapSimpleNMS(new TypeToken<EnchantmentArgument.EnchantmentParser<C>>() {
+            this.mapSimpleNMS(new TypeToken<EnchantmentParser<C>>() {
             }, "item_enchantment");
         } catch (final IllegalArgumentException ignore) {
             // 1.19.3+
-            this.mapNMS(new TypeToken<EnchantmentArgument.EnchantmentParser<C>>() {
+            this.mapNMS(new TypeToken<EnchantmentParser<C>>() {
             }, this::modernEnchantment);
         }
         /* Map Item arguments */
-        this.mapSimpleContextNMS(new TypeToken<ItemStackArgument.Parser<C>>() {
+        this.mapSimpleContextNMS(new TypeToken<ItemStackParser<C>>() {
         }, "item_stack");
-        this.mapSimpleContextNMS(new TypeToken<ItemStackPredicateArgument.Parser<C>>() {
+        this.mapSimpleContextNMS(new TypeToken<ItemStackPredicateParser<C>>() {
         }, "item_predicate");
         /* Map Block arguments */
         this.mapSimpleContextNMS(new TypeToken<BlockPredicateArgument.Parser<C>>() {

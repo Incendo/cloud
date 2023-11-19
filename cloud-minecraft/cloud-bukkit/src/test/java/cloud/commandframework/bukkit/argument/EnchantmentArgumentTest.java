@@ -24,7 +24,7 @@
 package cloud.commandframework.bukkit.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
+import cloud.commandframework.bukkit.parsers.EnchantmentParser;
 import cloud.commandframework.bukkit.util.ServerTest;
 import cloud.commandframework.context.CommandInput;
 import java.lang.reflect.Field;
@@ -77,7 +77,7 @@ class EnchantmentArgumentTest extends ServerTest {
     @MethodSource("Parse_HappyFlow_Success_Source")
     void Parse_HappyFlow_Success(final @NonNull String input, final @NonNull Enchantment enchantment) {
         // Arrange
-        final EnchantmentArgument.EnchantmentParser<CommandSender> parser = new EnchantmentArgument.EnchantmentParser<>();
+        final EnchantmentParser<CommandSender> parser = new EnchantmentParser<>();
         final CommandInput commandInput = CommandInput.of(input);
 
         // Act
@@ -103,7 +103,7 @@ class EnchantmentArgumentTest extends ServerTest {
     @Test
     void Parse_NonExistentEnchantment_Failure() {
         // Arrange
-        final EnchantmentArgument.EnchantmentParser<CommandSender> parser = new EnchantmentArgument.EnchantmentParser<>();
+        final EnchantmentParser<CommandSender> parser = new EnchantmentParser<>();
         final CommandInput commandInput = CommandInput.of("enchantment");
 
         // Act

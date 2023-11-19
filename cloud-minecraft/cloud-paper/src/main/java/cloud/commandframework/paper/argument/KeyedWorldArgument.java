@@ -30,7 +30,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
-import cloud.commandframework.bukkit.parsers.WorldArgument;
+import cloud.commandframework.bukkit.parsers.WorldParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
@@ -45,7 +45,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Argument type that parses Bukkit {@link World worlds} from a {@link NamespacedKey}.
  *
- * <p>Falls back to parsing by name, using the {@link WorldArgument.WorldParser} on server implementations where {@link World}
+ * <p>Falls back to parsing by name, using the {@link WorldParser} on server implementations where {@link World}
  * does not implement {@link org.bukkit.Keyed}.</p>
  *
  * @param <C> Command sender type
@@ -132,7 +132,7 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
             if (keyed != null && keyed.isAssignableFrom(World.class)) {
                 this.parser = null;
             } else {
-                this.parser = new WorldArgument.WorldParser<>();
+                this.parser = new WorldParser<>();
             }
         }
 
@@ -155,12 +155,12 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
 
             final NamespacedKey key = NamespacedKey.fromString(commandInput.readString());
             if (key == null) {
-                return ArgumentParseResult.failure(new WorldArgument.WorldParseException(input, commandContext));
+                return ArgumentParseResult.failure(new WorldParser.WorldParseException(input, commandContext));
             }
 
             final World world = Bukkit.getWorld(key);
             if (world == null) {
-                return ArgumentParseResult.failure(new WorldArgument.WorldParseException(input, commandContext));
+                return ArgumentParseResult.failure(new WorldParser.WorldParseException(input, commandContext));
             }
 
             return ArgumentParseResult.success(world);

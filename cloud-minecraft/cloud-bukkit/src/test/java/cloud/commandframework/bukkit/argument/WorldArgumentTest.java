@@ -24,7 +24,7 @@
 package cloud.commandframework.bukkit.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.bukkit.parsers.WorldArgument;
+import cloud.commandframework.bukkit.parsers.WorldParser;
 import cloud.commandframework.bukkit.util.ServerTest;
 import cloud.commandframework.context.CommandInput;
 import org.bukkit.World;
@@ -46,7 +46,7 @@ class WorldArgumentTest extends ServerTest {
     void Parse_HappyFlow_Success() {
         // Arrange
         when(this.server().getWorld("world")).thenReturn(this.world);
-        final WorldArgument.WorldParser<CommandSender> worldParser = new WorldArgument.WorldParser<>();
+        final WorldParser<CommandSender> worldParser = new WorldParser<>();
         final CommandInput commandInput = CommandInput.of("world");
 
         // Act
@@ -66,7 +66,7 @@ class WorldArgumentTest extends ServerTest {
     @Test
     void Parse_NonExistentWorld_Failure() {
         // Arrange
-        final WorldArgument.WorldParser<CommandSender> worldParser = new WorldArgument.WorldParser<>();
+        final WorldParser<CommandSender> worldParser = new WorldParser<>();
         final CommandInput commandInput = CommandInput.of("world");
 
         // Act

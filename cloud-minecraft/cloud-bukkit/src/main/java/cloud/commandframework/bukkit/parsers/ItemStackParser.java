@@ -23,12 +23,11 @@
 //
 package cloud.commandframework.bukkit.parsers;
 
-import cloud.commandframework.ArgumentDescription;
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
@@ -47,6 +46,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import org.apiguardian.api.API;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -56,111 +56,42 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Argument type for parsing a {@link Material} and optional extra NBT data into a {@link ProtoItemStack}.
+ * Parser for a {@link Material} and optional extra NBT data into a {@link ProtoItemStack}.
  *
- * <p>This argument type only provides basic suggestions by default. On Minecraft 1.13 and newer, enabling Brigadier
+ * <p>This parser only provides basic suggestions by default. On Minecraft 1.13 and newer, enabling Brigadier
  * compatibility through {@link BukkitCommandManager#registerBrigadier()} will allow client side validation and
  * suggestions to be utilized.</p>
  *
  * @param <C> Command sender type
  * @since 1.5.0
  */
-public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStack> {
+public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
 
-    private ItemStackArgument(
-            final @NonNull String name,
-            final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
-    ) {
-        super(name, new Parser<>(), ProtoItemStack.class, suggestionProvider, defaultDescription);
+    /**
+     * Creates a new item stack parser.
+     *
+     * @param <C> command sender type
+     * @return the created parser
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> @NonNull ParserDescriptor<C, ProtoItemStack> itemStackParser() {
+        return ParserDescriptor.of(new ItemStackParser<>(), ProtoItemStack.class);
     }
 
     /**
-     * Create a new {@link Builder}.
+     * Returns a {@link CommandComponent.Builder} using {@link #itemStackParser()} as the parser.
      *
-     * @param name Name of the argument
-     * @param <C>  Command sender type
-     * @return Created builder
-     * @since 1.5.0
+     * @param <C> the command sender type
+     * @return the component builder
+     * @since 2.0.0
      */
-    public static <C> ItemStackArgument.@NonNull Builder<C> builder(final @NonNull String name) {
-        return new ItemStackArgument.Builder<>(name);
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> CommandComponent.@NonNull Builder<C, ProtoItemStack> itemStackComponent() {
+        return CommandComponent.<C, ProtoItemStack>builder().parser(itemStackParser());
     }
 
-    /**
-     * Create a new required {@link ItemStackArgument}.
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull ItemStackArgument<C> of(final @NonNull String name) {
-        return ItemStackArgument.<C>builder(name).build();
-    }
-
-
-    /**
-     * Builder for {@link ItemStackArgument}.
-     *
-     * @param <C> sender type
-     * @since 1.5.0
-     */
-    public static final class Builder<C> extends TypedBuilder<C, ProtoItemStack, Builder<C>> {
-
-        private Builder(final @NonNull String name) {
-            super(ProtoItemStack.class, name);
-        }
-
-        @Override
-        public @NonNull ItemStackArgument<C> build() {
-            return new ItemStackArgument<>(
-                    this.getName(),
-                    this.suggestionProvider(),
-                    this.getDefaultDescription()
-            );
-        }
-    }
-
-    /**
-     * Parser for {@link ProtoItemStack}. Requires a CraftBukkit based server implementation.
-     *
-     * @param <C> sender type
-     * @since 1.5.0
-     */
-    public static final class Parser<C> implements ArgumentParser<C, ProtoItemStack> {
-
-        private final ArgumentParser<C, ProtoItemStack> parser;
-
-        /**
-         * Create a new {@link Parser}.
-         *
-         * @since 1.5.0
-         */
-        public Parser() {
-            if (findItemInputClass() != null) {
-                this.parser = new ModernParser<>();
-            } else {
-                this.parser = new LegacyParser<>();
-            }
-        }
-
-        @Override
-        public @NonNull ArgumentParseResult<ProtoItemStack> parse(
-                final @NonNull CommandContext<C> commandContext,
-                final @NonNull CommandInput commandInput
-        ) {
-            return this.parser.parse(commandContext, commandInput);
-        }
-
-        @Override
-        public @NonNull List<@NonNull Suggestion> suggestions(
-                final @NonNull CommandContext<C> commandContext,
-                final @NonNull String input
-        ) {
-            return this.parser.suggestions(commandContext, input);
-        }
-    }
+    private final ArgumentParser<C, ProtoItemStack> parser;
 
     private static @Nullable Class<?> findItemInputClass() {
         final Class<?>[] classes = new Class<?>[]{
@@ -175,6 +106,36 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
         }
         return null;
     }
+
+    /**
+     * Create a new {@link ItemStackParser}.
+     *
+     * @since 1.5.0
+     */
+    public ItemStackParser() {
+        if (findItemInputClass() != null) {
+            this.parser = new ModernParser<>();
+        } else {
+            this.parser = new LegacyParser<>();
+        }
+    }
+
+    @Override
+    public final @NonNull ArgumentParseResult<ProtoItemStack> parse(
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull CommandInput commandInput
+    ) {
+        return this.parser.parse(commandContext, commandInput);
+    }
+
+    @Override
+    public final @NonNull List<@NonNull Suggestion> suggestions(
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull String input
+    ) {
+        return this.parser.suggestions(commandContext, input);
+    }
+
 
     private static final class ModernParser<C> implements ArgumentParser<C, ProtoItemStack> {
 
@@ -319,7 +280,7 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
 
     private static final class LegacyParser<C> implements ArgumentParser<C, ProtoItemStack> {
 
-        private final ArgumentParser<C, ProtoItemStack> parser = new MaterialArgument.MaterialParser<C>()
+        private final ArgumentParser<C, ProtoItemStack> parser = new MaterialParser<C>()
                 .map((ctx, material) -> ArgumentParseResult.success(new LegacyProtoItemStack(material)));
 
         @Override

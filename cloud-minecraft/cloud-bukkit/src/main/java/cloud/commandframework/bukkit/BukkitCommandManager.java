@@ -40,13 +40,13 @@ import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
-import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
-import cloud.commandframework.bukkit.parsers.ItemStackArgument;
-import cloud.commandframework.bukkit.parsers.ItemStackPredicateArgument;
-import cloud.commandframework.bukkit.parsers.MaterialArgument;
-import cloud.commandframework.bukkit.parsers.OfflinePlayerArgument;
-import cloud.commandframework.bukkit.parsers.PlayerArgument;
-import cloud.commandframework.bukkit.parsers.WorldArgument;
+import cloud.commandframework.bukkit.parsers.EnchantmentParser;
+import cloud.commandframework.bukkit.parsers.ItemStackParser;
+import cloud.commandframework.bukkit.parsers.ItemStackPredicateParser;
+import cloud.commandframework.bukkit.parsers.MaterialParser;
+import cloud.commandframework.bukkit.parsers.OfflinePlayerParser;
+import cloud.commandframework.bukkit.parsers.PlayerParser;
+import cloud.commandframework.bukkit.parsers.WorldParser;
 import cloud.commandframework.bukkit.parsers.location.Location2D;
 import cloud.commandframework.bukkit.parsers.location.Location2DArgument;
 import cloud.commandframework.bukkit.parsers.location.LocationArgument;
@@ -148,21 +148,21 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
 
         /* Register Bukkit Parsers */
         this.parserRegistry().registerParserSupplier(TypeToken.get(World.class), parserParameters ->
-                new WorldArgument.WorldParser<>());
+                new WorldParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(Material.class), parserParameters ->
-                new MaterialArgument.MaterialParser<>());
+                new MaterialParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(Player.class), parserParameters ->
-                new PlayerArgument.PlayerParser<>());
+                new PlayerParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(OfflinePlayer.class), parserParameters ->
-                new OfflinePlayerArgument.OfflinePlayerParser<>());
+                new OfflinePlayerParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(Enchantment.class), parserParameters ->
-                new EnchantmentArgument.EnchantmentParser<>());
+                new EnchantmentParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(Location.class), parserParameters ->
                 new LocationArgument.LocationParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(Location2D.class), parserParameters ->
                 new Location2DArgument.Location2DParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(ProtoItemStack.class), parserParameters ->
-                new ItemStackArgument.Parser<>());
+                new ItemStackParser<>());
 
         /* Register Entity Selector Parsers */
         this.parserRegistry().registerParserSupplier(TypeToken.get(SingleEntitySelector.class), parserParameters ->
@@ -200,7 +200,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
 
         /* Register MC 1.13+ parsers */
         if (this.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
-            this.registerParserSupplierFor(ItemStackPredicateArgument.class);
+            this.registerParserSupplierFor(ItemStackPredicateParser.class);
             this.registerParserSupplierFor(BlockPredicateArgument.class);
         }
 

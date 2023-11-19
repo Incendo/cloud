@@ -28,7 +28,7 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
-import cloud.commandframework.bukkit.parsers.PlayerArgument;
+import cloud.commandframework.bukkit.parsers.PlayerParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import com.google.common.collect.ImmutableList;
@@ -44,7 +44,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Argument type for parsing {@link MultiplePlayerSelector}. On Minecraft 1.13+
  * this argument uses Minecraft's built-in entity selector argument for parsing
  * and suggestions. On prior versions, this argument behaves similarly to
- * {@link PlayerArgument}.
+ * {@link PlayerParser}.
  *
  * @param <C> sender type
  */
@@ -168,7 +168,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
             @SuppressWarnings("deprecation") final @Nullable Player player = Bukkit.getPlayer(input);
 
             if (player == null) {
-                return ArgumentParseResult.failure(new PlayerArgument.PlayerParseException(input, commandContext));
+                return ArgumentParseResult.failure(new PlayerParser.PlayerParseException(input, commandContext));
             }
             commandInput.readString();
             return ArgumentParseResult.success(new MultiplePlayerSelector(input, ImmutableList.of(player)));
