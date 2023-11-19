@@ -23,15 +23,10 @@
 //
 package cloud.commandframework.arguments.compound;
 
-import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.types.tuples.Tuple;
 import io.leangen.geantyref.TypeToken;
-import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.apiguardian.api.API;
@@ -44,13 +39,14 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @param <O> Output type
  */
-@API(status = API.Status.STABLE)
-public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, O> {
+@API(status = API.Status.INTERNAL, since = "2.0.0")
+public class CompoundArgument<T extends Tuple, C, O> implements ParserDescriptor<C, O> {
+
+    private final ParserDescriptor<C, O> parser;
 
     /**
      * Construct a Compound Argument
      *
-     * @param name         The argument name
      * @param names        Names of the sub-arguments (in order)
      * @param parserTuple  The sub arguments
      * @param types        Types of the sub-arguments (in order)
@@ -59,7 +55,6 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
      * @param valueType    The output type
      */
     public CompoundArgument(
-            final @NonNull String name,
             final @NonNull Tuple names,
             final @NonNull Tuple parserTuple,
             final @NonNull Tuple types,
@@ -67,164 +62,16 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
             final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory,
             final @NonNull TypeToken<O> valueType
     ) {
-        super(
-                name,
-                new CompoundParser<>(names, types, parserTuple, mapper, tupleFactory),
-                valueType,
-                null
-        );
-    }
-
-    private CompoundArgument(
-            final @NonNull String name,
-            final @NonNull Object @NonNull[] names,
-            final @NonNull Object @NonNull[] parserTuple,
-            final @NonNull Object @NonNull[] types,
-            final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
-            final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory,
-            final @NonNull TypeToken<O> valueType
-    ) {
-        super(
-                name,
-                new CompoundParser<>(names, types, parserTuple, mapper, tupleFactory),
-                valueType,
-                null
-        );
+        this.parser = ParserDescriptor.of(new CompoundParser<>(names, types, parserTuple, mapper, tupleFactory), valueType);
     }
 
     @Override
-    public final @NonNull CompoundArgument<T, C, O> copy() {
-        final CompoundParser<T, C, O> parser = this.getParser();
-        return new CompoundArgument<>(
-                this.getName(),
-                this.getParser().names(),
-                this.getParser().parsers(),
-                this.getParser().types(),
-                parser.mapper,
-                parser.tupleFactory,
-                this.getValueType()
-        );
+    public final @NonNull ArgumentParser<C, O> parser() {
+        return this.parser.parser();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public final @NonNull CompoundParser<T, C, O> getParser() {
-        return (CompoundParser<T, C, O>) super.getParser();
-    }
-
-    public static final class CompoundParser<T extends Tuple, C, O> implements ArgumentParser<C, O> {
-
-        private final Object[] names;
-        private final Object[] types;
-        private final Object[] parsers;
-        private final BiFunction<C, T, O> mapper;
-        private final Function<Object[], T> tupleFactory;
-
-        private CompoundParser(
-                final @NonNull Tuple names,
-                final @NonNull Tuple types,
-                final @NonNull Tuple parserTuple,
-                final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
-                final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory
-        ) {
-            this.names = names.toArray();
-            this.types = types.toArray();
-            this.parsers = parserTuple.toArray();
-            this.mapper = mapper;
-            this.tupleFactory = tupleFactory;
-        }
-
-        private CompoundParser(
-                final @NonNull Object @NonNull[] names,
-                final @NonNull Object @NonNull[] types,
-                final @NonNull Object @NonNull[] parserTuple,
-                final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
-                final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory
-        ) {
-            this.names = names;
-            this.types = types;
-            this.parsers = parserTuple;
-            this.mapper = mapper;
-            this.tupleFactory = tupleFactory;
-        }
-
-        /**
-         * Returns the argument names
-         *
-         * @return the argument names
-         * @since 2.0.0
-         */
-        @API(status = API.Status.STABLE, since = "2.0.0")
-        public @NonNull Object @NonNull[] names() {
-            return this.names;
-        }
-
-        /**
-         * Returns the argument parsers
-         *
-         * @return the argument parsers
-         * @since 2.0.0
-         */
-        @API(status = API.Status.STABLE, since = "2.0.0")
-        public @NonNull Object @NonNull[] parsers() {
-            return this.parsers;
-        }
-
-        /**
-         * Returns the parser types
-         *
-         * @return parser types
-         * @since 2.0.0
-         */
-        @API(status = API.Status.STABLE, since = "2.0.0")
-        public @NonNull Object @NonNull[] types() {
-            return this.types;
-        }
-
-        @Override
-        public @NonNull ArgumentParseResult<O> parse(
-                final @NonNull CommandContext<C> commandContext,
-                final @NonNull CommandInput commandInput
-        ) {
-            final Object[] output = new Object[this.parsers.length];
-            for (int i = 0; i < this.parsers.length; i++) {
-                @SuppressWarnings("unchecked") final ArgumentParser<C, ?> parser = (ArgumentParser<C, ?>) this.parsers[i];
-                final ArgumentParseResult<?> result = parser.parse(commandContext, commandInput);
-                if (result.getFailure().isPresent()) {
-                    /* Return the failure */
-                    return ArgumentParseResult.failure(result.getFailure().get());
-                }
-                /* Store the parsed value */
-                output[i] = result.getParsedValue().orElse(null);
-            }
-            /*
-             * We now know that we have complete output, as none of the parsers returned a failure.
-             * Now check if the mapper threw any exceptions
-             */
-            try {
-                return ArgumentParseResult.success(this.mapper.apply(
-                        commandContext.getSender(),
-                        this.tupleFactory.apply(output)
-                ));
-            } catch (final Exception e) {
-                return ArgumentParseResult.failure(e);
-            }
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public @NonNull List<@NonNull Suggestion> suggestions(
-                final @NonNull CommandContext<C> commandContext,
-                final @NonNull String input
-        ) {
-            /*
-            This method will be called n times, each time for each of the internal types.
-            The problem is that we need to then know which of the parsers to forward the
-            suggestion request to. This is done by storing the number of parsed subtypes
-            in the context, so we can then extract that number and forward the request
-             */
-            final int argument = commandContext.getOrDefault("__parsing_argument__", 1) - 1;
-            return ((ArgumentParser<C, ?>) this.parsers[argument]).suggestions(commandContext, input);
-        }
+    public final @NonNull TypeToken<O> valueType() {
+        return this.parser.valueType();
     }
 }

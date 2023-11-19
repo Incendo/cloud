@@ -24,7 +24,7 @@
 package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.compound.CompoundArgument;
+import cloud.commandframework.arguments.compound.CompoundParser;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.internal.CommandNode;
@@ -61,9 +61,9 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
             final CommandComponent<C> commandComponent = iterator.next();
             if (commandComponent.type() == CommandComponent.ComponentType.LITERAL) {
                 formattingInstance.appendLiteral(commandComponent);
-            } else if (commandComponent.parser() instanceof CompoundArgument.CompoundParser) {
-                final CompoundArgument.CompoundParser<?, ?, ?> compoundParser =
-                        (CompoundArgument.CompoundParser<?, ?, ?>) commandComponent.parser();
+            } else if (commandComponent.parser() instanceof CompoundParser) {
+                final CompoundParser<?, ?, ?> compoundParser =
+                        (CompoundParser<?, ?, ?>) commandComponent.parser();
                 formattingInstance.appendCompound(commandComponent, compoundParser);
             } else if (commandComponent.type() == CommandComponent.ComponentType.FLAG) {
                 formattingInstance.appendFlag((CommandFlagParser<?>) commandComponent.parser());
@@ -111,9 +111,9 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 break;
             }
             final CommandComponent<C> component = tail.children().get(0).component();
-            if (component.parser() instanceof CompoundArgument.CompoundParser) {
-                final CompoundArgument.CompoundParser<?, ?, ?> compoundParser =
-                        (CompoundArgument.CompoundParser<?, ?, ?>) component.parser();
+            if (component.parser() instanceof CompoundParser) {
+                final CompoundParser<?, ?, ?> compoundParser =
+                        (CompoundParser<?, ?, ?>) component.parser();
                 formattingInstance.appendBlankSpace();
                 formattingInstance.appendCompound(component, compoundParser);
             } else if (component.type() == CommandComponent.ComponentType.FLAG) {
@@ -184,7 +184,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
         @API(status = API.Status.STABLE, since = "2.0.0")
         public void appendCompound(
                 final @NonNull CommandComponent<?> component,
-                final CompoundArgument.@NonNull CompoundParser<?, ?, ?> parser
+                final @NonNull CompoundParser<?, ?, ?> parser
         ) {
             final String prefix = component.required() ? this.getRequiredPrefix() : this.getOptionalPrefix();
             final String suffix = component.required() ? this.getRequiredSuffix() : this.getOptionalSuffix();

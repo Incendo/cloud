@@ -1291,7 +1291,11 @@ public class Command<C> {
         public @NonNull Builder<C> argument(
                 final CommandComponent.Builder builder
         ) {
-            return this.argument((CommandComponent) builder.commandManager(this.commandManager).build());
+            if (this.commandManager != null) {
+                return this.argument(builder.commandManager(this.commandManager).build());
+            } else {
+                return this.argument(builder.build());
+            }
         }
 
         private <T> CommandComponent.@NonNull Builder<C, T> argumentToComponent(final @NonNull CommandArgument<C, T> argument) {
@@ -1334,7 +1338,11 @@ public class Command<C> {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
-            return this.required(ArgumentPair.of(this.commandManager, name, names, parserPair).simple(), description);
+            return this.required(
+                    name,
+                    ArgumentPair.of(this.commandManager, name, names, parserPair).simple(),
+                    description
+            );
         }
 
         /**
@@ -1365,7 +1373,11 @@ public class Command<C> {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
-            return this.optional(ArgumentPair.of(this.commandManager, name, names, parserPair).simple(), description);
+            return this.optional(
+                    name,
+                    ArgumentPair.of(this.commandManager, name, names, parserPair).simple(),
+                    description
+            );
         }
 
         /**
@@ -1402,6 +1414,7 @@ public class Command<C> {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
             return this.required(
+                    name,
                     ArgumentPair.of(this.commandManager, name, names, parserPair).withMapper(outputType, mapper),
                     description
             );
@@ -1441,6 +1454,7 @@ public class Command<C> {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
             return this.optional(
+                    name,
                     ArgumentPair.of(this.commandManager, name, names, parserPair).withMapper(outputType, mapper),
                     description
             );
@@ -1475,7 +1489,11 @@ public class Command<C> {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
-            return this.required(ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).simple(), description);
+            return this.required(
+                    name,
+                    ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).simple(),
+                    description
+            );
         }
 
         /**
@@ -1507,7 +1525,11 @@ public class Command<C> {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
-            return this.optional(ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).simple(), description);
+            return this.optional(
+                    name,
+                    ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).simple(),
+                    description
+            );
         }
 
         /**
@@ -1545,6 +1567,7 @@ public class Command<C> {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
             return this.required(
+                    name,
                     ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).withMapper(outputType, mapper),
                     description
             );
@@ -1585,6 +1608,7 @@ public class Command<C> {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
             return this.optional(
+                    name,
                     ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).withMapper(outputType, mapper),
                     description
             );

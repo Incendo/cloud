@@ -25,7 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.LiteralParser;
-import cloud.commandframework.arguments.compound.CompoundArgument;
+import cloud.commandframework.arguments.compound.CompoundParser;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
@@ -97,7 +97,7 @@ public final class CommandTree<C> {
 
     /**
      * Stores the index of the argument that is currently being parsed when parsing
-     * a {@link CompoundArgument}
+     * using {@link CompoundParser}
      */
     public static final CloudKey<Integer> PARSING_ARGUMENT_KEY = SimpleCloudKey.of(
             "__parsing_argument__",
@@ -698,10 +698,10 @@ public final class CommandTree<C> {
             return context;
         }
 
-        if (component.parser() instanceof CompoundArgument.CompoundParser) {
+        if (component.parser() instanceof CompoundParser) {
             // If we're working with a compound argument then we attempt to pop the required arguments from the input queue.
-            final CompoundArgument.CompoundParser<?, C, ?> compoundParser =
-                    (CompoundArgument.CompoundParser<?, C, ?>) component.parser();
+            final CompoundParser<?, C, ?> compoundParser =
+                    (CompoundParser<?, C, ?>) component.parser();
             this.popRequiredArguments(context.commandContext(), commandInput, compoundParser);
         } else if (component.parser() instanceof CommandFlagParser) {
             // Use the flag argument parser to deduce what flag is being suggested right now
@@ -731,7 +731,7 @@ public final class CommandTree<C> {
             return context;
         } else if (commandInput.remainingTokens() == 1) {
             return this.addArgumentSuggestions(context, child, commandInput.peekString());
-        } else if (child.isLeaf() && child.component().parser() instanceof CompoundArgument.CompoundParser) {
+        } else if (child.isLeaf() && child.component().parser() instanceof CompoundParser) {
             return this.addArgumentSuggestions(context, child, commandInput.tokenize().getLast());
         }
 
@@ -812,7 +812,7 @@ public final class CommandTree<C> {
     private void popRequiredArguments(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput,
-            final CompoundArgument.@NonNull CompoundParser<?, C, ?> compoundParser
+            final @NonNull CompoundParser<?, C, ?> compoundParser
     ) {
         /* See how many arguments it requires */
         final int requiredArguments = compoundParser.parsers().length;

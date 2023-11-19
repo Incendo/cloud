@@ -26,7 +26,7 @@ package cloud.commandframework.brigadier;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.compound.CompoundArgument;
+import cloud.commandframework.arguments.compound.CompoundParser;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.MappedArgumentParser;
@@ -480,9 +480,9 @@ public final class CloudBrigadierManager<C, S> {
             final com.mojang.brigadier.@NonNull Command<S> executor,
             final SuggestionProvider<S> suggestionProvider
     ) {
-        if (root.component().parser() instanceof CompoundArgument.CompoundParser) {
-            final CompoundArgument.CompoundParser<?, C, ?> compoundParser =
-                    (CompoundArgument.CompoundParser<?, C, ?>) root.component().parser();
+        if (root.component().parser() instanceof CompoundParser) {
+            final CompoundParser<?, C, ?> compoundParser =
+                    (CompoundParser<?, C, ?>) root.component().parser();
             final Object[] parsers = compoundParser.parsers();
             final Object[] types = compoundParser.types();
             final Object[] names = compoundParser.names();
