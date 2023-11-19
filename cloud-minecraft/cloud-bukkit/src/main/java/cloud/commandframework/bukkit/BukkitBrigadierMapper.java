@@ -24,7 +24,7 @@
 package cloud.commandframework.bukkit;
 
 import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.standard.UUIDArgument;
+import cloud.commandframework.arguments.standard.UUIDParser;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.argument.NamespacedKeyArgument;
 import cloud.commandframework.bukkit.internal.CommandBuildContextSupplier;
@@ -82,7 +82,7 @@ public final class BukkitBrigadierMapper<C> {
         try {
             final Class<? extends ArgumentType<?>> uuid = MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft("uuid"));
             /* Map UUID */
-            this.mapSimpleNMS(new TypeToken<UUIDArgument.UUIDParser<C>>() {
+            this.mapSimpleNMS(new TypeToken<UUIDParser<C>>() {
             }, "uuid");
         } catch (final IllegalArgumentException ignore) {
             // < 1.16

@@ -23,11 +23,10 @@
 //
 package cloud.commandframework.arguments.standard;
 
-import cloud.commandframework.ArgumentDescription;
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
@@ -38,96 +37,58 @@ import java.util.Objects;
 import java.util.UUID;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
-@SuppressWarnings("unused")
 @API(status = API.Status.STABLE)
-public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
+public final class UUIDParser<C> implements ArgumentParser<C, UUID> {
 
-    private UUIDArgument(
-            final @NonNull String name,
-            final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+    /**
+     * Creates a new UUID parser.
+     *
+     * @param <C> command sender type
+     * @return the created parser
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> @NonNull ParserDescriptor<C, UUID> uuidParser() {
+        return ParserDescriptor.of(new UUIDParser<>(), UUID.class);
+    }
+
+    /**
+     * Returns a {@link CommandComponent.Builder} using {@link #uuidParser()} as the parser.
+     *
+     * @param <C> the command sender type
+     * @return the component builder
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> CommandComponent.@NonNull Builder<C, UUID> uuidComponent() {
+        return CommandComponent.<C, UUID>builder().parser(uuidParser());
+    }
+
+    @Override
+    public @NonNull ArgumentParseResult<UUID> parse(
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull CommandInput commandInput
     ) {
-        super(name, new UUIDParser<>(), UUID.class, suggestionProvider, defaultDescription);
-    }
-
-    /**
-     * Create a new {@link Builder}.
-     *
-     * @param name argument name
-     * @param <C>  sender type
-     * @return new {@link Builder}
-     * @since 1.8.0
-     */
-    @API(status = API.Status.STABLE, since = "1.8.0")
-    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
-        return new Builder<>(name);
-    }
-
-    /**
-     * Create a new required command component
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created component
-     */
-    public static <C> @NonNull CommandArgument<C, UUID> of(final @NonNull String name) {
-        return UUIDArgument.<C>builder(name).build();
-    }
-
-
-    @API(status = API.Status.STABLE)
-    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, UUID, Builder<C>> {
-
-        private Builder(final @NonNull String name) {
-            super(UUID.class, name);
+        final String input = commandInput.peekString();
+        if (input.isEmpty()) {
+            return ArgumentParseResult.failure(new NoInputProvidedException(
+                    UUIDParser.class,
+                    commandContext
+            ));
         }
 
-        /**
-         * Builder a new example component
-         *
-         * @return Constructed component
-         */
-        @Override
-        public @NonNull UUIDArgument<C> build() {
-            return new UUIDArgument<>(
-                    this.getName(),
-                    this.suggestionProvider(),
-                    this.getDefaultDescription()
-            );
+        try {
+            final UUID uuid = UUID.fromString(commandInput.readString());
+            return ArgumentParseResult.success(uuid);
+        } catch (IllegalArgumentException e) {
+            return ArgumentParseResult.failure(new UUIDParseException(input, commandContext));
         }
     }
 
-
-    @API(status = API.Status.STABLE)
-    public static final class UUIDParser<C> implements ArgumentParser<C, UUID> {
-
-        @Override
-        public @NonNull ArgumentParseResult<UUID> parse(
-                final @NonNull CommandContext<C> commandContext,
-                final @NonNull CommandInput commandInput
-        ) {
-            final String input = commandInput.peekString();
-            if (input.isEmpty()) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(
-                        UUIDParser.class,
-                        commandContext
-                ));
-            }
-
-            try {
-                final UUID uuid = UUID.fromString(commandInput.readString());
-                return ArgumentParseResult.success(uuid);
-            } catch (IllegalArgumentException e) {
-                return ArgumentParseResult.failure(new UUIDParseException(input, commandContext));
-            }
-        }
-
-        @Override
-        public boolean isContextFree() {
-            return true;
-        }
+    @Override
+    public boolean isContextFree() {
+        return true;
     }
 
 

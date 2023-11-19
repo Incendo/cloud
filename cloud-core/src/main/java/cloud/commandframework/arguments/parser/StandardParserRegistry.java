@@ -40,7 +40,7 @@ import cloud.commandframework.arguments.standard.LongParser;
 import cloud.commandframework.arguments.standard.ShortParser;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
-import cloud.commandframework.arguments.standard.UUIDArgument;
+import cloud.commandframework.arguments.standard.UUIDParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import io.leangen.geantyref.AnnotatedTypeMap;
@@ -185,7 +185,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             final boolean liberal = options.get(StandardParameters.LIBERAL, false);
             return new BooleanParser<>(liberal);
         });
-        this.registerParserSupplier(TypeToken.get(UUID.class), options -> new UUIDArgument.UUIDParser<>());
+        this.registerParserSupplier(TypeToken.get(UUID.class), options -> new UUIDParser<>());
         this.registerParserSupplier(TypeToken.get(Duration.class), options -> new DurationParser<>());
     }
 
