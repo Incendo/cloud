@@ -25,7 +25,7 @@ package cloud.commandframework.fabric;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.arguments.standard.UUIDArgument;
+import cloud.commandframework.arguments.standard.UUIDParser;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
@@ -164,7 +164,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
 
     private void registerNativeBrigadierMappings(final @NonNull CloudBrigadierManager<C, S> brigadier) {
         /* Cloud-native argument types */
-        brigadier.registerMapping(new TypeToken<UUIDArgument.UUIDParser<C>>() {
+        brigadier.registerMapping(new TypeToken<UUIDParser<C>>() {
         }, builder -> builder.toConstant(UuidArgument.uuid()));
         this.registerRegistryEntryMappings();
         brigadier.registerMapping(new TypeToken<TeamArgument.TeamParser<C>>() {

@@ -23,8 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionHandler;
@@ -39,6 +37,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -97,7 +96,7 @@ class CommandManagerTest {
                 .build();
         final Command<TestCommandSender> commandC = this.commandManager.commandBuilder("test")
                 .literal("c")
-                .optional(IntegerArgument.of("opt"))
+                .optional("opt", integerParser())
                 .handler(handlerC)
                 .build();
 
@@ -142,8 +141,8 @@ class CommandManagerTest {
                 .literal("literal", "literalalias")
                 .literal("detail", ArgumentDescription.of("detaildescription"))
                 .required(
-                        CommandArgument.ofType(int.class, "argument"),
-                        ArgumentDescription.of("argumentdescription")
+                        CommandComponent.ofType(int.class, "argument")
+                                .description(ArgumentDescription.of("argumentdescription"))
                 )
                 .build();
         this.commandManager.command(command);

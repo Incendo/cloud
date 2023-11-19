@@ -23,8 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.standard.IntegerArgument;
-import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.types.tuples.Pair;
@@ -38,6 +36,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
+import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 
 class CommandHelpHandlerTest {
@@ -57,8 +57,8 @@ class CommandHelpHandlerTest {
                 .with(CommandMeta.DESCRIPTION, "Command with variables")
                 .build();
         manager.command(manager.commandBuilder("test", meta2).literal("int").
-                required(IntegerArgument.of("int"), ArgumentDescription.of("A number")).build());
-        manager.command(manager.commandBuilder("test").required(StringArgument.of("potato")));
+                required("int", integerParser(), ArgumentDescription.of("A number")).build());
+        manager.command(manager.commandBuilder("test").required("potato", stringParser()));
 
         manager.command(manager.commandBuilder("vec")
                 .meta(CommandMeta.DESCRIPTION, "Takes in a vector")

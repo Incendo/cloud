@@ -48,9 +48,9 @@ class ByteParserTest {
     @Test
     void Parse_NoMinMax_SuccessfulParse() {
         // Arrange
-        final ByteArgument.ByteParser<TestCommandSender> parser = new ByteArgument.ByteParser<>(
-                ByteArgument.ByteParser.DEFAULT_MINIMUM,
-                ByteArgument.ByteParser.DEFAULT_MAXIMUM
+        final ByteParser<TestCommandSender> parser = new ByteParser<>(
+                ByteParser.DEFAULT_MINIMUM,
+                ByteParser.DEFAULT_MAXIMUM
         );
 
         final byte byteInput = (byte) ThreadLocalRandom.current().nextInt(Byte.MAX_VALUE);
@@ -72,9 +72,9 @@ class ByteParserTest {
     @Test
     void Parse_ValueBelowMin_FailedParse() {
         // Arrange
-        final ByteArgument.ByteParser<TestCommandSender> parser = new ByteArgument.ByteParser<>(
+        final ByteParser<TestCommandSender> parser = new ByteParser<>(
                 (byte) 5 /* min */,
-                ByteArgument.ByteParser.DEFAULT_MAXIMUM
+                ByteParser.DEFAULT_MAXIMUM
         );
 
         // Act
@@ -84,7 +84,7 @@ class ByteParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new ByteArgument.ByteParseException(
+        assertThat(result.getFailure()).hasValue(new ByteParser.ByteParseException(
                 "4",
                 parser,
                 this.context
@@ -95,8 +95,8 @@ class ByteParserTest {
     @Test
     void Parse_ValueAboveMax_FailedParse() {
         // Arrange
-        final ByteArgument.ByteParser<TestCommandSender> parser = new ByteArgument.ByteParser<>(
-                ByteArgument.ByteParser.DEFAULT_MINIMUM,
+        final ByteParser<TestCommandSender> parser = new ByteParser<>(
+                ByteParser.DEFAULT_MINIMUM,
                 (byte) 5 /* max */
         );
 
@@ -107,7 +107,7 @@ class ByteParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new ByteArgument.ByteParseException(
+        assertThat(result.getFailure()).hasValue(new ByteParser.ByteParseException(
                 "6",
                 parser,
                 this.context
@@ -118,9 +118,9 @@ class ByteParserTest {
     @Test
     void Parse_NonByteInput_FailedParse() {
         // Arrange
-        final ByteArgument.ByteParser<TestCommandSender> parser = new ByteArgument.ByteParser<>(
-                ByteArgument.ByteParser.DEFAULT_MINIMUM,
-                ByteArgument.ByteParser.DEFAULT_MAXIMUM
+        final ByteParser<TestCommandSender> parser = new ByteParser<>(
+                ByteParser.DEFAULT_MINIMUM,
+                ByteParser.DEFAULT_MAXIMUM
         );
 
         // Act
@@ -130,7 +130,7 @@ class ByteParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new ByteArgument.ByteParseException(
+        assertThat(result.getFailure()).hasValue(new ByteParser.ByteParseException(
                 "cow",
                 parser,
                 this.context
@@ -141,9 +141,9 @@ class ByteParserTest {
     @Test
     void Suggestions_EmptyInput_ExpectedSuggestions() {
         // Arrange
-        final ByteArgument.ByteParser<TestCommandSender> parser = new ByteArgument.ByteParser<>(
-                ByteArgument.ByteParser.DEFAULT_MINIMUM,
-                ByteArgument.ByteParser.DEFAULT_MAXIMUM
+        final ByteParser<TestCommandSender> parser = new ByteParser<>(
+                ByteParser.DEFAULT_MINIMUM,
+                ByteParser.DEFAULT_MAXIMUM
         );
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();
@@ -164,9 +164,9 @@ class ByteParserTest {
     @Test
     void Suggestions_NegativeSignInput_ExpectedSuggestions() {
         // Arrange
-        final ByteArgument.ByteParser<TestCommandSender> parser = new ByteArgument.ByteParser<>(
-                ByteArgument.ByteParser.DEFAULT_MINIMUM,
-                ByteArgument.ByteParser.DEFAULT_MAXIMUM
+        final ByteParser<TestCommandSender> parser = new ByteParser<>(
+                ByteParser.DEFAULT_MINIMUM,
+                ByteParser.DEFAULT_MAXIMUM
         );
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();

@@ -24,9 +24,9 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.StaticArgument;
-import cloud.commandframework.arguments.compound.CompoundArgument;
-import cloud.commandframework.arguments.compound.FlagArgument;
+import cloud.commandframework.arguments.LiteralParser;
+import cloud.commandframework.arguments.compound.CompoundParser;
+import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
@@ -69,7 +69,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Tree containing all commands and command paths.
  * <p>
  * All {@link Command commands} consists of unique paths made out of {@link CommandComponent components}.
- * These arguments may be {@link StaticArgument literals} or variables. Command may either be required
+ * These arguments may be literals or variables. Command may either be required
  * or optional, with the requirement that no optional argument precedes a required argument.
  * <p>
  * The {@link Command commands} are stored in this tree and the nodes of tree consists of the command
@@ -97,7 +97,7 @@ public final class CommandTree<C> {
 
     /**
      * Stores the index of the argument that is currently being parsed when parsing
-     * a {@link CompoundArgument}
+     * using {@link CompoundParser}
      */
     public static final CloudKey<Integer> PARSING_ARGUMENT_KEY = SimpleCloudKey.of(
             "__parsing_argument__",
@@ -698,21 +698,21 @@ public final class CommandTree<C> {
             return context;
         }
 
-        if (component.parser() instanceof CompoundArgument.CompoundParser) {
+        if (component.parser() instanceof CompoundParser) {
             // If we're working with a compound argument then we attempt to pop the required arguments from the input queue.
-            final CompoundArgument.CompoundParser<?, C, ?> compoundParser =
-                    (CompoundArgument.CompoundParser<?, C, ?>) component.parser();
+            final CompoundParser<?, C, ?> compoundParser =
+                    (CompoundParser<?, C, ?>) component.parser();
             this.popRequiredArguments(context.commandContext(), commandInput, compoundParser);
-        } else if (component.parser() instanceof FlagArgument.FlagArgumentParser) {
+        } else if (component.parser() instanceof CommandFlagParser) {
             // Use the flag argument parser to deduce what flag is being suggested right now
             // If empty, then no flag value is being typed, and the different flag options should
             // be suggested instead.
-            final FlagArgument.FlagArgumentParser<C> parser = (FlagArgument.FlagArgumentParser<C>) component.parser();
+            final CommandFlagParser<C> parser = (CommandFlagParser<C>) component.parser();
             final Optional<String> lastFlag = parser.parseCurrentFlag(context.commandContext(), commandInput);
             if (lastFlag.isPresent()) {
-                context.commandContext().store(FlagArgument.FLAG_META_KEY, lastFlag.get());
+                context.commandContext().store(CommandFlagParser.FLAG_META_KEY, lastFlag.get());
             } else {
-                context.commandContext().remove(FlagArgument.FLAG_META_KEY);
+                context.commandContext().remove(CommandFlagParser.FLAG_META_KEY);
             }
         } else if (commandInput.remainingTokens() <= component.parser().getRequestedArgumentCount()) {
             // If the input queue contains fewer arguments than requested by the parser, then the parser will
@@ -731,7 +731,7 @@ public final class CommandTree<C> {
             return context;
         } else if (commandInput.remainingTokens() == 1) {
             return this.addArgumentSuggestions(context, child, commandInput.peekString());
-        } else if (child.isLeaf() && child.component().parser() instanceof CompoundArgument.CompoundParser) {
+        } else if (child.isLeaf() && child.component().parser() instanceof CompoundParser) {
             return this.addArgumentSuggestions(context, child, commandInput.tokenize().getLast());
         }
 
@@ -812,7 +812,7 @@ public final class CommandTree<C> {
     private void popRequiredArguments(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput,
-            final CompoundArgument.@NonNull CompoundParser<?, C, ?> compoundParser
+            final @NonNull CompoundParser<?, C, ?> compoundParser
     ) {
         /* See how many arguments it requires */
         final int requiredArguments = compoundParser.parsers().length;
@@ -848,7 +848,7 @@ public final class CommandTree<C> {
         final boolean isParsingFlag = component.type() == CommandComponent.ComponentType.FLAG
                 && !node.children().isEmpty() // Has children
                 && !text.startsWith("-") // Not a flag
-                && !context.commandContext().getOptional(FlagArgument.FLAG_META_KEY).isPresent();
+                && !context.commandContext().getOptional(CommandFlagParser.FLAG_META_KEY).isPresent();
 
         if (!isParsingFlag) {
             return context;
@@ -898,7 +898,7 @@ public final class CommandTree<C> {
                     tempNode = node.addChild(component);
                 } else if (component.type() == CommandComponent.ComponentType.LITERAL && tempNode.component() != null) {
                     for (final String alias : component.aliases()) {
-                        ((StaticArgument.StaticArgumentParser<C>) tempNode.component().parser()).insertAlias(alias);
+                        ((LiteralParser<C>) tempNode.component().parser()).insertAlias(alias);
                     }
                 }
                 if (!node.children().isEmpty()) {

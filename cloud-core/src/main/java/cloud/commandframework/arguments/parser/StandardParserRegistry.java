@@ -28,20 +28,19 @@ import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.annotations.specifier.Liberal;
 import cloud.commandframework.annotations.specifier.Quoted;
 import cloud.commandframework.annotations.specifier.Range;
-import cloud.commandframework.arguments.standard.BooleanArgument;
-import cloud.commandframework.arguments.standard.ByteArgument;
-import cloud.commandframework.arguments.standard.CharArgument;
-import cloud.commandframework.arguments.standard.DoubleArgument;
-import cloud.commandframework.arguments.standard.DurationArgument;
-import cloud.commandframework.arguments.standard.EnumArgument;
-import cloud.commandframework.arguments.standard.FloatArgument;
-import cloud.commandframework.arguments.standard.IntegerArgument;
-import cloud.commandframework.arguments.standard.LongArgument;
-import cloud.commandframework.arguments.standard.ShortArgument;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.arguments.standard.StringArrayArgument;
-import cloud.commandframework.arguments.standard.UUIDArgument;
-import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.standard.BooleanParser;
+import cloud.commandframework.arguments.standard.ByteParser;
+import cloud.commandframework.arguments.standard.CharacterParser;
+import cloud.commandframework.arguments.standard.DoubleParser;
+import cloud.commandframework.arguments.standard.DurationParser;
+import cloud.commandframework.arguments.standard.EnumParser;
+import cloud.commandframework.arguments.standard.FloatParser;
+import cloud.commandframework.arguments.standard.IntegerParser;
+import cloud.commandframework.arguments.standard.LongParser;
+import cloud.commandframework.arguments.standard.ShortParser;
+import cloud.commandframework.arguments.standard.StringArrayParser;
+import cloud.commandframework.arguments.standard.StringParser;
+import cloud.commandframework.arguments.standard.UUIDParser;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import io.leangen.geantyref.AnnotatedTypeMap;
 import io.leangen.geantyref.GenericTypeReflector;
@@ -49,7 +48,6 @@ import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedType;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
@@ -58,7 +56,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -116,38 +113,38 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
 
         /* Register standard types */
         this.registerParserSupplier(TypeToken.get(Byte.class), options ->
-                new ByteArgument.ByteParser<>(
+                new ByteParser<>(
                         (byte) options.get(StandardParameters.RANGE_MIN, Byte.MIN_VALUE),
                         (byte) options.get(StandardParameters.RANGE_MAX, Byte.MAX_VALUE)
                 ));
         this.registerParserSupplier(TypeToken.get(Short.class), options ->
-                new ShortArgument.ShortParser<>(
+                new ShortParser<>(
                         (short) options.get(StandardParameters.RANGE_MIN, Short.MIN_VALUE),
                         (short) options.get(StandardParameters.RANGE_MAX, Short.MAX_VALUE)
                 ));
         this.registerParserSupplier(TypeToken.get(Integer.class), options ->
-                new IntegerArgument.IntegerParser<>(
+                new IntegerParser<>(
                         (int) options.get(StandardParameters.RANGE_MIN, Integer.MIN_VALUE),
                         (int) options.get(StandardParameters.RANGE_MAX, Integer.MAX_VALUE)
                 ));
         this.registerParserSupplier(TypeToken.get(Long.class), options ->
-                new LongArgument.LongParser<>(
+                new LongParser<>(
                         (long) options.get(StandardParameters.RANGE_MIN, Long.MIN_VALUE),
                         (long) options.get(StandardParameters.RANGE_MAX, Long.MAX_VALUE)
                 ));
         this.registerParserSupplier(TypeToken.get(Float.class), options ->
-                new FloatArgument.FloatParser<>(
+                new FloatParser<>(
                         (float) options.get(StandardParameters.RANGE_MIN, Float.NEGATIVE_INFINITY),
                         (float) options.get(StandardParameters.RANGE_MAX, Float.POSITIVE_INFINITY)
                 ));
         this.registerParserSupplier(TypeToken.get(Double.class), options ->
-                new DoubleArgument.DoubleParser<>(
+                new DoubleParser<>(
                         (double) options.get(StandardParameters.RANGE_MIN, Double.NEGATIVE_INFINITY),
                         (double) options.get(StandardParameters.RANGE_MAX, Double.POSITIVE_INFINITY)
                 ));
-        this.registerParserSupplier(TypeToken.get(Character.class), options -> new CharArgument.CharacterParser<>());
+        this.registerParserSupplier(TypeToken.get(Character.class), options -> new CharacterParser<>());
         this.registerParserSupplier(TypeToken.get(String[].class), options ->
-                new StringArrayArgument.StringArrayParser<>(options.get(StandardParameters.FLAG_YIELDING, false))
+                new StringArrayParser<>(options.get(StandardParameters.FLAG_YIELDING, false))
         );
         /* Make this one less awful */
         this.registerParserSupplier(TypeToken.get(String.class), options -> {
@@ -163,30 +160,25 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                         "Don't know whether to create GREEDY or QUOTED StringArgument.StringParser, both specified."
                 );
             }
-            final StringArgument.StringMode stringMode;
+            final StringParser.StringMode stringMode;
             // allow @Greedy and @FlagYielding to both be true, give flag yielding priority
             if (greedyFlagAware) {
-                stringMode = StringArgument.StringMode.GREEDY_FLAG_YIELDING;
+                stringMode = StringParser.StringMode.GREEDY_FLAG_YIELDING;
             } else if (greedy) {
-                stringMode = StringArgument.StringMode.GREEDY;
+                stringMode = StringParser.StringMode.GREEDY;
             } else if (quoted) {
-                stringMode = StringArgument.StringMode.QUOTED;
+                stringMode = StringParser.StringMode.QUOTED;
             } else {
-                stringMode = StringArgument.StringMode.SINGLE;
+                stringMode = StringParser.StringMode.SINGLE;
             }
-            return new StringArgument.StringParser<>(
-                    stringMode,
-                    (context, s) -> Arrays.stream(options.get(StandardParameters.COMPLETIONS, new String[0]))
-                            .map(Suggestion::simple)
-                            .collect(Collectors.toList())
-            );
+            return new StringParser<>(stringMode);
         });
         this.registerParserSupplier(TypeToken.get(Boolean.class), options -> {
             final boolean liberal = options.get(StandardParameters.LIBERAL, false);
-            return new BooleanArgument.BooleanParser<>(liberal);
+            return new BooleanParser<>(liberal);
         });
-        this.registerParserSupplier(TypeToken.get(UUID.class), options -> new UUIDArgument.UUIDParser<>());
-        this.registerParserSupplier(TypeToken.get(Duration.class), options -> new DurationArgument.Parser<>());
+        this.registerParserSupplier(TypeToken.get(UUID.class), options -> new UUIDParser<>());
+        this.registerParserSupplier(TypeToken.get(Duration.class), options -> new DurationParser<>());
     }
 
     private static boolean isPrimitive(final @NonNull TypeToken<?> type) {
@@ -256,7 +248,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         if (producer == null) {
             /* Give enums special treatment */
             if (GenericTypeReflector.isSuperType(Enum.class, actualType.getType())) {
-                @SuppressWarnings("rawtypes") final EnumArgument.EnumParser enumArgument = new EnumArgument.EnumParser(
+                @SuppressWarnings("rawtypes") final EnumParser enumArgument = new EnumParser(
                         GenericTypeReflector.erase(actualType.getType())
                 );
                 return Optional.of(enumArgument);

@@ -56,7 +56,7 @@ class BooleanParserTest {
             final boolean expectedResult
     ) {
         // Arrange
-        final BooleanArgument.BooleanParser<TestCommandSender> parser = new BooleanArgument.BooleanParser<>(false /* liberal */);
+        final BooleanParser<TestCommandSender> parser = new BooleanParser<>(false /* liberal */);
         final CommandInput commandInput = CommandInput.of(input);
 
         // Act
@@ -86,7 +86,7 @@ class BooleanParserTest {
             final boolean expectedResult
     ) {
         // Arrange
-        final BooleanArgument.BooleanParser<TestCommandSender> parser = new BooleanArgument.BooleanParser<>(true /* liberal */);
+        final BooleanParser<TestCommandSender> parser = new BooleanParser<>(true /* liberal */);
         final CommandInput commandInput = CommandInput.of(input);
 
         // Act
@@ -117,7 +117,7 @@ class BooleanParserTest {
     @ValueSource(booleans = {true, false})
     void Parse_NonBooleanInput_FailedParse(final boolean liberal) {
         // Arrange
-        final BooleanArgument.BooleanParser<TestCommandSender> parser = new BooleanArgument.BooleanParser<>(liberal);
+        final BooleanParser<TestCommandSender> parser = new BooleanParser<>(liberal);
 
         // Act
         final ArgumentParseResult<Boolean> result = parser.parse(
@@ -126,7 +126,7 @@ class BooleanParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new BooleanArgument.BooleanParseException(
+        assertThat(result.getFailure()).hasValue(new BooleanParser.BooleanParseException(
                 "not-a-boolean",
                 liberal,
                 this.context
@@ -138,7 +138,7 @@ class BooleanParserTest {
     @MethodSource("Suggestions_ExpectedSuggestions_Source")
     void Suggestions_ExpectedSuggestions(final boolean liberal, final List<Suggestion> expectedSuggestions) {
         // Arrange
-        final BooleanArgument.BooleanParser<TestCommandSender> parser = new BooleanArgument.BooleanParser<>(liberal);
+        final BooleanParser<TestCommandSender> parser = new BooleanParser<>(liberal);
 
         // Act
         final List<Suggestion> suggestions = parser.suggestions(

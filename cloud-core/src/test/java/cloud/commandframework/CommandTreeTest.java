@@ -23,13 +23,9 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.standard.EnumArgument;
-import cloud.commandframework.arguments.standard.FloatArgument;
-import cloud.commandframework.arguments.standard.IntegerArgument;
-import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.arguments.standard.StringParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -50,6 +46,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
+import static cloud.commandframework.arguments.standard.FloatParser.floatParser;
+import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
+import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
@@ -90,7 +90,7 @@ class CommandTreeTest {
         ).command(
                 this.commandManager.commandBuilder("test", SimpleCommandMeta.empty())
                         .literal("opt")
-                        .optional(IntegerArgument.of("num"), DefaultValue.constant(defaultInputNumber))
+                        .optional("num", integerParser(), DefaultValue.constant(defaultInputNumber))
                         .build()
         );
 
@@ -135,7 +135,7 @@ class CommandTreeTest {
         final Command<TestCommandSender> command = this.commandManager.commandBuilder(
                         "test", Collections.singleton("other"), SimpleCommandMeta.empty()
                 ).literal("opt", "öpt")
-                .optional(IntegerArgument.of("num"), DefaultValue.constant(defaultInputNumber))
+                .optional("num", integerParser(), DefaultValue.constant(defaultInputNumber))
                 .build();
         this.commandManager.command(command);
 
@@ -179,7 +179,7 @@ class CommandTreeTest {
 
         this.commandManager.command(
                 this.commandManager.commandBuilder("default")
-                        .required(this.commandManager.argumentBuilder(Integer.class, "int"))
+                        .required(this.commandManager.componentBuilder(Integer.class, "int"))
                         .handler(executionHandler)
                         .build()
         );
@@ -211,8 +211,8 @@ class CommandTreeTest {
 
         final Command<TestCommandSender> toProxy = this.commandManager.commandBuilder("test")
                 .literal("unproxied")
-                .required(StringArgument.of("string"))
-                .required(IntegerArgument.of("int"))
+                .required("string", stringParser())
+                .required("int", integerParser())
                 .literal("anotherliteral")
                 .handler(executionHandler)
                 .build();
@@ -232,7 +232,7 @@ class CommandTreeTest {
         when(executionHandler.executeFuture(any())).thenReturn(CompletableFuture.completedFuture(null));
 
         final CommandFlag<Integer> num = this.commandManager.flagBuilder("num")
-                .withComponent(IntegerArgument.of("num"))
+                .withComponent(integerParser())
                 .build();
 
         this.commandManager.command(this.commandManager.commandBuilder("flags")
@@ -243,8 +243,7 @@ class CommandTreeTest {
                         .withAliases("f")
                         .build())
                 .flag(num)
-                .flag(this.commandManager.flagBuilder("enum")
-                        .withComponent(EnumArgument.of(FlagEnum.class, "enum")))
+                .flag(this.commandManager.flagBuilder("enum").withComponent(enumParser(FlagEnum.class)))
                 .handler(executionHandler)
                 .build());
 
@@ -410,16 +409,16 @@ class CommandTreeTest {
     void testAmbiguousNodes() {
         // Call setup(); after each time we leave the Tree in an invalid state
         this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
-                .required(StringArgument.of("string"))
+                .required("string", stringParser())
         );
         assertThrows(AmbiguousNodeException.class, () ->
                 this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
-                        .required(IntegerArgument.of("integer"))));
+                        .required("integer", integerParser())));
         this.setup();
 
         // Literal and argument can co-exist, not ambiguous
         this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
-                .required(StringArgument.of("string"))
+                .required("string", stringParser())
         );
         this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
                 .literal("literal"));
@@ -432,7 +431,7 @@ class CommandTreeTest {
                 .literal("literal2"));
 
         this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
-                .required(IntegerArgument.of("integer")));
+                .required("integer", integerParser()));
         this.setup();
 
         // Two literals with the same name can not co-exist, causes 'duplicate command chains' error
@@ -479,7 +478,7 @@ class CommandTreeTest {
         /* Build two commands for testing literals overriding variable arguments */
         this.commandManager.command(
                 this.commandManager.commandBuilder("literalwithvariable")
-                        .required(StringArgument.of("variable"))
+                        .required("variable", stringParser())
         );
 
         this.commandManager.command(
@@ -518,11 +517,12 @@ class CommandTreeTest {
     @Test
     void testDuplicateArgument() {
         // Arrange
-        final CommandArgument<TestCommandSender, String> argument = StringArgument.of("test");
-        this.commandManager.command(this.commandManager.commandBuilder("one").required(argument));
+        final CommandComponent<TestCommandSender> component =
+                StringParser.<TestCommandSender>stringComponent(StringParser.StringMode.SINGLE).name("test").build();
+        this.commandManager.command(this.commandManager.commandBuilder("one").argument(component));
 
         // Act & Assert
-        this.commandManager.command(this.commandManager.commandBuilder("two").required(argument));
+        this.commandManager.command(this.commandManager.commandBuilder("two").argument(component));
     }
 
     @Test
@@ -533,7 +533,7 @@ class CommandTreeTest {
 
         this.commandManager.command(
                 this.commandManager.commandBuilder("float")
-                        .required(FloatArgument.of("num"))
+                        .required("num", floatParser())
                         .handler(executionHandler)
                         .build()
         );
@@ -562,8 +562,8 @@ class CommandTreeTest {
 
         this.commandManager.command(
                 this.commandManager.commandBuilder("optionals")
-                        .optional(StringArgument.of("opt1"))
-                        .optional(StringArgument.of("opt2"))
+                        .optional("opt1", stringParser())
+                        .optional("opt2", stringParser())
                         .handler(executionHandler)
                         .build()
         );

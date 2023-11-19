@@ -26,6 +26,7 @@ package cloud.commandframework;
 import cloud.commandframework.arguments.ComponentPreprocessor;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
@@ -38,7 +39,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
 @API(status = API.Status.STABLE, since = "2.0.0")
-public final class TypedCommandComponent<C, T> extends CommandComponent<C> implements CloudKeyHolder<T> {
+public final class TypedCommandComponent<C, T> extends CommandComponent<C> implements CloudKeyHolder<T>, ParserDescriptor<C, T> {
 
     TypedCommandComponent(
             final @NonNull String name,

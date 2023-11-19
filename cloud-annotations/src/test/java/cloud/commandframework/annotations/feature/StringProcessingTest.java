@@ -34,9 +34,8 @@ import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.annotations.PropertyReplacingStringProcessor;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
-import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
+import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.meta.CommandMeta;
 import com.google.common.collect.ImmutableMap;
@@ -109,8 +108,8 @@ class StringProcessingTest {
         final List<CommandComponent<TestCommandSender>> components = command.components();
         assertThat(components).hasSize(3);
 
-        final FlagArgument.FlagArgumentParser<TestCommandSender> flagParser =
-                (FlagArgument.FlagArgumentParser<TestCommandSender>) components.get(2).parser();
+        final CommandFlagParser<TestCommandSender> flagParser =
+                (CommandFlagParser<TestCommandSender>) components.get(2).parser();
         assertThat(flagParser).isNotNull();
 
         final List<CommandFlag<?>> flags = new ArrayList<>(flagParser.flags());

@@ -24,7 +24,6 @@
 package cloud.commandframework.examples.jda;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.jda.JDA4CommandManager;
 import cloud.commandframework.jda.JDAGuildSender;
@@ -41,6 +40,8 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 
 public final class ExampleBot {
 
@@ -113,7 +114,7 @@ public final class ExampleBot {
         commandManager.command(builder
                 .literal("add")
                 .required(UserArgument.of("user"))
-                .required(StringArgument.single("perm"))
+                .required("perm", stringParser())
                 .handler(context -> {
                     final User user = context.get("user");
                     final String perm = context.get("perm");
@@ -125,7 +126,7 @@ public final class ExampleBot {
         commandManager.command(builder
                 .literal("remove")
                 .required(UserArgument.of("user"))
-                .required(StringArgument.single("perm"))
+                .required("perm", stringParser())
                 .handler(context -> {
                     final User user = context.get("user");
                     final String perm = context.get("perm");

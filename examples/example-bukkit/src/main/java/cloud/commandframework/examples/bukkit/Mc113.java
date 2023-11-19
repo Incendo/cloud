@@ -24,7 +24,6 @@
 package cloud.commandframework.examples.bukkit;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.data.BlockPredicate;
 import cloud.commandframework.bukkit.data.ItemStackPredicate;
@@ -42,6 +41,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.framework.qual.DefaultQualifier;
+
+import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 
 @DefaultQualifier(NonNull.class)
 final class Mc113 {
@@ -61,7 +62,7 @@ final class Mc113 {
                 .required(BlockPredicateArgument.of("predicate"))
                 .literal("with")
                 .required(MaterialArgument.of("block")) // todo: use BlockDataArgument
-                .required(IntegerArgument.<CommandSender>builder("radius").withMin(1))
+                .required("radius", integerParser(1 /* minValue */))
                 .handler(this::executeReplace));
 
         this.manager.command(builder.literal("test_item")

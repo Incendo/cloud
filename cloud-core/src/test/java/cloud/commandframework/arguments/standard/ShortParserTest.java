@@ -48,9 +48,9 @@ class ShortParserTest {
     @Test
     void Parse_NoMinMax_SuccessfulParse() {
         // Arrange
-        final ShortArgument.ShortParser<TestCommandSender> parser = new ShortArgument.ShortParser<>(
-                ShortArgument.ShortParser.DEFAULT_MINIMUM,
-                ShortArgument.ShortParser.DEFAULT_MAXIMUM
+        final ShortParser<TestCommandSender> parser = new ShortParser<>(
+                ShortParser.DEFAULT_MINIMUM,
+                ShortParser.DEFAULT_MAXIMUM
         );
 
         final short shortInput = (short) ThreadLocalRandom.current().nextInt(Short.MAX_VALUE);
@@ -72,9 +72,9 @@ class ShortParserTest {
     @Test
     void Parse_ValueBelowMin_FailedParse() {
         // Arrange
-        final ShortArgument.ShortParser<TestCommandSender> parser = new ShortArgument.ShortParser<>(
+        final ShortParser<TestCommandSender> parser = new ShortParser<>(
                 (short) 5 /* min */,
-                ShortArgument.ShortParser.DEFAULT_MAXIMUM
+                ShortParser.DEFAULT_MAXIMUM
         );
 
         // Act
@@ -84,7 +84,7 @@ class ShortParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new ShortArgument.ShortParseException(
+        assertThat(result.getFailure()).hasValue(new ShortParser.ShortParseException(
                 "4",
                 parser,
                 this.context
@@ -95,8 +95,8 @@ class ShortParserTest {
     @Test
     void Parse_ValueAboveMax_FailedParse() {
         // Arrange
-        final ShortArgument.ShortParser<TestCommandSender> parser = new ShortArgument.ShortParser<>(
-                ShortArgument.ShortParser.DEFAULT_MINIMUM,
+        final ShortParser<TestCommandSender> parser = new ShortParser<>(
+                ShortParser.DEFAULT_MINIMUM,
                 (short) 5 /* max */
         );
 
@@ -107,7 +107,7 @@ class ShortParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new ShortArgument.ShortParseException(
+        assertThat(result.getFailure()).hasValue(new ShortParser.ShortParseException(
                 "6",
                 parser,
                 this.context
@@ -118,9 +118,9 @@ class ShortParserTest {
     @Test
     void Parse_NonShortInput_FailedParse() {
         // Arrange
-        final ShortArgument.ShortParser<TestCommandSender> parser = new ShortArgument.ShortParser<>(
-                ShortArgument.ShortParser.DEFAULT_MINIMUM,
-                ShortArgument.ShortParser.DEFAULT_MAXIMUM
+        final ShortParser<TestCommandSender> parser = new ShortParser<>(
+                ShortParser.DEFAULT_MINIMUM,
+                ShortParser.DEFAULT_MAXIMUM
         );
 
         // Act
@@ -130,7 +130,7 @@ class ShortParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new ShortArgument.ShortParseException(
+        assertThat(result.getFailure()).hasValue(new ShortParser.ShortParseException(
                 "cow",
                 parser,
                 this.context
@@ -141,9 +141,9 @@ class ShortParserTest {
     @Test
     void Suggestions_EmptyInput_ExpectedSuggestions() {
         // Arrange
-        final ShortArgument.ShortParser<TestCommandSender> parser = new ShortArgument.ShortParser<>(
-                ShortArgument.ShortParser.DEFAULT_MINIMUM,
-                ShortArgument.ShortParser.DEFAULT_MAXIMUM
+        final ShortParser<TestCommandSender> parser = new ShortParser<>(
+                ShortParser.DEFAULT_MINIMUM,
+                ShortParser.DEFAULT_MAXIMUM
         );
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();
@@ -164,9 +164,9 @@ class ShortParserTest {
     @Test
     void Suggestions_NegativeSignInput_ExpectedSuggestions() {
         // Arrange
-        final ShortArgument.ShortParser<TestCommandSender> parser = new ShortArgument.ShortParser<>(
-                ShortArgument.ShortParser.DEFAULT_MINIMUM,
-                ShortArgument.ShortParser.DEFAULT_MAXIMUM
+        final ShortParser<TestCommandSender> parser = new ShortParser<>(
+                ShortParser.DEFAULT_MINIMUM,
+                ShortParser.DEFAULT_MAXIMUM
         );
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();

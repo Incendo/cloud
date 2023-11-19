@@ -32,10 +32,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static cloud.commandframework.arguments.standard.DurationParser.durationParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 
-public class DurationArgumentTest {
+class DurationParserTest {
 
     private static final Duration[] storage = new Duration[1];
     private static CommandManager<TestCommandSender> manager;
@@ -44,7 +45,7 @@ public class DurationArgumentTest {
     static void setup() {
         manager = createManager();
         manager.command(manager.commandBuilder("duration")
-                .required(DurationArgument.of("duration"))
+                .required("duration", durationParser())
                 .handler(c -> {
                     final Duration duration = c.get("duration");
                     storage[0] = duration;

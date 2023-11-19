@@ -23,7 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import cloud.commandframework.meta.SimpleCommandMeta;
@@ -33,6 +32,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 
 public class CommandPreProcessorTest {
@@ -43,7 +43,7 @@ public class CommandPreProcessorTest {
     static void newTree() {
         manager = createManager();
         manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
-                .required(EnumArgument.of(SampleEnum.class, "enum"))
+                .required("enum", enumParser(SampleEnum.class))
                 .handler(
                         commandContext -> System.out.printf(
                                 "enum = %s | integer = %d\n",

@@ -24,11 +24,10 @@
 package cloud.commandframework.fabric.testmod;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.TypedCommandComponent;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.standard.IntegerArgument;
-import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
@@ -44,6 +43,8 @@ import cloud.commandframework.fabric.data.Coordinates.ColumnCoordinates;
 import cloud.commandframework.fabric.data.MultipleEntitySelector;
 import cloud.commandframework.fabric.data.MultiplePlayerSelector;
 import cloud.commandframework.fabric.testmod.mixin.GiveCommandAccess;
+import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.keys.SimpleCloudKey;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Collection;
 import java.util.Comparator;
@@ -69,6 +70,9 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.Vec3;
 
+import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
+import static cloud.commandframework.arguments.standard.StringParser.stringParser;
+
 public final class FabricExample implements ModInitializer {
 
     @Override
@@ -79,13 +83,13 @@ public final class FabricExample implements ModInitializer {
 
         final Command.Builder<CommandSourceStack> base = manager.commandBuilder("cloudtest");
 
-        final CommandArgument<CommandSourceStack, String> name = StringArgument.of("name");
-        final CommandArgument<CommandSourceStack, Integer> hugs = IntegerArgument.of("hugs");
+        final CloudKey<String> name = SimpleCloudKey.of("name", String.class);
+        final CloudKey<Integer> hugs = SimpleCloudKey.of("hugs", Integer.class);
 
         manager.command(base
                 .literal("hugs")
-                .required(name)
-                .optional(hugs, DefaultValue.constant(1))
+                .required(name, stringParser())
+                .optional(hugs, integerParser(), DefaultValue.constant(1))
                 .handler(ctx -> {
                     ctx.getSender().sendSuccess(Component.literal("Hello, ")
                             .append(ctx.get(name))
@@ -148,8 +152,7 @@ public final class FabricExample implements ModInitializer {
                 .permission("cloud.give")
                 .required(MultiplePlayerSelectorArgument.of("targets"))
                 .required(ItemInputArgument.of("item"))
-                .optional(IntegerArgument.<CommandSourceStack>builder("amount")
-                        .withMin(1), DefaultValue.constant(1))
+                .optional("amount", integerParser(1), DefaultValue.constant(1))
                 .handler(ctx -> {
                     final ItemInput item = ctx.get("item");
                     final MultiplePlayerSelector targets = ctx.get("targets");
@@ -202,13 +205,13 @@ public final class FabricExample implements ModInitializer {
             ctx.getSender().sendSuccess(text, false);
         }));
 
-        final CommandArgument<CommandSourceStack, ModMetadata> modMetadata = manager.argumentBuilder(ModMetadata.class, "mod")
-                .withSuggestionProvider((ctx, input) -> FabricLoader.getInstance().getAllMods().stream()
+        final TypedCommandComponent<CommandSourceStack, ModMetadata> modMetadata = manager.componentBuilder(ModMetadata.class, "mod")
+                .suggestionProvider((ctx, input) -> FabricLoader.getInstance().getAllMods().stream()
                         .map(ModContainer::getMetadata)
                         .map(ModMetadata::getId)
                         .map(Suggestion::simple)
                         .collect(Collectors.toList()))
-                .withParser((ctx, inputQueue) -> {
+                .parser((ctx, inputQueue) -> {
                     final ModMetadata meta = FabricLoader.getInstance().getModContainer(inputQueue.readString())
                             .map(ModContainer::getMetadata)
                             .orElse(null);
@@ -222,7 +225,7 @@ public final class FabricExample implements ModInitializer {
                 })
                 .build();
 
-        manager.command(mods.required(modMetadata)
+        manager.command(mods.argument(modMetadata)
                 .handler(ctx -> {
                     final ModMetadata meta = ctx.get(modMetadata);
                     final MutableComponent text = Component.literal("")

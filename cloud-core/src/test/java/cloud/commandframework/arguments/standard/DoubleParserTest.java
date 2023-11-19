@@ -45,9 +45,9 @@ class DoubleParserTest {
     @Test
     void Parse_NoMinMax_SuccessfulParse() {
         // Arrange
-        final DoubleArgument.DoubleParser<TestCommandSender> parser = new DoubleArgument.DoubleParser<>(
-                DoubleArgument.DoubleParser.DEFAULT_MINIMUM,
-                DoubleArgument.DoubleParser.DEFAULT_MAXIMUM
+        final DoubleParser<TestCommandSender> parser = new DoubleParser<>(
+                DoubleParser.DEFAULT_MINIMUM,
+                DoubleParser.DEFAULT_MAXIMUM
         );
 
         final double doubleInput = ThreadLocalRandom.current().nextDouble();
@@ -69,9 +69,9 @@ class DoubleParserTest {
     @Test
     void Parse_ValueBelowMin_FailedParse() {
         // Arrange
-        final DoubleArgument.DoubleParser<TestCommandSender> parser = new DoubleArgument.DoubleParser<>(
+        final DoubleParser<TestCommandSender> parser = new DoubleParser<>(
                 5 /* min */,
-                DoubleArgument.DoubleParser.DEFAULT_MAXIMUM
+                DoubleParser.DEFAULT_MAXIMUM
         );
 
         // Act
@@ -81,7 +81,7 @@ class DoubleParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new DoubleArgument.DoubleParseException(
+        assertThat(result.getFailure()).hasValue(new DoubleParser.DoubleParseException(
                 "4.0",
                 parser,
                 this.context
@@ -92,8 +92,8 @@ class DoubleParserTest {
     @Test
     void Parse_ValueAboveMax_FailedParse() {
         // Arrange
-        final DoubleArgument.DoubleParser<TestCommandSender> parser = new DoubleArgument.DoubleParser<>(
-                DoubleArgument.DoubleParser.DEFAULT_MINIMUM,
+        final DoubleParser<TestCommandSender> parser = new DoubleParser<>(
+                DoubleParser.DEFAULT_MINIMUM,
                 5.0D /* max */
         );
 
@@ -104,7 +104,7 @@ class DoubleParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new DoubleArgument.DoubleParseException(
+        assertThat(result.getFailure()).hasValue(new DoubleParser.DoubleParseException(
                 "6.0",
                 parser,
                 this.context
@@ -115,9 +115,9 @@ class DoubleParserTest {
     @Test
     void Parse_NonDoubleInput_FailedParse() {
         // Arrange
-        final DoubleArgument.DoubleParser<TestCommandSender> parser = new DoubleArgument.DoubleParser<>(
-                DoubleArgument.DoubleParser.DEFAULT_MINIMUM,
-                DoubleArgument.DoubleParser.DEFAULT_MAXIMUM
+        final DoubleParser<TestCommandSender> parser = new DoubleParser<>(
+                DoubleParser.DEFAULT_MINIMUM,
+                DoubleParser.DEFAULT_MAXIMUM
         );
 
         // Act
@@ -127,7 +127,7 @@ class DoubleParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new DoubleArgument.DoubleParseException(
+        assertThat(result.getFailure()).hasValue(new DoubleParser.DoubleParseException(
                 "cow",
                 parser,
                 this.context

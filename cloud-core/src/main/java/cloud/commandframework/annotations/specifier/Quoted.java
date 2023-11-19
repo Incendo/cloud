@@ -30,8 +30,8 @@ import java.lang.annotation.Target;
 import org.apiguardian.api.API;
 
 /**
- * Annotation used to set the parsing mode of a {@link cloud.commandframework.arguments.standard.StringArgument string
- * argument} to quoted.
+ * Annotation used to set the parsing mode of a {@link cloud.commandframework.arguments.standard.StringParser string
+ * parser} to quoted.
  *
  * @since 1.5.0
  */

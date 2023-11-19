@@ -26,19 +26,19 @@ package cloud.commandframework.brigadier;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.compound.CompoundArgument;
-import cloud.commandframework.arguments.compound.FlagArgument;
+import cloud.commandframework.arguments.compound.CompoundParser;
+import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.MappedArgumentParser;
-import cloud.commandframework.arguments.standard.BooleanArgument;
-import cloud.commandframework.arguments.standard.ByteArgument;
-import cloud.commandframework.arguments.standard.DoubleArgument;
-import cloud.commandframework.arguments.standard.FloatArgument;
-import cloud.commandframework.arguments.standard.IntegerArgument;
-import cloud.commandframework.arguments.standard.LongArgument;
-import cloud.commandframework.arguments.standard.ShortArgument;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.arguments.standard.StringArrayArgument;
+import cloud.commandframework.arguments.standard.BooleanParser;
+import cloud.commandframework.arguments.standard.ByteParser;
+import cloud.commandframework.arguments.standard.DoubleParser;
+import cloud.commandframework.arguments.standard.FloatParser;
+import cloud.commandframework.arguments.standard.IntegerParser;
+import cloud.commandframework.arguments.standard.LongParser;
+import cloud.commandframework.arguments.standard.ShortParser;
+import cloud.commandframework.arguments.standard.StringArrayParser;
+import cloud.commandframework.arguments.standard.StringParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
@@ -140,15 +140,15 @@ public final class CloudBrigadierManager<C, S> {
 
     private void registerInternalMappings() {
         /* Map byte, short and int to IntegerArgumentType */
-        this.registerMapping(new TypeToken<ByteArgument.ByteParser<C>>() {
+        this.registerMapping(new TypeToken<ByteParser<C>>() {
         }, builder -> builder.to(argument -> {
             return IntegerArgumentType.integer(argument.getMin(), argument.getMax());
         }));
-        this.registerMapping(new TypeToken<ShortArgument.ShortParser<C>>() {
+        this.registerMapping(new TypeToken<ShortParser<C>>() {
         }, builder -> builder.to(argument -> {
             return IntegerArgumentType.integer(argument.getMin(), argument.getMax());
         }));
-        this.registerMapping(new TypeToken<IntegerArgument.IntegerParser<C>>() {
+        this.registerMapping(new TypeToken<IntegerParser<C>>() {
         }, builder -> builder.to(argument -> {
             if (!argument.hasMin() && !argument.hasMax()) {
                 return IntegerArgumentType.integer();
@@ -162,7 +162,7 @@ public final class CloudBrigadierManager<C, S> {
             return IntegerArgumentType.integer(argument.getMin(), argument.getMax());
         }));
         /* Map float to FloatArgumentType */
-        this.registerMapping(new TypeToken<FloatArgument.FloatParser<C>>() {
+        this.registerMapping(new TypeToken<FloatParser<C>>() {
         }, builder -> builder.to(argument -> {
             if (!argument.hasMin() && !argument.hasMax()) {
                 return FloatArgumentType.floatArg();
@@ -176,7 +176,7 @@ public final class CloudBrigadierManager<C, S> {
             return FloatArgumentType.floatArg(argument.getMin(), argument.getMax());
         }));
         /* Map double to DoubleArgumentType */
-        this.registerMapping(new TypeToken<DoubleArgument.DoubleParser<C>>() {
+        this.registerMapping(new TypeToken<DoubleParser<C>>() {
         }, builder -> builder.to(argument -> {
             if (!argument.hasMin() && !argument.hasMax()) {
                 return DoubleArgumentType.doubleArg();
@@ -190,7 +190,7 @@ public final class CloudBrigadierManager<C, S> {
             return DoubleArgumentType.doubleArg(argument.getMin(), argument.getMax());
         }));
         /* Map long parser to LongArgumentType */
-        this.registerMapping(new TypeToken<LongArgument.LongParser<C>>() {
+        this.registerMapping(new TypeToken<LongParser<C>>() {
         }, builder -> builder.to(longParser -> {
             if (!longParser.hasMin() && !longParser.hasMax()) {
                 return LongArgumentType.longArg();
@@ -204,10 +204,10 @@ public final class CloudBrigadierManager<C, S> {
             return LongArgumentType.longArg(longParser.getMin(), longParser.getMax());
         }));
         /* Map boolean to BoolArgumentType */
-        this.registerMapping(new TypeToken<BooleanArgument.BooleanParser<C>>() {
+        this.registerMapping(new TypeToken<BooleanParser<C>>() {
         }, builder -> builder.toConstant(BoolArgumentType.bool()));
         /* Map String properly to StringArgumentType */
-        this.registerMapping(new TypeToken<StringArgument.StringParser<C>>() {
+        this.registerMapping(new TypeToken<StringParser<C>>() {
         }, builder -> builder.cloudSuggestions().to(argument -> {
             switch (argument.getStringMode()) {
                 case QUOTED:
@@ -220,10 +220,10 @@ public final class CloudBrigadierManager<C, S> {
             }
         }));
         /* Map flags to a greedy string */
-        this.registerMapping(new TypeToken<FlagArgument.FlagArgumentParser<C>>() {
+        this.registerMapping(new TypeToken<CommandFlagParser<C>>() {
         }, builder -> builder.cloudSuggestions().toConstant(StringArgumentType.greedyString()));
         /* Map String[] to a greedy string */
-        this.registerMapping(new TypeToken<StringArrayArgument.StringArrayParser<C>>() {
+        this.registerMapping(new TypeToken<StringArrayParser<C>>() {
         }, builder -> builder.cloudSuggestions().toConstant(StringArgumentType.greedyString()));
         /* Map wrapped parsers to their native types */
         this.registerMapping(new TypeToken<WrappedBrigadierParser<C, ?>>() {
@@ -273,17 +273,17 @@ public final class CloudBrigadierManager<C, S> {
      * @since 1.2.0
      */
     public void setNativeNumberSuggestions(final boolean nativeNumberSuggestions) {
-        this.setNativeSuggestions(new TypeToken<ByteArgument.ByteParser<C>>() {
+        this.setNativeSuggestions(new TypeToken<ByteParser<C>>() {
         }, nativeNumberSuggestions);
-        this.setNativeSuggestions(new TypeToken<ShortArgument.ShortParser<C>>() {
+        this.setNativeSuggestions(new TypeToken<ShortParser<C>>() {
         }, nativeNumberSuggestions);
-        this.setNativeSuggestions(new TypeToken<IntegerArgument.IntegerParser<C>>() {
+        this.setNativeSuggestions(new TypeToken<IntegerParser<C>>() {
         }, nativeNumberSuggestions);
-        this.setNativeSuggestions(new TypeToken<FloatArgument.FloatParser<C>>() {
+        this.setNativeSuggestions(new TypeToken<FloatParser<C>>() {
         }, nativeNumberSuggestions);
-        this.setNativeSuggestions(new TypeToken<DoubleArgument.DoubleParser<C>>() {
+        this.setNativeSuggestions(new TypeToken<DoubleParser<C>>() {
         }, nativeNumberSuggestions);
-        this.setNativeSuggestions(new TypeToken<LongArgument.LongParser<C>>() {
+        this.setNativeSuggestions(new TypeToken<LongParser<C>>() {
         }, nativeNumberSuggestions);
     }
 
@@ -480,9 +480,9 @@ public final class CloudBrigadierManager<C, S> {
             final com.mojang.brigadier.@NonNull Command<S> executor,
             final SuggestionProvider<S> suggestionProvider
     ) {
-        if (root.component().parser() instanceof CompoundArgument.CompoundParser) {
-            final CompoundArgument.CompoundParser<?, C, ?> compoundParser =
-                    (CompoundArgument.CompoundParser<?, C, ?>) root.component().parser();
+        if (root.component().parser() instanceof CompoundParser) {
+            final CompoundParser<?, C, ?> compoundParser =
+                    (CompoundParser<?, C, ?>) root.component().parser();
             final Object[] parsers = compoundParser.parsers();
             final Object[] types = compoundParser.types();
             final Object[] names = compoundParser.names();

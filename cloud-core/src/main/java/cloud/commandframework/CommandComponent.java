@@ -25,8 +25,9 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.ComponentPreprocessor;
 import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.StaticArgument;
-import cloud.commandframework.arguments.compound.FlagArgument;
+import cloud.commandframework.arguments.LiteralParser;
+import cloud.commandframework.arguments.PreprocessorHolder;
+import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
@@ -56,7 +57,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  * @since 1.3.0
  */
 @API(status = API.Status.STABLE, since = "1.3.0")
-public class CommandComponent<C> implements Comparable<CommandComponent<C>> {
+public class CommandComponent<C> implements Comparable<CommandComponent<C>>, PreprocessorHolder<C> {
 
     private final String name;
     private final ArgumentParser<C, ?> parser;
@@ -75,9 +76,29 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>> {
      * @param <C> the command sender type
      * @param <T> the component value type
      * @return the builder
+     * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public static <C, T> @NonNull Builder<C, T> builder() {
-        return new Builder<C, T>();
+        return new Builder<>();
+    }
+
+    /**
+     * Creates a new mutable builder.
+     *
+     * @param <C> the command sender type
+     * @param <T> the component value type
+     * @param clazz the type of the component
+     * @param name the name of the component
+     * @return the builder
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C, T> @NonNull Builder<C, T> ofType(
+            final @NonNull Class<T> clazz,
+            final @NonNull String name
+    ) {
+        return CommandComponent.<C, T>builder().valueType(clazz).name(name);
     }
 
     CommandComponent(
@@ -145,8 +166,8 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>> {
     @SuppressWarnings("unchecked")
     @API(status = API.Status.STABLE, since = "2.0.0")
     public final @NonNull Collection<@NonNull String> aliases() {
-        if (this.parser() instanceof StaticArgument.StaticArgumentParser) {
-            return ((StaticArgument.StaticArgumentParser<C>) this.parser()).aliases();
+        if (this.parser() instanceof LiteralParser) {
+            return ((LiteralParser<C>) this.parser()).aliases();
         }
         return Collections.emptyList();
     }
@@ -163,8 +184,8 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>> {
     @SuppressWarnings("unchecked")
     @API(status = API.Status.STABLE, since = "2.0.0")
     public final @NonNull Collection<@NonNull String> alternativeAliases() {
-        if (this.parser() instanceof StaticArgument.StaticArgumentParser) {
-            return ((StaticArgument.StaticArgumentParser<C>) this.parser()).alternativeAliases();
+        if (this.parser() instanceof LiteralParser) {
+            return ((LiteralParser<C>) this.parser()).alternativeAliases();
         }
         return Collections.emptyList();
     }
@@ -321,7 +342,8 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>> {
         return ArgumentParseResult.success(true);
     }
 
-    protected final @NonNull Collection<@NonNull ComponentPreprocessor<C>> preprocessors() {
+    @Override
+    public final @NonNull Collection<@NonNull ComponentPreprocessor<C>> preprocessors() {
         return Collections.unmodifiableCollection(this.componentPreprocessors);
     }
 
@@ -594,9 +616,9 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>> {
             }
 
             final ComponentType componentType;
-            if (this.parser instanceof StaticArgument.StaticArgumentParser) {
+            if (this.parser instanceof LiteralParser) {
                 componentType = ComponentType.LITERAL;
-            } else if (this.parser instanceof FlagArgument.FlagArgumentParser) {
+            } else if (this.parser instanceof CommandFlagParser) {
                 componentType = ComponentType.FLAG;
             } else if (this.required) {
                 componentType = ComponentType.REQUIRED_VARIABLE;
@@ -612,7 +634,7 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>> {
             }
 
             return new TypedCommandComponent<>(
-                    this.name,
+                    Objects.requireNonNull(this.name, "name"),
                     parser,
                     Objects.requireNonNull(this.valueType, "valueType"),
                     Objects.requireNonNull(this.description, "description"),

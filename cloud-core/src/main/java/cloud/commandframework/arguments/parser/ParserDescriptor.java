@@ -29,10 +29,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE, since = "2.0.0")
-public final class ParserDescriptor<C, T> {
-
-    private final ArgumentParser<C, T> parser;
-    private final TypeToken<T> valueType;
+public interface ParserDescriptor<C, T> {
 
     /**
      * Creates a new parser descriptor.
@@ -43,16 +40,27 @@ public final class ParserDescriptor<C, T> {
      * @param valueType the type of values produced by the parser
      * @return the created descriptor
      */
-    public static <C, T> @NonNull ParserDescriptor<C, T> of(
+    static <C, T> @NonNull ParserDescriptor<C, T> of(
             final @NonNull ArgumentParser<C, T> parser,
             final @NonNull TypeToken<T> valueType
     ) {
-        return new ParserDescriptor<>(parser, valueType);
+        return new ParserDescriptorImpl<>(parser, valueType);
     }
 
-    private ParserDescriptor(final @NonNull ArgumentParser<C, T> parser, final @NonNull TypeToken<T> valueType) {
-        this.parser = parser;
-        this.valueType = valueType;
+    /**
+     * Creates a new parser descriptor.
+     *
+     * @param <C> the command sender type
+     * @param <T> the type of values produced by the parser
+     * @param parser    the parser
+     * @param valueType the type of values produced by the parser
+     * @return the created descriptor
+     */
+    static <C, T> @NonNull ParserDescriptor<C, T> of(
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull Class<T> valueType
+    ) {
+        return new ParserDescriptorImpl<>(parser, TypeToken.get(valueType));
     }
 
     /**
@@ -60,33 +68,51 @@ public final class ParserDescriptor<C, T> {
      *
      * @return the parser
      */
-    public @NonNull ArgumentParser<C, T> parser() {
-        return this.parser;
-    }
+    @NonNull ArgumentParser<C, T> parser();
 
     /**
      * Returns the type of values produced by the parser.
      *
      * @return the type of values produced by the parser
      */
-    public @NonNull TypeToken<T> valueType() {
-        return this.valueType;
-    }
+    @NonNull TypeToken<T> valueType();
 
-    @Override
-    public boolean equals(final Object object) {
-        if (this == object) {
-            return true;
-        }
-        if (object == null || this.getClass() != object.getClass()) {
-            return false;
-        }
-        final ParserDescriptor<?, ?> that = (ParserDescriptor<?, ?>) object;
-        return Objects.equals(this.parser, that.parser) && Objects.equals(this.valueType, that.valueType);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.parser, this.valueType);
+    final class ParserDescriptorImpl<C, T> implements ParserDescriptor<C, T> {
+
+        private final ArgumentParser<C, T> parser;
+        private final TypeToken<T> valueType;
+
+        private ParserDescriptorImpl(final @NonNull ArgumentParser<C, T> parser, final @NonNull TypeToken<T> valueType) {
+            this.parser = parser;
+            this.valueType = valueType;
+        }
+
+        @Override
+        public @NonNull ArgumentParser<C, T> parser() {
+            return this.parser;
+        }
+
+        @Override
+        public @NonNull TypeToken<T> valueType() {
+            return this.valueType;
+        }
+
+        @Override
+        public boolean equals(final Object object) {
+            if (this == object) {
+                return true;
+            }
+            if (!(object instanceof ParserDescriptor)) {
+                return false;
+            }
+            final ParserDescriptor<?, ?> that = (ParserDescriptor<?, ?>) object;
+            return Objects.equals(this.parser(), that.parser()) && Objects.equals(this.valueType(), that.valueType());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.parser(), this.valueType());
+        }
     }
 }

@@ -31,6 +31,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static cloud.commandframework.arguments.standard.StringParser.greedyStringParser;
+import static cloud.commandframework.arguments.standard.StringParser.quotedStringParser;
+import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 
@@ -43,8 +46,8 @@ class StringArgumentTest {
     static void setup() {
         manager = createManager();
         manager.command(manager.commandBuilder("quoted")
-                .required(StringArgument.of("message1", StringArgument.StringMode.QUOTED))
-                .required(StringArgument.of("message2"))
+                .required("message1", quotedStringParser())
+                .required("message2", stringParser())
                 .handler(c -> {
                     final String message1 = c.get("message1");
                     final String message2 = c.get("message2");
@@ -53,14 +56,14 @@ class StringArgumentTest {
                 })
                 .build());
         manager.command(manager.commandBuilder("single")
-                .required(StringArgument.of("message"))
+                .required("message", stringParser())
                 .handler(c -> {
                     final String message = c.get("message");
                     storage[0] = message;
                 })
                 .build());
         manager.command(manager.commandBuilder("greedy")
-                .required(StringArgument.of("message", StringArgument.StringMode.GREEDY))
+                .required("message", greedyStringParser())
                 .handler(c -> {
                     final String message = c.get("message");
                     storage[0] = message;

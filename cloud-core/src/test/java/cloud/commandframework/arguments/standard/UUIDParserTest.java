@@ -40,14 +40,14 @@ import static com.google.common.truth.Truth8.assertThat;
 @ExtendWith(MockitoExtension.class)
 class UUIDParserTest {
 
-    private UUIDArgument.UUIDParser<TestCommandSender> parser;
+    private UUIDParser<TestCommandSender> parser;
 
     @Mock
     private CommandContext<TestCommandSender> context;
 
     @BeforeEach
     void setup() {
-        this.parser = new UUIDArgument.UUIDParser<>();
+        this.parser = new UUIDParser<>();
     }
 
     @Test
@@ -81,7 +81,7 @@ class UUIDParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new UUIDArgument.UUIDParseException(
+        assertThat(result.getFailure()).hasValue(new UUIDParser.UUIDParseException(
                 "non-uuid",
                 this.context
         ));

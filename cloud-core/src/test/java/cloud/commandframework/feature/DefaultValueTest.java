@@ -25,14 +25,15 @@ package cloud.commandframework.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.execution.CommandResult;
+import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.keys.SimpleCloudKey;
 import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 
@@ -48,46 +49,46 @@ class DefaultValueTest {
     @Test
     void Constant_HappyFlow_Success() throws Exception {
         // Arrange
-        final CommandArgument<TestCommandSender, Integer> argument = IntegerArgument.of("int");
+        final CloudKey<Integer> key = SimpleCloudKey.of("int", Integer.class);
         this.commandManager.command(
-                this.commandManager.commandBuilder("test").optional(argument, DefaultValue.constant(5))
+                this.commandManager.commandBuilder("test").optional(key, integerParser(), DefaultValue.constant(5))
         );
 
         // Act
         final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(new TestCommandSender(), "test").get();
 
         // Assert
-        assertThat(result.getCommandContext().get(argument)).isEqualTo(5);
+        assertThat(result.getCommandContext().get(key)).isEqualTo(5);
     }
 
     @Test
     void Dynamic_HappyFlow_Success() throws Exception {
         // Arrange
-        final CommandArgument<TestCommandSender, Integer> argument = IntegerArgument.of("int");
+        final CloudKey<Integer> key = SimpleCloudKey.of("int", Integer.class);
         final DefaultValue<TestCommandSender, Integer> defaultValue = ctx -> ThreadLocalRandom.current().nextInt();
         this.commandManager.command(
-                this.commandManager.commandBuilder("test").optional(argument, defaultValue)
+                this.commandManager.commandBuilder("test").optional(key, integerParser(), defaultValue)
         );
 
         // Act
         final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(new TestCommandSender(), "test").get();
 
         // Assert
-        assertThat(result.getCommandContext().get(argument)).isNotNull();
+        assertThat(result.getCommandContext().get(key)).isNotNull();
     }
 
     @Test
     void Parsed_HappyFlow_Success() throws Exception {
         // Arrange
-        final CommandArgument<TestCommandSender, Integer> argument = IntegerArgument.of("int");
+        final CloudKey<Integer> key = SimpleCloudKey.of("int", Integer.class);
         this.commandManager.command(
-                this.commandManager.commandBuilder("test").optional(argument, DefaultValue.parsed("5"))
+                this.commandManager.commandBuilder("test").optional(key, integerParser(), DefaultValue.parsed("5"))
         );
 
         // Act
         final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(new TestCommandSender(), "test").get();
 
         // Assert
-        assertThat(result.getCommandContext().get(argument)).isEqualTo(5);
+        assertThat(result.getCommandContext().get(key)).isEqualTo(5);
     }
 }

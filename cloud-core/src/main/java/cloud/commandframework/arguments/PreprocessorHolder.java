@@ -21,23 +21,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations.specifier;
+package cloud.commandframework.arguments;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.Collection;
 import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Annotation used to set the parsing mode of a {@link cloud.commandframework.arguments.standard.BooleanParser boolean
- * parser} to liberal.
- *
- * @since 1.6.0
- */
-@Target(ElementType.PARAMETER)
-@Retention(RetentionPolicy.RUNTIME)
-@API(status = API.Status.STABLE, since = "1.6.0")
-public @interface Liberal {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface PreprocessorHolder<C> {
 
+    /**
+     * Returns an unmodifiable collection of preprocessors.
+     *
+     * @return the preprocessors
+     */
+    @NonNull Collection<ComponentPreprocessor<C>> preprocessors();
 }

@@ -48,9 +48,9 @@ class LongParserTest {
     @Test
     void Parse_NoMinMax_SuccessfulParse() {
         // Arrange
-        final LongArgument.LongParser<TestCommandSender> parser = new LongArgument.LongParser<>(
-                LongArgument.LongParser.DEFAULT_MINIMUM,
-                LongArgument.LongParser.DEFAULT_MAXIMUM
+        final LongParser<TestCommandSender> parser = new LongParser<>(
+                LongParser.DEFAULT_MINIMUM,
+                LongParser.DEFAULT_MAXIMUM
         );
 
         final long longInput = ThreadLocalRandom.current().nextLong();
@@ -72,9 +72,9 @@ class LongParserTest {
     @Test
     void Parse_ValueBelowMin_FailedParse() {
         // Arrange
-        final LongArgument.LongParser<TestCommandSender> parser = new LongArgument.LongParser<>(
+        final LongParser<TestCommandSender> parser = new LongParser<>(
                 5L /* min */,
-                LongArgument.LongParser.DEFAULT_MAXIMUM
+                LongParser.DEFAULT_MAXIMUM
         );
 
         // Act
@@ -84,7 +84,7 @@ class LongParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new LongArgument.LongParseException(
+        assertThat(result.getFailure()).hasValue(new LongParser.LongParseException(
                 "4",
                 parser,
                 this.context
@@ -95,8 +95,8 @@ class LongParserTest {
     @Test
     void Parse_ValueAboveMax_FailedParse() {
         // Arrange
-        final LongArgument.LongParser<TestCommandSender> parser = new LongArgument.LongParser<>(
-                LongArgument.LongParser.DEFAULT_MINIMUM,
+        final LongParser<TestCommandSender> parser = new LongParser<>(
+                LongParser.DEFAULT_MINIMUM,
                 5L /* max */
         );
 
@@ -107,7 +107,7 @@ class LongParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new LongArgument.LongParseException(
+        assertThat(result.getFailure()).hasValue(new LongParser.LongParseException(
                 "6",
                 parser,
                 this.context
@@ -118,9 +118,9 @@ class LongParserTest {
     @Test
     void Parse_NonLongInput_FailedParse() {
         // Arrange
-        final LongArgument.LongParser<TestCommandSender> parser = new LongArgument.LongParser<>(
-                LongArgument.LongParser.DEFAULT_MINIMUM,
-                LongArgument.LongParser.DEFAULT_MAXIMUM
+        final LongParser<TestCommandSender> parser = new LongParser<>(
+                LongParser.DEFAULT_MINIMUM,
+                LongParser.DEFAULT_MAXIMUM
         );
 
         // Act
@@ -130,7 +130,7 @@ class LongParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new LongArgument.LongParseException(
+        assertThat(result.getFailure()).hasValue(new LongParser.LongParseException(
                 "cow",
                 parser,
                 this.context
@@ -141,9 +141,9 @@ class LongParserTest {
     @Test
     void Suggestions_EmptyInput_ExpectedSuggestions() {
         // Arrange
-        final LongArgument.LongParser<TestCommandSender> parser = new LongArgument.LongParser<>(
-                LongArgument.LongParser.DEFAULT_MINIMUM,
-                LongArgument.LongParser.DEFAULT_MAXIMUM
+        final LongParser<TestCommandSender> parser = new LongParser<>(
+                LongParser.DEFAULT_MINIMUM,
+                LongParser.DEFAULT_MAXIMUM
         );
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();
@@ -164,9 +164,9 @@ class LongParserTest {
     @Test
     void Suggestions_NegativeSignInput_ExpectedSuggestions() {
         // Arrange
-        final LongArgument.LongParser<TestCommandSender> parser = new LongArgument.LongParser<>(
-                LongArgument.LongParser.DEFAULT_MINIMUM,
-                LongArgument.LongParser.DEFAULT_MAXIMUM
+        final LongParser<TestCommandSender> parser = new LongParser<>(
+                LongParser.DEFAULT_MINIMUM,
+                LongParser.DEFAULT_MAXIMUM
         );
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();

@@ -50,10 +50,6 @@ public final class StandardParameters {
      */
     public static final ParserParameter<Boolean> CONFIRMATION = create("confirmation", TypeToken.get(Boolean.class));
     /**
-     * Command completions
-     */
-    public static final ParserParameter<String[]> COMPLETIONS = create("completions", TypeToken.get(String[].class));
-    /**
      * The command should be hidden from help menus, etc
      */
     public static final ParserParameter<Boolean> HIDDEN = create("hidden", TypeToken.get(Boolean.class));

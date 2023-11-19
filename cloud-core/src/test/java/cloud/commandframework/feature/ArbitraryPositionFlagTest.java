@@ -25,8 +25,7 @@ package cloud.commandframework.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.compound.FlagArgument;
-import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.execution.CommandResult;
 import com.google.common.truth.ThrowableSubject;
@@ -37,6 +36,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
+import static cloud.commandframework.arguments.standard.StringParser.greedyFlagYieldingStringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -53,7 +53,7 @@ class ArbitraryPositionFlagTest {
         this.commandManager.command(
                 this.commandManager.commandBuilder("test")
                         .literal("literal")
-                        .required(StringArgument.greedyFlagYielding("text"))
+                        .required("text", greedyFlagYieldingStringParser())
                         .flag(this.commandManager.flagBuilder("flag").withAliases("f")));
     }
 
@@ -90,7 +90,7 @@ class ArbitraryPositionFlagTest {
 
         ThrowableSubject argParse = assertThat(completionException).hasCauseThat();
         argParse.isInstanceOf(ArgumentParseException.class);
-        argParse.hasCauseThat().isInstanceOf(FlagArgument.FlagParseException.class);
+        argParse.hasCauseThat().isInstanceOf(CommandFlagParser.FlagParseException.class);
     }
 
     private Executable commandExecutable(String cmd) {

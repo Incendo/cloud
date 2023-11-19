@@ -25,7 +25,7 @@ package cloud.commandframework.bukkit.parsers.location;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.standard.DoubleArgument;
+import cloud.commandframework.arguments.standard.DoubleParser;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -76,11 +76,11 @@ public final class LocationCoordinateParser<C> implements ArgumentParser<C, Loca
                 commandInput.read();
             }
         } catch (final Exception e) {
-            return ArgumentParseResult.failure(new DoubleArgument.DoubleParseException(
+            return ArgumentParseResult.failure(new DoubleParser.DoubleParseException(
                     input,
-                    new DoubleArgument.DoubleParser<>(
-                            DoubleArgument.DoubleParser.DEFAULT_MINIMUM,
-                            DoubleArgument.DoubleParser.DEFAULT_MAXIMUM
+                    new DoubleParser<>(
+                            DoubleParser.DEFAULT_MINIMUM,
+                            DoubleParser.DEFAULT_MAXIMUM
                     ),
                     commandContext
             ));

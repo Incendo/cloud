@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.parser.ParserParameters;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -39,6 +40,7 @@ import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
@@ -56,7 +58,8 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  */
 @SuppressWarnings("unused")
 @API(status = API.Status.STABLE)
-public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>, CloudKeyHolder<T> {
+public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>, CloudKeyHolder<T>, ParserDescriptor<C, T>,
+        SuggestionProvider<C>, PreprocessorHolder<C> {
 
     /**
      * Pattern for command argument names
@@ -276,14 +279,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         return ParserDescriptor.of(this.parser, this.valueType);
     }
 
-    /**
-     * Returns the preprocessors.
-     *
-     * @return unmodifiable view of the preprocessors
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull Collection<@NonNull ComponentPreprocessor<C>> argumentPreprocessors() {
+    @Override
+    public final @NonNull Collection<@NonNull ComponentPreprocessor<C>> preprocessors() {
         return Collections.unmodifiableCollection(this.argumentPreprocessors);
     }
 
@@ -359,14 +356,14 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
 
     @Override
     public final int compareTo(final @NonNull CommandArgument<?, ?> o) {
-        if (this instanceof StaticArgument) {
-            if (o instanceof StaticArgument) {
+        if (this.parser instanceof LiteralParser) {
+            if (o.parser instanceof LiteralParser) {
                 return this.getName().compareTo(o.getName());
             } else {
                 return -1;
             }
         } else {
-            if (o instanceof StaticArgument) {
+            if (o.parser instanceof LiteralParser) {
                 return 1;
             } else {
                 return 0;
@@ -380,6 +377,16 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @return Value type
      */
     public @NonNull TypeToken<T> getValueType() {
+        return this.valueType;
+    }
+
+    @Override
+    public final @NonNull ArgumentParser<C, T> parser() {
+        return this.parser;
+    }
+
+    @Override
+    public final @NonNull TypeToken<T> valueType() {
         return this.valueType;
     }
 
@@ -397,6 +404,14 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         return argument;
     }
 
+    @Override
+    public final @NonNull List<@NonNull Suggestion> suggestions(
+            @NonNull final CommandContext<C> context,
+            @NonNull final String input
+    ) {
+        return this.suggestionProvider.suggestions(context, input);
+    }
+
     /**
      * Mutable builder for {@link CommandArgument} instances. Builders should extend {@link TypedBuilder} instead of this class.
      *
@@ -404,7 +419,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param <T> Argument value type
      */
     @API(status = API.Status.STABLE)
-    public static class Builder<C, T> {
+    public static class Builder<C, T> implements ParserDescriptor<C, T>, CloudKeyHolder<T>, SuggestionProvider<C>,
+            PreprocessorHolder<C> {
 
         private final TypeToken<T> valueType;
         private final String name;
@@ -414,7 +430,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         private SuggestionProvider<C> suggestionProvider;
 
         private final Collection<BiFunction<@NonNull CommandContext<C>,
-                @NonNull String, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors = new LinkedList<>();
+                @NonNull CommandInput, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors = new LinkedList<>();
 
         private Builder(
                 final @NonNull TypeToken<T> valueType,
@@ -488,7 +504,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
                     this.name,
                     this.parser,
                     this.valueType,
-                    this.suggestionProvider
+                    this.suggestionProvider,
+                    this.argumentPreprocessors
             );
         }
 
@@ -510,6 +527,40 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
 
         protected final @NonNull TypeToken<T> getValueType() {
             return this.valueType;
+        }
+
+        @Override
+        public @NonNull ArgumentParser<C, T> parser() {
+            if (this.parser == null) {
+                this.build();
+            }
+            return this.parser;
+        }
+
+        @Override
+        public @NonNull TypeToken<T> valueType() {
+            return this.valueType;
+        }
+
+        @Override
+        public @NonNull List<@NonNull Suggestion> suggestions(
+                @NonNull final CommandContext<C> context,
+                @NonNull final String input
+        ) {
+            if (this.suggestionProvider == null) {
+                this.build();
+            }
+            return this.suggestionProvider.suggestions(context, input);
+        }
+
+        @Override
+        public @NonNull CloudKey<T> getKey() {
+            return SimpleCloudKey.of(this.name, this.valueType);
+        }
+
+        @Override
+        public @NonNull Collection<ComponentPreprocessor<C>> preprocessors() {
+            return this.argumentPreprocessors.stream().map(ComponentPreprocessor::wrap).collect(Collectors.toList());
         }
     }
 
