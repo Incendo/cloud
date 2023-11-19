@@ -31,11 +31,11 @@ import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.MappedArgumentParser;
 import cloud.commandframework.arguments.standard.BooleanParser;
-import cloud.commandframework.arguments.standard.ByteArgument;
+import cloud.commandframework.arguments.standard.ByteParser;
 import cloud.commandframework.arguments.standard.DoubleArgument;
 import cloud.commandframework.arguments.standard.FloatArgument;
 import cloud.commandframework.arguments.standard.IntegerParser;
-import cloud.commandframework.arguments.standard.LongArgument;
+import cloud.commandframework.arguments.standard.LongParser;
 import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
@@ -140,7 +140,7 @@ public final class CloudBrigadierManager<C, S> {
 
     private void registerInternalMappings() {
         /* Map byte, short and int to IntegerArgumentType */
-        this.registerMapping(new TypeToken<ByteArgument.ByteParser<C>>() {
+        this.registerMapping(new TypeToken<ByteParser<C>>() {
         }, builder -> builder.to(argument -> {
             return IntegerArgumentType.integer(argument.getMin(), argument.getMax());
         }));
@@ -190,7 +190,7 @@ public final class CloudBrigadierManager<C, S> {
             return DoubleArgumentType.doubleArg(argument.getMin(), argument.getMax());
         }));
         /* Map long parser to LongArgumentType */
-        this.registerMapping(new TypeToken<LongArgument.LongParser<C>>() {
+        this.registerMapping(new TypeToken<LongParser<C>>() {
         }, builder -> builder.to(longParser -> {
             if (!longParser.hasMin() && !longParser.hasMax()) {
                 return LongArgumentType.longArg();
@@ -273,7 +273,7 @@ public final class CloudBrigadierManager<C, S> {
      * @since 1.2.0
      */
     public void setNativeNumberSuggestions(final boolean nativeNumberSuggestions) {
-        this.setNativeSuggestions(new TypeToken<ByteArgument.ByteParser<C>>() {
+        this.setNativeSuggestions(new TypeToken<ByteParser<C>>() {
         }, nativeNumberSuggestions);
         this.setNativeSuggestions(new TypeToken<ShortArgument.ShortParser<C>>() {
         }, nativeNumberSuggestions);
@@ -283,7 +283,7 @@ public final class CloudBrigadierManager<C, S> {
         }, nativeNumberSuggestions);
         this.setNativeSuggestions(new TypeToken<DoubleArgument.DoubleParser<C>>() {
         }, nativeNumberSuggestions);
-        this.setNativeSuggestions(new TypeToken<LongArgument.LongParser<C>>() {
+        this.setNativeSuggestions(new TypeToken<LongParser<C>>() {
         }, nativeNumberSuggestions);
     }
 

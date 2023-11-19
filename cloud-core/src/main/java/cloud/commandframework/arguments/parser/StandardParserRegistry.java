@@ -29,14 +29,14 @@ import cloud.commandframework.annotations.specifier.Liberal;
 import cloud.commandframework.annotations.specifier.Quoted;
 import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.arguments.standard.BooleanParser;
-import cloud.commandframework.arguments.standard.ByteArgument;
+import cloud.commandframework.arguments.standard.ByteParser;
 import cloud.commandframework.arguments.standard.CharArgument;
 import cloud.commandframework.arguments.standard.DoubleArgument;
 import cloud.commandframework.arguments.standard.DurationArgument;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.FloatArgument;
 import cloud.commandframework.arguments.standard.IntegerParser;
-import cloud.commandframework.arguments.standard.LongArgument;
+import cloud.commandframework.arguments.standard.LongParser;
 import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
@@ -116,7 +116,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
 
         /* Register standard types */
         this.registerParserSupplier(TypeToken.get(Byte.class), options ->
-                new ByteArgument.ByteParser<>(
+                new ByteParser<>(
                         (byte) options.get(StandardParameters.RANGE_MIN, Byte.MIN_VALUE),
                         (byte) options.get(StandardParameters.RANGE_MAX, Byte.MAX_VALUE)
                 ));
@@ -131,7 +131,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                         (int) options.get(StandardParameters.RANGE_MAX, Integer.MAX_VALUE)
                 ));
         this.registerParserSupplier(TypeToken.get(Long.class), options ->
-                new LongArgument.LongParser<>(
+                new LongParser<>(
                         (long) options.get(StandardParameters.RANGE_MIN, Long.MIN_VALUE),
                         (long) options.get(StandardParameters.RANGE_MAX, Long.MAX_VALUE)
                 ));
