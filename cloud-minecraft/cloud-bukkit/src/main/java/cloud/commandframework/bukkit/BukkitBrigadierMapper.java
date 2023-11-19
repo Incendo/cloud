@@ -34,8 +34,8 @@ import cloud.commandframework.bukkit.parsers.EnchantmentParser;
 import cloud.commandframework.bukkit.parsers.ItemStackParser;
 import cloud.commandframework.bukkit.parsers.ItemStackPredicateParser;
 import cloud.commandframework.bukkit.parsers.NamespacedKeyParser;
-import cloud.commandframework.bukkit.parsers.location.Location2DArgument;
-import cloud.commandframework.bukkit.parsers.location.LocationArgument;
+import cloud.commandframework.bukkit.parsers.location.Location2DParser;
+import cloud.commandframework.bukkit.parsers.location.LocationParser;
 import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorArgument;
 import cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorArgument;
 import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
@@ -120,10 +120,10 @@ public final class BukkitBrigadierMapper<C> {
         this.mapNMS(new TypeToken<MultiplePlayerSelectorArgument.MultiplePlayerSelectorParser<C>>() {
         }, this.entitySelectorArgumentSupplier(false, true));
         /* Map Vec3 */
-        this.mapNMS(new TypeToken<LocationArgument.LocationParser<C>>() {
+        this.mapNMS(new TypeToken<LocationParser<C>>() {
         }, this::argumentVec3);
         /* Map Vec2 */
-        this.mapNMS(new TypeToken<Location2DArgument.Location2DParser<C>>() {
+        this.mapNMS(new TypeToken<Location2DParser<C>>() {
         }, this::argumentVec2);
     }
 

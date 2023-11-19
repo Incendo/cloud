@@ -48,8 +48,8 @@ import cloud.commandframework.bukkit.parsers.OfflinePlayerParser;
 import cloud.commandframework.bukkit.parsers.PlayerParser;
 import cloud.commandframework.bukkit.parsers.WorldParser;
 import cloud.commandframework.bukkit.parsers.location.Location2D;
-import cloud.commandframework.bukkit.parsers.location.Location2DArgument;
-import cloud.commandframework.bukkit.parsers.location.LocationArgument;
+import cloud.commandframework.bukkit.parsers.location.Location2DParser;
+import cloud.commandframework.bukkit.parsers.location.LocationParser;
 import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorArgument;
 import cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorArgument;
 import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
@@ -158,9 +158,9 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         this.parserRegistry().registerParserSupplier(TypeToken.get(Enchantment.class), parserParameters ->
                 new EnchantmentParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(Location.class), parserParameters ->
-                new LocationArgument.LocationParser<>());
+                new LocationParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(Location2D.class), parserParameters ->
-                new Location2DArgument.Location2DParser<>());
+                new Location2DParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(ProtoItemStack.class), parserParameters ->
                 new ItemStackParser<>());
 

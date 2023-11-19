@@ -25,7 +25,7 @@ package cloud.commandframework.bukkit.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.bukkit.parsers.location.Location2D;
-import cloud.commandframework.bukkit.parsers.location.Location2DArgument;
+import cloud.commandframework.bukkit.parsers.location.Location2DParser;
 import cloud.commandframework.bukkit.util.ServerTest;
 import cloud.commandframework.context.CommandInput;
 import java.util.Collections;
@@ -55,7 +55,7 @@ class Location2DArgumentTest extends ServerTest {
     void Parse_HappyFlow_Success(final @NonNull String input, final @NonNull Vector expectedLocation) {
         // Arrange
         when(this.server().getWorlds()).thenReturn(Collections.singletonList(this.world));
-        final Location2DArgument.Location2DParser<CommandSender> parser = new Location2DArgument.Location2DParser<>();
+        final Location2DParser<CommandSender> parser = new Location2DParser<>();
         final CommandInput commandInput = CommandInput.of(input);
 
         // Act
@@ -88,7 +88,7 @@ class Location2DArgumentTest extends ServerTest {
     @ValueSource(strings = { "0 ", "not location" })
     void Parse_InvalidLocation_Failure(final @NonNull String input) {
         // Arrange
-        final Location2DArgument.Location2DParser<CommandSender> parser = new Location2DArgument.Location2DParser<>();
+        final Location2DParser<CommandSender> parser = new Location2DParser<>();
         final CommandInput commandInput = CommandInput.of(input);
 
         // Act
