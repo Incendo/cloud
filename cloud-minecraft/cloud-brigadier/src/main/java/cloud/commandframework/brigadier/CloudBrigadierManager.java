@@ -36,7 +36,7 @@ import cloud.commandframework.arguments.standard.DoubleParser;
 import cloud.commandframework.arguments.standard.FloatParser;
 import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.LongParser;
-import cloud.commandframework.arguments.standard.ShortArgument;
+import cloud.commandframework.arguments.standard.ShortParser;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
@@ -144,7 +144,7 @@ public final class CloudBrigadierManager<C, S> {
         }, builder -> builder.to(argument -> {
             return IntegerArgumentType.integer(argument.getMin(), argument.getMax());
         }));
-        this.registerMapping(new TypeToken<ShortArgument.ShortParser<C>>() {
+        this.registerMapping(new TypeToken<ShortParser<C>>() {
         }, builder -> builder.to(argument -> {
             return IntegerArgumentType.integer(argument.getMin(), argument.getMax());
         }));
@@ -275,7 +275,7 @@ public final class CloudBrigadierManager<C, S> {
     public void setNativeNumberSuggestions(final boolean nativeNumberSuggestions) {
         this.setNativeSuggestions(new TypeToken<ByteParser<C>>() {
         }, nativeNumberSuggestions);
-        this.setNativeSuggestions(new TypeToken<ShortArgument.ShortParser<C>>() {
+        this.setNativeSuggestions(new TypeToken<ShortParser<C>>() {
         }, nativeNumberSuggestions);
         this.setNativeSuggestions(new TypeToken<IntegerParser<C>>() {
         }, nativeNumberSuggestions);
