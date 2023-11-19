@@ -59,7 +59,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
 @SuppressWarnings("unused")
 @API(status = API.Status.STABLE)
 public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>, CloudKeyHolder<T>, ParserDescriptor<C, T>,
-        SuggestionProvider<C> {
+        SuggestionProvider<C>, PreprocessorHolder<C> {
 
     /**
      * Pattern for command argument names
@@ -279,14 +279,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         return ParserDescriptor.of(this.parser, this.valueType);
     }
 
-    /**
-     * Returns the preprocessors.
-     *
-     * @return unmodifiable view of the preprocessors
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull Collection<@NonNull ComponentPreprocessor<C>> argumentPreprocessors() {
+    @Override
+    public final @NonNull Collection<@NonNull ComponentPreprocessor<C>> preprocessors() {
         return Collections.unmodifiableCollection(this.argumentPreprocessors);
     }
 
@@ -425,7 +419,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param <T> Argument value type
      */
     @API(status = API.Status.STABLE)
-    public static class Builder<C, T> {
+    public static class Builder<C, T> implements ParserDescriptor<C, T>, CloudKeyHolder<T>, SuggestionProvider<C>,
+            PreprocessorHolder<C> {
 
         private final TypeToken<T> valueType;
         private final String name;
@@ -435,7 +430,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         private SuggestionProvider<C> suggestionProvider;
 
         private final Collection<BiFunction<@NonNull CommandContext<C>,
-                @NonNull String, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors = new LinkedList<>();
+                @NonNull CommandInput, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors = new LinkedList<>();
 
         private Builder(
                 final @NonNull TypeToken<T> valueType,
@@ -509,7 +504,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
                     this.name,
                     this.parser,
                     this.valueType,
-                    this.suggestionProvider
+                    this.suggestionProvider,
+                    this.argumentPreprocessors
             );
         }
 
@@ -531,6 +527,40 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
 
         protected final @NonNull TypeToken<T> getValueType() {
             return this.valueType;
+        }
+
+        @Override
+        public @NonNull ArgumentParser<C, T> parser() {
+            if (this.parser == null) {
+                this.build();
+            }
+            return this.parser;
+        }
+
+        @Override
+        public @NonNull TypeToken<T> valueType() {
+            return this.valueType;
+        }
+
+        @Override
+        public @NonNull List<@NonNull Suggestion> suggestions(
+                @NonNull final CommandContext<C> context,
+                @NonNull final String input
+        ) {
+            if (this.suggestionProvider == null) {
+                this.build();
+            }
+            return this.suggestionProvider.suggestions(context, input);
+        }
+
+        @Override
+        public @NonNull CloudKey<T> getKey() {
+            return SimpleCloudKey.of(this.name, this.valueType);
+        }
+
+        @Override
+        public @NonNull Collection<ComponentPreprocessor<C>> preprocessors() {
+            return this.argumentPreprocessors.stream().map(ComponentPreprocessor::wrap).collect(Collectors.toList());
         }
     }
 

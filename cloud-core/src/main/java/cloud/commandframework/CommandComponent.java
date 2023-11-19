@@ -26,6 +26,7 @@ package cloud.commandframework;
 import cloud.commandframework.arguments.ComponentPreprocessor;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.LiteralParser;
+import cloud.commandframework.arguments.PreprocessorHolder;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -56,7 +57,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  * @since 1.3.0
  */
 @API(status = API.Status.STABLE, since = "1.3.0")
-public class CommandComponent<C> implements Comparable<CommandComponent<C>> {
+public class CommandComponent<C> implements Comparable<CommandComponent<C>>, PreprocessorHolder<C> {
 
     private final String name;
     private final ArgumentParser<C, ?> parser;
@@ -341,7 +342,8 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>> {
         return ArgumentParseResult.success(true);
     }
 
-    protected final @NonNull Collection<@NonNull ComponentPreprocessor<C>> preprocessors() {
+    @Override
+    public final @NonNull Collection<@NonNull ComponentPreprocessor<C>> preprocessors() {
         return Collections.unmodifiableCollection(this.componentPreprocessors);
     }
 

@@ -25,6 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.LiteralParser;
+import cloud.commandframework.arguments.PreprocessorHolder;
 import cloud.commandframework.arguments.compound.ArgumentPair;
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
 import cloud.commandframework.arguments.flags.CommandFlag;
@@ -523,6 +524,9 @@ public class Command<C> {
             if (argument instanceof SuggestionProvider) {
                 builder.suggestionProvider((SuggestionProvider<C>) argument);
             }
+            if (argument instanceof PreprocessorHolder) {
+                builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
+            }
             return this.argument(builder);
         }
 
@@ -609,6 +613,9 @@ public class Command<C> {
             if (argument instanceof SuggestionProvider) {
                 builder.suggestionProvider((SuggestionProvider<C>) argument);
             }
+            if (argument instanceof PreprocessorHolder) {
+                builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
+            }
             return this.argument(builder);
         }
 
@@ -630,6 +637,9 @@ public class Command<C> {
                     .parser(argument);
             if (argument instanceof SuggestionProvider) {
                 builder.suggestionProvider((SuggestionProvider<C>) argument);
+            }
+            if (argument instanceof PreprocessorHolder) {
+                builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
             }
             return this.argument(builder);
         }
@@ -653,6 +663,9 @@ public class Command<C> {
                     .optional();
             if (argument instanceof SuggestionProvider) {
                 builder.suggestionProvider((SuggestionProvider<C>) argument);
+            }
+            if (argument instanceof PreprocessorHolder) {
+                builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
             }
             return this.argument(builder);
         }
