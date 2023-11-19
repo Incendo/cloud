@@ -23,10 +23,9 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.arguments.standard.StringParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -50,6 +49,7 @@ import org.mockito.ArgumentCaptor;
 import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
 import static cloud.commandframework.arguments.standard.FloatParser.floatParser;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
+import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
@@ -211,7 +211,7 @@ class CommandTreeTest {
 
         final Command<TestCommandSender> toProxy = this.commandManager.commandBuilder("test")
                 .literal("unproxied")
-                .required(StringArgument.of("string"))
+                .required("string", stringParser())
                 .required("int", integerParser())
                 .literal("anotherliteral")
                 .handler(executionHandler)
@@ -409,7 +409,7 @@ class CommandTreeTest {
     void testAmbiguousNodes() {
         // Call setup(); after each time we leave the Tree in an invalid state
         this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
-                .required(StringArgument.of("string"))
+                .required("string", stringParser())
         );
         assertThrows(AmbiguousNodeException.class, () ->
                 this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
@@ -418,7 +418,7 @@ class CommandTreeTest {
 
         // Literal and argument can co-exist, not ambiguous
         this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
-                .required(StringArgument.of("string"))
+                .required("string", stringParser())
         );
         this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
                 .literal("literal"));
@@ -478,7 +478,7 @@ class CommandTreeTest {
         /* Build two commands for testing literals overriding variable arguments */
         this.commandManager.command(
                 this.commandManager.commandBuilder("literalwithvariable")
-                        .required(StringArgument.of("variable"))
+                        .required("variable", stringParser())
         );
 
         this.commandManager.command(
@@ -517,11 +517,12 @@ class CommandTreeTest {
     @Test
     void testDuplicateArgument() {
         // Arrange
-        final CommandArgument<TestCommandSender, String> argument = StringArgument.of("test");
-        this.commandManager.command(this.commandManager.commandBuilder("one").required(argument));
+        final CommandComponent<TestCommandSender> component =
+                StringParser.<TestCommandSender>stringComponent(StringParser.StringMode.SINGLE).name("test").build();
+        this.commandManager.command(this.commandManager.commandBuilder("one").argument(component));
 
         // Act & Assert
-        this.commandManager.command(this.commandManager.commandBuilder("two").required(argument));
+        this.commandManager.command(this.commandManager.commandBuilder("two").argument(component));
     }
 
     @Test
@@ -561,8 +562,8 @@ class CommandTreeTest {
 
         this.commandManager.command(
                 this.commandManager.commandBuilder("optionals")
-                        .optional(StringArgument.of("opt1"))
-                        .optional(StringArgument.of("opt2"))
+                        .optional("opt1", stringParser())
+                        .optional("opt2", stringParser())
                         .handler(executionHandler)
                         .build()
         );

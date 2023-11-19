@@ -27,8 +27,6 @@ import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import java.util.Collections;
-import java.util.LinkedList;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -46,10 +44,7 @@ class StringParserTest {
     @Test
     void Parse_GreedyFlagAwareLongFormFlag_EndsAfterFlag() {
         // Arrange
-        final StringArgument.StringParser<TestCommandSender> parser = new StringArgument.StringParser<>(
-                StringArgument.StringMode.GREEDY_FLAG_YIELDING,
-                (context, input) -> Collections.emptyList()
-        );
+        final StringParser<TestCommandSender> parser = new StringParser<>(StringParser.StringMode.GREEDY_FLAG_YIELDING);
         final CommandInput commandInput = CommandInput.of(ArgumentTestHelper.linkedListOf(
                 "this",
                 "is",
@@ -77,10 +72,7 @@ class StringParserTest {
     @Test
     void Parse_GreedyFlagAwareShortFormFlag_EndsAfterFlag() {
         // Arrange
-        final StringArgument.StringParser<TestCommandSender> parser = new StringArgument.StringParser<>(
-                StringArgument.StringMode.GREEDY_FLAG_YIELDING,
-                (context, input) -> Collections.emptyList()
-        );
+        final StringParser<TestCommandSender> parser = new StringParser<>(StringParser.StringMode.GREEDY_FLAG_YIELDING);
         final CommandInput commandInput = CommandInput.of(ArgumentTestHelper.linkedListOf(
                 "this",
                 "is",

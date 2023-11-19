@@ -38,10 +38,9 @@ import cloud.commandframework.arguments.standard.FloatParser;
 import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.LongParser;
 import cloud.commandframework.arguments.standard.ShortParser;
-import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
+import cloud.commandframework.arguments.standard.StringParser;
 import cloud.commandframework.arguments.standard.UUIDParser;
-import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import io.leangen.geantyref.AnnotatedTypeMap;
 import io.leangen.geantyref.GenericTypeReflector;
@@ -49,7 +48,6 @@ import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedType;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
@@ -58,7 +56,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -163,23 +160,18 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                         "Don't know whether to create GREEDY or QUOTED StringArgument.StringParser, both specified."
                 );
             }
-            final StringArgument.StringMode stringMode;
+            final StringParser.StringMode stringMode;
             // allow @Greedy and @FlagYielding to both be true, give flag yielding priority
             if (greedyFlagAware) {
-                stringMode = StringArgument.StringMode.GREEDY_FLAG_YIELDING;
+                stringMode = StringParser.StringMode.GREEDY_FLAG_YIELDING;
             } else if (greedy) {
-                stringMode = StringArgument.StringMode.GREEDY;
+                stringMode = StringParser.StringMode.GREEDY;
             } else if (quoted) {
-                stringMode = StringArgument.StringMode.QUOTED;
+                stringMode = StringParser.StringMode.QUOTED;
             } else {
-                stringMode = StringArgument.StringMode.SINGLE;
+                stringMode = StringParser.StringMode.SINGLE;
             }
-            return new StringArgument.StringParser<>(
-                    stringMode,
-                    (context, s) -> Arrays.stream(options.get(StandardParameters.COMPLETIONS, new String[0]))
-                            .map(Suggestion::simple)
-                            .collect(Collectors.toList())
-            );
+            return new StringParser<>(stringMode);
         });
         this.registerParserSupplier(TypeToken.get(Boolean.class), options -> {
             final boolean liberal = options.get(StandardParameters.LIBERAL, false);

@@ -33,7 +33,7 @@ import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.standard.IntegerParser;
-import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.arguments.standard.StringParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
@@ -73,8 +73,7 @@ class AnnotationParserTest {
     void setup() {
         manager = new TestCommandManager();
         annotationParser = new AnnotationParser<>(manager, TestCommandSender.class, p -> SimpleCommandMeta.empty());
-        manager.parserRegistry().registerNamedParserSupplier("potato", p -> new StringArgument.StringParser<>(
-                StringArgument.StringMode.SINGLE, (c, s) -> Collections.singletonList(Suggestion.simple("potato"))));
+        manager.parserRegistry().registerNamedParserSupplier("potato", p -> new StringParser<>(StringParser.StringMode.SINGLE));
         /* Register a suggestion provider */
         manager.parserRegistry().registerSuggestionProvider(
                 "some-name",

@@ -24,7 +24,7 @@
 package cloud.commandframework.kotlin
 
 import cloud.commandframework.CommandManager
-import cloud.commandframework.arguments.standard.StringArgument
+import cloud.commandframework.arguments.standard.StringParser.stringParser
 import cloud.commandframework.execution.CommandExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
 import cloud.commandframework.kotlin.extension.argumentDescription
@@ -48,9 +48,11 @@ class CommandBuildingDSLTest {
                 senderType<SpecificCommandSender>()
 
                 literal("dsl")
-                required(argumentDescription("An amazing command argument")) {
-                    StringArgument.of("moment")
+
+                required("moment", stringParser()) {
+                    description(argumentDescription("An amazing command argument"))
                 }
+
                 handler {
                     // ...
                 }

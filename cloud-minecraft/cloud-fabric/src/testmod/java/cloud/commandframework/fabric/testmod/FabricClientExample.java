@@ -25,7 +25,6 @@ package cloud.commandframework.fabric.testmod;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricClientCommandManager;
 import cloud.commandframework.fabric.argument.ItemInputArgument;
@@ -55,6 +54,9 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import static cloud.commandframework.arguments.standard.StringParser.greedyStringParser;
+import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 
 public final class FabricClientExample implements ClientModInitializer {
 
@@ -95,7 +97,7 @@ public final class FabricClientExample implements ClientModInitializer {
                 }));
 
         commandManager.command(base.literal("say")
-                .required(StringArgument.greedy("message"))
+                .required("required", greedyStringParser())
                 .handler(ctx -> ctx.getSender().sendFeedback(
                         Component.literal("Cloud client commands says: " + ctx.get("message"))
                 )));
@@ -128,7 +130,7 @@ public final class FabricClientExample implements ClientModInitializer {
                 }));
 
         commandManager.command(base.literal("flag_test")
-                .optional(StringArgument.of("parameter"))
+                .optional("parameter", stringParser())
                 .flag(CommandFlag.builder("flag").withAliases("f"))
                 .handler(ctx -> ctx.getSender().sendFeedback(Component.literal("Had flag: " + ctx.flags().isPresent("flag")))));
     }

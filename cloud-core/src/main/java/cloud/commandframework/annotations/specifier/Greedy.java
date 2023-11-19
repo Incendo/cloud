@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
 import org.apiguardian.api.API;
 
 /**
- * Annotation used to make {@link cloud.commandframework.arguments.standard.StringArgument string arguments} greedy
+ * Annotation used to make {@link cloud.commandframework.arguments.standard.StringParser string parsers} greedy
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)

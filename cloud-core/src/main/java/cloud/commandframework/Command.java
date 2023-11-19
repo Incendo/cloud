@@ -31,6 +31,7 @@ import cloud.commandframework.arguments.compound.ArgumentTriplet;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.meta.CommandMeta;
@@ -629,44 +630,6 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional {@code argument} to the command
-         *
-         * @param argument     Argument to add
-         * @param description  Description of the argument
-         * @param defaultValue The default value that gets used when the argument is omitted
-         * @param <T>          Argument type
-         * @return New builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
-         */
-        @API(status = API.Status.STABLE, since = "2.0.0")
-        public <T> @NonNull Builder<C> optional(
-                final @NonNull CommandArgument<C, T> argument,
-                final @NonNull ArgumentDescription description,
-                final @NonNull DefaultValue<C, T> defaultValue
-        ) {
-            return this.argument(this.argumentToComponent(argument).optional(defaultValue).description(description));
-        }
-
-        /**
-         * Adds the given optional {@code argument} to the command
-         *
-         * @param argument     Argument to add
-         * @param description  Description of the argument
-         * @param defaultValue The default value that gets used when the argument is omitted
-         * @param <T>          Argument type
-         * @return New builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
-         */
-        @API(status = API.Status.STABLE, since = "2.0.0")
-        public <T> @NonNull Builder<C> optional(
-                final CommandArgument.@NonNull Builder<C, T> argument,
-                final @NonNull ArgumentDescription description,
-                final @NonNull DefaultValue<C, T> defaultValue
-        ) {
-            return this.argument(this.argumentToComponent(argument.build()).optional().description(description));
-        }
-
-        /**
          * Adds the given required {@code argument} to the command
          *
          * @param argument Argument to add
@@ -701,6 +664,31 @@ public class Command<C> {
         /**
          * Adds the given required argument to the command
          *
+         * @param name        the name of the argument
+         * @param parser      the parser
+         * @param suggestions the suggestion provider
+         * @param <T>         the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> required(
+                final @NonNull String name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull SuggestionProvider<C> suggestions
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .name(name)
+                            .parser(parser)
+                            .suggestionProvider(suggestions)
+                            .build()
+            );
+        }
+
+        /**
+         * Adds the given required argument to the command
+         *
          * @param name   the name of the argument
          * @param parser the parser
          * @param <T>    the type produced by the parser
@@ -713,6 +701,31 @@ public class Command<C> {
                 final @NonNull ParserDescriptor<C, T> parser
         ) {
             return this.argument(CommandComponent.<C, T>builder().key(name).parser(parser).build());
+        }
+
+        /**
+         * Adds the given required argument to the command
+         *
+         * @param name        the name of the argument
+         * @param parser      the parser
+         * @param suggestions the suggestion provider
+         * @param <T>         the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> required(
+                final @NonNull CloudKey<T> name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull SuggestionProvider<C> suggestions
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .key(name)
+                            .parser(parser)
+                            .suggestionProvider(suggestions)
+                            .build()
+            );
         }
 
         /**
@@ -740,6 +753,34 @@ public class Command<C> {
          * @param name        the name of the argument
          * @param parser      the parser
          * @param description the description of the argument
+         * @param suggestions the suggestion provider
+         * @param <T>         the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> required(
+                final @NonNull CloudKey<T> name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ArgumentDescription description,
+                final @NonNull SuggestionProvider<C> suggestions
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .key(name)
+                            .parser(parser)
+                            .description(description)
+                            .suggestionProvider(suggestions)
+                            .build()
+            );
+        }
+
+        /**
+         * Adds the given required argument to the command
+         *
+         * @param name        the name of the argument
+         * @param parser      the parser
+         * @param description the description of the argument
          * @param <T>         the type produced by the parser
          * @return New builder instance with the command argument inserted into the argument list
          * @since 2.0.0
@@ -752,6 +793,35 @@ public class Command<C> {
         ) {
             return this.argument(CommandComponent.<C, T>builder().name(name).parser(parser).description(description).build());
         }
+
+        /**
+         * Adds the given required argument to the command
+         *
+         * @param name        the name of the argument
+         * @param parser      the parser
+         * @param description the description of the argument
+         * @param suggestions the suggestion provider
+         * @param <T>         the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> required(
+                final @NonNull String name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ArgumentDescription description,
+                final @NonNull SuggestionProvider<C> suggestions
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .name(name)
+                            .parser(parser)
+                            .description(description)
+                            .suggestionProvider(suggestions)
+                            .build()
+            );
+        }
+
 
         /**
          * Adds the given optional argument to the command
@@ -768,6 +838,32 @@ public class Command<C> {
                 final @NonNull ParserDescriptor<C, T> parser
         ) {
             return this.argument(CommandComponent.<C, T>builder().name(name).parser(parser).optional().build());
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param name        the name of the argument
+         * @param parser      the parser
+         * @param suggestions the suggestion provider
+         * @param <T>         the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull String name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull SuggestionProvider<C> suggestions
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .name(name)
+                            .parser(parser)
+                            .optional()
+                            .suggestionProvider(suggestions)
+                            .build()
+            );
         }
 
         /**
@@ -792,6 +888,32 @@ public class Command<C> {
          *
          * @param name        the name of the argument
          * @param parser      the parser
+         * @param suggestions the suggestion provider
+         * @param <T>         the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull CloudKey<T> name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull SuggestionProvider<C> suggestions
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .key(name)
+                            .parser(parser)
+                            .optional()
+                            .suggestionProvider(suggestions)
+                            .build()
+            );
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param name        the name of the argument
+         * @param parser      the parser
          * @param description the description of the argument
          * @param <T>         the type produced by the parser
          * @return New builder instance with the command argument inserted into the argument list
@@ -809,6 +931,35 @@ public class Command<C> {
                             .parser(parser)
                             .description(description)
                             .optional()
+                            .build()
+            );
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param name        the name of the argument
+         * @param parser      the parser
+         * @param description the description of the argument
+         * @param suggestions the suggestion provider
+         * @param <T>         the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull String name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ArgumentDescription description,
+                final @NonNull SuggestionProvider<C> suggestions
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .name(name)
+                            .parser(parser)
+                            .description(description)
+                            .optional()
+                            .suggestionProvider(suggestions)
                             .build()
             );
         }
@@ -842,6 +993,35 @@ public class Command<C> {
         /**
          * Adds the given optional argument to the command
          *
+         * @param name        the name of the argument
+         * @param parser      the parser
+         * @param description the description of the argument
+         * @param suggestions the suggestion provider
+         * @param <T>         the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull CloudKey<T> name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ArgumentDescription description,
+                final @NonNull SuggestionProvider<C> suggestions
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .key(name)
+                            .parser(parser)
+                            .description(description)
+                            .optional()
+                            .suggestionProvider(suggestions)
+                            .build()
+            );
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
          * @param name         the name of the argument
          * @param parser       the parser
          * @param defaultValue the default value
@@ -870,6 +1050,34 @@ public class Command<C> {
          * @param name         the name of the argument
          * @param parser       the parser
          * @param defaultValue the default value
+         * @param suggestions  the suggestion provider
+         * @param <T>          the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull String name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull DefaultValue<C, T> defaultValue,
+                final @NonNull SuggestionProvider<C> suggestions
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .name(name)
+                            .parser(parser)
+                            .optional(defaultValue)
+                            .suggestionProvider(suggestions)
+                            .build()
+            );
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param name         the name of the argument
+         * @param parser       the parser
+         * @param defaultValue the default value
          * @param <T>          the type produced by the parser
          * @return New builder instance with the command argument inserted into the argument list
          * @since 2.0.0
@@ -885,6 +1093,34 @@ public class Command<C> {
                             .key(name)
                             .parser(parser)
                             .optional(defaultValue)
+                            .build()
+            );
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param name         the name of the argument
+         * @param parser       the parser
+         * @param defaultValue the default value
+         * @param suggestions  the suggestion provider
+         * @param <T>          the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull CloudKey<T> name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull DefaultValue<C, T> defaultValue,
+                final @NonNull SuggestionProvider<C> suggestions
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .key(name)
+                            .parser(parser)
+                            .optional(defaultValue)
+                            .suggestionProvider(suggestions)
                             .build()
             );
         }
@@ -924,6 +1160,37 @@ public class Command<C> {
          * @param parser       the parser
          * @param defaultValue the default value
          * @param description  the description of the argument
+         * @param suggestions  the suggestion provider
+         * @param <T>          the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull String name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull DefaultValue<C, T> defaultValue,
+                final @NonNull ArgumentDescription description,
+                final @NonNull SuggestionProvider<C> suggestions
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .name(name)
+                            .parser(parser)
+                            .optional(defaultValue)
+                            .description(description)
+                            .suggestionProvider(suggestions)
+                            .build()
+            );
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param name         the name of the argument
+         * @param parser       the parser
+         * @param defaultValue the default value
+         * @param description  the description of the argument
          * @param <T>          the type produced by the parser
          * @return New builder instance with the command argument inserted into the argument list
          * @since 2.0.0
@@ -941,6 +1208,37 @@ public class Command<C> {
                             .parser(parser)
                             .optional(defaultValue)
                             .description(description)
+                            .build()
+            );
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param name         the name of the argument
+         * @param parser       the parser
+         * @param defaultValue the default value
+         * @param description  the description of the argument
+         * @param suggestions  the suggestion provider
+         * @param <T>          the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull CloudKey<T> name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull DefaultValue<C, T> defaultValue,
+                final @NonNull ArgumentDescription description,
+                final @NonNull SuggestionProvider<C> suggestions
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .key(name)
+                            .parser(parser)
+                            .optional(defaultValue)
+                            .description(description)
+                            .suggestionProvider(suggestions)
                             .build()
             );
         }

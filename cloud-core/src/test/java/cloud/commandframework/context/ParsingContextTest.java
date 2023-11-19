@@ -26,12 +26,12 @@ package cloud.commandframework.context;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.standard.IntegerParser;
-import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.execution.CommandResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
+import static cloud.commandframework.arguments.standard.StringParser.greedyStringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 
@@ -50,7 +50,7 @@ class ParsingContextTest {
         this.commandManager.command(
                 this.commandManager.commandBuilder("test", "t")
                         .required("int", IntegerParser.integerParser())
-                        .required(StringArgument.greedy("string"))
+                        .required("string", greedyStringParser())
         );
         final String commandInput = "t 1337 roflmao xd";
 

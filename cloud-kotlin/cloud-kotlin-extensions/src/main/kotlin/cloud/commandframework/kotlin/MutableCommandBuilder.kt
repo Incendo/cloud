@@ -29,7 +29,9 @@ import cloud.commandframework.CommandComponent
 import cloud.commandframework.CommandManager
 import cloud.commandframework.TypedCommandComponent
 import cloud.commandframework.arguments.CommandArgument
+import cloud.commandframework.arguments.parser.ParserDescriptor
 import cloud.commandframework.execution.CommandExecutionHandler
+import cloud.commandframework.keys.CloudKey
 import cloud.commandframework.kotlin.extension.command
 import cloud.commandframework.kotlin.extension.senderType
 import cloud.commandframework.meta.CommandMeta
@@ -396,6 +398,115 @@ public class MutableCommandBuilder<C : Any>(
     ): MutableCommandBuilder<C> = mutate { it.required(argument, description) }
 
     /**
+     * Adds a new component to this command
+     *
+     * @param component component to add
+     * @return this mutable builder
+     * @since 2.0.0
+     */
+    public fun argument(
+        component: CommandComponent<C>
+    ): MutableCommandBuilder<C> = mutate { it.argument(component) }
+
+    /**
+     * Adds a new component to this command
+     *
+     * @param component component to add
+     * @return this mutable builder
+     * @since 2.0.0
+     */
+    public fun required(
+        component: CommandComponent.Builder<C, *>
+    ): MutableCommandBuilder<C> = mutate { it.required(component) }
+
+    /**
+     * Adds a new component to this command
+     *
+     * @param component component to add
+     * @return this mutable builder
+     * @since 2.0.0
+     */
+    public fun optional(
+        component: CommandComponent.Builder<C, *>
+    ): MutableCommandBuilder<C> = mutate { it.optional(component) }
+
+    /**
+     * Adds a new component to this command
+     *
+     * @param name the name of the component
+     * @param parser the parser of the component
+     * @param mutator mutator of the component
+     * @param T the type of the component
+     * @since 2.0.0
+     */
+    public fun <T> required(
+        name: String,
+        parser: ParserDescriptor<C, T>,
+        mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
+    ): MutableCommandBuilder<C> = mutate {
+        it.required(
+            CommandComponent.builder<C, T>().name(name).parser(parser).also(mutator)
+        )
+    }
+
+    /**
+     * Adds a new component to this command
+     *
+     * @param name the name of the component
+     * @param parser the parser of the component
+     * @param mutator mutator of the component
+     * @param T the type of the component
+     * @since 2.0.0
+     */
+    public fun <T> optional(
+        name: String,
+        parser: ParserDescriptor<C, T>,
+        mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
+    ): MutableCommandBuilder<C> = mutate {
+        it.required(
+            CommandComponent.builder<C, T>().name(name).parser(parser).optional().also(mutator)
+        )
+    }
+
+    /**
+     * Adds a new component to this command
+     *
+     * @param name the name of the component
+     * @param parser the parser of the component
+     * @param mutator mutator of the component
+     * @param T the type of the component
+     * @since 2.0.0
+     */
+    public fun <T> required(
+        name: CloudKey<T>,
+        parser: ParserDescriptor<C, T>,
+        mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
+    ): MutableCommandBuilder<C> = mutate {
+        it.required(
+            CommandComponent.builder<C, T>().key(name).parser(parser).also(mutator)
+        )
+    }
+
+    /**
+     * Adds a new component to this command
+     *
+     * @param name the name of the component
+     * @param parser the parser of the component
+     * @param mutator mutator of the component
+     * @param T the type of the component
+     * @since 2.0.0
+     */
+    public fun <T> optional(
+        name: CloudKey<T>,
+        parser: ParserDescriptor<C, T>,
+        mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
+    ): MutableCommandBuilder<C> = mutate {
+        it.required(
+            CommandComponent.builder<C, T>().key(name).parser(parser).optional().also(mutator)
+        )
+    }
+
+    /**
      * Add a new argument to this command
      *
      * @param argument argument to add
@@ -446,6 +557,39 @@ public class MutableCommandBuilder<C : Any>(
         description: ArgumentDescription = ArgumentDescription.empty(),
         argumentSupplier: () -> CommandArgument<C, *>
     ): MutableCommandBuilder<C> = mutate { it.required(argumentSupplier(), description) }
+
+    /**
+     * Add a new argument to this command
+     *
+     * @param componentSupplier supplier of the component
+     * @return this mutable builder
+     * @since 2.0.0
+     */
+    public fun argument(
+        componentSupplier: () -> CommandComponent<C>
+    ): MutableCommandBuilder<C> = mutate { it.argument(componentSupplier()) }
+
+    /**
+     * Add a new argument to this command
+     *
+     * @param componentSupplier supplier of the component
+     * @return this mutable builder
+     * @since 2.0.0
+     */
+    public fun required(
+        componentSupplier: () -> CommandComponent.Builder<*, *>
+    ): MutableCommandBuilder<C> = mutate { it.required(componentSupplier()) }
+
+    /**
+     * Add a new argument to this command
+     *
+     * @param componentSupplier supplier of the component
+     * @return this mutable builder
+     * @since 2.0.0
+     */
+    public fun optional(
+        componentSupplier: () -> CommandComponent.Builder<C, *>
+    ): MutableCommandBuilder<C> = mutate { it.optional(componentSupplier()) }
 
     /**
      * Add a new argument to this command

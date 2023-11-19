@@ -27,7 +27,6 @@ import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
@@ -71,6 +70,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.Vec3;
 
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
+import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 
 public final class FabricExample implements ModInitializer {
 
@@ -82,12 +82,12 @@ public final class FabricExample implements ModInitializer {
 
         final Command.Builder<CommandSourceStack> base = manager.commandBuilder("cloudtest");
 
-        final CommandArgument<CommandSourceStack, String> name = StringArgument.of("name");
+        final CloudKey<String> name = SimpleCloudKey.of("name", String.class);
         final CloudKey<Integer> hugs = SimpleCloudKey.of("hugs", Integer.class);
 
         manager.command(base
                 .literal("hugs")
-                .required(name)
+                .required(name, stringParser())
                 .optional(hugs, integerParser(), DefaultValue.constant(1))
                 .handler(ctx -> {
                     ctx.getSender().sendSuccess(Component.literal("Hello, ")

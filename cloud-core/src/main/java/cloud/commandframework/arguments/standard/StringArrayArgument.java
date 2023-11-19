@@ -38,7 +38,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * This is a command argument type that essentially mimics {@link StringArgument#greedy(String)},
+ * This is a command argument type that essentially mimics {@link StringParser#greedyStringParser()},
  * but then splits the input string into a string array. The input string will be split at
  * every blank space.
  *

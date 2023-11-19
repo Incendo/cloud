@@ -37,8 +37,8 @@ import cloud.commandframework.arguments.standard.FloatParser;
 import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.LongParser;
 import cloud.commandframework.arguments.standard.ShortParser;
-import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
+import cloud.commandframework.arguments.standard.StringParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
@@ -207,7 +207,7 @@ public final class CloudBrigadierManager<C, S> {
         this.registerMapping(new TypeToken<BooleanParser<C>>() {
         }, builder -> builder.toConstant(BoolArgumentType.bool()));
         /* Map String properly to StringArgumentType */
-        this.registerMapping(new TypeToken<StringArgument.StringParser<C>>() {
+        this.registerMapping(new TypeToken<StringParser<C>>() {
         }, builder -> builder.cloudSuggestions().to(argument -> {
             switch (argument.getStringMode()) {
                 case QUOTED:
