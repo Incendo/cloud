@@ -31,10 +31,10 @@ import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.arguments.standard.BooleanParser;
 import cloud.commandframework.arguments.standard.ByteParser;
 import cloud.commandframework.arguments.standard.CharacterParser;
-import cloud.commandframework.arguments.standard.DoubleArgument;
+import cloud.commandframework.arguments.standard.DoubleParser;
 import cloud.commandframework.arguments.standard.DurationArgument;
 import cloud.commandframework.arguments.standard.EnumParser;
-import cloud.commandframework.arguments.standard.FloatArgument;
+import cloud.commandframework.arguments.standard.FloatParser;
 import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.LongParser;
 import cloud.commandframework.arguments.standard.ShortArgument;
@@ -136,12 +136,12 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                         (long) options.get(StandardParameters.RANGE_MAX, Long.MAX_VALUE)
                 ));
         this.registerParserSupplier(TypeToken.get(Float.class), options ->
-                new FloatArgument.FloatParser<>(
+                new FloatParser<>(
                         (float) options.get(StandardParameters.RANGE_MIN, Float.NEGATIVE_INFINITY),
                         (float) options.get(StandardParameters.RANGE_MAX, Float.POSITIVE_INFINITY)
                 ));
         this.registerParserSupplier(TypeToken.get(Double.class), options ->
-                new DoubleArgument.DoubleParser<>(
+                new DoubleParser<>(
                         (double) options.get(StandardParameters.RANGE_MIN, Double.NEGATIVE_INFINITY),
                         (double) options.get(StandardParameters.RANGE_MAX, Double.POSITIVE_INFINITY)
                 ));

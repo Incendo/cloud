@@ -45,9 +45,9 @@ class FloatParserTest {
     @Test
     void Parse_NoMinMax_SuccessfulParse() {
         // Arrange
-        final FloatArgument.FloatParser<TestCommandSender> parser = new FloatArgument.FloatParser<>(
-                FloatArgument.FloatParser.DEFAULT_MINIMUM,
-                FloatArgument.FloatParser.DEFAULT_MAXIMUM
+        final FloatParser<TestCommandSender> parser = new FloatParser<>(
+                FloatParser.DEFAULT_MINIMUM,
+                FloatParser.DEFAULT_MAXIMUM
         );
 
         final float floatInput = ThreadLocalRandom.current().nextFloat();
@@ -69,9 +69,9 @@ class FloatParserTest {
     @Test
     void Parse_ValueBelowMin_FailedParse() {
         // Arrange
-        final FloatArgument.FloatParser<TestCommandSender> parser = new FloatArgument.FloatParser<>(
+        final FloatParser<TestCommandSender> parser = new FloatParser<>(
                 5 /* min */,
-                FloatArgument.FloatParser.DEFAULT_MAXIMUM
+                FloatParser.DEFAULT_MAXIMUM
         );
 
         // Act
@@ -81,7 +81,7 @@ class FloatParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new FloatArgument.FloatParseException(
+        assertThat(result.getFailure()).hasValue(new FloatParser.FloatParseException(
                 "4.0",
                 parser,
                 this.context
@@ -92,8 +92,8 @@ class FloatParserTest {
     @Test
     void Parse_ValueAboveMax_FailedParse() {
         // Arrange
-        final FloatArgument.FloatParser<TestCommandSender> parser = new FloatArgument.FloatParser<>(
-                FloatArgument.FloatParser.DEFAULT_MINIMUM,
+        final FloatParser<TestCommandSender> parser = new FloatParser<>(
+                FloatParser.DEFAULT_MINIMUM,
                 5.0f /* max */
         );
 
@@ -104,7 +104,7 @@ class FloatParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new FloatArgument.FloatParseException(
+        assertThat(result.getFailure()).hasValue(new FloatParser.FloatParseException(
                 "6.0",
                 parser,
                 this.context
@@ -115,9 +115,9 @@ class FloatParserTest {
     @Test
     void Parse_NonFloatInput_FailedParse() {
         // Arrange
-        final FloatArgument.FloatParser<TestCommandSender> parser = new FloatArgument.FloatParser<>(
-                FloatArgument.FloatParser.DEFAULT_MINIMUM,
-                FloatArgument.FloatParser.DEFAULT_MAXIMUM
+        final FloatParser<TestCommandSender> parser = new FloatParser<>(
+                FloatParser.DEFAULT_MINIMUM,
+                FloatParser.DEFAULT_MAXIMUM
         );
 
         // Act
@@ -127,7 +127,7 @@ class FloatParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new FloatArgument.FloatParseException(
+        assertThat(result.getFailure()).hasValue(new FloatParser.FloatParseException(
                 "cow",
                 parser,
                 this.context

@@ -26,7 +26,6 @@ package cloud.commandframework;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.standard.FloatArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
@@ -49,6 +48,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
+import static cloud.commandframework.arguments.standard.FloatParser.floatParser;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
@@ -532,7 +532,7 @@ class CommandTreeTest {
 
         this.commandManager.command(
                 this.commandManager.commandBuilder("float")
-                        .required(FloatArgument.of("num"))
+                        .required("num", floatParser())
                         .handler(executionHandler)
                         .build()
         );

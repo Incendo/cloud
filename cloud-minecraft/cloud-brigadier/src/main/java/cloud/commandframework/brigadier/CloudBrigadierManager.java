@@ -32,8 +32,8 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.MappedArgumentParser;
 import cloud.commandframework.arguments.standard.BooleanParser;
 import cloud.commandframework.arguments.standard.ByteParser;
-import cloud.commandframework.arguments.standard.DoubleArgument;
-import cloud.commandframework.arguments.standard.FloatArgument;
+import cloud.commandframework.arguments.standard.DoubleParser;
+import cloud.commandframework.arguments.standard.FloatParser;
 import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.LongParser;
 import cloud.commandframework.arguments.standard.ShortArgument;
@@ -162,7 +162,7 @@ public final class CloudBrigadierManager<C, S> {
             return IntegerArgumentType.integer(argument.getMin(), argument.getMax());
         }));
         /* Map float to FloatArgumentType */
-        this.registerMapping(new TypeToken<FloatArgument.FloatParser<C>>() {
+        this.registerMapping(new TypeToken<FloatParser<C>>() {
         }, builder -> builder.to(argument -> {
             if (!argument.hasMin() && !argument.hasMax()) {
                 return FloatArgumentType.floatArg();
@@ -176,7 +176,7 @@ public final class CloudBrigadierManager<C, S> {
             return FloatArgumentType.floatArg(argument.getMin(), argument.getMax());
         }));
         /* Map double to DoubleArgumentType */
-        this.registerMapping(new TypeToken<DoubleArgument.DoubleParser<C>>() {
+        this.registerMapping(new TypeToken<DoubleParser<C>>() {
         }, builder -> builder.to(argument -> {
             if (!argument.hasMin() && !argument.hasMax()) {
                 return DoubleArgumentType.doubleArg();
@@ -279,9 +279,9 @@ public final class CloudBrigadierManager<C, S> {
         }, nativeNumberSuggestions);
         this.setNativeSuggestions(new TypeToken<IntegerParser<C>>() {
         }, nativeNumberSuggestions);
-        this.setNativeSuggestions(new TypeToken<FloatArgument.FloatParser<C>>() {
+        this.setNativeSuggestions(new TypeToken<FloatParser<C>>() {
         }, nativeNumberSuggestions);
-        this.setNativeSuggestions(new TypeToken<DoubleArgument.DoubleParser<C>>() {
+        this.setNativeSuggestions(new TypeToken<DoubleParser<C>>() {
         }, nativeNumberSuggestions);
         this.setNativeSuggestions(new TypeToken<LongParser<C>>() {
         }, nativeNumberSuggestions);
