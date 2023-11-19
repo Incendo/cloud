@@ -33,7 +33,7 @@ import cloud.commandframework.arguments.standard.ByteParser;
 import cloud.commandframework.arguments.standard.CharacterParser;
 import cloud.commandframework.arguments.standard.DoubleArgument;
 import cloud.commandframework.arguments.standard.DurationArgument;
-import cloud.commandframework.arguments.standard.EnumArgument;
+import cloud.commandframework.arguments.standard.EnumParser;
 import cloud.commandframework.arguments.standard.FloatArgument;
 import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.LongParser;
@@ -256,7 +256,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         if (producer == null) {
             /* Give enums special treatment */
             if (GenericTypeReflector.isSuperType(Enum.class, actualType.getType())) {
-                @SuppressWarnings("rawtypes") final EnumArgument.EnumParser enumArgument = new EnumArgument.EnumParser(
+                @SuppressWarnings("rawtypes") final EnumParser enumArgument = new EnumParser(
                         GenericTypeReflector.erase(actualType.getType())
                 );
                 return Optional.of(enumArgument);

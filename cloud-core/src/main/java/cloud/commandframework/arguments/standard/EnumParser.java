@@ -23,11 +23,10 @@
 //
 package cloud.commandframework.arguments.standard;
 
-import cloud.commandframework.ArgumentDescription;
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
@@ -40,130 +39,87 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
-/**
- * Argument type that recognizes enums
- *
- * @param <C> Argument sender
- * @param <E> Enum type
- */
-@SuppressWarnings("unused")
 @API(status = API.Status.STABLE)
-public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
-
-    protected EnumArgument(
-            final @NonNull Class<E> enumClass,
-            final @NonNull String name,
-            final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
-    ) {
-        super(name, new EnumParser<>(enumClass), enumClass, suggestionProvider, defaultDescription);
-    }
+public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C, E> {
 
     /**
-     * Create a new {@link Builder}.
+     * Creates a new enum parser.
      *
-     * @param enumClass enum class
-     * @param name      argument name
-     * @param <C>       sender type
-     * @param <E>       enum type
-     * @return new {@link Builder}
-     * @since 1.8.0
+     * @param <C>       command sender type
+     * @param <E>       the enum type
+     * @param enumClass the enum class
+     * @return the created parser
+     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "1.8.0")
-    public static <C, E extends Enum<E>> @NonNull Builder<C, E> builder(
-            final @NonNull Class<E> enumClass,
-            final @NonNull String name
-    ) {
-        return new Builder<>(name, enumClass);
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C, E extends Enum<E>> @NonNull ParserDescriptor<C, E> enumParser(final @NonNull Class<E> enumClass) {
+        return ParserDescriptor.of(new EnumParser<>(enumClass), enumClass);
     }
 
     /**
-     * Create a new required command argument
+     * Returns a {@link CommandComponent.Builder} using {@link #enumParser(Class)} as the parser.
+     *
+     * @param <C>       command sender type
+     * @param <E>       the enum type
+     * @param enumClass the enum class
+     * @return the component builder
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C, E extends Enum<E>> CommandComponent.@NonNull Builder<C, E> enumComponent(
+            final @NonNull Class<E> enumClass
+    ) {
+        return CommandComponent.<C, E>builder().parser(enumParser(enumClass));
+    }
+
+    private final Class<E> enumClass;
+    private final EnumSet<E> allowedValues;
+
+    /**
+     * Construct a new enum parser
      *
      * @param enumClass Enum class
-     * @param name      Name of the argument
-     * @param <C>       Command sender type
-     * @param <E>       Enum type
-     * @return Created argument
      */
-    public static <C, E extends Enum<E>> @NonNull CommandArgument<C, E> of(
-            final @NonNull Class<E> enumClass,
-            final @NonNull String name
+    public EnumParser(final @NonNull Class<E> enumClass) {
+        this.enumClass = enumClass;
+        this.allowedValues = EnumSet.allOf(enumClass);
+    }
+
+    @Override
+    public @NonNull ArgumentParseResult<E> parse(
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull CommandInput commandInput
     ) {
-        return EnumArgument.<C, E>builder(enumClass, name).build();
+        final String input = commandInput.peekString();
+        if (input.isEmpty()) {
+            return ArgumentParseResult.failure(new NoInputProvidedException(
+                    EnumParser.class,
+                    commandContext
+            ));
+        }
+
+        for (final E value : this.allowedValues) {
+            if (value.name().equalsIgnoreCase(input)) {
+                commandInput.readString();
+                return ArgumentParseResult.success(value);
+            }
+        }
+
+        return ArgumentParseResult.failure(new EnumParseException(input, this.enumClass, commandContext));
     }
 
-
-    @API(status = API.Status.STABLE)
-    public static final class Builder<C, E extends Enum<E>> extends CommandArgument.TypedBuilder<C, E, Builder<C, E>> {
-
-        private final Class<E> enumClass;
-
-        private Builder(final @NonNull String name, final @NonNull Class<E> enumClass) {
-            super(enumClass, name);
-            this.enumClass = enumClass;
-        }
-
-        @Override
-        public @NonNull CommandArgument<C, E> build() {
-            return new EnumArgument<>(this.enumClass, this.getName(), this.suggestionProvider(), this.getDefaultDescription());
-        }
+    @Override
+    public @NonNull List<@NonNull String> stringSuggestions(
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull String input
+    ) {
+        return EnumSet.allOf(this.enumClass).stream().map(e -> e.name().toLowerCase()).collect(Collectors.toList());
     }
 
-
-    @API(status = API.Status.STABLE)
-    public static final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C, E> {
-
-        private final Class<E> enumClass;
-        private final EnumSet<E> allowedValues;
-
-        /**
-         * Construct a new enum parser
-         *
-         * @param enumClass Enum class
-         */
-        public EnumParser(final @NonNull Class<E> enumClass) {
-            this.enumClass = enumClass;
-            this.allowedValues = EnumSet.allOf(enumClass);
-        }
-
-        @Override
-        public @NonNull ArgumentParseResult<E> parse(
-                final @NonNull CommandContext<C> commandContext,
-                final @NonNull CommandInput commandInput
-        ) {
-            final String input = commandInput.peekString();
-            if (input.isEmpty()) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(
-                        EnumParser.class,
-                        commandContext
-                ));
-            }
-
-            for (final E value : this.allowedValues) {
-                if (value.name().equalsIgnoreCase(input)) {
-                    commandInput.readString();
-                    return ArgumentParseResult.success(value);
-                }
-            }
-
-            return ArgumentParseResult.failure(new EnumParseException(input, this.enumClass, commandContext));
-        }
-
-        @Override
-        public @NonNull List<@NonNull String> stringSuggestions(
-                final @NonNull CommandContext<C> commandContext,
-                final @NonNull String input
-        ) {
-            return EnumSet.allOf(this.enumClass).stream().map(e -> e.name().toLowerCase()).collect(Collectors.toList());
-        }
-
-        @Override
-        public boolean isContextFree() {
-            return true;
-        }
+    @Override
+    public boolean isContextFree() {
+        return true;
     }
 
 

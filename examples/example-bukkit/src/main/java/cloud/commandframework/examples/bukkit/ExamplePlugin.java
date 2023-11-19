@@ -40,7 +40,6 @@ import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
-import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
@@ -106,6 +105,7 @@ import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static net.kyori.adventure.text.Component.text;
 
@@ -351,7 +351,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 }));
         this.manager.command(builder.literal("summon")
                 .senderType(Player.class)
-                .required(EnumArgument.of(EntityType.class, "type"))
+                .required("type", enumParser(EntityType.class))
                 .handler(c -> this.manager.taskRecipe().begin(c).synchronous(ctx -> {
                     final Location loc = ((Player) ctx.getSender()).getLocation();
                     loc.getWorld().spawnEntity(loc, ctx.get("type"));

@@ -26,7 +26,6 @@ package cloud.commandframework;
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.standard.DurationArgument;
-import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
@@ -48,6 +47,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static cloud.commandframework.arguments.standard.ArgumentTestHelper.suggestionList;
 import static cloud.commandframework.arguments.standard.BooleanParser.booleanParser;
+import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerComponent;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.util.TestUtils.createManager;
@@ -67,7 +67,7 @@ class CommandSuggestionsTest {
                 .literal("var")
                 .required(StringArgument.<TestCommandSender>builder("str")
                         .withSuggestionProvider((c, s) -> suggestionList("one", "two")))
-                .required(EnumArgument.of(TestEnum.class, "enum")));
+                .required("enum", enumParser(TestEnum.class)));
         this.manager.command(manager.commandBuilder("test")
                 .literal("comb")
                 .required(StringArgument.<TestCommandSender>builder("str")
@@ -132,7 +132,7 @@ class CommandSuggestionsTest {
                         return ArgumentParseResult.failure(new NullPointerException());
                     }
                 }))
-                .required(EnumArgument.of(TestEnum.class, "enum"))
+                .required("enum", enumParser(TestEnum.class))
                 .literal("world"));
     }
 
@@ -241,7 +241,7 @@ class CommandSuggestionsTest {
         this.manager.command(manager.commandBuilder("flags")
                 .required("num", IntegerParser.integerParser())
                 .flag(manager.flagBuilder("enum")
-                        .withComponent(EnumArgument.of(TestEnum.class, "enum"))
+                        .withComponent(enumParser(TestEnum.class))
                         .build())
                 .flag(manager.flagBuilder("static")
                         .build())
@@ -262,7 +262,7 @@ class CommandSuggestionsTest {
         this.manager.command(manager.commandBuilder("flags")
                 .required("num", IntegerParser.integerParser())
                 .flag(manager.flagBuilder("enum")
-                        .withComponent(EnumArgument.of(TestEnum.class, "enum"))
+                        .withComponent(enumParser(TestEnum.class))
                         .build())
                 .flag(manager.flagBuilder("static")
                         .build())
@@ -283,7 +283,7 @@ class CommandSuggestionsTest {
         this.manager.command(manager.commandBuilder("flags")
                 .required("num", IntegerParser.integerParser())
                 .flag(manager.flagBuilder("enum")
-                        .withComponent(EnumArgument.of(TestEnum.class, "enum"))
+                        .withComponent(enumParser(TestEnum.class))
                         .build())
                 .flag(manager.flagBuilder("static")
                         .build())
@@ -773,8 +773,7 @@ class CommandSuggestionsTest {
         this.manager.setSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING, true);
         this.manager.command(
                 this.manager.commandBuilder("command")
-                        .flag(manager.flagBuilder("flag").withAliases("f")
-                                .withComponent(EnumArgument.of(TestEnum.class, "test")).build())
+                        .flag(manager.flagBuilder("flag").withAliases("f").withComponent(enumParser(TestEnum.class)).build())
                         .flag(manager.flagBuilder("flog").build())
         );
 

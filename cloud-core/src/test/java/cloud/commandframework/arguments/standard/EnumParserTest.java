@@ -49,7 +49,7 @@ class EnumParserTest {
     @EnumSource(TestEnum.class)
     void Parse_EnumValues_SuccessfulParse(final TestEnum value) {
         // Arrange
-        final EnumArgument.EnumParser<TestCommandSender, TestEnum> parser = new EnumArgument.EnumParser<>(
+        final EnumParser<TestCommandSender, TestEnum> parser = new EnumParser<>(
                 TestEnum.class
         );
         CommandInput commandInput = CommandInput.of(value.name());
@@ -69,7 +69,7 @@ class EnumParserTest {
     @Test
     void Parse_NonEnumValue_FailedParse() {
         // Arrange
-        final EnumArgument.EnumParser<TestCommandSender, TestEnum> parser = new EnumArgument.EnumParser<>(
+        final EnumParser<TestCommandSender, TestEnum> parser = new EnumParser<>(
                 TestEnum.class
         );
 
@@ -80,7 +80,7 @@ class EnumParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new EnumArgument.EnumParseException(
+        assertThat(result.getFailure()).hasValue(new EnumParser.EnumParseException(
                 "not-an-enum-value",
                 TestEnum.class,
                 this.context
@@ -91,7 +91,7 @@ class EnumParserTest {
     @Test
     void Suggestions_ExpectedSuggestions() {
         // Arrange
-        final EnumArgument.EnumParser<TestCommandSender, TestEnum> parser = new EnumArgument.EnumParser<>(
+        final EnumParser<TestCommandSender, TestEnum> parser = new EnumParser<>(
                 TestEnum.class
         );
 
