@@ -1702,7 +1702,7 @@ public class Command<C> {
          * @param senderType Required sender type
          * @return New builder instance using the required sender type
          */
-        @SuppressWarnings("unchecked") // This is a safe cast. We know that the type is now going to be N when it is executed.
+        @SuppressWarnings("unchecked")
         public <N extends C> @NonNull Builder<N> senderType(final @NonNull Class<? extends N> senderType) {
             return (Builder<N>) new Builder<>(
                     this.commandManager,
