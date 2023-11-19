@@ -39,14 +39,14 @@ import static com.google.common.truth.Truth8.assertThat;
 @ExtendWith(MockitoExtension.class)
 class CharacterParserTest {
 
-    private CharArgument.CharacterParser<TestCommandSender> parser;
+    private CharacterParser<TestCommandSender> parser;
 
     @Mock
     private CommandContext<TestCommandSender> context;
 
     @BeforeEach
     void setup() {
-        this.parser = new CharArgument.CharacterParser<>();
+        this.parser = new CharacterParser<>();
     }
 
     @Test
@@ -79,7 +79,7 @@ class CharacterParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new CharArgument.CharParseException(
+        assertThat(result.getFailure()).hasValue(new CharacterParser.CharParseException(
                 "aa",
                 this.context
         ));

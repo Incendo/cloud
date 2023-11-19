@@ -30,7 +30,7 @@ import cloud.commandframework.annotations.specifier.Quoted;
 import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.arguments.standard.BooleanParser;
 import cloud.commandframework.arguments.standard.ByteParser;
-import cloud.commandframework.arguments.standard.CharArgument;
+import cloud.commandframework.arguments.standard.CharacterParser;
 import cloud.commandframework.arguments.standard.DoubleArgument;
 import cloud.commandframework.arguments.standard.DurationArgument;
 import cloud.commandframework.arguments.standard.EnumArgument;
@@ -145,7 +145,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                         (double) options.get(StandardParameters.RANGE_MIN, Double.NEGATIVE_INFINITY),
                         (double) options.get(StandardParameters.RANGE_MAX, Double.POSITIVE_INFINITY)
                 ));
-        this.registerParserSupplier(TypeToken.get(Character.class), options -> new CharArgument.CharacterParser<>());
+        this.registerParserSupplier(TypeToken.get(Character.class), options -> new CharacterParser<>());
         this.registerParserSupplier(TypeToken.get(String[].class), options ->
                 new StringArrayArgument.StringArrayParser<>(options.get(StandardParameters.FLAG_YIELDING, false))
         );
