@@ -52,7 +52,7 @@ class TextColorArgumentTest {
     @MethodSource("Parse_LegacyColor_Success_Source")
     void Parse_LegacyColor_Success(final @NonNull String input, final @NonNull TextColor color) {
         // Arrange
-        final TextColorArgument.TextColorParser<Object> parser = new TextColorArgument.TextColorParser<>();
+        final TextColorParser<Object> parser = new TextColorParser<>();
         final CommandInput commandInput = CommandInput.of(input);
 
         // Act
@@ -89,7 +89,7 @@ class TextColorArgumentTest {
     @MethodSource("Parse_NamedColor_Success_Source")
     void Parse_NamedColor_Success(final @NonNull String input, final @NonNull TextColor color) {
         // Arrange
-        final TextColorArgument.TextColorParser<Object> parser = new TextColorArgument.TextColorParser<>();
+        final TextColorParser<Object> parser = new TextColorParser<>();
         final CommandInput commandInput = CommandInput.of(input);
 
         // Act
@@ -109,7 +109,7 @@ class TextColorArgumentTest {
     @MethodSource("Parse_HexColor_Success_Source")
     void Parse_HexColor_Success(final @NonNull String input, final @NonNull TextColor color) {
         // Arrange
-        final TextColorArgument.TextColorParser<Object> parser = new TextColorArgument.TextColorParser<>();
+        final TextColorParser<Object> parser = new TextColorParser<>();
         final CommandInput commandInput = CommandInput.of(input);
 
         // Act
@@ -134,7 +134,7 @@ class TextColorArgumentTest {
     @ValueSource(strings = { "notacolor", "", "woo" } )
     void Parse_InvalidColor_Failure(final @NonNull String input) {
         // Arrange
-        final TextColorArgument.TextColorParser<Object> parser = new TextColorArgument.TextColorParser<>();
+        final TextColorParser<Object> parser = new TextColorParser<>();
         final CommandInput commandInput = CommandInput.of(input);
 
         // Act

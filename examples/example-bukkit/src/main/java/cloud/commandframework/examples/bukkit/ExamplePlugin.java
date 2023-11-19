@@ -58,7 +58,6 @@ import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.minecraft.extras.RichDescription;
-import cloud.commandframework.minecraft.extras.TextColorArgument;
 import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.paper.argument.KeyedWorldArgument;
 import cloud.commandframework.permission.PredicatePermission;
@@ -107,6 +106,7 @@ import static cloud.commandframework.bukkit.parsers.MaterialParser.materialParse
 import static cloud.commandframework.bukkit.parsers.NamespacedKeyParser.namespacedKeyParser;
 import static cloud.commandframework.bukkit.parsers.WorldParser.worldParser;
 import static cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorParser.singleEntitySelectorParser;
+import static cloud.commandframework.minecraft.extras.TextColorParser.textColorParser;
 import static net.kyori.adventure.text.Component.text;
 
 /**
@@ -369,25 +369,19 @@ public final class ExamplePlugin extends JavaPlugin {
                 .meta(CommandMeta.DESCRIPTION, "Sets the color scheme for '/example help'")
                 .literal("helpcolors")
                 .required(
-                        TextColorArgument.of("primary"),
+                        "primary", textColorParser(),
                         RichDescription.of(text("The primary color for the color scheme", Style.style(TextDecoration.ITALIC)))
                 )
                 .required(
-                        TextColorArgument.of("highlight"),
+                        "highlight", textColorParser(),
                         RichDescription.of(text("The primary color used to highlight commands and queries"))
                 )
                 .required(
-                        TextColorArgument.of("alternate_highlight"),
+                        "alternate_highlight",
+                        textColorParser(),
                         RichDescription.of(text("The secondary color used to highlight commands and queries"))
-                )
-                .required(
-                        TextColorArgument.of("text"),
-                        RichDescription.of(text("The color used for description text"))
-                )
-                .required(
-                        TextColorArgument.of("accent"),
-                        RichDescription.of(text("The color used for accents and symbols"))
-                )
+                ).required("text", textColorParser(), RichDescription.of(text("The color used for description text")))
+                .required("accent", textColorParser(), RichDescription.of(text("The color used for accents and symbols")))
                 .handler(c -> this.minecraftHelp.setHelpColors(MinecraftHelp.HelpColors.of(
                         c.get("primary"),
                         c.get("highlight"),
