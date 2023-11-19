@@ -36,10 +36,10 @@ import cloud.commandframework.bukkit.parsers.ItemStackPredicateParser;
 import cloud.commandframework.bukkit.parsers.NamespacedKeyParser;
 import cloud.commandframework.bukkit.parsers.location.Location2DParser;
 import cloud.commandframework.bukkit.parsers.location.LocationParser;
-import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorArgument;
-import cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorArgument;
-import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
-import cloud.commandframework.bukkit.parsers.selector.SinglePlayerSelectorArgument;
+import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorParser;
+import cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorParser;
+import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorParser;
+import cloud.commandframework.bukkit.parsers.selector.SinglePlayerSelectorParser;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import io.leangen.geantyref.GenericTypeReflector;
@@ -111,13 +111,13 @@ public final class BukkitBrigadierMapper<C> {
         this.mapSimpleContextNMS(new TypeToken<BlockPredicateParser<C>>() {
         }, "block_predicate");
         /* Map Entity Selectors */
-        this.mapNMS(new TypeToken<SingleEntitySelectorArgument.SingleEntitySelectorParser<C>>() {
+        this.mapNMS(new TypeToken<SingleEntitySelectorParser<C>>() {
         }, this.entitySelectorArgumentSupplier(true, false));
-        this.mapNMS(new TypeToken<SinglePlayerSelectorArgument.SinglePlayerSelectorParser<C>>() {
+        this.mapNMS(new TypeToken<SinglePlayerSelectorParser<C>>() {
         }, this.entitySelectorArgumentSupplier(true, true));
-        this.mapNMS(new TypeToken<MultipleEntitySelectorArgument.MultipleEntitySelectorParser<C>>() {
+        this.mapNMS(new TypeToken<MultipleEntitySelectorParser<C>>() {
         }, this.entitySelectorArgumentSupplier(false, false));
-        this.mapNMS(new TypeToken<MultiplePlayerSelectorArgument.MultiplePlayerSelectorParser<C>>() {
+        this.mapNMS(new TypeToken<MultiplePlayerSelectorParser<C>>() {
         }, this.entitySelectorArgumentSupplier(false, true));
         /* Map Vec3 */
         this.mapNMS(new TypeToken<LocationParser<C>>() {

@@ -41,8 +41,8 @@ public final class BukkitParserParameters {
 
     /**
      * Used to specify if an empty result is allowed for
-     * {@link cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorArgument} and
-     * {@link cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorArgument}.
+     * {@link cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorParser} and
+     * {@link cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorParser}.
      *
      * @since 1.8.0
      */

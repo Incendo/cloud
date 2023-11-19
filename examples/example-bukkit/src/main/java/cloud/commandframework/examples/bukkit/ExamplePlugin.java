@@ -44,7 +44,6 @@ import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
-import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.SimpleCaptionRegistry;
 import cloud.commandframework.context.CommandContext;
@@ -107,6 +106,7 @@ import static cloud.commandframework.bukkit.parsers.EnchantmentParser.enchantmen
 import static cloud.commandframework.bukkit.parsers.MaterialParser.materialParser;
 import static cloud.commandframework.bukkit.parsers.NamespacedKeyParser.namespacedKeyParser;
 import static cloud.commandframework.bukkit.parsers.WorldParser.worldParser;
+import static cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorParser.singleEntitySelectorParser;
 import static net.kyori.adventure.text.Component.text;
 
 /**
@@ -299,10 +299,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 .command(builder.literal("teleport")
                         .literal("entity")
                         .senderType(Player.class)
-                        .required(
-                                SingleEntitySelectorArgument.of("entity"),
-                                ArgumentDescription.of("Entity to teleport")
-                        )
+                        .required("entity", singleEntitySelectorParser(), ArgumentDescription.of("Entity to teleport"))
                         .literal("here")
                         .handler(
                                 context -> this.manager.taskRecipe().begin(context)
