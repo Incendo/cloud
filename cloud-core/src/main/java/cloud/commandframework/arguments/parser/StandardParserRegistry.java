@@ -38,7 +38,7 @@ import cloud.commandframework.arguments.standard.FloatParser;
 import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.LongParser;
 import cloud.commandframework.arguments.standard.ShortParser;
-import cloud.commandframework.arguments.standard.StringArrayArgument;
+import cloud.commandframework.arguments.standard.StringArrayParser;
 import cloud.commandframework.arguments.standard.StringParser;
 import cloud.commandframework.arguments.standard.UUIDParser;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
@@ -144,7 +144,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                 ));
         this.registerParserSupplier(TypeToken.get(Character.class), options -> new CharacterParser<>());
         this.registerParserSupplier(TypeToken.get(String[].class), options ->
-                new StringArrayArgument.StringArrayParser<>(options.get(StandardParameters.FLAG_YIELDING, false))
+                new StringArrayParser<>(options.get(StandardParameters.FLAG_YIELDING, false))
         );
         /* Make this one less awful */
         this.registerParserSupplier(TypeToken.get(String.class), options -> {

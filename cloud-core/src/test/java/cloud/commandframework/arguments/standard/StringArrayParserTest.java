@@ -42,14 +42,14 @@ import static com.google.common.truth.Truth8.assertThat;
 @ExtendWith(MockitoExtension.class)
 class StringArrayParserTest {
 
-    private StringArrayArgument.StringArrayParser<TestCommandSender> parser;
+    private StringArrayParser<TestCommandSender> parser;
 
     @Mock
     private CommandContext<TestCommandSender> context;
 
     @BeforeEach
     void setup() {
-        this.parser = new StringArrayArgument.StringArrayParser<>();
+        this.parser = new StringArrayParser<>();
     }
 
     @Test
@@ -84,7 +84,7 @@ class StringArrayParserTest {
     @Test
     void Parse_GreedyFlagAwareLongFormFlag_EndsAfterFlag() {
         // Arrange
-        final StringArrayArgument.StringArrayParser<TestCommandSender> parser = new StringArrayArgument.StringArrayParser<>(true);
+        final StringArrayParser<TestCommandSender> parser = new StringArrayParser<>(true);
         final CommandInput commandInput = CommandInput.of(ArgumentTestHelper.linkedListOf(
                 "this",
                 "is",
@@ -112,7 +112,7 @@ class StringArrayParserTest {
     @Test
     void Parse_GreedyFlagAwareShortFormFlag_EndsAfterFlag() {
         // Arrange
-        final StringArrayArgument.StringArrayParser<TestCommandSender> parser = new StringArrayArgument.StringArrayParser<>(true);
+        final StringArrayParser<TestCommandSender> parser = new StringArrayParser<>(true);
         final CommandInput commandInput = CommandInput.of(ArgumentTestHelper.linkedListOf(
                 "this",
                 "is",

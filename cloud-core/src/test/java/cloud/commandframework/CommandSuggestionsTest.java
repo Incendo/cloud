@@ -26,7 +26,6 @@ package cloud.commandframework;
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.standard.IntegerParser;
-import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.arguments.standard.StringParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
@@ -50,6 +49,7 @@ import static cloud.commandframework.arguments.standard.DurationParser.durationP
 import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerComponent;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
+import static cloud.commandframework.arguments.standard.StringArrayParser.flagYieldingStringArrayParser;
 import static cloud.commandframework.arguments.standard.StringParser.greedyFlagYieldingStringParser;
 import static cloud.commandframework.arguments.standard.StringParser.greedyStringParser;
 import static cloud.commandframework.arguments.standard.StringParser.stringComponent;
@@ -633,13 +633,8 @@ class CommandSuggestionsTest {
         this.manager = createManager();
         this.manager.command(
                 this.manager.commandBuilder("command")
-                        .required(
-                                StringArrayArgument.of(
-                                        "array",
-                                        true,
-                                        (context, input) -> Collections.emptyList()
-                                )
-                        ).flag(manager.flagBuilder("flag").withAliases("f").build())
+                        .required("array", flagYieldingStringArrayParser())
+                        .flag(manager.flagBuilder("flag").withAliases("f").build())
                         .flag(manager.flagBuilder("flag2").build())
         );
 
@@ -730,13 +725,8 @@ class CommandSuggestionsTest {
         this.manager.setSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING, true);
         this.manager.command(
                 this.manager.commandBuilder("command")
-                        .required(
-                                StringArrayArgument.of(
-                                        "array",
-                                        true,
-                                        (context, input) -> Collections.emptyList()
-                                )
-                        ).flag(manager.flagBuilder("flag").withAliases("f").build())
+                        .required("array", flagYieldingStringArrayParser())
+                        .flag(manager.flagBuilder("flag").withAliases("f").build())
                         .flag(manager.flagBuilder("flag2").build())
         );
 

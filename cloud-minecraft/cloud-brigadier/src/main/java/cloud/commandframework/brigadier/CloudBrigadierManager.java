@@ -37,7 +37,7 @@ import cloud.commandframework.arguments.standard.FloatParser;
 import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.LongParser;
 import cloud.commandframework.arguments.standard.ShortParser;
-import cloud.commandframework.arguments.standard.StringArrayArgument;
+import cloud.commandframework.arguments.standard.StringArrayParser;
 import cloud.commandframework.arguments.standard.StringParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
@@ -223,7 +223,7 @@ public final class CloudBrigadierManager<C, S> {
         this.registerMapping(new TypeToken<CommandFlagParser<C>>() {
         }, builder -> builder.cloudSuggestions().toConstant(StringArgumentType.greedyString()));
         /* Map String[] to a greedy string */
-        this.registerMapping(new TypeToken<StringArrayArgument.StringArrayParser<C>>() {
+        this.registerMapping(new TypeToken<StringArrayParser<C>>() {
         }, builder -> builder.cloudSuggestions().toConstant(StringArgumentType.greedyString()));
         /* Map wrapped parsers to their native types */
         this.registerMapping(new TypeToken<WrappedBrigadierParser<C, ?>>() {

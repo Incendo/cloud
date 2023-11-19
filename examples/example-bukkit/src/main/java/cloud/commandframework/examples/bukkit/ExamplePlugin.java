@@ -40,7 +40,6 @@ import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
-import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
@@ -107,6 +106,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
+import static cloud.commandframework.arguments.standard.StringArrayParser.stringArrayParser;
 import static net.kyori.adventure.text.Component.text;
 
 /**
@@ -415,17 +415,16 @@ public final class ExamplePlugin extends JavaPlugin {
                         "arraycommand",
                         ArgumentDescription.of("Bukkit-esque cmmand")
                 ).optional(
-                        StringArrayArgument.of(
-                                "args",
-                                (context, lastString) -> {
-                                    final CommandInput allArgs = context.rawInput();
-                                    if (allArgs.remainingTokens() > 1 && allArgs.readString().equals("curry")) {
-                                        return Collections.singletonList(Suggestion.simple("hot"));
-                                    }
-                                    return Collections.emptyList();
-                                }
-                        ),
-                        ArgumentDescription.of("Arguments")
+                        "args",
+                        stringArrayParser(),
+                        ArgumentDescription.of("Arguments"),
+                        (context, lastString) -> {
+                            final CommandInput allArgs = context.rawInput();
+                            if (allArgs.remainingTokens() > 1 && allArgs.readString().equals("curry")) {
+                                return Collections.singletonList(Suggestion.simple("hot"));
+                            }
+                            return Collections.emptyList();
+                        }
                 ).handler(context -> {
                     final String[] args = context.getOrDefault("args", new String[0]);
                     context.getSender().sendMessage("You wrote: " + StringUtils.join(args, " "));

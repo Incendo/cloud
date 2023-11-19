@@ -26,12 +26,11 @@ package cloud.commandframework.issue;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.flags.FlagContext;
-import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandResult;
-import java.util.Collections;
 import org.junit.jupiter.api.Test;
 
+import static cloud.commandframework.arguments.standard.StringArrayParser.flagYieldingStringArrayParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth8.assertThat;
 
@@ -46,25 +45,8 @@ class Issue321 {
         final CommandManager<TestCommandSender> commandManager = createManager();
         commandManager.command(
                 commandManager.commandBuilder("command")
-                        .flag(
-                                commandManager.flagBuilder("flag1")
-                                        .withComponent(
-                                                StringArrayArgument.of(
-                                                        "array",
-                                                        true /* flagYielding */,
-                                                        (context, input) -> Collections.emptyList()
-                                                )
-                                        )
-                        ).flag(
-                                commandManager.flagBuilder("flag2")
-                                        .withComponent(
-                                                StringArrayArgument.of(
-                                                        "array",
-                                                        true /* flagYielding */,
-                                                        (context, input) -> Collections.emptyList()
-                                                )
-                                        )
-                        )
+                        .flag(commandManager.flagBuilder("flag1").withComponent(flagYieldingStringArrayParser()))
+                        .flag(commandManager.flagBuilder("flag2").withComponent(flagYieldingStringArrayParser()))
         );
 
         // Act
