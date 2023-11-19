@@ -28,8 +28,8 @@ import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.LiteralParser;
 import cloud.commandframework.arguments.compound.ArgumentPair;
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
-import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
+import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.keys.CloudKey;
@@ -286,12 +286,12 @@ public class Command<C> {
      */
     @SuppressWarnings("unchecked")
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public FlagArgument.@Nullable FlagArgumentParser<@NonNull C> flagParser() {
+    public @Nullable CommandFlagParser<@NonNull C> flagParser() {
         final CommandComponent<C> flagComponent = this.flagComponent();
         if (flagComponent == null) {
             return null;
         }
-        return (FlagArgument.FlagArgumentParser<C>) flagComponent.parser();
+        return (CommandFlagParser<C>) flagComponent.parser();
     }
 
     /**
@@ -1591,8 +1591,15 @@ public class Command<C> {
             final List<CommandComponent<C>> commandComponents = new ArrayList<>(this.commandComponents);
             /* Construct flag node */
             if (!this.flags.isEmpty()) {
-                final FlagArgument<C> flagArgument = new FlagArgument<>(this.flags);
-                commandComponents.add(this.argumentToComponent(flagArgument).description(ArgumentDescription.of("Command flags")).build());
+                final CommandFlagParser<C> flagParser = new CommandFlagParser<>(this.flags);
+                final CommandComponent<C> flagComponent =
+                        CommandComponent.<C, Object>builder()
+                                .name("flags")
+                                .parser(flagParser)
+                                .valueType(Object.class)
+                                .description(ArgumentDescription.of("Command flags"))
+                                .build();
+                commandComponents.add(flagComponent);
             }
             return new Command<>(
                     Collections.unmodifiableList(commandComponents),

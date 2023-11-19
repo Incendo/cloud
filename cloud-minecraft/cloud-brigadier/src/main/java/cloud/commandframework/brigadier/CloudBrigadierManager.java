@@ -27,7 +27,7 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.compound.CompoundArgument;
-import cloud.commandframework.arguments.compound.FlagArgument;
+import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.MappedArgumentParser;
 import cloud.commandframework.arguments.standard.BooleanParser;
@@ -220,7 +220,7 @@ public final class CloudBrigadierManager<C, S> {
             }
         }));
         /* Map flags to a greedy string */
-        this.registerMapping(new TypeToken<FlagArgument.FlagArgumentParser<C>>() {
+        this.registerMapping(new TypeToken<CommandFlagParser<C>>() {
         }, builder -> builder.cloudSuggestions().toConstant(StringArgumentType.greedyString()));
         /* Map String[] to a greedy string */
         this.registerMapping(new TypeToken<StringArrayArgument.StringArrayParser<C>>() {

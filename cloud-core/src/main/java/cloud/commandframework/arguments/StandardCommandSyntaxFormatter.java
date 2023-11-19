@@ -25,8 +25,8 @@ package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.compound.CompoundArgument;
-import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
+import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.internal.CommandNode;
 import java.util.Iterator;
 import java.util.List;
@@ -66,7 +66,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                         (CompoundArgument.CompoundParser<?, ?, ?>) commandComponent.parser();
                 formattingInstance.appendCompound(commandComponent, compoundParser);
             } else if (commandComponent.type() == CommandComponent.ComponentType.FLAG) {
-                formattingInstance.appendFlag((FlagArgument.FlagArgumentParser<?>) commandComponent.parser());
+                formattingInstance.appendFlag((CommandFlagParser<?>) commandComponent.parser());
             } else {
                 if (commandComponent.required()) {
                     formattingInstance.appendRequired(commandComponent);
@@ -118,7 +118,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 formattingInstance.appendCompound(component, compoundParser);
             } else if (component.type() == CommandComponent.ComponentType.FLAG) {
                 formattingInstance.appendBlankSpace();
-                formattingInstance.appendFlag((FlagArgument.FlagArgumentParser<?>) component.parser());
+                formattingInstance.appendFlag((CommandFlagParser<?>) component.parser());
             } else if (component.type() == CommandComponent.ComponentType.LITERAL) {
                 formattingInstance.appendBlankSpace();
                 formattingInstance.appendLiteral(component);
@@ -206,7 +206,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
          *
          * @param flagParser flag parser
          */
-        public void appendFlag(final FlagArgument.@NonNull FlagArgumentParser<?> flagParser) {
+        public void appendFlag(final @NonNull CommandFlagParser<?> flagParser) {
             this.builder.append(this.getOptionalPrefix());
 
             final Iterator<CommandFlag<?>> flagIterator = flagParser

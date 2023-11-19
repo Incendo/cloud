@@ -26,7 +26,7 @@ package cloud.commandframework;
 import cloud.commandframework.arguments.ComponentPreprocessor;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.LiteralParser;
-import cloud.commandframework.arguments.compound.FlagArgument;
+import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
@@ -596,7 +596,7 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>> {
             final ComponentType componentType;
             if (this.parser instanceof LiteralParser) {
                 componentType = ComponentType.LITERAL;
-            } else if (this.parser instanceof FlagArgument.FlagArgumentParser) {
+            } else if (this.parser instanceof CommandFlagParser) {
                 componentType = ComponentType.FLAG;
             } else if (this.required) {
                 componentType = ComponentType.REQUIRED_VARIABLE;

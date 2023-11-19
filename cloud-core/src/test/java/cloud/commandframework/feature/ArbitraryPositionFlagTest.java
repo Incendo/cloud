@@ -25,7 +25,7 @@ package cloud.commandframework.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.compound.FlagArgument;
+import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.execution.CommandResult;
@@ -90,7 +90,7 @@ class ArbitraryPositionFlagTest {
 
         ThrowableSubject argParse = assertThat(completionException).hasCauseThat();
         argParse.isInstanceOf(ArgumentParseException.class);
-        argParse.hasCauseThat().isInstanceOf(FlagArgument.FlagParseException.class);
+        argParse.hasCauseThat().isInstanceOf(CommandFlagParser.FlagParseException.class);
     }
 
     private Executable commandExecutable(String cmd) {
