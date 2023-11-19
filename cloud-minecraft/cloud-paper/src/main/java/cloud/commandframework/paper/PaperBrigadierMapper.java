@@ -25,7 +25,7 @@ package cloud.commandframework.paper;
 
 import cloud.commandframework.bukkit.BukkitBrigadierMapper;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
-import cloud.commandframework.paper.argument.KeyedWorldArgument;
+import cloud.commandframework.paper.parser.KeyedWorldParser;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.World;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -48,7 +48,7 @@ final class PaperBrigadierMapper<C> {
     private void registerMappings(final @NonNull BukkitBrigadierMapper<C> mapper) {
         final Class<?> keyed = CraftBukkitReflection.findClass("org.bukkit.Keyed");
         if (keyed != null && keyed.isAssignableFrom(World.class)) {
-            mapper.mapSimpleNMS(new TypeToken<KeyedWorldArgument.Parser<C>>() {
+            mapper.mapSimpleNMS(new TypeToken<KeyedWorldParser<C>>() {
             }, "resource_location", true);
         }
     }
