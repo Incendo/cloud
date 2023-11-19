@@ -23,7 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.LiteralParser;
 import cloud.commandframework.arguments.compound.ArgumentPair;
@@ -34,6 +33,7 @@ import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.keys.CloudKeyHolder;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.permission.CommandPermission;
@@ -55,7 +55,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * A command consists out of a chain of {@link CommandArgument command arguments}.
+ * A command consists out of a chain of {@link CommandComponent command components}.
  *
  * @param <C> Command sender type
  */
@@ -506,16 +506,24 @@ public class Command<C> {
          *
          * @param argument    Argument to add
          * @param description Description of the argument
-         * @param <T>         Argument type
+         * @param <U>         Type of the argument
          * @return New builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
+        @SuppressWarnings({"unchecked", "rawtypes"})
         @API(status = API.Status.STABLE, since = "2.0.0")
-        public <T> @NonNull Builder<C> required(
-                final @NonNull CommandArgument<C, T> argument,
+        public <U extends CloudKeyHolder & ParserDescriptor> @NonNull Builder<C> required(
+                final @NonNull U argument,
                 final @NonNull ArgumentDescription description
         ) {
-            return this.argument(this.argumentToComponent(argument).description(description));
+            final CommandComponent.Builder builder = CommandComponent.builder()
+                    .key(argument.getKey())
+                    .parser(argument)
+                    .description(description);
+            if (argument instanceof SuggestionProvider) {
+                builder.suggestionProvider((SuggestionProvider<C>) argument);
+            }
+            return this.argument(builder);
         }
 
         /**
@@ -583,31 +591,70 @@ public class Command<C> {
          *
          * @param argument    Argument to add
          * @param description Description of the argument
-         * @param <T>         Argument type
+         * @param <U>         Type of the argument
          * @return New builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
+        @SuppressWarnings({"unchecked", "rawtypes"})
         @API(status = API.Status.STABLE, since = "2.0.0")
-        public <T> @NonNull Builder<C> optional(
-                final @NonNull CommandArgument<C, T> argument,
+        public <U extends CloudKeyHolder & ParserDescriptor> @NonNull Builder<C> optional(
+                final @NonNull U argument,
                 final @NonNull ArgumentDescription description
         ) {
-            return this.argument(this.argumentToComponent(argument).optional().description(description));
+            final CommandComponent.Builder builder = CommandComponent.builder()
+                    .key(argument.getKey())
+                    .parser(argument)
+                    .optional()
+                    .description(description);
+            if (argument instanceof SuggestionProvider) {
+                builder.suggestionProvider((SuggestionProvider<C>) argument);
+            }
+            return this.argument(builder);
         }
 
         /**
-         * Adds the given required {@code argument} to the command
+         * Adds the given required argument to the command
          *
-         * @param argument Argument to add
-         * @param <T>      Argument type
+         * @param argument the argument
+         * @param <U>      type of the argument
          * @return New builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
+        @SuppressWarnings({"unchecked", "rawtypes"})
         @API(status = API.Status.STABLE, since = "2.0.0")
-        public <T> @NonNull Builder<C> required(
-                final @NonNull CommandArgument<C, T> argument
+        public <U extends CloudKeyHolder & ParserDescriptor> @NonNull Builder<C> required(
+                final @NonNull U argument
         ) {
-            return this.argument(this.argumentToComponent(argument));
+            final CommandComponent.Builder builder = CommandComponent.builder()
+                    .key(argument.getKey())
+                    .parser(argument);
+            if (argument instanceof SuggestionProvider) {
+                builder.suggestionProvider((SuggestionProvider<C>) argument);
+            }
+            return this.argument(builder);
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param argument the argument
+         * @param <U>      type of the argument
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <U extends CloudKeyHolder & ParserDescriptor> @NonNull Builder<C> optional(
+                final @NonNull U argument
+        ) {
+            final CommandComponent.Builder builder = CommandComponent.builder()
+                    .key(argument.getKey())
+                    .parser(argument)
+                    .optional();
+            if (argument instanceof SuggestionProvider) {
+                builder.suggestionProvider((SuggestionProvider<C>) argument);
+            }
+            return this.argument(builder);
         }
 
         /**
@@ -1297,16 +1344,6 @@ public class Command<C> {
                 return this.argument(builder.build());
             }
         }
-
-        private <T> CommandComponent.@NonNull Builder<C, T> argumentToComponent(final @NonNull CommandArgument<C, T> argument) {
-            return CommandComponent.<C, T>builder()
-                    .commandManager(this.commandManager)
-                    .key(argument.getKey())
-                    .parser(argument.parserDescriptor())
-                    .suggestionProvider(argument.suggestionProvider())
-                    .preprocessors(argument.argumentPreprocessors());
-        }
-
 
         // Compound helper methods
 

@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.parser.ParserParameters;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -39,6 +40,7 @@ import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
@@ -56,7 +58,8 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  */
 @SuppressWarnings("unused")
 @API(status = API.Status.STABLE)
-public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>, CloudKeyHolder<T> {
+public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>, CloudKeyHolder<T>, ParserDescriptor<C, T>,
+        SuggestionProvider<C> {
 
     /**
      * Pattern for command argument names
@@ -383,6 +386,16 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         return this.valueType;
     }
 
+    @Override
+    public final @NonNull ArgumentParser<C, T> parser() {
+        return this.parser;
+    }
+
+    @Override
+    public final @NonNull TypeToken<T> valueType() {
+        return this.valueType;
+    }
+
     /**
      * Create a copy of the command argument
      *
@@ -395,6 +408,14 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         final CommandArgument<C, T> argument = builder.build();
         this.argumentPreprocessors.forEach(argument::addPreprocessor);
         return argument;
+    }
+
+    @Override
+    public final @NonNull List<@NonNull Suggestion> suggestions(
+            @NonNull final CommandContext<C> context,
+            @NonNull final String input
+    ) {
+        return this.suggestionProvider.suggestions(context, input);
     }
 
     /**

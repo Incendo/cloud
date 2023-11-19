@@ -26,7 +26,6 @@ package cloud.commandframework.context;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationAccessor;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.FlagContext;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionRegistry;
@@ -191,18 +190,6 @@ public class CommandContext<C> {
      * @param keyHolder Holder of the identifying key
      * @param value     Value
      * @param <T>       Value type
-     */
-    public <T extends @NonNull Object> void store(final @NonNull CommandArgument<C, T> keyHolder, final T value) {
-        this.store((CloudKeyHolder<T>) keyHolder, value);
-    }
-
-    /**
-     * Store a value in the context map. This will overwrite any existing
-     * value stored with the same key
-     *
-     * @param keyHolder Holder of the identifying key
-     * @param value     Value
-     * @param <T>       Value type
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
@@ -323,19 +310,6 @@ public class CommandContext<C> {
         } else {
             return Optional.empty();
         }
-    }
-
-    /**
-     * Get a value from its key. Will return {@link Optional#empty()}
-     * if no value is stored with the given key
-     *
-     * @param keyHolder Holder of the key
-     * @param <T>       Value type
-     * @return Value
-     */
-    @SuppressWarnings("unused")
-    public <T extends @NonNull Object> @NonNull Optional<T> getOptional(final @NonNull CommandArgument<C, T> keyHolder) {
-        return this.getOptional((CloudKeyHolder<T>) keyHolder);
     }
 
     /**
