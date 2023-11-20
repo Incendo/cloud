@@ -46,7 +46,6 @@ import static net.kyori.adventure.text.Component.text;
  */
 public final class ConfirmationExample implements AnnotationFeature {
 
-    private CommandConfirmationManager<CommandSender> confirmationManager;
     private BukkitAudiences bukkitAudiences;
 
     @Override
@@ -79,7 +78,7 @@ public final class ConfirmationExample implements AnnotationFeature {
         commandManager.command(
                 commandManager.commandBuilder("annotations")
                         .literal("confirm")
-                        .handler(this.confirmationManager.createConfirmationExecutionHandler())
+                        .handler(confirmationManager.createConfirmationExecutionHandler())
         );
     }
 
