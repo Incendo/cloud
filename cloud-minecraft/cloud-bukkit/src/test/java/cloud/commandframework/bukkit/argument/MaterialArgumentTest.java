@@ -24,7 +24,7 @@
 package cloud.commandframework.bukkit.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.bukkit.parsers.MaterialArgument;
+import cloud.commandframework.bukkit.parsers.MaterialParser;
 import cloud.commandframework.bukkit.util.ServerTest;
 import cloud.commandframework.context.CommandInput;
 import org.bukkit.Material;
@@ -43,7 +43,7 @@ class MaterialArgumentTest extends ServerTest {
     @EnumSource(value = Material.class, names = { "DIRT", "STONE", "ACACIA_BOAT" })
     void Parse_HappyFlow_Success(final @NonNull Material material) {
         // Arrange
-        final MaterialArgument.MaterialParser<CommandSender> parser = new MaterialArgument.MaterialParser<>();
+        final MaterialParser<CommandSender> parser = new MaterialParser<>();
         final CommandInput commandInput = CommandInput.of(material.name().toLowerCase());
 
         // Act
@@ -61,7 +61,7 @@ class MaterialArgumentTest extends ServerTest {
     @Test
     void Parse_NonExistentMaterial_Failure() {
         // Arrange
-        final MaterialArgument.MaterialParser<CommandSender> parser = new MaterialArgument.MaterialParser<>();
+        final MaterialParser<CommandSender> parser = new MaterialParser<>();
         final CommandInput commandInput = CommandInput.of("material");
 
         // Act

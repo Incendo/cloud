@@ -24,7 +24,7 @@
 package cloud.commandframework.bukkit.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.bukkit.parsers.OfflinePlayerArgument;
+import cloud.commandframework.bukkit.parsers.OfflinePlayerParser;
 import cloud.commandframework.bukkit.util.ServerTest;
 import cloud.commandframework.context.CommandInput;
 import com.google.common.truth.Truth;
@@ -53,7 +53,7 @@ class OfflinePlayerArgumentTest extends ServerTest {
     void Parse_HappyFlow_Success() {
         // Arrange
         when(this.player.hasPlayedBefore()).thenReturn(true);
-        final OfflinePlayerArgument.OfflinePlayerParser<CommandSender> parser = new OfflinePlayerArgument.OfflinePlayerParser<>();
+        final OfflinePlayerParser<CommandSender> parser = new OfflinePlayerParser<>();
         final CommandInput commandInput = CommandInput.of("player");
 
         // Act
@@ -73,7 +73,7 @@ class OfflinePlayerArgumentTest extends ServerTest {
     @Test
     void Parse_NonExistentPlayer_Failure() {
         // Arrange
-        final OfflinePlayerArgument.OfflinePlayerParser<CommandSender> parser = new OfflinePlayerArgument.OfflinePlayerParser<>();
+        final OfflinePlayerParser<CommandSender> parser = new OfflinePlayerParser<>();
         final CommandInput commandInput = CommandInput.of("player");
 
         // Act

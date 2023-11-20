@@ -37,19 +37,13 @@ import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.annotations.Regex;
 import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.annotations.suggestions.Suggestions;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
-import cloud.commandframework.bukkit.argument.NamespacedKeyArgument;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
-import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
-import cloud.commandframework.bukkit.parsers.MaterialArgument;
-import cloud.commandframework.bukkit.parsers.WorldArgument;
-import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.SimpleCaptionRegistry;
 import cloud.commandframework.context.CommandContext;
@@ -58,14 +52,13 @@ import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
+import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.minecraft.extras.RichDescription;
-import cloud.commandframework.minecraft.extras.TextColorArgument;
 import cloud.commandframework.paper.PaperCommandManager;
-import cloud.commandframework.paper.argument.KeyedWorldArgument;
 import cloud.commandframework.permission.PredicatePermission;
 import cloud.commandframework.tasks.TaskConsumer;
 import cloud.commandframework.types.tuples.Pair;
@@ -107,6 +100,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.arguments.standard.StringArrayParser.stringArrayParser;
+import static cloud.commandframework.bukkit.parsers.EnchantmentParser.enchantmentParser;
+import static cloud.commandframework.bukkit.parsers.MaterialParser.materialParser;
+import static cloud.commandframework.bukkit.parsers.NamespacedKeyParser.namespacedKeyParser;
+import static cloud.commandframework.bukkit.parsers.WorldParser.worldParser;
+import static cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorParser.singleEntitySelectorParser;
+import static cloud.commandframework.minecraft.extras.TextColorParser.textColorParser;
+import static cloud.commandframework.paper.parser.KeyedWorldParser.keyedWorldParser;
 import static net.kyori.adventure.text.Component.text;
 
 /**
@@ -269,7 +269,7 @@ public final class ExamplePlugin extends JavaPlugin {
         //
         // Create a world argument
         //
-        final CommandArgument<CommandSender, World> worldArgument = WorldArgument.of("world");
+        final CloudKey<World> worldKey = SimpleCloudKey.of("world", World.class);
         //
         // Create a teleportation command
         //
@@ -277,7 +277,7 @@ public final class ExamplePlugin extends JavaPlugin {
                         .literal("me")
                         // Require a player sender
                         .senderType(Player.class)
-                        .required(worldArgument, ArgumentDescription.of("World name"))
+                        .required(worldKey, worldParser(), ArgumentDescription.of("World name"))
                         .requiredArgumentTriplet(
                                 "coords",
                                 TypeToken.get(Vector.class),
@@ -291,7 +291,7 @@ public final class ExamplePlugin extends JavaPlugin {
                         .handler(context -> this.manager.taskRecipe().begin(context)
                                 .synchronous(commandContext -> {
                                     final Player player = commandContext.getSender();
-                                    final World world = commandContext.get(worldArgument);
+                                    final World world = commandContext.get(worldKey);
                                     final Vector coords = commandContext.get("coords");
                                     final Location location = coords.toLocation(world);
                                     player.teleport(location);
@@ -299,10 +299,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 .command(builder.literal("teleport")
                         .literal("entity")
                         .senderType(Player.class)
-                        .required(
-                                SingleEntitySelectorArgument.of("entity"),
-                                ArgumentDescription.of("Entity to teleport")
-                        )
+                        .required("entity", singleEntitySelectorParser(), ArgumentDescription.of("Entity to teleport"))
                         .literal("here")
                         .handler(
                                 context -> this.manager.taskRecipe().begin(context)
@@ -321,7 +318,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 .command(builder.literal("teleport")
                         .meta(CommandMeta.DESCRIPTION, "Teleport to a world")
                         .senderType(Player.class)
-                        .required(WorldArgument.of("world"), ArgumentDescription.of("World to teleport to"))
+                        .required("world", worldParser(), ArgumentDescription.of("World to teleport to"))
                         .handler(context -> this.manager.taskRecipe().begin(context).synchronous(ctx -> {
                             final Player player = ctx.getSender();
                             player.teleport(ctx.<World>get("world").getSpawnLocation());
@@ -341,7 +338,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 ));
         this.manager.command(this.manager.commandBuilder("give")
                 .senderType(Player.class)
-                .required(MaterialArgument.of("material"))
+                .required("material", materialParser())
                 .required("amount", integerParser())
                 .handler(c -> {
                     final Material material = c.get("material");
@@ -359,7 +356,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 }).execute()));
         this.manager.command(builder.literal("enchant")
                 .senderType(Player.class)
-                .required(EnchantmentArgument.of("enchant"))
+                .required("enchant", enchantmentParser())
                 .required("level", integerParser())
                 .handler(c -> this.manager.taskRecipe().begin(c).synchronous(ctx -> {
                     final Player player = ctx.getSender();
@@ -373,25 +370,19 @@ public final class ExamplePlugin extends JavaPlugin {
                 .meta(CommandMeta.DESCRIPTION, "Sets the color scheme for '/example help'")
                 .literal("helpcolors")
                 .required(
-                        TextColorArgument.of("primary"),
+                        "primary", textColorParser(),
                         RichDescription.of(text("The primary color for the color scheme", Style.style(TextDecoration.ITALIC)))
                 )
                 .required(
-                        TextColorArgument.of("highlight"),
+                        "highlight", textColorParser(),
                         RichDescription.of(text("The primary color used to highlight commands and queries"))
                 )
                 .required(
-                        TextColorArgument.of("alternate_highlight"),
+                        "alternate_highlight",
+                        textColorParser(),
                         RichDescription.of(text("The secondary color used to highlight commands and queries"))
-                )
-                .required(
-                        TextColorArgument.of("text"),
-                        RichDescription.of(text("The color used for description text"))
-                )
-                .required(
-                        TextColorArgument.of("accent"),
-                        RichDescription.of(text("The color used for accents and symbols"))
-                )
+                ).required("text", textColorParser(), RichDescription.of(text("The color used for description text")))
+                .required("accent", textColorParser(), RichDescription.of(text("The color used for accents and symbols")))
                 .handler(c -> this.minecraftHelp.setHelpColors(MinecraftHelp.HelpColors.of(
                         c.get("primary"),
                         c.get("highlight"),
@@ -462,7 +453,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 }));
 
         this.manager.command(builder.literal("keyed_world")
-                .required(KeyedWorldArgument.of("world"))
+                .required("world", keyedWorldParser())
                 .senderType(Player.class)
                 .handler(ctx -> {
                     final World world = ctx.get("world");
@@ -485,7 +476,7 @@ public final class ExamplePlugin extends JavaPlugin {
 
         this.manager.command(this.manager.commandBuilder("example")
                 .literal("namespacedkey")
-                .required(NamespacedKeyArgument.of("key"))
+                .required("key", namespacedKeyParser())
                 .handler(ctx -> {
                     final NamespacedKey namespacedKey = ctx.get("key");
                     final String key = namespacedKey.getNamespace() + ":" + namespacedKey.getKey();

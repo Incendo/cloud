@@ -28,10 +28,6 @@ import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.data.BlockPredicate;
 import cloud.commandframework.bukkit.data.ItemStackPredicate;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
-import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
-import cloud.commandframework.bukkit.parsers.ItemStackArgument;
-import cloud.commandframework.bukkit.parsers.ItemStackPredicateArgument;
-import cloud.commandframework.bukkit.parsers.MaterialArgument;
 import cloud.commandframework.context.CommandContext;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -43,6 +39,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.framework.qual.DefaultQualifier;
 
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
+import static cloud.commandframework.bukkit.parsers.BlockPredicateParser.blockPredicateParser;
+import static cloud.commandframework.bukkit.parsers.ItemStackParser.itemStackParser;
+import static cloud.commandframework.bukkit.parsers.ItemStackPredicateParser.itemStackPredicateParser;
+import static cloud.commandframework.bukkit.parsers.MaterialParser.materialParser;
 
 @DefaultQualifier(NonNull.class)
 final class Mc113 {
@@ -59,16 +59,16 @@ final class Mc113 {
 
         this.manager.command(builder.literal("replace")
                 .senderType(Player.class)
-                .required(BlockPredicateArgument.of("predicate"))
+                .required("predicate", blockPredicateParser())
                 .literal("with")
-                .required(MaterialArgument.of("block")) // todo: use BlockDataArgument
+                .required("block", materialParser()) // todo: use BlockDataArgument
                 .required("radius", integerParser(1 /* minValue */))
                 .handler(this::executeReplace));
 
         this.manager.command(builder.literal("test_item")
-                .required(ItemStackArgument.of("item"))
+                .required("item", itemStackParser())
                 .literal("is")
-                .required(ItemStackPredicateArgument.of("predicate"))
+                .required("predicate", itemStackPredicateParser())
                 .handler(Mc113::executeTestItem));
     }
 

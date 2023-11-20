@@ -23,9 +23,10 @@
 //
 package cloud.commandframework.minecraft.extras;
 
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
@@ -33,7 +34,6 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.types.tuples.Pair;
-import io.leangen.geantyref.TypeToken;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -51,7 +52,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 1.1.0
  */
-public final class TextColorArgument<C> extends CommandArgument<C, TextColor> {
+public final class TextColorParser<C> implements ArgumentParser<C, TextColor> {
 
     private static final Pattern LEGACY_PREDICATE = Pattern.compile(
             "&[0-9a-fA-F]"
@@ -80,87 +81,86 @@ public final class TextColorArgument<C> extends CommandArgument<C, TextColor> {
             Pair.of('f', NamedTextColor.WHITE)
     );
 
-    private TextColorArgument(final @NonNull String name) {
-        super(
-                name,
-                new TextColorParser<>(),
-                TypeToken.get(TextColor.class),
-                null,
-                new LinkedList<>()
-        );
+    /**
+     * Creates a new text color parser.
+     *
+     * @param <C> command sender type
+     * @return the created parser
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> @NonNull ParserDescriptor<C, TextColor> textColorParser() {
+        return ParserDescriptor.of(new TextColorParser<>(), TextColor.class);
     }
 
     /**
-     * Create a new required TextColor argument
+     * Returns a {@link CommandComponent.Builder} using {@link #textColorParser()} as the parser.
      *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
+     * @param <C> the command sender type
+     * @return the component builder
+     * @since 2.0.0
      */
-    public static <C> @NonNull TextColorArgument<C> of(final @NonNull String name) {
-        return new TextColorArgument<>(name);
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> CommandComponent.@NonNull Builder<C, TextColor> itemStackComponent() {
+        return CommandComponent.<C, TextColor>builder().parser(textColorParser());
     }
 
-
-    public static final class TextColorParser<C> implements ArgumentParser<C, TextColor> {
-
-        @Override
-        public @NonNull ArgumentParseResult<@NonNull TextColor> parse(
-                final @NonNull CommandContext<@NonNull C> commandContext,
-                final @NonNull CommandInput commandInput
-        ) {
-            final String input = commandInput.peekString();
-            if (input.isEmpty()) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(
-                        TextColorParser.class,
-                        commandContext
-                ));
-            }
-            if (LEGACY_PREDICATE.matcher(input).matches()) {
-                commandInput.moveCursor(1);
-                final char code = Character.toLowerCase(commandInput.read());
-                for (final Pair<Character, NamedTextColor> pair : COLORS) {
-                    if (pair.getFirst() == code) {
-                        return ArgumentParseResult.success(pair.getSecond());
-                    }
-                }
-                // If we didn't match the input, we move back.
-                commandInput.moveCursor(-2);
-            }
+    @Override
+    public @NonNull ArgumentParseResult<@NonNull TextColor> parse(
+            final @NonNull CommandContext<@NonNull C> commandContext,
+            final @NonNull CommandInput commandInput
+    ) {
+        final String input = commandInput.peekString();
+        if (input.isEmpty()) {
+            return ArgumentParseResult.failure(new NoInputProvidedException(
+                    TextColorParser.class,
+                    commandContext
+            ));
+        }
+        if (LEGACY_PREDICATE.matcher(input).matches()) {
+            commandInput.moveCursor(1);
+            final char code = Character.toLowerCase(commandInput.read());
             for (final Pair<Character, NamedTextColor> pair : COLORS) {
-                if (pair.getSecond().toString().equalsIgnoreCase(commandInput.peekString())) {
-                    commandInput.readString();
+                if (pair.getFirst() == code) {
                     return ArgumentParseResult.success(pair.getSecond());
                 }
             }
-            if (HEX_PREDICATE.matcher(commandInput.peekString()).matches()) {
-                if (commandInput.peek() == '#') {
-                    commandInput.moveCursor(1);
-                }
-                return ArgumentParseResult.success(TextColor.color(commandInput.readInteger(16)));
-            }
-            return ArgumentParseResult.failure(new TextColorParseException(commandContext, input));
+            // If we didn't match the input, we move back.
+            commandInput.moveCursor(-2);
         }
+        for (final Pair<Character, NamedTextColor> pair : COLORS) {
+            if (pair.getSecond().toString().equalsIgnoreCase(commandInput.peekString())) {
+                commandInput.readString();
+                return ArgumentParseResult.success(pair.getSecond());
+            }
+        }
+        if (HEX_PREDICATE.matcher(commandInput.peekString()).matches()) {
+            if (commandInput.peek() == '#') {
+                commandInput.moveCursor(1);
+            }
+            return ArgumentParseResult.success(TextColor.color(commandInput.readInteger(16)));
+        }
+        return ArgumentParseResult.failure(new TextColorParseException(commandContext, input));
+    }
 
-        @Override
-        public @NonNull List<@NonNull String> stringSuggestions(
-                final @NonNull CommandContext<C> commandContext, final @NonNull String input
-        ) {
-            final List<String> suggestions = new LinkedList<>();
-            if (input.isEmpty() || input.equals("#") || (HEX_PREDICATE.matcher(input).matches()
-                    && input.length() < (input.startsWith("#") ? 7 : 6))) {
-                for (char c = 'a'; c <= 'f'; c++) {
-                    suggestions.add(String.format("%s%c", input, c));
-                    suggestions.add(String.format("&%c", c));
-                }
-                for (char c = '0'; c <= '9'; c++) {
-                    suggestions.add(String.format("%s%c", input, c));
-                    suggestions.add(String.format("&%c", c));
-                }
+    @Override
+    public @NonNull List<@NonNull String> stringSuggestions(
+            final @NonNull CommandContext<C> commandContext, final @NonNull String input
+    ) {
+        final List<String> suggestions = new LinkedList<>();
+        if (input.isEmpty() || input.equals("#") || (HEX_PREDICATE.matcher(input).matches()
+                && input.length() < (input.startsWith("#") ? 7 : 6))) {
+            for (char c = 'a'; c <= 'f'; c++) {
+                suggestions.add(String.format("%s%c", input, c));
+                suggestions.add(String.format("&%c", c));
             }
-            suggestions.addAll(NamedTextColor.NAMES.keys());
-            return suggestions;
+            for (char c = '0'; c <= '9'; c++) {
+                suggestions.add(String.format("%s%c", input, c));
+                suggestions.add(String.format("&%c", c));
+            }
         }
+        suggestions.addAll(NamedTextColor.NAMES.keys());
+        return suggestions;
     }
 
 

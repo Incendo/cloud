@@ -24,7 +24,7 @@
 package cloud.commandframework.bukkit.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.bukkit.parsers.location.LocationArgument;
+import cloud.commandframework.bukkit.parsers.location.LocationParser;
 import cloud.commandframework.bukkit.util.ServerTest;
 import cloud.commandframework.context.CommandInput;
 import java.util.Collections;
@@ -55,7 +55,7 @@ class LocationArgumentTest extends ServerTest {
     void Parse_HappyFlow_Success(final @NonNull String input, final @NonNull Vector expectedLocation) {
         // Arrange
         when(this.server().getWorlds()).thenReturn(Collections.singletonList(this.world));
-        final LocationArgument.LocationParser<CommandSender> parser = new LocationArgument.LocationParser<>();
+        final LocationParser<CommandSender> parser = new LocationParser<>();
         final CommandInput commandInput = CommandInput.of(input);
 
         // Act
@@ -88,7 +88,7 @@ class LocationArgumentTest extends ServerTest {
     @ValueSource(strings = { "0 0", "not a location" })
     void Parse_InvalidLocation_Failure(final @NonNull String input) {
         // Arrange
-        final LocationArgument.LocationParser<CommandSender> parser = new LocationArgument.LocationParser<>();
+        final LocationParser<CommandSender> parser = new LocationParser<>();
         final CommandInput commandInput = CommandInput.of(input);
 
         // Act

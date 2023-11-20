@@ -24,7 +24,7 @@
 package cloud.commandframework.bukkit.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.bukkit.parsers.PlayerArgument;
+import cloud.commandframework.bukkit.parsers.PlayerParser;
 import cloud.commandframework.bukkit.util.ServerTest;
 import cloud.commandframework.context.CommandInput;
 import org.bukkit.command.CommandSender;
@@ -47,7 +47,7 @@ class PlayerArgumentTest extends ServerTest {
     void Parse_HappyFlow_Success() {
         // Arrange
         when(this.server().getPlayer("player")).thenReturn(this.player);
-        final PlayerArgument.PlayerParser<CommandSender> parser = new PlayerArgument.PlayerParser<>();
+        final PlayerParser<CommandSender> parser = new PlayerParser<>();
         final CommandInput commandInput = CommandInput.of("player");
 
         // Act
@@ -67,7 +67,7 @@ class PlayerArgumentTest extends ServerTest {
     @Test
     void Parse_NonExistentPlayer_Failure() {
         // Arrange
-        final PlayerArgument.PlayerParser<CommandSender> parser = new PlayerArgument.PlayerParser<>();
+        final PlayerParser<CommandSender> parser = new PlayerParser<>();
         final CommandInput commandInput = CommandInput.of("player");
 
         // Act

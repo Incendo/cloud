@@ -32,28 +32,28 @@ import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.annotation.specifier.AllowEmptySelection;
 import cloud.commandframework.bukkit.annotation.specifier.DefaultNamespace;
 import cloud.commandframework.bukkit.annotation.specifier.RequireExplicitNamespace;
-import cloud.commandframework.bukkit.argument.NamespacedKeyArgument;
 import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
-import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
-import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
-import cloud.commandframework.bukkit.parsers.ItemStackArgument;
-import cloud.commandframework.bukkit.parsers.ItemStackPredicateArgument;
-import cloud.commandframework.bukkit.parsers.MaterialArgument;
-import cloud.commandframework.bukkit.parsers.OfflinePlayerArgument;
-import cloud.commandframework.bukkit.parsers.PlayerArgument;
-import cloud.commandframework.bukkit.parsers.WorldArgument;
+import cloud.commandframework.bukkit.parsers.BlockPredicateParser;
+import cloud.commandframework.bukkit.parsers.EnchantmentParser;
+import cloud.commandframework.bukkit.parsers.ItemStackParser;
+import cloud.commandframework.bukkit.parsers.ItemStackPredicateParser;
+import cloud.commandframework.bukkit.parsers.MaterialParser;
+import cloud.commandframework.bukkit.parsers.NamespacedKeyParser;
+import cloud.commandframework.bukkit.parsers.OfflinePlayerParser;
+import cloud.commandframework.bukkit.parsers.PlayerParser;
+import cloud.commandframework.bukkit.parsers.WorldParser;
 import cloud.commandframework.bukkit.parsers.location.Location2D;
-import cloud.commandframework.bukkit.parsers.location.Location2DArgument;
-import cloud.commandframework.bukkit.parsers.location.LocationArgument;
-import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorArgument;
-import cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorArgument;
-import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
-import cloud.commandframework.bukkit.parsers.selector.SinglePlayerSelectorArgument;
+import cloud.commandframework.bukkit.parsers.location.Location2DParser;
+import cloud.commandframework.bukkit.parsers.location.LocationParser;
+import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorParser;
+import cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorParser;
+import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorParser;
+import cloud.commandframework.bukkit.parsers.selector.SinglePlayerSelectorParser;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.meta.CommandMeta;
@@ -148,46 +148,46 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
 
         /* Register Bukkit Parsers */
         this.parserRegistry().registerParserSupplier(TypeToken.get(World.class), parserParameters ->
-                new WorldArgument.WorldParser<>());
+                new WorldParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(Material.class), parserParameters ->
-                new MaterialArgument.MaterialParser<>());
+                new MaterialParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(Player.class), parserParameters ->
-                new PlayerArgument.PlayerParser<>());
+                new PlayerParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(OfflinePlayer.class), parserParameters ->
-                new OfflinePlayerArgument.OfflinePlayerParser<>());
+                new OfflinePlayerParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(Enchantment.class), parserParameters ->
-                new EnchantmentArgument.EnchantmentParser<>());
+                new EnchantmentParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(Location.class), parserParameters ->
-                new LocationArgument.LocationParser<>());
+                new LocationParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(Location2D.class), parserParameters ->
-                new Location2DArgument.Location2DParser<>());
+                new Location2DParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(ProtoItemStack.class), parserParameters ->
-                new ItemStackArgument.Parser<>());
+                new ItemStackParser<>());
 
         /* Register Entity Selector Parsers */
         this.parserRegistry().registerParserSupplier(TypeToken.get(SingleEntitySelector.class), parserParameters ->
-                new SingleEntitySelectorArgument.SingleEntitySelectorParser<>());
+                new SingleEntitySelectorParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(SinglePlayerSelector.class), parserParameters ->
-                new SinglePlayerSelectorArgument.SinglePlayerSelectorParser<>());
+                new SinglePlayerSelectorParser<>());
         this.parserRegistry().registerAnnotationMapper(
                 AllowEmptySelection.class,
                 (annotation, type) -> ParserParameters.single(BukkitParserParameters.ALLOW_EMPTY_SELECTOR_RESULT, annotation.value())
         );
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(MultipleEntitySelector.class),
-                parserParameters -> new MultipleEntitySelectorArgument.MultipleEntitySelectorParser<>(
+                parserParameters -> new MultipleEntitySelectorParser<>(
                         parserParameters.get(BukkitParserParameters.ALLOW_EMPTY_SELECTOR_RESULT, true)
                 )
         );
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(MultiplePlayerSelector.class),
-                parserParameters -> new MultiplePlayerSelectorArgument.MultiplePlayerSelectorParser<>(
+                parserParameters -> new MultiplePlayerSelectorParser<>(
                         parserParameters.get(BukkitParserParameters.ALLOW_EMPTY_SELECTOR_RESULT, true)
                 )
         );
 
         if (CraftBukkitReflection.classExists("org.bukkit.NamespacedKey")) {
-            this.registerParserSupplierFor(NamespacedKeyArgument.class);
+            this.registerParserSupplierFor(NamespacedKeyParser.class);
             this.parserRegistry().registerAnnotationMapper(
                     RequireExplicitNamespace.class,
                     (annotation, type) -> ParserParameters.single(BukkitParserParameters.REQUIRE_EXPLICIT_NAMESPACE, true)
@@ -200,8 +200,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
 
         /* Register MC 1.13+ parsers */
         if (this.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
-            this.registerParserSupplierFor(ItemStackPredicateArgument.class);
-            this.registerParserSupplierFor(BlockPredicateArgument.class);
+            this.registerParserSupplierFor(ItemStackPredicateParser.class);
+            this.registerParserSupplierFor(BlockPredicateParser.class);
         }
 
         /* Register suggestion and state listener */

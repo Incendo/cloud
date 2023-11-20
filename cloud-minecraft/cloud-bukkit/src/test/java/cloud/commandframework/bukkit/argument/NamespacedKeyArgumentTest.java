@@ -25,6 +25,7 @@ package cloud.commandframework.bukkit.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.bukkit.BukkitCommandManager;
+import cloud.commandframework.bukkit.parsers.NamespacedKeyParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.StandardCommandContextFactory;
@@ -59,7 +60,7 @@ class NamespacedKeyArgumentTest {
     @Test
     void RequireExplicitNamespace_NamespaceProvided_Succeeds() {
         // Arrange
-        final NamespacedKeyArgument.Parser<Object> parser = new NamespacedKeyArgument.Parser<>(
+        final NamespacedKeyParser<Object> parser = new NamespacedKeyParser<>(
                 true /* requireExplicitNamespace */,
                 NamespacedKey.MINECRAFT
         );
@@ -80,7 +81,7 @@ class NamespacedKeyArgumentTest {
     @Test
     void RequireExplicitNamespace_NamespaceMissing_Fails() {
         // Arrange
-        final NamespacedKeyArgument.Parser<Object> parser = new NamespacedKeyArgument.Parser<>(
+        final NamespacedKeyParser<Object> parser = new NamespacedKeyParser<>(
                 true /* requireExplicitNamespace */,
                 NamespacedKey.MINECRAFT
         );
@@ -100,7 +101,7 @@ class NamespacedKeyArgumentTest {
     @Test
     void RequireExplicitNamespaceFalse_NamespaceMissing_Succeeds() {
         // Arrange
-        final NamespacedKeyArgument.Parser<Object> parser = new NamespacedKeyArgument.Parser<>(
+        final NamespacedKeyParser<Object> parser = new NamespacedKeyParser<>(
                 false /* requireExplicitNamespace */,
                 NamespacedKey.MINECRAFT
         );

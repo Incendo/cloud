@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Annotation used to set a custom namespace for {@link cloud.commandframework.bukkit.argument.NamespacedKeyArgument}.
+ * Annotation used to set a custom namespace for {@link cloud.commandframework.bukkit.parsers.NamespacedKeyParser}.
  * Without this annotation, the default namespace is {@link org.bukkit.NamespacedKey#MINECRAFT}.
  *
  * @since 1.7.0

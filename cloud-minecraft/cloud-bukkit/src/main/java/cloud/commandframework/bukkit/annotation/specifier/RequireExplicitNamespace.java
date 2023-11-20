@@ -29,7 +29,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used to set {@link cloud.commandframework.bukkit.argument.NamespacedKeyArgument} to
+ * Annotation used to set {@link cloud.commandframework.bukkit.parsers.NamespacedKeyParser} to
  * require explicit namespaces.
  *
  * @since 1.7.0
