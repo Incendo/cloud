@@ -290,7 +290,7 @@ public final class ExamplePlugin extends JavaPlugin {
                         )
                         .handler(context -> this.manager.taskRecipe().begin(context)
                                 .synchronous(commandContext -> {
-                                    final Player player = (Player) commandContext.getSender();
+                                    final Player player = commandContext.getSender();
                                     final World world = commandContext.get(worldArgument);
                                     final Vector coords = commandContext.get("coords");
                                     final Location location = coords.toLocation(world);
@@ -307,7 +307,7 @@ public final class ExamplePlugin extends JavaPlugin {
                         .handler(
                                 context -> this.manager.taskRecipe().begin(context)
                                         .synchronous(commandContext -> {
-                                            final Player player = (Player) commandContext.getSender();
+                                            final Player player = commandContext.getSender();
                                             final SingleEntitySelector singleEntitySelector = commandContext
                                                     .get("entity");
                                             if (singleEntitySelector.hasAny()) {
@@ -320,9 +320,10 @@ public final class ExamplePlugin extends JavaPlugin {
                         ))
                 .command(builder.literal("teleport")
                         .meta(CommandMeta.DESCRIPTION, "Teleport to a world")
+                        .senderType(Player.class)
                         .required(WorldArgument.of("world"), ArgumentDescription.of("World to teleport to"))
                         .handler(context -> this.manager.taskRecipe().begin(context).synchronous(ctx -> {
-                            final Player player = (Player) ctx.getSender();
+                            final Player player = ctx.getSender();
                             player.teleport(ctx.<World>get("world").getSpawnLocation());
                             player.sendMessage(ChatColor.GREEN + "You have been teleported!");
                         }).execute()));
@@ -346,14 +347,14 @@ public final class ExamplePlugin extends JavaPlugin {
                     final Material material = c.get("material");
                     final int amount = c.get("amount");
                     final ItemStack itemStack = new ItemStack(material, amount);
-                    ((Player) c.getSender()).getInventory().addItem(itemStack);
+                    c.getSender().getInventory().addItem(itemStack);
                     c.getSender().sendMessage("You've been given stuff, bro.");
                 }));
         this.manager.command(builder.literal("summon")
                 .senderType(Player.class)
                 .required("type", enumParser(EntityType.class))
                 .handler(c -> this.manager.taskRecipe().begin(c).synchronous(ctx -> {
-                    final Location loc = ((Player) ctx.getSender()).getLocation();
+                    final Location loc = ctx.getSender().getLocation();
                     loc.getWorld().spawnEntity(loc, ctx.get("type"));
                 }).execute()));
         this.manager.command(builder.literal("enchant")
@@ -361,7 +362,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 .required(EnchantmentArgument.of("enchant"))
                 .required("level", integerParser())
                 .handler(c -> this.manager.taskRecipe().begin(c).synchronous(ctx -> {
-                    final Player player = ((Player) ctx.getSender());
+                    final Player player = ctx.getSender();
                     player.getInventory().getItemInMainHand().addEnchantment(ctx.get("enchant"), ctx.get("level"));
                 }).execute()));
 
@@ -457,7 +458,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 )
                 .handler(ctx -> {
                     final ItemStack stack = ctx.get("itemstack");
-                    ((Player) ctx.getSender()).getInventory().addItem(stack);
+                    ctx.getSender().getInventory().addItem(stack);
                 }));
 
         this.manager.command(builder.literal("keyed_world")
@@ -465,7 +466,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 .senderType(Player.class)
                 .handler(ctx -> {
                     final World world = ctx.get("world");
-                    final Player sender = (Player) ctx.getSender();
+                    final Player sender = ctx.getSender();
                     this.getServer().getScheduler().runTask(this, () -> sender.teleport(world.getSpawnLocation()));
                 }));
     }

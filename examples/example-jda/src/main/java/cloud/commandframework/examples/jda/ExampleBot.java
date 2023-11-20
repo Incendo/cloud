@@ -141,7 +141,7 @@ public final class ExampleBot {
                 .permission("kick")
                 .required(UserArgument.of("user"))
                 .handler(context -> {
-                    final GuildUser guildUser = (GuildUser) context.getSender();
+                    final GuildUser guildUser = context.getSender();
                     final TextChannel textChannel = guildUser.getTextChannel();
                     final User user = context.get("user");
 
