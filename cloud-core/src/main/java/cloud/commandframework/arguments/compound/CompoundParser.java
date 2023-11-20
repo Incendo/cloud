@@ -23,20 +23,23 @@
 //
 package cloud.commandframework.arguments.compound;
 
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.types.tuples.Tuple;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class CompoundParser<T extends Tuple, C, O> implements ArgumentParser<C, O> {
+public final class CompoundParser<T extends Tuple, C, O> implements ArgumentParser.FutureArgumentParser<C, O> {
 
     private final Object[] names;
     private final Object[] types;
@@ -106,33 +109,28 @@ public final class CompoundParser<T extends Tuple, C, O> implements ArgumentPars
     }
 
     @Override
-    public @NonNull ArgumentParseResult<O> parse(
+    public @NonNull CompletableFuture<O> parseFuture(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final Object[] output = new Object[this.parsers.length];
-        for (int i = 0; i < this.parsers.length; i++) {
-            @SuppressWarnings("unchecked") final ArgumentParser<C, ?> parser = (ArgumentParser<C, ?>) this.parsers[i];
-            final ArgumentParseResult<?> result = parser.parse(commandContext, commandInput);
-            if (result.getFailure().isPresent()) {
-                /* Return the failure */
-                return ArgumentParseResult.failure(result.getFailure().get());
-            }
-            /* Store the parsed value */
-            output[i] = result.getParsedValue().orElse(null);
+        CompletableFuture<List<Object>> parsingFuture = CompletableFuture.completedFuture(Collections.emptyList());
+        for (final Object parser : this.parsers) {
+            parsingFuture = parsingFuture.thenCombine(
+                    this.parseToList(parser, commandContext, commandInput),
+                    (l1, l2) -> Stream.concat(l1.stream(), l2.stream()).collect(Collectors.toList())
+            );
         }
-        /*
-         * We now know that we have complete output, as none of the parsers returned a failure.
-         * Now check if the mapper threw any exceptions
-         */
-        try {
-            return ArgumentParseResult.success(this.mapper.apply(
-                    commandContext.getSender(),
-                    this.tupleFactory.apply(output)
-            ));
-        } catch (final Exception e) {
-            return ArgumentParseResult.failure(e);
-        }
+        return parsingFuture.thenApply(output -> this.mapper
+                .apply(commandContext.getSender(), this.tupleFactory.apply(output.toArray(new Object[0]))));
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private CompletableFuture<List<Object>> parseToList(
+            final @NonNull Object parser,
+            final @NonNull CommandContext<C> context,
+            final @NonNull CommandInput input
+    ) {
+        return ((ArgumentParser) parser).parseFuture(context, input).thenApply(Collections::singletonList);
     }
 
     @Override

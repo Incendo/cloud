@@ -26,6 +26,7 @@ package cloud.commandframework.arguments;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -47,7 +48,7 @@ public interface CommandSuggestionEngine<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    @NonNull List<@NonNull Suggestion> getSuggestions(
+    @NonNull CompletableFuture<List<@NonNull Suggestion>> getSuggestions(
             @NonNull CommandContext<C> context,
             @NonNull String input
     );

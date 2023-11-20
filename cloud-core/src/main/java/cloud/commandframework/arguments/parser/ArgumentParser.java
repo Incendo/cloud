@@ -29,6 +29,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
@@ -78,6 +79,45 @@ public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
             @NonNull CommandContext<@NonNull C> commandContext,
             @NonNull CommandInput commandInput
     );
+
+    /**
+     * Parse command input into a command result.
+     * <p>
+     * This method may be called when a command chain is being parsed for execution
+     * (using {@link cloud.commandframework.CommandManager#executeCommand(Object, String)})
+     * or when a command is being parsed to provide context for suggestions
+     * (using {@link cloud.commandframework.CommandManager#suggest(Object, String)}). It is
+     * possible to use {@link CommandContext#isSuggestions()}} to see what the purpose of the
+     * parsing is. Particular care should be taken when parsing for suggestions, as the parsing
+     * method is then likely to be called once for every character written by the command sender.
+     * <p>
+     * This method should never throw any exceptions under normal circumstances. Instead, if the
+     * parsing for some reason cannot be done successfully {@link ArgumentParseResult#failure(Throwable)}
+     * should be returned. This then wraps any exception that should be forwarded to the command sender.
+     * <p>
+     * The parser is assumed to be completely stateless and should not store any information about
+     * the command sender or the command context. Instead, information should be stored in the
+     * {@link CommandContext}.
+     *
+     * @param commandContext Command context
+     * @param commandInput   Command Input
+     * @return future that completes with the result.
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    default @NonNull CompletableFuture<@NonNull T> parseFuture(
+            @NonNull CommandContext<@NonNull C> commandContext,
+            @NonNull CommandInput commandInput
+    ) {
+        final CompletableFuture<T> future = new CompletableFuture<>();
+        final ArgumentParseResult<T> result = this.parse(commandContext, commandInput);
+        if (result.getFailure().isPresent()) {
+            future.completeExceptionally(result.getFailure().get());
+        } else {
+            future.complete(result.getParsedValue().orElse(null));
+        }
+        return future;
+    }
 
     /**
      * Returns a list of suggested arguments that would be correctly parsed by this parser
@@ -152,5 +192,28 @@ public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
     @API(status = API.Status.STABLE, since = "1.1.0")
     default int getRequestedArgumentCount() {
         return DEFAULT_ARGUMENT_COUNT;
+    }
+
+
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    interface FutureArgumentParser<C, T> extends ArgumentParser<C, T> {
+
+        @Override
+        default @NonNull ArgumentParseResult<@NonNull T> parse(
+                @NonNull CommandContext<@NonNull C> commandContext,
+                @NonNull CommandInput commandInput
+        ) {
+            return this.parseFuture(commandContext, commandInput)
+                    .thenApply(ArgumentParseResult::success)
+                    .exceptionally(ArgumentParseResult::failure)
+                    .join();
+        }
+
+        @Override
+        @NonNull
+        CompletableFuture<@NonNull T> parseFuture(
+                @NonNull CommandContext<@NonNull C> commandContext,
+                @NonNull CommandInput commandInput
+        );
     }
 }

@@ -23,19 +23,14 @@
 //
 package cloud.commandframework.execution;
 
-import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.services.State;
-import cloud.commandframework.types.tuples.Pair;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * The command execution coordinator is responsible for
@@ -110,36 +105,14 @@ public abstract class CommandExecutionCoordinator<C> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull CommandInput commandInput
         ) {
-            final CompletableFuture<CommandResult<C>> completableFuture = new CompletableFuture<>();
-            try {
-                final @NonNull Pair<@Nullable Command<C>, @Nullable Exception> pair =
-                        this.getCommandTree().parse(commandContext, commandInput);
-                if (pair.getSecond() != null) {
-                    completableFuture.completeExceptionally(pair.getSecond());
-                } else {
-                    final Command<C> command = Objects.requireNonNull(pair.getFirst());
-                    if (this.getCommandTree().commandManager().postprocessContext(commandContext, command) == State.ACCEPTED) {
-                        try {
-                            command.getCommandExecutionHandler().executeFuture(commandContext).get();
-                        } catch (final java.util.concurrent.ExecutionException exception) {
-                            Throwable cause = exception.getCause();
-                            if (cause instanceof CommandExecutionException) {
-                                completableFuture.completeExceptionally(cause);
-                            } else {
-                                completableFuture.completeExceptionally(new CommandExecutionException(cause, commandContext));
-                            }
-                        } catch (final CommandExecutionException exception) {
-                            completableFuture.completeExceptionally(exception);
-                        } catch (final Exception exception) {
-                            completableFuture.completeExceptionally(new CommandExecutionException(exception, commandContext));
-                        }
-                    }
-                    completableFuture.complete(new CommandResult<>(commandContext));
+            return this.getCommandTree().parse(commandContext, commandInput).thenCompose(command -> {
+                if (this.getCommandTree().commandManager().postprocessContext(commandContext, command) == State.ACCEPTED) {
+                    return command.getCommandExecutionHandler()
+                            .executeFuture(commandContext)
+                            .thenApply(v -> new CommandResult<>(commandContext));
                 }
-            } catch (final Exception e) {
-                completableFuture.completeExceptionally(e);
-            }
-            return completableFuture;
+                return CompletableFuture.completedFuture(new CommandResult<>(commandContext));
+            });
         }
     }
 }

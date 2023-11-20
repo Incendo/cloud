@@ -67,7 +67,7 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser<C, O>
     public @NonNull ArgumentParseResult<@NonNull O> parse(
             @NonNull final CommandContext<@NonNull C> commandContext,
             @NonNull final CommandInput commandInput
-            ) {
+    ) {
         final ArgumentParseResult<@NonNull I> baseResult = this.base.parse(commandContext, commandInput);
         return baseResult.flatMapParsedValue(value -> this.mapper.apply(commandContext, value));
     }

@@ -215,6 +215,25 @@ public abstract class CommandManager<C> {
             final @NonNull C commandSender,
             final @NonNull String input
     ) {
+        return this.suggestFuture(commandSender, input).join();
+    }
+
+    /**
+     * Get command suggestions for the "next" argument that would yield a correctly parsing command input. The command
+     * suggestions provided by the command argument parsers will be filtered using the {@link CommandSuggestionProcessor}
+     * before being returned.
+     *
+     * @param commandSender Sender of the command
+     * @param input         Input provided by the sender. Prefixes should be removed before the method is being called, and
+     *                      the input here will be passed directly to the command parsing pipeline, after having been tokenized.
+     * @return List of suggestions
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CompletableFuture<List<@NonNull Suggestion>> suggestFuture(
+            final @NonNull C commandSender,
+            final @NonNull String input
+    ) {
         final CommandContext<C> context = this.commandContextFactory.create(
                 true,
                 commandSender,
