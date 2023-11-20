@@ -41,6 +41,7 @@ import cloud.commandframework.examples.bukkit.annotations.feature.RegexExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.RootCommandDeletionExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.TaskRecipeExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.minecraft.LocationExample;
+import cloud.commandframework.examples.bukkit.annotations.feature.minecraft.SelectorExample;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.tasks.TaskConsumer;
 import java.util.Arrays;
@@ -67,7 +68,8 @@ public final class AnnotationParserExample {
             new RootCommandDeletionExample(),
             new TaskRecipeExample(),
             // Minecraft-specific features
-            new LocationExample()
+            new LocationExample(),
+            new SelectorExample()
     );
 
     private final ExamplePlugin examplePlugin;
