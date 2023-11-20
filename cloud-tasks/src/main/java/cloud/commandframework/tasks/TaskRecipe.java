@@ -56,6 +56,17 @@ public final class TaskRecipe {
         return new TaskRecipeComponentOutputting<>(input);
     }
 
+    /**
+     * Begin the recipe. This step always runs asynchronously.
+     *
+     * @return Function that maps the input to itself
+     */
+    public @NonNull TaskRecipeComponentOutputting<Object, Object> begin() {
+        this.addAsynchronous(TaskFunction.identity());
+        return new TaskRecipeComponentOutputting<>(new Object());
+    }
+
+
     private void addAsynchronous(final TaskRecipeStep taskRecipeStep) {
         this.recipeSteps.put(taskRecipeStep, false);
     }
@@ -86,6 +97,13 @@ public final class TaskRecipe {
                         other = this.synchronizer.runSynchronous(o, function);
                     } else {
                         other = this.synchronizer.runAsynchronous(o, function);
+                    }
+                } else if (entry.getKey() instanceof TaskRunnable) {
+                    final TaskRunnable runnable = (TaskRunnable) entry.getKey();
+                    if (synchronous) {
+                        other = this.synchronizer.runSynchronous(runnable);
+                    } else {
+                        other = this.synchronizer.runAsynchronous(runnable);
                     }
                 } else {
                     final TaskConsumer consumer = (TaskConsumer<?>) entry.getKey();
@@ -166,6 +184,30 @@ public final class TaskRecipe {
         }
 
         /**
+         * Add a new synchronous step, which ignores the input and does not produce any output
+         *
+         * @param runnable The step to run
+         * @return New task recipe component
+         * @since 2.0.0
+         */
+        public TaskRecipeComponentVoid<O> synchronous(final @NonNull TaskRunnable runnable) {
+            TaskRecipe.this.addSynchronous(runnable);
+            return new TaskRecipeComponentVoid<>(this.initialInput);
+        }
+
+        /**
+         * Add a new asynchronous step, which ignores the input and does not produce any output
+         *
+         * @param runnable The step to run
+         * @return New task recipe component
+         * @since 2.0.0
+         */
+        public TaskRecipeComponentVoid<O> asynchronous(final @NonNull TaskRunnable runnable) {
+            TaskRecipe.this.addAsynchronous(runnable);
+            return new TaskRecipeComponentVoid<>(this.initialInput);
+        }
+
+        /**
          * Execute the recipe
          *
          * @param callback Callback function
@@ -215,6 +257,30 @@ public final class TaskRecipe {
          */
         public TaskRecipeComponentVoid<I> asynchronous(final @NonNull TaskConsumer<I> consumer) {
             TaskRecipe.this.addSynchronous(consumer);
+            return new TaskRecipeComponentVoid<>(this.initialInput);
+        }
+
+        /**
+         * Add a new asynchronous step, which ignores the input and does not produce any output
+         *
+         * @param runnable The step to run
+         * @return New task recipe component
+         * @since 2.0.0
+         */
+        public TaskRecipeComponentVoid<I> asynchronous(final @NonNull TaskRunnable runnable) {
+            TaskRecipe.this.addAsynchronous(runnable);
+            return new TaskRecipeComponentVoid<>(this.initialInput);
+        }
+
+        /**
+         * Add a new synchronous step, which ignores the input and does not produce any output
+         *
+         * @param runnable The step to run
+         * @return New task recipe component
+         * @since 2.0.0
+         */
+        public TaskRecipeComponentVoid<I> synchronous(final @NonNull TaskRunnable runnable) {
+            TaskRecipe.this.addSynchronous(runnable);
             return new TaskRecipeComponentVoid<>(this.initialInput);
         }
 

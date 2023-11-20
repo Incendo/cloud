@@ -26,9 +26,9 @@ package cloud.commandframework.examples.bukkit.annotations.feature;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
+import cloud.commandframework.examples.bukkit.annotations.Synchronized;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
@@ -41,27 +41,21 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class EnumExample implements AnnotationFeature {
 
-    private BukkitCommandManager<CommandSender> manager;
-
     @Override
     public void registerFeature(
             final @NonNull ExamplePlugin examplePlugin,
             final @NonNull AnnotationParser<CommandSender> annotationParser
     ) {
-        this.manager = (BukkitCommandManager<CommandSender>) annotationParser.manager();
         annotationParser.parse(this);
     }
 
+    @Synchronized
     @CommandMethod("annotations summon <type>")
     public void commandSummon(
-            final @NonNull Player sender,
+            final @NonNull Player player,
             @Argument("type") final @NonNull EntityType type
     ) {
-        // We cannot teleport players asynchronously, but we use an asynchronous command execution coordinator.
-        // The task recipe allows us to chain together tasks and run some of them on the main thread.
-        this.manager.taskRecipe().begin(sender).synchronous(player -> {
-            final Location loc = player.getLocation();
-            loc.getWorld().spawnEntity(loc, type);
-        }).execute();
+        final Location loc = player.getLocation();
+        loc.getWorld().spawnEntity(loc, type);
     }
 }

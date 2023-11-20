@@ -25,6 +25,7 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.tasks.TaskConsumer;
 import cloud.commandframework.tasks.TaskFunction;
+import cloud.commandframework.tasks.TaskRunnable;
 import cloud.commandframework.tasks.TaskSynchronizer;
 import java.util.concurrent.CompletableFuture;
 import org.bukkit.plugin.Plugin;
@@ -57,6 +58,16 @@ public final class BukkitSynchronizer implements TaskSynchronizer {
     }
 
     @Override
+    public CompletableFuture<Void> runSynchronous(@NonNull final TaskRunnable runnable) {
+        final CompletableFuture<Void> future = new CompletableFuture<>();
+        this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
+            runnable.run();
+            future.complete(null);
+        });
+        return future;
+    }
+
+    @Override
     public <I, O> CompletableFuture<O> runSynchronous(final @NonNull I input, final @NonNull TaskFunction<I, O> function) {
         final CompletableFuture<O> future = new CompletableFuture<>();
         this.plugin.getServer().getScheduler().runTask(this.plugin, () -> future.complete(function.apply(input)));
@@ -77,6 +88,16 @@ public final class BukkitSynchronizer implements TaskSynchronizer {
     public <I, O> CompletableFuture<O> runAsynchronous(final @NonNull I input, final @NonNull TaskFunction<I, O> function) {
         final CompletableFuture<O> future = new CompletableFuture<>();
         this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> future.complete(function.apply(input)));
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<Void> runAsynchronous(@NonNull final TaskRunnable runnable) {
+        final CompletableFuture<Void> future = new CompletableFuture<>();
+        this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            runnable.run();
+            future.complete(null);
+        });
         return future;
     }
 }

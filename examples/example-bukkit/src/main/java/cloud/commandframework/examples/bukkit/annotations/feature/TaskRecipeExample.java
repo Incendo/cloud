@@ -21,46 +21,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.examples.bukkit.annotations.feature.minecraft;
+package cloud.commandframework.examples.bukkit.annotations.feature;
 
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
+import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
-import cloud.commandframework.examples.bukkit.annotations.Synchronized;
-import org.bukkit.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Example showcasing how to work with entity selectors.
+ * This example showcases the task recipe system which can be used to invoke tasks
+ * synchronously and asynchronously. This is useful when wanting to perform tasks that require
+ * the main server thread.
  */
-@CommandMethod("annotations teleport")
-public final class SelectorExample implements AnnotationFeature {
+public final class TaskRecipeExample implements AnnotationFeature {
+
+    private BukkitCommandManager<CommandSender> manager;
 
     @Override
     public void registerFeature(
             final @NonNull ExamplePlugin examplePlugin,
             final @NonNull AnnotationParser<CommandSender> annotationParser
     ) {
+        this.manager = (BukkitCommandManager<CommandSender>) annotationParser.manager();
         annotationParser.parse(this);
     }
 
-    @Synchronized
-    @CommandMethod("entity <entity> here")
-    public void teleportEntity(
-            final @NonNull Player player,
-            @Argument(value = "entity", description = "The entity to teleport")
-            final @NonNull SingleEntitySelector singleEntitySelector
-    ) {
-        if (singleEntitySelector.hasAny()) {
-            singleEntitySelector.getEntity().teleport(player);
-            player.sendMessage(ChatColor.GREEN + "The entity was teleported to you!");
-        } else {
-            player.sendMessage(ChatColor.RED + "No entity matched your query.");
-        }
+    @CommandMethod("annotations tasktest")
+    public void commandTaskTest(final @NonNull CommandSender sender) {
+        this.manager.taskRecipe()
+                .begin()
+                .asynchronous(() -> {
+                    sender.sendMessage("ASYNC: " + !Bukkit.isPrimaryThread());
+                })
+                .synchronous(() -> {
+                    sender.sendMessage("SYNC: " + Bukkit.isPrimaryThread());
+                })
+                .execute(() -> sender.sendMessage("DONE!"));
     }
 }
