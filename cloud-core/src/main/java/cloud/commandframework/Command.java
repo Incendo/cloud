@@ -1698,11 +1698,13 @@ public class Command<C> {
         /**
          * Specify a required sender type
          *
+         * @param <N> The new sender type or a superclass thereof
          * @param senderType Required sender type
          * @return New builder instance using the required sender type
          */
-        public @NonNull Builder<C> senderType(final @NonNull Class<? extends C> senderType) {
-            return new Builder<>(
+        @SuppressWarnings("unchecked")
+        public <N extends C> @NonNull Builder<N> senderType(final @NonNull Class<? extends N> senderType) {
+            return (Builder<N>) new Builder<>(
                     this.commandManager,
                     this.commandMeta,
                     senderType,

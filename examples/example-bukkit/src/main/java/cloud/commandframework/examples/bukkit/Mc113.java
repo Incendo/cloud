@@ -72,12 +72,12 @@ final class Mc113 {
                 .handler(Mc113::executeTestItem));
     }
 
-    private void executeReplace(final CommandContext<CommandSender> ctx) {
+    private void executeReplace(final CommandContext<Player> ctx) {
         final BlockData block = ctx.<Material>get("block").createBlockData();
         final BlockPredicate predicate = ctx.get("predicate");
         final int radius = ctx.get("radius");
 
-        final Player player = (Player) ctx.getSender();
+        final Player player = ctx.getSender();
         final Location loc = player.getLocation();
 
         this.manager.taskRecipe().begin(ctx).synchronous(context -> {
