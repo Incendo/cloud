@@ -25,29 +25,14 @@ package cloud.commandframework.examples.bukkit;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
-import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandDescription;
-import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.annotations.CommandPermission;
-import cloud.commandframework.annotations.Confirmation;
-import cloud.commandframework.annotations.Flag;
-import cloud.commandframework.annotations.Regex;
-import cloud.commandframework.annotations.specifier.Greedy;
-import cloud.commandframework.annotations.suggestions.Suggestions;
-import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
-import cloud.commandframework.captions.Caption;
-import cloud.commandframework.captions.SimpleCaptionRegistry;
-import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.examples.bukkit.annotations.AnnotationParserExample;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
@@ -56,24 +41,14 @@ import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
-import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.minecraft.extras.RichDescription;
 import cloud.commandframework.paper.PaperCommandManager;
-import cloud.commandframework.permission.PredicatePermission;
-import cloud.commandframework.tasks.TaskConsumer;
 import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -81,21 +56,16 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
@@ -116,10 +86,7 @@ import static net.kyori.adventure.text.Component.text;
 public final class ExamplePlugin extends JavaPlugin {
 
     private BukkitCommandManager<CommandSender> manager;
-    private BukkitAudiences bukkitAudiences;
-    private MinecraftHelp<CommandSender> minecraftHelp;
     private CommandConfirmationManager<CommandSender> confirmationManager;
-    private AnnotationParser<CommandSender> annotationParser;
 
     @Override
     public void onEnable() {
@@ -134,6 +101,8 @@ public final class ExamplePlugin extends JavaPlugin {
         //
         // final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
         //        CommandExecutionCoordinator.simpleCoordinator();
+        //
+
         //
         // This function maps the command sender type of our choice to the bukkit command sender.
         // However, in this example we use the Bukkit command sender, and so we just need to map it
@@ -153,27 +122,15 @@ public final class ExamplePlugin extends JavaPlugin {
             this.getServer().getPluginManager().disablePlugin(this);
             return;
         }
-
+        //
         // Use contains to filter suggestions instead of default startsWith
+        //
         this.manager.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
                 FilteringCommandSuggestionProcessor.Filter.<CommandSender>contains(true).andTrimBeforeLastSpace()
         ));
-
         //
-        // Create a BukkitAudiences instance (adventure) in order to use the minecraft-extras
-        // help system
-        //
-        this.bukkitAudiences = BukkitAudiences.create(this);
-        //
-        // Create the Minecraft help menu system
-        //
-        this.minecraftHelp = new MinecraftHelp<>(
-                /* Help Prefix */ "/example help",
-                /* Audience mapper */ this.bukkitAudiences::sender,
-                /* Manager */ this.manager
-        );
-        //
-        // Register Brigadier mappings
+        // Register Brigadier mappings. The capability tells us whether Brigadier is natively available
+        // on the current server. If it is, we can safely register the Brigadier integration.
         //
         if (this.manager.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
             this.manager.registerBrigadier();
@@ -200,20 +157,10 @@ public final class ExamplePlugin extends JavaPlugin {
         // Register the confirmation processor. This will enable confirmations for commands that require it
         //
         this.confirmationManager.registerConfirmationProcessor(this.manager);
-        //
-        // Create the annotation parser. This allows you to define commands using methods annotated with
-        // @CommandMethod
-        //
-        final Function<ParserParameters, CommandMeta> commandMetaFunction = p ->
-                CommandMeta.simple()
-                        // This will allow you to decorate commands with descriptions
-                        .with(CommandMeta.DESCRIPTION, p.get(StandardParameters.DESCRIPTION, "No description"))
-                        .build();
-        this.annotationParser = new AnnotationParser<>(
-                /* Manager */ this.manager,
-                /* Command sender type */ CommandSender.class,
-                /* Mapper for command meta instances */ commandMetaFunction
-        );
+
+        // Create the annotation examples.
+        new AnnotationParserExample(this, this.manager);
+
         //
         // Override the default exception handlers
         //
@@ -229,7 +176,7 @@ public final class ExamplePlugin extends JavaPlugin {
                                 .append(text("Example", NamedTextColor.GOLD))
                                 .append(text("] ", NamedTextColor.DARK_GRAY))
                                 .append(component).build()
-                ).apply(this.manager, this.bukkitAudiences::sender);
+                ).apply(this.manager, BukkitAudiences.create(this)::sender);
         //
         // Create the commands
         //
@@ -237,25 +184,6 @@ public final class ExamplePlugin extends JavaPlugin {
     }
 
     private void constructCommands() {
-        // Add a custom permission checker
-        this.annotationParser.registerBuilderModifier(
-                GameModeRequirement.class,
-                (requirement, builder) -> builder.permission(
-                        PredicatePermission.of(SimpleCloudKey.of("gamemode"), sender ->
-                                !(sender instanceof Player) || ((Player) sender).getGameMode() == requirement.value()
-                        )
-                )
-        );
-        //
-        // Parse all @CommandMethod-annotated methods
-        //
-        this.annotationParser.parse(this);
-        // Parse all @CommandContainer-annotated classes
-        try {
-            this.annotationParser.parseContainers();
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
         //
         // Base command builder
         //
@@ -324,6 +252,7 @@ public final class ExamplePlugin extends JavaPlugin {
                             player.teleport(ctx.<World>get("world").getSpawnLocation());
                             player.sendMessage(ChatColor.GREEN + "You have been teleported!");
                         }).execute()));
+
         this.manager.command(builder.literal("tasktest")
                 .handler(context -> this.manager.taskRecipe()
                         .begin(context)
@@ -336,6 +265,7 @@ public final class ExamplePlugin extends JavaPlugin {
                         })
                         .execute(() -> context.getSender().sendMessage("DONE!"))
                 ));
+
         this.manager.command(this.manager.commandBuilder("give")
                 .senderType(Player.class)
                 .required("material", materialParser())
@@ -347,6 +277,7 @@ public final class ExamplePlugin extends JavaPlugin {
                     c.getSender().getInventory().addItem(itemStack);
                     c.getSender().sendMessage("You've been given stuff, bro.");
                 }));
+
         this.manager.command(builder.literal("summon")
                 .senderType(Player.class)
                 .required("type", enumParser(EntityType.class))
@@ -354,6 +285,7 @@ public final class ExamplePlugin extends JavaPlugin {
                     final Location loc = ctx.getSender().getLocation();
                     loc.getWorld().spawnEntity(loc, ctx.get("type"));
                 }).execute()));
+
         this.manager.command(builder.literal("enchant")
                 .senderType(Player.class)
                 .required("enchant", enchantmentParser())
@@ -383,13 +315,13 @@ public final class ExamplePlugin extends JavaPlugin {
                         RichDescription.of(text("The secondary color used to highlight commands and queries"))
                 ).required("text", textColorParser(), RichDescription.of(text("The color used for description text")))
                 .required("accent", textColorParser(), RichDescription.of(text("The color used for accents and symbols")))
-                .handler(c -> this.minecraftHelp.setHelpColors(MinecraftHelp.HelpColors.of(
+                /*.handler(c -> this.minecraftHelp.setHelpColors(MinecraftHelp.HelpColors.of(
                         c.get("primary"),
                         c.get("highlight"),
                         c.get("alternate_highlight"),
                         c.get("text"),
                         c.get("accent")
-                )))
+                )))*/
         );
 
         // Commands using MC 1.13+ argument types
@@ -422,15 +354,6 @@ public final class ExamplePlugin extends JavaPlugin {
                     context.getSender().sendMessage("You wrote: " + StringUtils.join(args, " "));
                 })
         );
-
-        /* Register a custom regex caption */
-        final Caption moneyCaption = Caption.of("regex.money");
-        if (this.manager.captionRegistry() instanceof SimpleCaptionRegistry) {
-            ((SimpleCaptionRegistry<CommandSender>) this.manager.captionRegistry()).registerMessageFactory(
-                    moneyCaption,
-                    (sender, key) -> "'{input}' is not very cash money of you"
-            );
-        }
 
         // compound itemstack arg
         this.manager.command(this.manager.commandBuilder("gib")
@@ -482,134 +405,5 @@ public final class ExamplePlugin extends JavaPlugin {
                     final String key = namespacedKey.getNamespace() + ":" + namespacedKey.getKey();
                     ctx.getSender().sendMessage("The key you typed is '" + key + "'.");
                 }));
-    }
-
-    @Suggestions("help_queries")
-    public @NonNull List<String> suggestHelpQueries(
-            final @NonNull CommandContext<CommandSender> ctx,
-            final @NonNull String input
-    ) {
-        return this.manager.createCommandHelpHandler().queryRootIndex(ctx.getSender()).getEntries().stream()
-                .map(CommandHelpHandler.VerboseHelpEntry::getSyntaxString)
-                .collect(Collectors.toList());
-    }
-
-    @CommandMethod("example|e|ex help [query]")
-    @CommandDescription("Help menu")
-    public void commandHelp(
-            final @NonNull CommandSender sender,
-            final @Argument(value = "query", suggestions = "help_queries") @Greedy String query
-    ) {
-        this.minecraftHelp.queryCommands(query == null ? "" : query, sender);
-    }
-
-    @Confirmation
-    @CommandMethod("example clear")
-    @CommandDescription("Clear your inventory")
-    @CommandPermission("example.clear")
-    public void commandClear(final @NonNull Player player) {
-        player.getInventory().clear();
-        this.bukkitAudiences.player(player)
-                .sendMessage(text("Your inventory has been cleared", NamedTextColor.GOLD));
-    }
-
-    @CommandMethod("example give <material> <amount>")
-    @CommandDescription("Give yourself an item")
-    public void commandGive(
-            final @NonNull Player player,
-            final @NonNull @Argument("material") Material material,
-            final @Argument("amount") int number,
-            final @Nullable @Flag("color") ChatColor nameColor,
-            final @Nullable @Flag("enchant") Enchantment enchant
-    ) {
-        final ItemStack itemStack = new ItemStack(material, number);
-        String itemName = String.format(
-                "%s's %s",
-                player.getName(),
-                material.name()
-                        .toLowerCase()
-                        .replace('_', ' ')
-        );
-        if (nameColor != null) {
-            itemName = nameColor + itemName;
-        }
-        final ItemMeta meta = itemStack.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(itemName);
-            itemStack.setItemMeta(meta);
-        }
-        if (enchant != null) {
-            itemStack.addUnsafeEnchantment(enchant, 10);
-        }
-        player.getInventory().addItem(itemStack);
-        player.sendMessage(ChatColor.GREEN + String.format("You have been given %d x %s", number, material));
-    }
-
-    @CommandMethod("example pay <money>")
-    @CommandDescription("Command to test the preprocessing system")
-    public void commandPay(
-            final @NonNull CommandSender sender,
-            final @Argument("money") @Regex(value = "(?=.*?\\d)^\\$?(([1-9]\\d{0,2}(,\\d{3})*)|\\d+)?(\\.\\d{1,2})?$",
-                    failureCaption = "regex.money") String money
-    ) {
-        this.bukkitAudiences.sender(sender).sendMessage(
-                text().append(text("You have been given ", NamedTextColor.AQUA))
-                        .append(text(money, NamedTextColor.GOLD))
-        );
-    }
-
-    @CommandMethod("example teleport complex <location>")
-    public void teleportComplex(
-            final @NonNull Player sender,
-            final @NonNull @Argument("location") Location location
-    ) {
-        this.manager.taskRecipe().begin(location).synchronous((@NonNull TaskConsumer<Location>) sender::teleport)
-                .execute(() -> sender.sendMessage("You have been teleported!"));
-    }
-
-    @CommandMethod("removeall")
-    public void removeAll(
-            final @NonNull CommandSender sender
-    ) {
-        this.manager.rootCommands().forEach(this.manager::deleteRootCommand);
-        sender.sendMessage("All root commands have been deleted :)");
-    }
-
-    @CommandMethod("removesingle <command>")
-    public void removeSingle(
-            final @NonNull CommandSender sender,
-            final @Argument(value = "command", suggestions = "commands") String command
-    ) {
-        this.manager.deleteRootCommand(command);
-        sender.sendMessage("Deleted the root command :)");
-    }
-
-    @Suggestions("commands")
-    public List<String> commands(
-            final @NonNull CommandContext<CommandSender> context,
-            final @NonNull String input
-    ) {
-        return new ArrayList<>(this.manager.rootCommands());
-    }
-
-    @CommandMethod("disableme")
-    public void disableMe() {
-        this.getServer().getPluginManager().disablePlugin(this);
-    }
-
-
-    /**
-     * Command must have the given game mode
-     */
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface GameModeRequirement {
-
-        /**
-         * The required game mode
-         *
-         * @return Required game mode
-         */
-        GameMode value();
     }
 }

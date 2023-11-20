@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.examples.bukkit;
+package cloud.commandframework.examples.bukkit.annotations;
 
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.CommandMethod;
@@ -46,7 +46,7 @@ public final class ExampleCommandContainer {
      *
      * @param sender the sender
      */
-    @CommandMethod("container")
+    @CommandMethod("annotations container")
     public void containerCommand(final CommandSender sender) {
         sender.sendMessage("This is sent from a container!!");
     }
