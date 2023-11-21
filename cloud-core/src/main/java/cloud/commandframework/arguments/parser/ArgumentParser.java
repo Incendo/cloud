@@ -30,7 +30,6 @@ import cloud.commandframework.context.CommandInput;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -109,14 +108,7 @@ public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
             @NonNull CommandContext<@NonNull C> commandContext,
             @NonNull CommandInput commandInput
     ) {
-        final CompletableFuture<T> future = new CompletableFuture<>();
-        final ArgumentParseResult<T> result = this.parse(commandContext, commandInput);
-        if (result.getFailure().isPresent()) {
-            future.completeExceptionally(result.getFailure().get());
-        } else {
-            future.complete(result.getParsedValue().orElse(null));
-        }
-        return future;
+        return this.parse(commandContext, commandInput).asFuture();
     }
 
     /**
@@ -165,10 +157,10 @@ public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
      * @param mapper the mapper to apply
      * @param <O>    the result type
      * @return a derived parser.
-     * @since 1.5.0
+     * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "1.5.0")
-    default <O> @NonNull ArgumentParser<C, O> map(final BiFunction<CommandContext<C>, T, ArgumentParseResult<O>> mapper) {
+    default <O> @NonNull ArgumentParser<C, O> map(final MappedArgumentParser.Mapper<C, T, O> mapper) {
         return new MappedArgumentParser<>(this, requireNonNull(mapper, "mapper"));
     }
 

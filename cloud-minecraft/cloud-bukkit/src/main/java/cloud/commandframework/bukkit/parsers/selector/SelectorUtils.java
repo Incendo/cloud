@@ -51,6 +51,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
@@ -134,7 +135,7 @@ final class SelectorUtils {
     }
 
     @SuppressWarnings("unused") // errorprone false positive
-    private abstract static class SelectorParser<C, T> implements ArgumentParser<C, T>, SelectorMapper<T> {
+    private abstract static class SelectorParser<C, T> implements ArgumentParser.FutureArgumentParser<C, T>, SelectorMapper<T> {
 
         protected static final Supplier<Object> NO_PLAYERS_EXCEPTION_TYPE =
                 Suppliers.memoize(() -> findExceptionType("argument.entity.notfound.player"));
@@ -164,16 +165,16 @@ final class SelectorUtils {
             this.modernParser = createModernParser(single, playersOnly, this);
         }
 
-        protected ArgumentParseResult<T> legacyParse(
+        protected CompletableFuture<T> legacyParse(
                 final CommandContext<C> commandContext,
                 final CommandInput commandInput
         ) {
-            return ArgumentParseResult.failure(new SelectorParseException(
+            return ArgumentParseResult.<T>failure(new SelectorParseException(
                     "",
                     commandContext,
                     SelectorParseException.FailureReason.UNSUPPORTED_VERSION,
                     this.getClass()
-            ));
+            )).asFuture();
         }
 
         protected @NonNull List<@NonNull Suggestion> legacySuggestions(
@@ -184,12 +185,12 @@ final class SelectorUtils {
         }
 
         @Override
-        public ArgumentParseResult<T> parse(
+        public CompletableFuture<T> parseFuture(
                 final CommandContext<C> commandContext,
                 final CommandInput commandInput
         ) {
             if (this.modernParser != null) {
-                return this.modernParser.parse(commandContext, commandInput);
+                return this.modernParser.parseFuture(commandContext, commandInput);
             }
             return this.legacyParse(commandContext, commandInput);
         }
@@ -264,7 +265,7 @@ final class SelectorUtils {
         }
     }
 
-    private static class ModernSelectorParser<C, T> implements ArgumentParser<C, T> {
+    private static class ModernSelectorParser<C, T> implements ArgumentParser.FutureArgumentParser<C, T> {
 
         private final ArgumentParser<C, Object> wrappedBrigadierParser;
         private final SelectorMapper<T> mapper;
@@ -278,30 +279,25 @@ final class SelectorUtils {
         }
 
         @Override
-        public ArgumentParseResult<T> parse(
+        public CompletableFuture<T> parseFuture(
                 final CommandContext<C> commandContext,
                 final CommandInput commandInput
         ) {
             final CommandInput originalCommandInput = commandInput.copy();
-
-            final ArgumentParseResult<Object> result = this.wrappedBrigadierParser.parse(commandContext, commandInput);
-            if (result.getFailure().isPresent()) {
-                return ArgumentParseResult.failure(result.getFailure().get());
-            } else if (result.getParsedValue().isPresent()) {
-                try {
-                    final String input = originalCommandInput.difference(commandInput);
-                    return ArgumentParseResult.success(this.mapper.mapResult(
-                            input,
-                            new EntitySelectorWrapper(commandContext, result.getParsedValue().get())
-                    ));
-                } catch (final CommandSyntaxException ex) {
-                    commandInput.cursor(originalCommandInput.cursor());
-                    return ArgumentParseResult.failure(ex);
-                } catch (final Exception ex) {
-                    throw rethrow(ex);
-                }
-            }
-            throw new IllegalStateException();
+            return this.wrappedBrigadierParser.parseFuture(commandContext, commandInput)
+                    .thenCompose(result -> {
+                        final CompletableFuture<T> future = new CompletableFuture<>();
+                        try {
+                            final String input = originalCommandInput.difference(commandInput);
+                            future.complete(this.mapper.mapResult(input, new EntitySelectorWrapper(commandContext, result)));
+                        } catch (final CommandSyntaxException ex) {
+                            commandInput.cursor(originalCommandInput.cursor());
+                            future.completeExceptionally(ex);
+                        } catch (final Exception ex) {
+                            future.completeExceptionally(ex);
+                        }
+                        return future;
+                    });
         }
 
         @Override

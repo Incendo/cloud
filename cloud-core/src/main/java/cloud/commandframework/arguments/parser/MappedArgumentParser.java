@@ -27,7 +27,7 @@ import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import java.util.List;
-import java.util.function.BiFunction;
+import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -41,14 +41,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @since 1.5.0
  */
 @API(status = API.Status.STABLE, since = "1.5.0")
-public final class MappedArgumentParser<C, I, O> implements ArgumentParser<C, O> {
+public final class MappedArgumentParser<C, I, O> implements ArgumentParser.FutureArgumentParser<C, O> {
 
     private final ArgumentParser<C, I> base;
-    private final BiFunction<CommandContext<C>, I, ArgumentParseResult<O>> mapper;
+    private final Mapper<C, I, O> mapper;
 
     MappedArgumentParser(
             final ArgumentParser<C, I> base,
-            final BiFunction<CommandContext<C>, I, ArgumentParseResult<O>> mapper
+            final Mapper<C, I, O> mapper
     ) {
         this.base = base;
         this.mapper = mapper;
@@ -64,12 +64,12 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser<C, O>
     }
 
     @Override
-    public @NonNull ArgumentParseResult<@NonNull O> parse(
+    public @NonNull CompletableFuture<@NonNull O> parseFuture(
             @NonNull final CommandContext<@NonNull C> commandContext,
             @NonNull final CommandInput commandInput
     ) {
-        final ArgumentParseResult<@NonNull I> baseResult = this.base.parse(commandContext, commandInput);
-        return baseResult.flatMapParsedValue(value -> this.mapper.apply(commandContext, value));
+       return this.base.parseFuture(commandContext, commandInput)
+               .thenCompose(result -> this.mapper.map(commandContext, result));
     }
 
     @Override
@@ -81,10 +81,12 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser<C, O>
     }
 
     @Override
-    public @NonNull <O1> ArgumentParser<C, O1> map(final BiFunction<CommandContext<C>, O, ArgumentParseResult<O1>> mapper) {
+    public @NonNull <O1> ArgumentParser<C, O1> map(final Mapper<C, O, O1> mapper) {
+        final Mapper<C, I, O1> composedMapper = (ctx, original) -> this.mapper.map(ctx, original)
+                .thenCompose(value -> mapper.map(ctx, value));
         return new MappedArgumentParser<>(
                 this.base,
-                (ctx, original) -> this.mapper.apply(ctx, original).flatMapParsedValue(value -> mapper.apply(ctx, value))
+                composedMapper
         );
     }
 
@@ -120,5 +122,20 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser<C, O>
         return "MappedArgumentParser{"
                 + "base=" + this.base + ','
                 + "mapper=" + this.mapper + '}';
+    }
+
+
+    @FunctionalInterface
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public interface Mapper<C, I, O> {
+
+        /**
+         * Maps the input to a future that completes with the output.
+         *
+         * @param context the context
+         * @param input   the input
+         * @return future that completes with the output
+         */
+        @NonNull CompletableFuture<O> map(@NonNull CommandContext<C> context, @NonNull I input);
     }
 }

@@ -24,6 +24,8 @@
 package cloud.commandframework.arguments.parser;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -38,6 +40,24 @@ import org.checkerframework.common.returnsreceiver.qual.This;
 public abstract class ArgumentParseResult<T> {
 
     private ArgumentParseResult() {
+    }
+
+    /**
+     * Maps the future to a future returning an argument parse result
+     *
+     * @param <T>    the type of the result
+     * @param future the future to map
+     * @return the mapped future
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <T> @NonNull CompletableFuture<ArgumentParseResult<T>> mapFuture(final @NonNull CompletableFuture<T> future) {
+        return future.thenApply(ArgumentParseResult::success).exceptionally(throwable -> {
+            if (throwable instanceof CompletionException) {
+                return ArgumentParseResult.failure(throwable.getCause());
+            }
+            return ArgumentParseResult.failure(throwable);
+        });
     }
 
     /**
@@ -108,6 +128,15 @@ public abstract class ArgumentParseResult<T> {
     @API(status = API.Status.STABLE, since = "1.5.0")
     public abstract @NonNull ArgumentParseResult<T> mapFailure(Function<Throwable, Throwable> mapper);
 
+    /**
+     * Maps the result to a completable future.
+     *
+     * @return the future
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public abstract @NonNull CompletableFuture<T> asFuture();
+
 
     private static final class ParseSuccess<T> extends ArgumentParseResult<T> {
 
@@ -143,6 +172,11 @@ public abstract class ArgumentParseResult<T> {
         @Override
         public @NonNull @This ArgumentParseResult<T> mapFailure(final Function<Throwable, Throwable> mapper) {
             return this;
+        }
+
+        @Override
+        public @NonNull CompletableFuture<T> asFuture() {
+            return CompletableFuture.completedFuture(this.value);
         }
     }
 
@@ -182,6 +216,17 @@ public abstract class ArgumentParseResult<T> {
         @Override
         public @NonNull ArgumentParseResult<T> mapFailure(final Function<Throwable, Throwable> mapper) {
             return new ParseFailure<>(mapper.apply(this.failure));
+        }
+
+        @Override
+        public @NonNull CompletableFuture<T> asFuture() {
+            final CompletableFuture<T> future = new CompletableFuture<>();
+            if (this.failure instanceof CompletionException) {
+                future.completeExceptionally(this.failure.getCause());
+            } else {
+                future.completeExceptionally(this.failure);
+            }
+            return future;
         }
     }
 }

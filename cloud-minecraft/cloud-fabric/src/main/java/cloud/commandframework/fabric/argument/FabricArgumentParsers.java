@@ -47,6 +47,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import net.minecraft.commands.CommandBuildContext;
@@ -99,7 +100,7 @@ public final class FabricArgumentParsers {
      */
     public static <C> @NonNull ArgumentParser<C, MinecraftTime> time() {
         return new WrappedBrigadierParser<C, Integer>(TimeArgument.time())
-                .map((ctx, val) -> ArgumentParseResult.success(MinecraftTime.of(val)));
+                .map((ctx, val) -> CompletableFuture.completedFuture(MinecraftTime.of(val)));
     }
 
     /**
@@ -152,13 +153,13 @@ public final class FabricArgumentParsers {
     }
 
     @SuppressWarnings("unchecked")
-    private static <C, O extends Coordinates> @NonNull ArgumentParseResult<@NonNull O> mapToCoordinates(
+    private static <C, O extends Coordinates> @NonNull CompletableFuture<@NonNull O> mapToCoordinates(
             final @NonNull CommandContext<C> ctx,
             final net.minecraft.commands.arguments.coordinates.@NonNull Coordinates posArgument
     ) {
         return requireCommandSourceStack(
                 ctx,
-                serverCommandSource -> ArgumentParseResult.success((O) new CoordinatesImpl(
+                serverCommandSource -> CompletableFuture.completedFuture((O) new CoordinatesImpl(
                         serverCommandSource,
                         posArgument
                 ))
@@ -276,27 +277,31 @@ public final class FabricArgumentParsers {
         @NonNull ArgumentParseResult<O> result() throws CommandSyntaxException;
     }
 
-    private static <O> @NonNull ArgumentParseResult<O> handleCommandSyntaxExceptionAsFailure(
+    private static <O> @NonNull CompletableFuture<O> handleCommandSyntaxExceptionAsFailure(
             final @NonNull CommandSyntaxExceptionThrowingParseResultSupplier<O> resultSupplier
     ) {
+        final CompletableFuture<ArgumentParseResult<O>> future = new CompletableFuture<>();
         try {
-            return resultSupplier.result();
+            future.complete(resultSupplier.result());
         } catch (final CommandSyntaxException ex) {
-            return ArgumentParseResult.failure(ex);
+            future.completeExceptionally(ex);
         }
+        return future.thenCompose(ArgumentParseResult::asFuture);
     }
 
     private static @NonNull IllegalStateException serverOnly() {
         return new IllegalStateException("This command argument type is server-only.");
     }
 
-    private static <C, O> @NonNull ArgumentParseResult<O> requireCommandSourceStack(
+    private static <C, O> @NonNull CompletableFuture<O> requireCommandSourceStack(
             final @NonNull CommandContext<C> context,
-            final @NonNull Function<CommandSourceStack, ArgumentParseResult<O>> resultFunction
+            final @NonNull Function<CommandSourceStack, CompletableFuture<O>> resultFunction
     ) {
         final SharedSuggestionProvider nativeSource = context.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
         if (!(nativeSource instanceof CommandSourceStack)) {
-            return ArgumentParseResult.failure(serverOnly());
+            final CompletableFuture<O> future = new CompletableFuture<>();
+            future.completeExceptionally(serverOnly());
+            return future;
         }
         return resultFunction.apply((CommandSourceStack) nativeSource);
     }
