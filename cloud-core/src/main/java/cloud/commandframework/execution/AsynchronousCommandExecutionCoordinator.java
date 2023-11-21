@@ -29,8 +29,10 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.CommandExecutionException;
+import cloud.commandframework.exceptions.CommandParseException;
 import cloud.commandframework.services.State;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Function;
@@ -105,7 +107,23 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
                                 }
                                 return new CommandResult<>(commandContext);
                             });
-                }, this.executor);
+                }, this.executor)
+                .exceptionally(exception -> {
+                    final Throwable workingException;
+                    if (exception instanceof CompletionException) {
+                        workingException = exception.getCause();
+                    } else {
+                        workingException = exception;
+                    }
+
+                    if (workingException instanceof CommandParseException) {
+                        throw (CommandParseException) workingException;
+                    } else if (workingException instanceof CommandExecutionException) {
+                        throw (CommandExecutionException) workingException;
+                    } else {
+                        throw new CommandExecutionException(workingException, commandContext);
+                    }
+                });
     }
 
 
