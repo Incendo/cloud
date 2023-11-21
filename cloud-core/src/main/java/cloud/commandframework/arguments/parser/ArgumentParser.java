@@ -30,6 +30,7 @@ import cloud.commandframework.context.CommandInput;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -195,10 +196,15 @@ public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
                 @NonNull CommandContext<@NonNull C> commandContext,
                 @NonNull CommandInput commandInput
         ) {
-            return this.parseFuture(commandContext, commandInput)
-                    .thenApply(ArgumentParseResult::success)
-                    .exceptionally(ArgumentParseResult::failure)
-                    .join();
+            try {
+                return ArgumentParseResult.mapFuture(this.parseFuture(commandContext, commandInput)).join();
+            } catch (final CompletionException exception) {
+                final Throwable cause = exception.getCause();
+                if (cause instanceof RuntimeException) {
+                    throw (RuntimeException) cause;
+                }
+                throw exception;
+            }
         }
 
         @Override
