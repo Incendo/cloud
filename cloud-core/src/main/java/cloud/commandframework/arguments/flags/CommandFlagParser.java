@@ -350,7 +350,8 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
             CompletableFuture<Boolean> result = CompletableFuture.completedFuture(false);
             final Set<CommandFlag<?>> parsedFlags = commandContext.computeIfAbsent(PARSED_FLAGS, k -> new HashSet());
 
-            for (int i = 0; i <= commandInput.remainingTokens(); i++) {
+            final int remainingTokens = commandInput.remainingTokens();
+            for (int i = 0; i <= remainingTokens; i++) {
                 result = result.thenCompose(done -> {
                     if (done || commandInput.isEmpty()) {
                         return CompletableFuture.completedFuture(true);

@@ -76,6 +76,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -215,7 +216,16 @@ public abstract class CommandManager<C> {
             final @NonNull C commandSender,
             final @NonNull String input
     ) {
-        return this.suggestFuture(commandSender, input).join();
+        try {
+            return this.suggestFuture(commandSender, input).join();
+        } catch (final CompletionException completionException) {
+            final Throwable cause = completionException.getCause();
+            // We unwrap if we can, otherwise we don't. There's no point in wrapping again.
+            if (cause instanceof RuntimeException) {
+                throw ((RuntimeException) cause);
+            }
+            throw completionException;
+        }
     }
 
     /**
@@ -866,10 +876,10 @@ public abstract class CommandManager<C> {
     /**
      * Sets the command suggestion processor.
      * <p>
-     * This will be called ever time {@link #suggest(Object, String)} is called, in order to process the list
+     * This will be called every time {@link #suggest(Object, String)} is called, in order to process the list
      * of suggestions before it's returned to the caller.
      *
-     * @param commandSuggestionProcessor the new command sugesstion processor
+     * @param commandSuggestionProcessor the new command suggestion processor
      * @since 1.7.0
      * @see #commandSuggestionProcessor()
      */
