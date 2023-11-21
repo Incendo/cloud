@@ -81,7 +81,7 @@ public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
     );
 
     /**
-     * Parse command input into a command result.
+     * Returns a future that completes with the result of parsing the given {@code commandInput}.
      * <p>
      * This method may be called when a command chain is being parsed for execution
      * (using {@link cloud.commandframework.CommandManager#executeCommand(Object, String)})
@@ -188,6 +188,14 @@ public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
     }
 
 
+    /**
+     * Utility interface extending {@link ArgumentParser} to make it easier to implement
+     * {@link #parseFuture(CommandContext, CommandInput)}.
+     *
+     * @param <C> the command sender type
+     * @param <T> the type produced by the parser
+     * @since 2.0.0
+     */
     @API(status = API.Status.STABLE, since = "2.0.0")
     interface FutureArgumentParser<C, T> extends ArgumentParser<C, T> {
 
