@@ -25,6 +25,11 @@ package cloud.commandframework.kotlin.coroutines.annotations
 
 import cloud.commandframework.annotations.AnnotationParser
 import cloud.commandframework.annotations.MethodCommandExecutionHandler
+import cloud.commandframework.annotations.suggestions.MethodSuggestionProvider
+import cloud.commandframework.annotations.suggestions.SuggestionProviderFactory
+import cloud.commandframework.arguments.suggestion.Suggestion
+import cloud.commandframework.arguments.suggestion.SuggestionProvider
+import cloud.commandframework.arguments.suggestion.SuggestionProvider.FutureSuggestionProvider
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.execution.CommandExecutionCoordinator
 import io.leangen.geantyref.GenericTypeReflector
@@ -38,6 +43,7 @@ import java.util.function.Predicate
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.callSuspend
 import kotlin.reflect.full.callSuspendBy
@@ -78,6 +84,8 @@ public fun <C> AnnotationParser<C>.installCoroutineSupport(
     registerCommandExecutionMethodFactory(predicate) {
         KotlinMethodCommandExecutionHandler(scope, context, it)
     }
+
+    suggestionProviderFactory(KotlinSuggestionProviderFactory(scope, context))
 
     return this
 }
@@ -155,5 +163,43 @@ private class KotlinMethodCommandExecutionHandler<C>(
     private fun KParameter.hasType(clazz: Class<*>): Boolean {
         val javaType = GenericTypeReflector.erase(type.javaType)
         return javaType == clazz
+    }
+}
+
+private class KotlinSuggestionProviderFactory<C>(
+    private val coroutineScope: CoroutineScope,
+    private val coroutineContext: CoroutineContext
+) : SuggestionProviderFactory<C> {
+
+    override fun createSuggestionProvider(instance: Any, method: Method): SuggestionProvider<C> {
+        if (method.kotlinFunction == null) {
+            return SuggestionProviderFactory.defaultFactory<C>().createSuggestionProvider(instance, method)
+        }
+        val kFunction = requireNotNull(method.kotlinFunction)
+        return KotlinSuggestionProvider(coroutineScope, coroutineContext, kFunction, instance)
+    }
+}
+
+private class KotlinSuggestionProvider<C>(
+    private val coroutineScope: CoroutineScope,
+    private val coroutineContext: CoroutineContext,
+    private val kFunction: KFunction<*>,
+    private val instance: Any
+) : FutureSuggestionProvider<C> {
+
+    override fun suggestionsFuture(context: CommandContext<C>, input: String): CompletableFuture<List<Suggestion>> {
+        return coroutineScope.future(coroutineContext) {
+            try {
+                kFunction.callSuspend(instance, context, input)
+            } catch (e: InvocationTargetException) {
+                e.cause?.let { throw it } ?: throw e // if cause exists, throw, else rethrow invocation exception
+            }
+        }.thenCompose { result ->
+            when (result) {
+                null -> CompletableFuture.completedFuture(emptyList<Suggestion>())
+                is Sequence<*> -> MethodSuggestionProvider.mapSuggestions(result.asIterable())
+                else -> MethodSuggestionProvider.mapSuggestions(result)
+            }
+        }
     }
 }

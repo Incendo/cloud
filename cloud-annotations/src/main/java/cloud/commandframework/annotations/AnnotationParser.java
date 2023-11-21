@@ -31,7 +31,7 @@ import cloud.commandframework.annotations.injection.RawArgs;
 import cloud.commandframework.annotations.parsers.MethodArgumentParser;
 import cloud.commandframework.annotations.parsers.Parser;
 import cloud.commandframework.annotations.processing.CommandContainerProcessor;
-import cloud.commandframework.annotations.suggestions.MethodSuggestionProvider;
+import cloud.commandframework.annotations.suggestions.SuggestionProviderFactory;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -67,6 +67,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -104,6 +105,7 @@ public final class AnnotationParser<C> {
     private FlagExtractor flagExtractor;
     private FlagAssembler flagAssembler;
     private CommandExtractor commandExtractor;
+    private SuggestionProviderFactory<C> suggestionProviderFactory;
 
     /**
      * Construct a new annotation parser
@@ -153,6 +155,7 @@ public final class AnnotationParser<C> {
         this.argumentExtractor = new ArgumentExtractorImpl();
         this.argumentAssembler = new ArgumentAssemblerImpl<>(this);
         this.commandExtractor = new CommandExtractorImpl(this);
+        this.suggestionProviderFactory = SuggestionProviderFactory.defaultFactory();
         this.registerAnnotationMapper(CommandDescription.class, d ->
                 ParserParameters.single(StandardParameters.DESCRIPTION, this.processString(d.value())));
         this.registerPreprocessorMapper(Regex.class, annotation -> RegexPreprocessor.of(
@@ -506,6 +509,28 @@ public final class AnnotationParser<C> {
     }
 
     /**
+     * Returns the suggestion provider factory.
+     *
+     * @return the suggestion provider factory
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull SuggestionProviderFactory<C> suggestionProviderFactory() {
+        return this.suggestionProviderFactory;
+    }
+
+    /**
+     * Sets the suggestion provider factory.
+     *
+     * @param suggestionProviderFactory new suggestion provider factory
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void suggestionProviderFactory(final @NonNull SuggestionProviderFactory<C> suggestionProviderFactory) {
+        this.suggestionProviderFactory = suggestionProviderFactory;
+    }
+
+    /**
      * Parses all known {@link cloud.commandframework.annotations.processing.CommandContainer command containers}.
      *
      * @return Collection of parsed commands
@@ -587,21 +612,39 @@ public final class AnnotationParser<C> {
             if (!method.isAccessible()) {
                 method.setAccessible(true);
             }
-            if (method.getParameterCount() != 2
-                    || !(Iterable.class.isAssignableFrom(method.getReturnType()) || method.getReturnType().equals(Stream.class))
-                    || !method.getParameters()[0].getType().equals(CommandContext.class)
-                    || !method.getParameters()[1].getType().equals(String.class)
-            ) {
+
+            boolean valid;
+            if (method.getParameterCount() != 2 && method.getParameterCount() != 3) {
+                valid = false;
+            } else if (method.getParameterCount() == 3) {
+                valid = method.getParameters()[0].getType().equals(CommandContext.class)
+                        && method.getParameters()[1].getType().equals(String.class)
+                        && method.getParameters()[2].getType().getSimpleName().equals("Continuation");
+            } else {
+                valid = method.getParameters()[0].getType().equals(CommandContext.class)
+                        && method.getParameters()[1].getType().equals(String.class);
+            }
+
+            valid = valid
+                    && (Iterable.class.isAssignableFrom(method.getReturnType())
+                    || method.getReturnType().equals(Stream.class)
+                    || method.getReturnType().equals(CompletableFuture.class)
+                    || method.getReturnType().getSimpleName().equals("Sequence")
+                    || method.getParameterCount() == 3 /* TODO(City): Fix this... */);
+
+            if (!valid) {
                 throw new IllegalArgumentException(String.format(
                         "@Suggestions annotated method '%s' in class '%s' does not have the correct signature",
                         method.getName(),
                         instance.getClass().getCanonicalName()
                 ));
             }
+
             try {
+
                 this.manager.parserRegistry().registerSuggestionProvider(
                         this.processString(suggestions.value()),
-                        new MethodSuggestionProvider<>(instance, method)
+                        this.suggestionProviderFactory.createSuggestionProvider(instance, method)
                 );
             } catch (final Exception e) {
                 throw new RuntimeException(e);
