@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.examples.bukkit;
+package cloud.commandframework.examples.bukkit.builder;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.bukkit.BukkitCommandManager;

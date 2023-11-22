@@ -39,6 +39,7 @@ import cloud.commandframework.examples.bukkit.annotations.feature.RegexExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.RootCommandDeletionExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.TaskRecipeExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.minecraft.LocationExample;
+import cloud.commandframework.examples.bukkit.annotations.feature.minecraft.NamespacedKeyExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.minecraft.SelectorExample;
 import cloud.commandframework.meta.CommandMeta;
 import java.util.Arrays;
@@ -66,6 +67,7 @@ public final class AnnotationParserExample {
             new TaskRecipeExample(),
             // Minecraft-specific features
             new LocationExample(),
+            new NamespacedKeyExample(),
             new SelectorExample()
     );
 
@@ -90,11 +92,6 @@ public final class AnnotationParserExample {
 
         // Set up the example modules.
         this.setupExamples();
-
-        //
-        // Parse all @CommandMethod-annotated methods
-        //
-        this.annotationParser.parse(this);
     }
 
     private void setupExamples() {
