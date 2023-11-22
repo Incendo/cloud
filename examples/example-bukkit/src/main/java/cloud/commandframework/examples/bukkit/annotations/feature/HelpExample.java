@@ -61,7 +61,7 @@ public final class HelpExample implements AnnotationFeature {
             final @NonNull AnnotationParser<CommandSender> annotationParser
     ) {
         this.manager = annotationParser.manager();
-        this.bukkitAudiences = BukkitAudiences.create(examplePlugin);
+        this.bukkitAudiences = examplePlugin.bukkitAudiences();
 
         // Set up the help instance.
         this.setupHelp();

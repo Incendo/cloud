@@ -29,7 +29,6 @@ import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.bukkit.parsers.location.Location2D;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
-import cloud.commandframework.examples.bukkit.annotations.Synchronized;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -49,7 +48,6 @@ public final class LocationExample implements AnnotationFeature {
         annotationParser.parse(this);
     }
 
-    @Synchronized
     @CommandMethod("annotations teleport location <location>")
     public void teleportComplex(
             final @NonNull Player sender,
@@ -59,7 +57,6 @@ public final class LocationExample implements AnnotationFeature {
         sender.sendMessage("You have been teleported!");
     }
 
-    @Synchronized
     @CommandMethod("annotations teleport chunk <chunk>")
     public void teleportComplex(
             final @NonNull Player sender,

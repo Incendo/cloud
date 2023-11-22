@@ -51,7 +51,7 @@ public final class RegexExample implements AnnotationFeature {
             final @NonNull ExamplePlugin examplePlugin,
             final @NonNull AnnotationParser<CommandSender> annotationParser
     ) {
-        this.bukkitAudiences = BukkitAudiences.create(examplePlugin);
+        this.bukkitAudiences = examplePlugin.bukkitAudiences();
         annotationParser.parse(this);
 
         final Caption moneyCaption = Caption.of("annotations.regex.money");

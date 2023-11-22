@@ -27,8 +27,6 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
-import cloud.commandframework.bukkit.BukkitCommandManager;
-import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.feature.BuilderModifierExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.CommandContainerExample;
@@ -43,7 +41,6 @@ import cloud.commandframework.examples.bukkit.annotations.feature.TaskRecipeExam
 import cloud.commandframework.examples.bukkit.annotations.feature.minecraft.LocationExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.minecraft.SelectorExample;
 import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.tasks.TaskConsumer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -91,8 +88,6 @@ public final class AnnotationParserExample {
                 commandMetaFunction
         );
 
-        this.setupSynchronization();
-
         // Set up the example modules.
         this.setupExamples();
 
@@ -100,25 +95,6 @@ public final class AnnotationParserExample {
         // Parse all @CommandMethod-annotated methods
         //
         this.annotationParser.parse(this);
-    }
-
-    /**
-     * Adds support for the {@link Synchronized} annotation by running the command handler through a synchronous
-     * task recipe step.
-     */
-    private void setupSynchronization() {
-        final BukkitCommandManager<CommandSender> commandManager =
-                (BukkitCommandManager<CommandSender>) this.annotationParser.manager();
-        this.annotationParser.registerBuilderModifier(
-                Synchronized.class,
-                (annotation, builder) -> builder.handler(
-                        commandContext -> commandManager.taskRecipe()
-                                .begin(commandContext)
-                                .synchronous((TaskConsumer<CommandContext<CommandSender>>) context -> builder.handler()
-                                        .execute(commandContext))
-                                .execute()
-                )
-        );
     }
 
     private void setupExamples() {

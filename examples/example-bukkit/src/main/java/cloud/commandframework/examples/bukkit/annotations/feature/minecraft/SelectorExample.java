@@ -29,7 +29,6 @@ import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
-import cloud.commandframework.examples.bukkit.annotations.Synchronized;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -49,7 +48,6 @@ public final class SelectorExample implements AnnotationFeature {
         annotationParser.parse(this);
     }
 
-    @Synchronized
     @CommandMethod("entity <entity> here")
     public void teleportEntity(
             final @NonNull Player player,

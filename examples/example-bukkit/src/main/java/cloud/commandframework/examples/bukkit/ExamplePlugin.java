@@ -25,7 +25,6 @@ package cloud.commandframework.examples.bukkit;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
@@ -33,7 +32,6 @@ import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationParserExample;
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
@@ -47,7 +45,6 @@ import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -66,6 +63,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
@@ -87,34 +85,25 @@ public final class ExamplePlugin extends JavaPlugin {
 
     private BukkitCommandManager<CommandSender> manager;
     private CommandConfirmationManager<CommandSender> confirmationManager;
+    private BukkitAudiences bukkitAudiences;
 
     @Override
     public void onEnable() {
-        //
-        // This is a function that will provide a command execution coordinator that parses and executes commands
-        // asynchronously
-        //
-        final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
-                AsynchronousCommandExecutionCoordinator.<CommandSender>builder().build();
-        //
-        // However, in many cases it is fine for to run everything synchronously:
-        //
-        // final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
-        //        CommandExecutionCoordinator.simpleCoordinator();
-        //
-
-        //
-        // This function maps the command sender type of our choice to the bukkit command sender.
-        // However, in this example we use the Bukkit command sender, and so we just need to map it
-        // to itself
-        //
-        final Function<CommandSender, CommandSender> mapperFunction = Function.identity();
         try {
+            //
+            // (1) The execution coordinator determines how commands are executed. The simple execution coordinator will
+            //     run the command on the thread that is calling it. In the case of Bukkit, this is the primary server thread.
+            //     It is possible to execute (and parse!) commands asynchronously by using the
+            //     AsynchronousCommandExecutionCoordinator.
+            // (2) This functions maps the Bukkit command sender to your custom sender type. If you're not using a custom
+            //     type, then Function.identity() maps CommandSender to itself.
+            // (3) The same concept as (2), but mapping from your custom type to a Bukkit command sender.
+            //
             this.manager = new PaperCommandManager<>(
                     /* Owning plugin */ this,
-                    /* Coordinator function */ executionCoordinatorFunction,
-                    /* Command Sender -> C */ mapperFunction,
-                    /* C -> Command Sender */ mapperFunction
+                    /* (1) */ CommandExecutionCoordinator.simpleCoordinator(),
+                    /* (2) */ Function.identity(),
+                    /* (3) */ Function.identity()
             );
         } catch (final Exception e) {
             this.getLogger().severe("Failed to initialize the command this.manager");
@@ -136,33 +125,20 @@ public final class ExamplePlugin extends JavaPlugin {
             this.manager.registerBrigadier();
         }
         //
-        // Register asynchronous completions
+        // Register asynchronous completions. The capability tells us whether asynchronous completions
+        // are available on the server that is running the plugin. The asynchronous completion method
+        // is only available in cloud-paper, not cloud-bukkit.
         //
         if (this.manager.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
             ((PaperCommandManager<CommandSender>) this.manager).registerAsynchronousCompletions();
         }
         //
-        // Create the confirmation this.manager. This allows us to require certain commands to be
-        // confirmed before they can be executed
+        // Create the Bukkit audiences that maps command senders to adventure audience. This is not needed
+        // if you're using paper-api instead of Bukkit.
         //
-        this.confirmationManager = new CommandConfirmationManager<>(
-                /* Timeout */ 30L,
-                /* Timeout unit */ TimeUnit.SECONDS,
-                /* Action when confirmation is required */ context -> context.getCommandContext().getSender().sendMessage(
-                ChatColor.RED + "Confirmation required. Confirm using /example confirm."),
-                /* Action when no confirmation is pending */ sender -> sender.sendMessage(
-                ChatColor.RED + "You don't have any pending commands.")
-        );
+        this.bukkitAudiences = BukkitAudiences.create(this);
         //
-        // Register the confirmation processor. This will enable confirmations for commands that require it
-        //
-        this.confirmationManager.registerConfirmationProcessor(this.manager);
-
-        // Create the annotation examples.
-        new AnnotationParserExample(this, this.manager);
-
-        //
-        // Override the default exception handlers
+        // Override the default exception handlers and use the exception handlers from cloud-minecraft-extras instead.
         //
         new MinecraftExceptionHandler<CommandSender>()
                 .withInvalidSyntaxHandler()
@@ -176,11 +152,17 @@ public final class ExamplePlugin extends JavaPlugin {
                                 .append(text("Example", NamedTextColor.GOLD))
                                 .append(text("] ", NamedTextColor.DARK_GRAY))
                                 .append(component).build()
-                ).apply(this.manager, BukkitAudiences.create(this)::sender);
+                ).apply(this.manager, this.bukkitAudiences::sender);
+        //
+        // Create the annotation examples.
+        //
+        new AnnotationParserExample(this, this.manager);
+
+
         //
         // Create the commands
         //
-        this.constructCommands();
+        // this.constructCommands();
     }
 
     private void constructCommands() {
@@ -405,5 +387,14 @@ public final class ExamplePlugin extends JavaPlugin {
                     final String key = namespacedKey.getNamespace() + ":" + namespacedKey.getKey();
                     ctx.getSender().sendMessage("The key you typed is '" + key + "'.");
                 }));
+    }
+
+    /**
+     * Returns the {@link BukkitAudiences} instance.
+     *
+     * @return audiences
+     */
+    public @NonNull BukkitAudiences bukkitAudiences() {
+        return this.bukkitAudiences;
     }
 }

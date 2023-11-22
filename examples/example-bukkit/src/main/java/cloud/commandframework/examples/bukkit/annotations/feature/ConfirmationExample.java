@@ -53,7 +53,7 @@ public final class ConfirmationExample implements AnnotationFeature {
             final @NonNull ExamplePlugin examplePlugin,
             final @NonNull AnnotationParser<CommandSender> annotationParser
     ) {
-        this.bukkitAudiences = BukkitAudiences.create(examplePlugin);
+        this.bukkitAudiences = examplePlugin.bukkitAudiences();
         this.registerConfirmationManager(annotationParser.manager());
         annotationParser.parse(this);
     }
