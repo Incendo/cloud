@@ -34,7 +34,6 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.meta.SimpleCommandMeta;
-import cloud.commandframework.types.tuples.Pair;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collections;
 import java.util.List;
@@ -95,37 +94,29 @@ class CommandTreeTest {
         );
 
         // Act
-        final Pair<Command<TestCommandSender>, Exception> command1 = this.commandManager.commandTree().parse(
+        final CompletableFuture<Command<TestCommandSender>> command1 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 CommandInput.of("test one")
         );
-        final Pair<Command<TestCommandSender>, Exception> command2 = this.commandManager.commandTree().parse(
+        final CompletableFuture<Command<TestCommandSender>> command2 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 CommandInput.of("test two")
         );
-        final Pair<Command<TestCommandSender>, Exception> command3 = this.commandManager.commandTree().parse(
+        final CompletableFuture<Command<TestCommandSender>> command3 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 CommandInput.of("test opt")
         );
-        final Pair<Command<TestCommandSender>, Exception> command4 = this.commandManager.commandTree().parse(
+        final CompletableFuture<Command<TestCommandSender>> command4 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 CommandInput.of("test opt 12")
         );
 
         // Assert
-        assertThat(command1.getFirst()).isNotNull();
-        assertThat(command1.getSecond()).isNull();
-
-        assertThat(command2.getFirst()).isNull();
-        assertThat(command2.getSecond()).isInstanceOf(NoPermissionException.class);
-
-        assertThat(command3.getFirst()).isNotNull();
-        assertThat(command3.getFirst().toString()).isEqualTo("test opt num");
-        assertThat(command3.getSecond()).isNull();
-
-        assertThat(command4.getFirst()).isNotNull();
-        assertThat(command4.getFirst().toString()).isEqualTo("test opt num");
-        assertThat(command4.getSecond()).isNull();
+        assertThat(command1.join()).isNotNull();
+        assertThat(assertThrows(CompletionException.class, command2::join)).hasCauseThat()
+                .isInstanceOf(NoPermissionException.class);
+        assertThat(command3.join().toString()).isEqualTo("test opt num");
+        assertThat(command4.join().toString()).isEqualTo("test opt num");
     }
 
     @Test
@@ -143,7 +134,7 @@ class CommandTreeTest {
         final Command<TestCommandSender> result = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 CommandInput.of("other öpt 12")
-        ).getFirst();
+        ).join();
 
         // Assert
         assertThat(result).isEqualTo(command);
@@ -165,7 +156,7 @@ class CommandTreeTest {
         final List<Suggestion> results = this.commandManager.commandTree().getSuggestions(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 CommandInput.of("test ")
-        );
+        ).join();
 
         // Assert
         assertThat(results).containsExactly(Suggestion.simple("a"), Suggestion.simple("b"));
@@ -487,31 +478,31 @@ class CommandTreeTest {
         );
 
         /* Try parsing as a variable, which should match the variable command */
-        final Pair<Command<TestCommandSender>, Exception> variableResult = this.commandManager.commandTree().parse(
+        final Command<TestCommandSender> variableResult = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 CommandInput.of("literalwithvariable argthatdoesnotmatch")
-        );
-        assertThat(variableResult.getSecond()).isNull();
-        assertThat(variableResult.getFirst().rootComponent().name()).isEqualTo("literalwithvariable");
-        assertThat(variableResult.getFirst().components().get(1).name()).isEqualTo("variable");
+        ).join();
+        assertThat(variableResult).isNotNull();
+        assertThat(variableResult.rootComponent().name()).isEqualTo("literalwithvariable");
+        assertThat(variableResult.components().get(1).name()).isEqualTo("variable");
 
         /* Try parsing with the main name literal, which should match the literal command */
-        final Pair<Command<TestCommandSender>, Exception> literalResult = this.commandManager.commandTree().parse(
+        final Command<TestCommandSender> literalResult = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 CommandInput.of("literalwithvariable literal")
-        );
-        assertThat(literalResult.getSecond()).isNull();
-        assertThat(literalResult.getFirst().rootComponent().name()).isEqualTo("literalwithvariable");
-        assertThat(literalResult.getFirst().components().get(1).name()).isEqualTo("literal");
+        ).join();
+        assertThat(literalResult).isNotNull();
+        assertThat(literalResult.rootComponent().name()).isEqualTo("literalwithvariable");
+        assertThat(literalResult.components().get(1).name()).isEqualTo("literal");
 
         /* Try parsing with the alias of the literal, which should match the literal command */
-        final Pair<Command<TestCommandSender>, Exception> literalAliasResult = this.commandManager.commandTree().parse(
+        final Command<TestCommandSender> literalAliasResult = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 CommandInput.of("literalwithvariable literalalias")
-        );
-        assertThat(literalAliasResult.getSecond()).isNull();
-        assertThat(literalAliasResult.getFirst().rootComponent().name()).isEqualTo("literalwithvariable");
-        assertThat(literalAliasResult.getFirst().components().get(1).name()).isEqualTo("literal");
+        ).join();
+        assertThat(literalAliasResult).isNotNull();
+        assertThat(literalAliasResult.rootComponent().name()).isEqualTo("literalwithvariable");
+        assertThat(literalAliasResult.components().get(1).name()).isEqualTo("literal");
     }
 
     @Test

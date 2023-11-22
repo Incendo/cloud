@@ -27,7 +27,10 @@ import cloud.commandframework.CommandManager
 import cloud.commandframework.annotations.AnnotationParser
 import cloud.commandframework.annotations.Argument
 import cloud.commandframework.annotations.CommandMethod
+import cloud.commandframework.annotations.suggestions.Suggestions
+import cloud.commandframework.arguments.suggestion.Suggestion
 import cloud.commandframework.context.CommandContext
+import cloud.commandframework.context.StandardCommandContextFactory
 import cloud.commandframework.exceptions.CommandExecutionException
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
@@ -99,6 +102,48 @@ class KotlinAnnotatedMethodsTest {
         assertThat(result.commandContext.get<Int>("the-value")).isEqualTo(5)
     }
 
+    @Test
+    fun `test suspending suggestion method`(): Unit = runBlocking {
+        AnnotationParser(commandManager, TestCommandSender::class.java) {
+            SimpleCommandMeta.empty()
+        }
+            .installCoroutineSupport()
+            .parse(SuggestionMethods())
+
+        val commandContext = StandardCommandContextFactory<TestCommandSender>().create(
+            true,
+            TestCommandSender(),
+            commandManager
+        )
+        val suggestions = commandManager.parserRegistry().getSuggestionProvider("suspending-suggestions").get()
+            .suggestionsFuture(commandContext, "")
+            .await()
+            .map(Suggestion::suggestion)
+            .map(String::toInt)
+        assertThat(suggestions).containsExactlyElementsIn(1..10)
+    }
+
+    @Test
+    fun `test non-suspending suggestion method`(): Unit = runBlocking {
+        AnnotationParser(commandManager, TestCommandSender::class.java) {
+            SimpleCommandMeta.empty()
+        }
+            .installCoroutineSupport()
+            .parse(SuggestionMethods())
+
+        val commandContext = StandardCommandContextFactory<TestCommandSender>().create(
+            true,
+            TestCommandSender(),
+            commandManager
+        )
+        val suggestions = commandManager.parserRegistry().getSuggestionProvider("non-suspending-suggestions").get()
+            .suggestionsFuture(commandContext, "")
+            .await()
+            .map(Suggestion::suggestion)
+            .map(String::toInt)
+        assertThat(suggestions).containsExactlyElementsIn(1..10)
+    }
+
     public class TestCommandSender
 
     private class TestCommandManager : CommandManager<TestCommandSender>(
@@ -128,5 +173,18 @@ class KotlinAnnotatedMethodsTest {
         public fun commandWithDefault(@Argument("value") value: Int = 5, context: CommandContext<TestCommandSender>) {
             context["the-value"] = value
         }
+    }
+
+    class SuggestionMethods {
+
+        @Suggestions("suspending-suggestions")
+        suspend fun suspendingSuggestions(ctx: CommandContext<TestCommandSender>, input: String): Sequence<Suggestion> =
+            withContext(Dispatchers.Default) {
+                (1..10).asSequence().map(Int::toString).map(Suggestion::simple)
+            }
+
+        @Suggestions("non-suspending-suggestions")
+        fun suggestions(ctx: CommandContext<TestCommandSender>, input: String): Sequence<Suggestion> =
+            (1..10).asSequence().map(Int::toString).map(Suggestion::simple)
     }
 }

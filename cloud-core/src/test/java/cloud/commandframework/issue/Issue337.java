@@ -29,10 +29,8 @@ import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.NoSuchCommandException;
-import cloud.commandframework.types.tuples.Pair;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.concurrent.CompletionException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static cloud.commandframework.util.TestUtils.createManager;
@@ -52,13 +50,14 @@ class Issue337 {
         final CommandInput commandInput = CommandInput.of("test this thing");
 
         // Act
-        final Pair<?, Exception> result = commandTree.parse(new CommandContext<>(commandSender, commandManager), commandInput);
+        final CompletionException exception = Assertions.assertThrows(
+                CompletionException.class,
+                () -> commandTree.parse(new CommandContext<>(commandSender, commandManager), commandInput).join()
+        );
 
         // Assert
-        assertThat(result.getFirst()).isNull();
-        assertThat(result.getSecond()).isInstanceOf(NoSuchCommandException.class);
-
-        final NoSuchCommandException noSuchCommandException = (NoSuchCommandException) result.getSecond();
+        assertThat(exception).hasCauseThat().isInstanceOf(NoSuchCommandException.class);
+        final NoSuchCommandException noSuchCommandException = (NoSuchCommandException) exception.getCause();
         assertThat(noSuchCommandException.getSuppliedCommand()).isEqualTo("test");
         assertThat(noSuchCommandException).hasCauseThat().isNull();
     }

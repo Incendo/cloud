@@ -32,6 +32,7 @@ import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext
 import cloud.commandframework.services.State;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -64,28 +65,31 @@ public final class DelegatingCommandSuggestionEngine<C> implements CommandSugges
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> getSuggestions(
+    public @NonNull CompletableFuture<List<@NonNull Suggestion>> getSuggestions(
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {
         final @NonNull CommandInput commandInput = CommandInput.of(input);
         /* Store a copy of the input queue in the context */
         context.store("__raw_input__", commandInput.copy());
-        final List<Suggestion> suggestions;
-        if (this.commandManager.preprocessContext(context, commandInput) == State.ACCEPTED) {
-            suggestions = this.commandManager.commandSuggestionProcessor().apply(
-                    new CommandPreprocessingContext<>(context, commandInput),
-                    this.commandTree.getSuggestions(
-                            context,
-                            commandInput
-                    )
-            );
-        } else {
-            suggestions = Collections.emptyList();
+
+        if (this.commandManager.preprocessContext(context, commandInput) != State.ACCEPTED) {
+            if (this.commandManager.getSetting(CommandManager.ManagerSettings.FORCE_SUGGESTION)) {
+                return CompletableFuture.completedFuture(SINGLE_EMPTY_SUGGESTION);
+            }
+            return CompletableFuture.completedFuture(Collections.emptyList());
         }
-        if (this.commandManager.getSetting(CommandManager.ManagerSettings.FORCE_SUGGESTION) && suggestions.isEmpty()) {
-            return SINGLE_EMPTY_SUGGESTION;
-        }
-        return suggestions;
+
+        return this.commandTree.getSuggestions(context, commandInput).thenApply(suggestions ->
+                this.commandManager.commandSuggestionProcessor().apply(
+                        new CommandPreprocessingContext<>(context, commandInput),
+                        suggestions
+                )
+        ).thenApply(suggestions -> {
+            if (this.commandManager.getSetting(CommandManager.ManagerSettings.FORCE_SUGGESTION) && suggestions.isEmpty()) {
+                return SINGLE_EMPTY_SUGGESTION;
+            }
+            return suggestions;
+        });
     }
 }

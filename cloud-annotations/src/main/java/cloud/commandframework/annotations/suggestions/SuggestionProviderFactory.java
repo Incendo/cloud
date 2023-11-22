@@ -21,35 +21,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments;
+package cloud.commandframework.annotations.suggestions;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.context.CommandContext;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import java.lang.reflect.Method;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Handler that produces command suggestions depending on input
- *
- * @param <C> Command sender type
- */
-@API(status = API.Status.STABLE)
-public interface CommandSuggestionEngine<C> {
+@FunctionalInterface
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface SuggestionProviderFactory<C> {
 
     /**
-     * Returns command suggestions for the "next" argument that would yield a correctly
-     * parsing command input
+     * Returns a factory that produces {@link MethodSuggestionProvider} instances.
      *
-     * @param context Request context
-     * @param input   Input provided by the sender
-     * @return List of suggestions
+     * @param <C> the command sender type
+     * @return the created factory
+     */
+    static <C> @NonNull SuggestionProviderFactory<C> defaultFactory() {
+        return MethodSuggestionProvider::new;
+    }
+
+    /**
+     * Creates a suggestion provider using the given {@code method}.
+     *
+     * @param instance the parsed instance
+     * @param method   the suggestion method
+     * @return the suggestion provider
      * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    @NonNull CompletableFuture<List<@NonNull Suggestion>> getSuggestions(
-            @NonNull CommandContext<C> context,
-            @NonNull String input
-    );
+    @NonNull SuggestionProvider<C> createSuggestionProvider(@NonNull Object instance, @NonNull Method method);
 }

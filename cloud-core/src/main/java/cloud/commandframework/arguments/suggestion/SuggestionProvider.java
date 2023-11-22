@@ -25,6 +25,8 @@ package cloud.commandframework.arguments.suggestion;
 
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -39,11 +41,62 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface SuggestionProvider<C> {
 
     /**
-     * Returns the suggestions for the given {@code input}
+     * Returns the suggestions for the given {@code input}.
      *
      * @param context the context of the suggestion lookup
      * @param input   the current input
      * @return the suggestions
      */
     @NonNull List<@NonNull Suggestion> suggestions(@NonNull CommandContext<C> context, @NonNull String input);
+
+    /**
+     * Returns a future that completes with the suggestions for the given {@code input}. By default, this delegates to
+     * {@link #suggestions(CommandContext, String)}.
+     * <p>
+     * If you want to implement this method for your parser it is recommended to implement
+     * {@link FutureSuggestionProvider} rather than {@link SuggestionProvider}.
+     *
+     * @param context the context of the suggestion lookup
+     * @param input   the current input
+     * @return the suggestions
+     */
+    default @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
+            @NonNull CommandContext<C> context,
+            @NonNull String input
+    ) {
+        return CompletableFuture.completedFuture(this.suggestions(context, input));
+    }
+
+
+    /**
+     * Utility interface extending {@link SuggestionProvider} to make it easier to implement
+     * {@link #suggestionsFuture(CommandContext, String)}.
+     *
+     * @param <C> the command sender type
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    interface FutureSuggestionProvider<C> extends SuggestionProvider<C> {
+
+        @Override
+        default @NonNull List<@NonNull Suggestion> suggestions(
+                @NonNull CommandContext<C> context,
+                @NonNull String input
+        ) {
+            try {
+                return this.suggestionsFuture(context, input).join();
+            } catch (final CompletionException exception) {
+                final Throwable cause = exception.getCause();
+                if (cause instanceof RuntimeException) {
+                    throw (RuntimeException) cause;
+                }
+                throw exception;
+            }
+        }
+
+        @Override
+        @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
+                @NonNull CommandContext<C> context,
+                @NonNull String input
+        );
+    }
 }

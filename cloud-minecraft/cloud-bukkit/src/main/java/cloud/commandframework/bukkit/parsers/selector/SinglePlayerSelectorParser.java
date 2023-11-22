@@ -24,7 +24,6 @@
 package cloud.commandframework.bukkit.parsers.selector;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
 import cloud.commandframework.bukkit.parsers.PlayerParser;
@@ -32,6 +31,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import com.google.common.collect.ImmutableList;
 import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -88,17 +88,20 @@ public final class SinglePlayerSelectorParser<C> extends SelectorUtils.PlayerSel
     }
 
     @Override
-    protected @NonNull ArgumentParseResult<SinglePlayerSelector> legacyParse(
+    protected @NonNull CompletableFuture<SinglePlayerSelector> legacyParse(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
+        final CompletableFuture<SinglePlayerSelector> result = new CompletableFuture<>();
         final String input = commandInput.peekString();
         @SuppressWarnings("deprecation") final @Nullable Player player = Bukkit.getPlayer(input);
 
         if (player == null) {
-            return ArgumentParseResult.failure(new PlayerParser.PlayerParseException(input, commandContext));
+            result.completeExceptionally(new PlayerParser.PlayerParseException(input, commandContext));
+        } else {
+            result.complete(new SinglePlayerSelector(commandInput.readString(), ImmutableList.of(player)));
         }
-        commandInput.readString();
-        return ArgumentParseResult.success(new SinglePlayerSelector(input, ImmutableList.of(player)));
+
+        return result;
     }
 }

@@ -29,12 +29,12 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.CommandExecutionException;
+import cloud.commandframework.exceptions.CommandParseException;
 import cloud.commandframework.services.State;
-import cloud.commandframework.types.tuples.Pair;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -81,49 +81,49 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final CompletableFuture<CommandResult<C>> resultFuture = new CompletableFuture<>();
-
-        final Consumer<Command<C>> commandConsumer = command -> {
-            if (this.commandManager.postprocessContext(commandContext, command) == State.ACCEPTED) {
-                command.getCommandExecutionHandler().executeFuture(commandContext).whenComplete((result, throwable) -> {
-                    if (throwable != null) {
-                        if (throwable instanceof CommandExecutionException) {
-                            resultFuture.completeExceptionally(throwable);
-                        } else {
-                            resultFuture.completeExceptionally(new CommandExecutionException(throwable, commandContext));
-                        }
-                    }
-                    // Only complete when the execution is actually finished. See #306 for more info.
-                    resultFuture.complete(new CommandResult<>(commandContext));
-                });
-            }
-        };
-
+        final CompletableFuture<CompletableFuture<Command<C>>> parseResult;
         if (this.synchronizeParsing) {
-            final @NonNull Pair<@Nullable Command<C>, @Nullable Exception> pair =
-                    this.getCommandTree().parse(commandContext, commandInput);
-            if (pair.getSecond() != null) {
-                resultFuture.completeExceptionally(pair.getSecond());
-            } else {
-                this.executor.execute(() -> commandConsumer.accept(pair.getFirst()));
-            }
+            parseResult = CompletableFuture.completedFuture(this.getCommandTree().parse(commandContext, commandInput));
         } else {
-            this.executor.execute(() -> {
-                try {
-                    final @NonNull Pair<@Nullable Command<C>, @Nullable Exception> pair =
-                            this.getCommandTree().parse(commandContext, commandInput);
-                    if (pair.getSecond() != null) {
-                        resultFuture.completeExceptionally(pair.getSecond());
-                    } else {
-                        commandConsumer.accept(pair.getFirst());
-                    }
-                } catch (final Exception e) {
-                    resultFuture.completeExceptionally(e);
-                }
-            });
+            parseResult = CompletableFuture.supplyAsync(() ->
+                    this.getCommandTree().parse(commandContext, commandInput), this.executor);
         }
 
-        return resultFuture;
+        return parseResult.thenCompose(f -> f)
+                .thenComposeAsync(command -> {
+                    if (this.commandManager.postprocessContext(commandContext, command) != State.ACCEPTED) {
+                        return CompletableFuture.completedFuture(new CommandResult<>(commandContext));
+                    }
+
+                    return command.getCommandExecutionHandler()
+                            .executeFuture(commandContext)
+                            .handle((result, throwable) -> {
+                                if (throwable != null) {
+                                    if (throwable instanceof CommandExecutionException) {
+                                        throw (CommandExecutionException) throwable;
+                                    } else {
+                                        throw new CommandExecutionException(throwable, commandContext);
+                                    }
+                                }
+                                return new CommandResult<>(commandContext);
+                            });
+                }, this.executor)
+                .exceptionally(exception -> {
+                    final Throwable workingException;
+                    if (exception instanceof CompletionException) {
+                        workingException = exception.getCause();
+                    } else {
+                        workingException = exception;
+                    }
+
+                    if (workingException instanceof CommandParseException) {
+                        throw (CommandParseException) workingException;
+                    } else if (workingException instanceof CommandExecutionException) {
+                        throw (CommandExecutionException) workingException;
+                    } else {
+                        throw new CommandExecutionException(workingException, commandContext);
+                    }
+                });
     }
 
 

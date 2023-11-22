@@ -43,6 +43,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import org.apiguardian.api.API;
 import org.bukkit.NamespacedKey;
@@ -193,7 +194,7 @@ public final class BlockPredicateParser<C> implements ArgumentParser<C, BlockPre
         return new WrappedBrigadierParser<C, Object>(inst).map((ctx, result) -> {
             if (result instanceof Predicate) {
                 // 1.19+
-                return ArgumentParseResult.success(new BlockPredicateImpl((Predicate<Object>) result));
+                return CompletableFuture.completedFuture(new BlockPredicateImpl((Predicate<Object>) result));
             }
             final Object commandSourceStack = ctx.get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER);
             try {
@@ -206,7 +207,7 @@ public final class BlockPredicateParser<C> implements ArgumentParser<C, BlockPre
                 }
                 Objects.requireNonNull(CREATE_PREDICATE_METHOD, "create on BlockPredicateArgument$Result");
                 final Predicate<Object> predicate = (Predicate<Object>) CREATE_PREDICATE_METHOD.invoke(result, obj);
-                return ArgumentParseResult.success(new BlockPredicateImpl(predicate));
+                return CompletableFuture.completedFuture(new BlockPredicateImpl(predicate));
             } catch (final ReflectiveOperationException ex) {
                 throw new RuntimeException(ex);
             }

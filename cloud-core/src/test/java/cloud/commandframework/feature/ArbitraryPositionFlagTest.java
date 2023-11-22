@@ -87,7 +87,6 @@ class ArbitraryPositionFlagTest {
         final CompletionException completionException = assertThrows(CompletionException.class,
                 commandExecutable("test literal -f foo bar -f"));
 
-
         ThrowableSubject argParse = assertThat(completionException).hasCauseThat();
         argParse.isInstanceOf(ArgumentParseException.class);
         argParse.hasCauseThat().isInstanceOf(CommandFlagParser.FlagParseException.class);

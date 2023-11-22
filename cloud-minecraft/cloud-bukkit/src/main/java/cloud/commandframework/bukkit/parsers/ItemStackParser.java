@@ -45,6 +45,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.bukkit.Material;
@@ -203,7 +204,7 @@ public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
                 inst = (ArgumentType<Object>) ctr.newInstance(CommandBuildContextSupplier.commandBuildContext());
             }
             return new WrappedBrigadierParser<C, Object>(inst)
-                    .map((ctx, itemInput) -> ArgumentParseResult.success(new ModernProtoItemStack(itemInput)));
+                    .map((ctx, itemInput) -> CompletableFuture.completedFuture(new ModernProtoItemStack(itemInput)));
         }
 
         @Override
@@ -281,7 +282,7 @@ public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
     private static final class LegacyParser<C> implements ArgumentParser<C, ProtoItemStack> {
 
         private final ArgumentParser<C, ProtoItemStack> parser = new MaterialParser<C>()
-                .map((ctx, material) -> ArgumentParseResult.success(new LegacyProtoItemStack(material)));
+                .map((ctx, material) -> CompletableFuture.completedFuture(new LegacyProtoItemStack(material)));
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull ProtoItemStack> parse(
