@@ -28,13 +28,13 @@ import cloud.commandframework.Command;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
-import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.feature.CompoundArgumentExample;
 import cloud.commandframework.examples.bukkit.builder.feature.StringArrayExample;
 import cloud.commandframework.examples.bukkit.builder.feature.TaskRecipeExample;
+import cloud.commandframework.examples.bukkit.builder.feature.minecraft.SelectorExample;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.RichDescription;
@@ -66,13 +66,12 @@ import static cloud.commandframework.bukkit.parsers.EnchantmentParser.enchantmen
 import static cloud.commandframework.bukkit.parsers.MaterialParser.materialParser;
 import static cloud.commandframework.bukkit.parsers.NamespacedKeyParser.namespacedKeyParser;
 import static cloud.commandframework.bukkit.parsers.WorldParser.worldParser;
-import static cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorParser.singleEntitySelectorParser;
 import static cloud.commandframework.minecraft.extras.TextColorParser.textColorParser;
 import static cloud.commandframework.paper.parser.KeyedWorldParser.keyedWorldParser;
 import static net.kyori.adventure.text.Component.text;
 
 /**
- * Main entrypoint for all builder related examples. It registers a bunch of {@link #FEATURES features}
+ * Main entrypoint for all builder-related examples. It registers a bunch of {@link #FEATURES features}
  * that showcase specific cloud concepts.
  */
 public final class BuilderExample {
@@ -80,7 +79,9 @@ public final class BuilderExample {
     private static final List<BuilderFeature> FEATURES = Arrays.asList(
             new CompoundArgumentExample(),
             new StringArrayExample(),
-            new TaskRecipeExample()
+            new TaskRecipeExample(),
+            // Minecraft-specific features
+            new SelectorExample()
     );
 
     private CommandConfirmationManager<CommandSender> confirmationManager;
@@ -121,25 +122,6 @@ public final class BuilderExample {
         // Create a teleportation command
         //
         this.manager.command(builder.literal("teleport")
-                        .literal("entity")
-                        .senderType(Player.class)
-                        .required("entity", singleEntitySelectorParser(), ArgumentDescription.of("Entity to teleport"))
-                        .literal("here")
-                        .handler(
-                                context -> this.manager.taskRecipe().begin(context)
-                                        .synchronous(commandContext -> {
-                                            final Player player = commandContext.getSender();
-                                            final SingleEntitySelector singleEntitySelector = commandContext
-                                                    .get("entity");
-                                            if (singleEntitySelector.hasAny()) {
-                                                singleEntitySelector.getEntity().teleport(player);
-                                                player.sendMessage(ChatColor.GREEN + "The entity was teleported to you!");
-                                            } else {
-                                                player.sendMessage(ChatColor.RED + "No entity matched your query.");
-                                            }
-                                        }).execute()
-                        ))
-                .command(builder.literal("teleport")
                         .meta(CommandMeta.DESCRIPTION, "Teleport to a world")
                         .senderType(Player.class)
                         .required("world", worldParser(), ArgumentDescription.of("World to teleport to"))
@@ -148,19 +130,6 @@ public final class BuilderExample {
                             player.teleport(ctx.<World>get("world").getSpawnLocation());
                             player.sendMessage(ChatColor.GREEN + "You have been teleported!");
                         }).execute()));
-
-        this.manager.command(builder.literal("tasktest")
-                .handler(context -> this.manager.taskRecipe()
-                        .begin(context)
-                        .asynchronous(c -> {
-                            c.getSender().sendMessage("ASYNC: " + !Bukkit.isPrimaryThread());
-                            return c;
-                        })
-                        .synchronous(c -> {
-                            c.getSender().sendMessage("SYNC: " + Bukkit.isPrimaryThread());
-                        })
-                        .execute(() -> context.getSender().sendMessage("DONE!"))
-                ));
 
         this.manager.command(this.manager.commandBuilder("give")
                 .senderType(Player.class)
