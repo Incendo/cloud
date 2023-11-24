@@ -93,7 +93,8 @@ class CommandSuggestionsTest {
         this.manager.command(manager.commandBuilder("flags3")
                 .flag(manager.flagBuilder("compound")
                         .withComponent(
-                                ArgumentTriplet.of(manager, "triplet",
+                                ArgumentTriplet.of(
+                                        manager,
                                         Triplet.of("x", "y", "z"),
                                         Triplet.of(int.class, int.class, int.class)
                                 ).simple()

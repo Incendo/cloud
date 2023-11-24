@@ -32,14 +32,12 @@ import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
+import cloud.commandframework.examples.bukkit.builder.feature.CompoundArgumentExample;
 import cloud.commandframework.examples.bukkit.builder.feature.TaskRecipeExample;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
-import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.RichDescription;
 import cloud.commandframework.types.tuples.Pair;
-import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
 import java.util.Arrays;
 import java.util.Collections;
@@ -58,7 +56,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
@@ -80,6 +77,7 @@ import static net.kyori.adventure.text.Component.text;
 public final class BuilderExample {
 
     private static final List<BuilderFeature> FEATURES = Arrays.asList(
+            new CompoundArgumentExample(),
             new TaskRecipeExample()
     );
 
@@ -118,36 +116,9 @@ public final class BuilderExample {
                 .meta(CommandMeta.DESCRIPTION, "Confirm a pending command")
                 .handler(this.confirmationManager.createConfirmationExecutionHandler()));
         //
-        // Create a world argument
-        //
-        final CloudKey<World> worldKey = SimpleCloudKey.of("world", World.class);
-        //
         // Create a teleportation command
         //
         this.manager.command(builder.literal("teleport")
-                        .literal("me")
-                        // Require a player sender
-                        .senderType(Player.class)
-                        .required(worldKey, worldParser(), ArgumentDescription.of("World name"))
-                        .requiredArgumentTriplet(
-                                "coords",
-                                TypeToken.get(Vector.class),
-                                Triplet.of("x", "y", "z"),
-                                Triplet.of(Integer.class, Integer.class, Integer.class),
-                                (sender, triplet) -> new Vector(triplet.getFirst(), triplet.getSecond(),
-                                        triplet.getThird()
-                                ),
-                                ArgumentDescription.of("Coordinates")
-                        )
-                        .handler(context -> this.manager.taskRecipe().begin(context)
-                                .synchronous(commandContext -> {
-                                    final Player player = commandContext.getSender();
-                                    final World world = commandContext.get(worldKey);
-                                    final Vector coords = commandContext.get("coords");
-                                    final Location location = coords.toLocation(world);
-                                    player.teleport(location);
-                                }).execute()))
-                .command(builder.literal("teleport")
                         .literal("entity")
                         .senderType(Player.class)
                         .required("entity", singleEntitySelectorParser(), ArgumentDescription.of("Entity to teleport"))

@@ -71,7 +71,6 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
      * Construct a builder for an argument triplet
      *
      * @param manager Command manager
-     * @param name    Argument name
      * @param names   Sub-argument names
      * @param types   Triplet containing the types of the sub-arguments. There must be parsers for these types registered
      *                in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
@@ -85,7 +84,6 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
     public static <C, U, V, W> @NonNull ArgumentTripletIntermediaryBuilder<@NonNull C, @NonNull U, @NonNull V, @NonNull W>
     of(
             final @NonNull CommandManager<C> manager,
-            final @NonNull String name,
             final @NonNull Triplet<@NonNull String, @NonNull String, @NonNull String> names,
             final @NonNull Triplet<@NonNull Class<U>, @NonNull Class<V>, @NonNull Class<W>> types
     ) {

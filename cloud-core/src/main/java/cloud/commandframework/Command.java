@@ -1390,7 +1390,42 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    ArgumentPair.of(this.commandManager, name, names, parserPair).simple(),
+                    ArgumentPair.of(this.commandManager, names, parserPair).simple(),
+                    description
+            );
+        }
+
+        /**
+         * Create a new argument pair that maps to {@link Pair}
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name        Name of the argument
+         * @param names       Pair containing the names of the sub-arguments
+         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+         *                    {@link CommandManager} attached to this command
+         * @param description Description of the argument
+         * @param <U>         First type
+         * @param <V>         Second type
+         * @return Builder instance with the argument inserted
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <U, V> @NonNull Builder<C> requiredArgumentPair(
+                final @NonNull CloudKey<Pair<U, V>> name,
+                final @NonNull Pair<@NonNull String, @NonNull String> names,
+                final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
+                final @NonNull ArgumentDescription description
+        ) {
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.required(
+                    name,
+                    ArgumentPair.of(this.commandManager, names, parserPair).simple(),
                     description
             );
         }
@@ -1425,7 +1460,42 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    ArgumentPair.of(this.commandManager, name, names, parserPair).simple(),
+                    ArgumentPair.of(this.commandManager, names, parserPair).simple(),
+                    description
+            );
+        }
+
+        /**
+         * Create a new argument pair that maps to {@link Pair}
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name        Name of the argument
+         * @param names       Pair containing the names of the sub-arguments
+         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+         *                    {@link CommandManager} attached to this command
+         * @param description Description of the argument
+         * @param <U>         First type
+         * @param <V>         Second type
+         * @return Builder instance with the argument inserted
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <U, V> @NonNull Builder<C> optionalArgumentPair(
+                final @NonNull CloudKey<Pair<U, V>> name,
+                final @NonNull Pair<@NonNull String, @NonNull String> names,
+                final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
+                final @NonNull ArgumentDescription description
+        ) {
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.optional(
+                    name,
+                    ArgumentPair.of(this.commandManager, names, parserPair).simple(),
                     description
             );
         }
@@ -1465,7 +1535,47 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    ArgumentPair.of(this.commandManager, name, names, parserPair).withMapper(outputType, mapper),
+                    ArgumentPair.of(this.commandManager, names, parserPair).withMapper(outputType, mapper),
+                    description
+            );
+        }
+
+        /**
+         * Create a new argument pair that maps to a custom type.
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name        Name of the argument
+         * @param outputType  The output type
+         * @param names       Pair containing the names of the sub-arguments
+         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+         *                    {@link CommandManager} attached to this command
+         * @param mapper      Mapper that maps from {@link Pair} to the custom type
+         * @param description Description of the argument
+         * @param <U>         First type
+         * @param <V>         Second type
+         * @param <O>         Output type
+         * @return Builder instance with the argument inserted
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <U, V, O> @NonNull Builder<C> requiredArgumentPair(
+                final @NonNull CloudKey<O> name,
+                final @NonNull TypeToken<O> outputType,
+                final @NonNull Pair<String, String> names,
+                final @NonNull Pair<Class<U>, Class<V>> parserPair,
+                final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
+                final @NonNull ArgumentDescription description
+        ) {
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.required(
+                    name,
+                    ArgumentPair.of(this.commandManager, names, parserPair).withMapper(outputType, mapper),
                     description
             );
         }
@@ -1505,7 +1615,47 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    ArgumentPair.of(this.commandManager, name, names, parserPair).withMapper(outputType, mapper),
+                    ArgumentPair.of(this.commandManager, names, parserPair).withMapper(outputType, mapper),
+                    description
+            );
+        }
+
+        /**
+         * Create a new argument pair that maps to a custom type.
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name        Name of the argument
+         * @param outputType  The output type
+         * @param names       Pair containing the names of the sub-arguments
+         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+         *                    {@link CommandManager} attached to this command
+         * @param mapper      Mapper that maps from {@link Pair} to the custom type
+         * @param description Description of the argument
+         * @param <U>         First type
+         * @param <V>         Second type
+         * @param <O>         Output type
+         * @return Builder instance with the argument inserted
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <U, V, O> @NonNull Builder<C> optionalArgumentPair(
+                final @NonNull CloudKey<O> name,
+                final @NonNull TypeToken<O> outputType,
+                final @NonNull Pair<String, String> names,
+                final @NonNull Pair<Class<U>, Class<V>> parserPair,
+                final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
+                final @NonNull ArgumentDescription description
+        ) {
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.optional(
+                    name,
+                    ArgumentPair.of(this.commandManager, names, parserPair).withMapper(outputType, mapper),
                     description
             );
         }
@@ -1541,7 +1691,43 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).simple(),
+                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).simple(),
+                    description
+            );
+        }
+
+        /**
+         * Create a new argument pair that maps to {@link cloud.commandframework.types.tuples.Triplet}
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name          Name of the argument
+         * @param names         Triplet containing the names of the sub-arguments
+         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry}
+         *                      used by the {@link CommandManager} attached to this command
+         * @param description   Description of the argument
+         * @param <U>           First type
+         * @param <V>           Second type
+         * @param <W>           Third type
+         * @return Builder instance with the argument inserted
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <U, V, W> @NonNull Builder<C> requiredArgumentTriplet(
+                final @NonNull CloudKey<Triplet<U, V, W>> name,
+                final @NonNull Triplet<String, String, String> names,
+                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                final @NonNull ArgumentDescription description
+        ) {
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.required(
+                    name,
+                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).simple(),
                     description
             );
         }
@@ -1577,7 +1763,43 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).simple(),
+                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).simple(),
+                    description
+            );
+        }
+
+        /**
+         * Create a new argument pair that maps to {@link cloud.commandframework.types.tuples.Triplet}
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name          Name of the argument
+         * @param names         Triplet containing the names of the sub-arguments
+         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry}
+         *                      used by the {@link CommandManager} attached to this command
+         * @param description   Description of the argument
+         * @param <U>           First type
+         * @param <V>           Second type
+         * @param <W>           Third type
+         * @return Builder instance with the argument inserted
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <U, V, W> @NonNull Builder<C> optionalArgumentTriplet(
+                final @NonNull CloudKey<Triplet<U, V, W>> name,
+                final @NonNull Triplet<String, String, String> names,
+                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                final @NonNull ArgumentDescription description
+        ) {
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.optional(
+                    name,
+                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).simple(),
                     description
             );
         }
@@ -1618,7 +1840,48 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).withMapper(outputType, mapper),
+                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).withMapper(outputType, mapper),
+                    description
+            );
+        }
+
+        /**
+         * Create a new argument triplet that maps to a custom type.
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name          Name of the argument
+         * @param outputType    The output type
+         * @param names         Triplet containing the names of the sub-arguments
+         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by
+         *                      the {@link CommandManager} attached to this command
+         * @param mapper        Mapper that maps from {@link Triplet} to the custom type
+         * @param description   Description of the argument
+         * @param <U>           First type
+         * @param <V>           Second type
+         * @param <W>           Third type
+         * @param <O>           Output type
+         * @return Builder instance with the argument inserted
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <U, V, W, O> @NonNull Builder<C> requiredArgumentTriplet(
+                final @NonNull CloudKey<O> name,
+                final @NonNull TypeToken<O> outputType,
+                final @NonNull Triplet<String, String, String> names,
+                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
+                final @NonNull ArgumentDescription description
+        ) {
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.required(
+                    name,
+                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).withMapper(outputType, mapper),
                     description
             );
         }
@@ -1659,7 +1922,48 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).withMapper(outputType, mapper),
+                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).withMapper(outputType, mapper),
+                    description
+            );
+        }
+
+        /**
+         * Create a new argument triplet that maps to a custom type.
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name          Name of the argument
+         * @param outputType    The output type
+         * @param names         Triplet containing the names of the sub-arguments
+         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by
+         *                      the {@link CommandManager} attached to this command
+         * @param mapper        Mapper that maps from {@link Triplet} to the custom type
+         * @param description   Description of the argument
+         * @param <U>           First type
+         * @param <V>           Second type
+         * @param <W>           Third type
+         * @param <O>           Output type
+         * @return Builder instance with the argument inserted
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <U, V, W, O> @NonNull Builder<C> optionalArgumentTriplet(
+                final @NonNull CloudKey<O> name,
+                final @NonNull TypeToken<O> outputType,
+                final @NonNull Triplet<String, String, String> names,
+                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
+                final @NonNull ArgumentDescription description
+        ) {
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.optional(
+                    name,
+                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).withMapper(outputType, mapper),
                     description
             );
         }
