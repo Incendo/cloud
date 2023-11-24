@@ -64,22 +64,41 @@ public final class GuiceInjectionService<C> implements InjectionService<C> {
     @Override
     @SuppressWarnings("EmptyCatch")
     public @Nullable Object handle(final @NonNull Triplet<CommandContext<C>, Class<?>, AnnotationAccessor> triplet) {
-        final Annotation bindingAnnotation = triplet
-                .getThird()
+        try {
+            return this.injector.getInstance(this.createKey(triplet.getSecond(), triplet.getThird()));
+        } catch (final ConfigurationException ignored) {}
+        return null;
+    }
+
+    /**
+     * Create a Guice key for the given class and annotation accessor.
+     * <p>
+     * If the annotation accessor contains a binding annotation, the key will be created with that annotation.
+     * Otherwise, the key will be created without a binding annotation.
+     * <p>
+     * If the annotation accessor contains multiple binding annotations, the first one will be used.
+     *
+     * @param cls                Class to create key for.
+     * @param annotationAccessor Annotation accessor to create key for.
+     * @param <T>                Type of the key.
+     *
+     * @return The created key.
+     *
+     * @see Key
+     * @see BindingAnnotation
+     */
+    @NonNull
+    private <T> Key<T> createKey(@NonNull final Class<T> cls, @NonNull final AnnotationAccessor annotationAccessor) {
+        final Annotation bindingAnnotation = annotationAccessor
                 .annotations()
                 .stream()
                 .filter(annotation -> annotation.annotationType().isAnnotationPresent(BindingAnnotation.class))
                 .findFirst()
                 .orElse(null);
-
-        try {
-            if (bindingAnnotation == null) {
-                return this.injector.getInstance(triplet.getSecond());
-            } else {
-                return this.injector.getInstance(Key.get(triplet.getSecond(), bindingAnnotation));
-            }
-        } catch (final ConfigurationException ignored) {
+        if (bindingAnnotation == null) {
+            return Key.get(cls);
+        } else {
+            return Key.get(cls, bindingAnnotation);
         }
-        return null;
     }
 }
