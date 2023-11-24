@@ -1,7 +1,7 @@
 plugins {
-    id("com.github.johnrengelman.shadow")
+    alias(libs.plugins.shadow)
     id("cloud.example-conventions")
-    id("xyz.jpenilla.run-velocity")
+    alias(libs.plugins.run.velocity)
 }
 
 indra {

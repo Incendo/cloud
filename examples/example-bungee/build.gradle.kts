@@ -1,7 +1,7 @@
 plugins {
     id("cloud.example-conventions")
-    id("com.github.johnrengelman.shadow")
-    id("xyz.jpenilla.run-waterfall")
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.run.waterfall)
 }
 
 tasks {
