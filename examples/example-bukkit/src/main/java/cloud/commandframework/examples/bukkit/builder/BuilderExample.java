@@ -33,6 +33,7 @@ import cloud.commandframework.bukkit.data.ProtoItemStack;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.feature.CompoundArgumentExample;
+import cloud.commandframework.examples.bukkit.builder.feature.StringArrayExample;
 import cloud.commandframework.examples.bukkit.builder.feature.TaskRecipeExample;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
@@ -78,6 +79,7 @@ public final class BuilderExample {
 
     private static final List<BuilderFeature> FEATURES = Arrays.asList(
             new CompoundArgumentExample(),
+            new StringArrayExample(),
             new TaskRecipeExample()
     );
 

@@ -37,6 +37,7 @@ import cloud.commandframework.examples.bukkit.annotations.feature.HelpExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.PermissionExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.RegexExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.RootCommandDeletionExample;
+import cloud.commandframework.examples.bukkit.annotations.feature.StringArrayExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.TaskRecipeExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.minecraft.LocationExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.minecraft.NamespacedKeyExample;
@@ -64,6 +65,7 @@ public final class AnnotationParserExample {
             new PermissionExample(),
             new RegexExample(),
             new RootCommandDeletionExample(),
+            new StringArrayExample(),
             new TaskRecipeExample(),
             // Minecraft-specific features
             new LocationExample(),
