@@ -28,6 +28,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.types.tuples.Triplet;
 import com.google.inject.BindingAnnotation;
 import com.google.inject.ConfigurationException;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import java.lang.annotation.Annotation;
@@ -37,6 +38,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * {@link InjectionService Injection service} that injects using a Guice {@link Injector}
+ * <p>
+ * You should not put {@link Inject} annotation on your methods.
+ * <p>
+ * Ignore the warning says 'Binding annotation @YourAnnotation without @Inject declared'.
  *
  * @param <C> Command sender type
  * @since 1.4.0
