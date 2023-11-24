@@ -1,6 +1,6 @@
 plugins {
     `kotlin-dsl`
-    id("com.diffplug.spotless")
+    alias(libs.plugins.spotless)
 }
 
 repositories {

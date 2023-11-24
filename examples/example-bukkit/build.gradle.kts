@@ -2,8 +2,8 @@ import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
     id("cloud.example-conventions")
-    id("com.github.johnrengelman.shadow")
-    id("xyz.jpenilla.run-paper")
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.run.paper)
 }
 
 dependencies {
