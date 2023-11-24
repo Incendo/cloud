@@ -82,7 +82,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -518,7 +517,7 @@ public final class ExamplePlugin extends JavaPlugin {
     public void commandClear(final @NonNull Player player) {
         player.getInventory().clear();
         this.bukkitAudiences.player(player)
-                .sendMessage(Identity.nil(), text("Your inventory has been cleared", NamedTextColor.GOLD));
+                .sendMessage(text("Your inventory has been cleared", NamedTextColor.GOLD));
     }
 
     @CommandMethod("example give <material> <amount>")
@@ -561,7 +560,6 @@ public final class ExamplePlugin extends JavaPlugin {
                     failureCaption = "regex.money") String money
     ) {
         this.bukkitAudiences.sender(sender).sendMessage(
-                Identity.nil(),
                 text().append(text("You have been given ", NamedTextColor.AQUA))
                         .append(text(money, NamedTextColor.GOLD))
         );
