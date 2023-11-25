@@ -25,9 +25,11 @@ package cloud.commandframework.arguments.aggregate;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.keys.SimpleCloudKey;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
@@ -77,6 +79,21 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
                             }));
         }
         return future.thenCompose(result -> this.mapper().map(commandContext, aggregateCommandContext));
+    }
+
+    @Override
+    @NonNull
+    default CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
+            final @NonNull CommandContext<C> context,
+            final @NonNull String input
+    ) {
+        return this.components()
+                .stream()
+                .filter(arg -> !context.contains(arg.name()))
+                .map(CommandComponent::parser)
+                .map(parser -> parser.suggestionsFuture(context, input))
+                .findFirst()
+                .orElse(CompletableFuture.completedFuture(Collections.emptyList()));
     }
 
     @Override

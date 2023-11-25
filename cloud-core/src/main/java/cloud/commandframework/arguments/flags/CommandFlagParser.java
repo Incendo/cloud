@@ -144,7 +144,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public @NonNull List<@NonNull Suggestion> suggestions(
+    public @NonNull CompletableFuture<List<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
@@ -214,7 +214,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
             if (suggestCombined) {
                 suggestions.add(Suggestion.simple(input));
             }
-            return suggestions;
+            return CompletableFuture.completedFuture(suggestions);
         } else {
             CommandFlag<?> currentFlag = null;
             if (lastArg.startsWith("--")) { // --long
@@ -240,12 +240,12 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
             if (currentFlag != null
                     && commandContext.hasPermission(currentFlag.permission())
                     && currentFlag.commandComponent() != null) {
-                return (List<Suggestion>) ((SuggestionProvider) currentFlag.commandComponent().suggestionProvider())
-                        .suggestions(commandContext, input);
+                final SuggestionProvider suggestionProvider = currentFlag.commandComponent().suggestionProvider();
+                return suggestionProvider.suggestionsFuture(commandContext, input);
             }
         }
         commandContext.store(FLAG_META_KEY, "");
-        return this.suggestions(commandContext, input);
+        return this.suggestionsFuture(commandContext, input);
     }
 
 

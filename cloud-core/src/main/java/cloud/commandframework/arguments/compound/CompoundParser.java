@@ -27,8 +27,6 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
 import cloud.commandframework.arguments.aggregate.AggregateResultMapper;
 import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.types.tuples.Tuple;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,20 +78,5 @@ public final class CompoundParser<T extends Tuple, C, O> implements AggregateCom
             final T tuple = this.tupleFactory.apply(values);
             return CompletableFuture.completedFuture(this.mapper.apply(commandContext.getSender(), tuple));
         };
-    }
-
-    @Override
-    public @NonNull List<@NonNull Suggestion> suggestions(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
-    ) {
-        /*
-        This method will be called n times, each time for each of the internal types.
-        The problem is that we need to then know which of the parsers to forward the
-        suggestion request to. This is done by storing the number of parsed subtypes
-        in the context, so we can then extract that number and forward the request
-         */
-        final int argument = commandContext.getOrDefault("__parsing_argument__", 1) - 1;
-        return this.components.get(argument).parser().suggestions(commandContext, input);
     }
 }
