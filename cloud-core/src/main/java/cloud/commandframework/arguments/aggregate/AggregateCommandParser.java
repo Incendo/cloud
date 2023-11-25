@@ -25,6 +25,7 @@ package cloud.commandframework.arguments.aggregate;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -44,7 +45,18 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgumentParser<C, O> {
+public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgumentParser<C, O>, ParserDescriptor<C, O> {
+
+    /**
+     * Returns a new aggregate command parser builder. The builder is immutable, and each method returns
+     * a new builder instance.
+     *
+     * @param <C> the command sender type
+     * @return the builder
+     */
+    static <C> @NonNull AggregateCommandParserBuilder<C> builder() {
+        return new AggregateCommandParserBuilder<>();
+    }
 
     /**
      * Returns the inner components of the parser.
@@ -99,5 +111,10 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
     @Override
     default int getRequestedArgumentCount() {
         return this.components().stream().map(CommandComponent::parser).mapToInt(ArgumentParser::getRequestedArgumentCount).sum();
+    }
+
+    @Override
+    default @NonNull ArgumentParser<C, O> parser() {
+        return this;
     }
 }

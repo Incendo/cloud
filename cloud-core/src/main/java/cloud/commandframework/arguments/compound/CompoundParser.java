@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
 import cloud.commandframework.arguments.aggregate.AggregateResultMapper;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.types.tuples.Tuple;
+import io.leangen.geantyref.TypeToken;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,6 +44,7 @@ public final class CompoundParser<T extends Tuple, C, O> implements AggregateCom
     private final List<CommandComponent<C>> components;
     private final BiFunction<C, T, O> mapper;
     private final Function<Object[], T> tupleFactory;
+    private final TypeToken<O> valueType;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     CompoundParser(
@@ -50,11 +52,12 @@ public final class CompoundParser<T extends Tuple, C, O> implements AggregateCom
             final @NonNull Object[] types,
             final @NonNull Object[] parsers,
             final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
-            final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory
+            final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory,
+            final @NonNull TypeToken<O> valueType
     ) {
         this.mapper = mapper;
         this.tupleFactory = tupleFactory;
-
+        this.valueType = valueType;
         this.components = new ArrayList<>(parsers.length);
         for (int i = 0; i < parsers.length; i++) {
             final CommandComponent component = CommandComponent.builder()
@@ -78,5 +81,10 @@ public final class CompoundParser<T extends Tuple, C, O> implements AggregateCom
             final T tuple = this.tupleFactory.apply(values);
             return CompletableFuture.completedFuture(this.mapper.apply(commandContext.getSender(), tuple));
         };
+    }
+
+    @Override
+    public @NonNull TypeToken<O> valueType() {
+        return this.valueType;
     }
 }

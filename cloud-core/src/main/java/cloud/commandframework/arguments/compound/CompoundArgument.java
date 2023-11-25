@@ -68,7 +68,8 @@ public class CompoundArgument<T extends Tuple, C, O> implements ParserDescriptor
                         types.toArray(),
                         parserTuple.toArray(),
                         mapper,
-                        tupleFactory
+                        tupleFactory,
+                        valueType
                 ),
                 valueType
         );
