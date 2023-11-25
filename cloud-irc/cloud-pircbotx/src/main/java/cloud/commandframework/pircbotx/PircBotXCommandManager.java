@@ -32,7 +32,7 @@ import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.pircbotx.arguments.UserArgument;
+import cloud.commandframework.pircbotx.arguments.UserParser;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -113,7 +113,7 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
         this.registerCommandPreProcessor(context -> context.getCommandContext().store(PIRCBOTX_META_KEY, pircBotX));
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(User.class),
-                parameters -> new UserArgument.UserArgumentParser<>()
+                parameters -> new UserParser<>()
         );
 
         // No "native" command system means that we can delete commands just fine.
