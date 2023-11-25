@@ -27,7 +27,6 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
-import cloud.commandframework.bukkit.data.ProtoItemStack;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.feature.CommandBeanExample;
 import cloud.commandframework.examples.bukkit.builder.feature.CompoundArgumentExample;
@@ -36,11 +35,10 @@ import cloud.commandframework.examples.bukkit.builder.feature.EnumExample;
 import cloud.commandframework.examples.bukkit.builder.feature.FlagExample;
 import cloud.commandframework.examples.bukkit.builder.feature.StringArrayExample;
 import cloud.commandframework.examples.bukkit.builder.feature.TaskRecipeExample;
+import cloud.commandframework.examples.bukkit.builder.feature.minecraft.ItemStackExample;
 import cloud.commandframework.examples.bukkit.builder.feature.minecraft.SelectorExample;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.RichDescription;
-import cloud.commandframework.types.tuples.Pair;
-import io.leangen.geantyref.TypeToken;
 import java.util.Arrays;
 import java.util.List;
 import net.kyori.adventure.text.format.Style;
@@ -82,6 +80,7 @@ public final class BuilderExample {
             new StringArrayExample(),
             new TaskRecipeExample(),
             // Minecraft-specific features
+            new ItemStackExample(),
             new SelectorExample()
     );
 
@@ -186,27 +185,6 @@ public final class BuilderExample {
         }
 
         this.registerNamespacedKeyUsingCommand();
-
-        // compound itemstack arg
-        this.manager.command(this.manager.commandBuilder("gib")
-                .senderType(Player.class)
-                .requiredArgumentPair(
-                        "itemstack",
-                        TypeToken.get(ItemStack.class),
-                        Pair.of("item", "amount"),
-                        Pair.of(ProtoItemStack.class, Integer.class),
-                        (sender, pair) -> {
-                            final ProtoItemStack proto = pair.getFirst();
-                            final int amount = pair.getSecond();
-                            return proto.createItemStack(amount, true);
-                        },
-                        ArgumentDescription.of("The ItemStack to give")
-                )
-                .handler(ctx -> {
-                    final ItemStack stack = ctx.get("itemstack");
-                    ctx.getSender().getInventory().addItem(stack);
-                }));
-
         this.manager.command(builder.literal("keyed_world")
                 .required("world", keyedWorldParser())
                 .senderType(Player.class)
