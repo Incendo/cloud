@@ -23,118 +23,66 @@
 //
 package cloud.commandframework.arguments.compound;
 
+import cloud.commandframework.CommandComponent;
+import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
+import cloud.commandframework.arguments.aggregate.AggregateResultMapper;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.types.tuples.Tuple;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class CompoundParser<T extends Tuple, C, O> implements ArgumentParser.FutureArgumentParser<C, O> {
+public final class CompoundParser<T extends Tuple, C, O> implements AggregateCommandParser<C, O> {
 
-    private final Object[] names;
-    private final Object[] types;
-    private final Object[] parsers;
+    private final List<CommandComponent<C>> components;
     private final BiFunction<C, T, O> mapper;
     private final Function<Object[], T> tupleFactory;
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     CompoundParser(
-            final @NonNull Tuple names,
-            final @NonNull Tuple types,
-            final @NonNull Tuple parserTuple,
+            final @NonNull Object[] names,
+            final @NonNull Object[] types,
+            final @NonNull Object[] parsers,
             final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
             final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory
     ) {
-        this.names = names.toArray();
-        this.types = types.toArray();
-        this.parsers = parserTuple.toArray();
         this.mapper = mapper;
         this.tupleFactory = tupleFactory;
-    }
 
-    CompoundParser(
-            final @NonNull Object @NonNull [] names,
-            final @NonNull Object @NonNull [] types,
-            final @NonNull Object @NonNull [] parserTuple,
-            final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
-            final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory
-    ) {
-        this.names = names;
-        this.types = types;
-        this.parsers = parserTuple;
-        this.mapper = mapper;
-        this.tupleFactory = tupleFactory;
-    }
-
-    /**
-     * Returns the argument names
-     *
-     * @return the argument names
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull Object @NonNull [] names() {
-        return this.names;
-    }
-
-    /**
-     * Returns the argument parsers
-     *
-     * @return the argument parsers
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull Object @NonNull [] parsers() {
-        return this.parsers;
-    }
-
-    /**
-     * Returns the parser types
-     *
-     * @return parser types
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull Object @NonNull [] types() {
-        return this.types;
-    }
-
-    @Override
-    public @NonNull CompletableFuture<O> parseFuture(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull CommandInput commandInput
-    ) {
-        CompletableFuture<List<Object>> parsingFuture = CompletableFuture.completedFuture(Collections.emptyList());
-        for (final Object parser : this.parsers) {
-            parsingFuture = parsingFuture.thenCombine(
-                    this.parseToList(parser, commandContext, commandInput),
-                    (l1, l2) -> Stream.concat(l1.stream(), l2.stream()).collect(Collectors.toList())
-            );
+        this.components = new ArrayList<>(parsers.length);
+        for (int i = 0; i < parsers.length; i++) {
+            final CommandComponent component = CommandComponent.builder()
+                    .parser((ArgumentParser) parsers[i])
+                    .name((String) names[i])
+                    .valueType((Class) types[i])
+                    .build();
+            this.components.add(component);
         }
-        return parsingFuture.thenApply(output -> this.mapper
-                .apply(commandContext.getSender(), this.tupleFactory.apply(output.toArray(new Object[0]))));
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private CompletableFuture<List<Object>> parseToList(
-            final @NonNull Object parser,
-            final @NonNull CommandContext<C> context,
-            final @NonNull CommandInput input
-    ) {
-        return ((ArgumentParser) parser).parseFuture(context, input).thenApply(Collections::singletonList);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    public @NonNull List<@NonNull CommandComponent<C>> components() {
+        return Collections.unmodifiableList(this.components);
+    }
+
+    @Override
+    public @NonNull AggregateResultMapper<C, O> mapper() {
+        return (commandContext, context) -> {
+            final Object[] values = this.components.stream().map(CommandComponent::name).map(context::get).toArray();
+            final T tuple = this.tupleFactory.apply(values);
+            return CompletableFuture.completedFuture(this.mapper.apply(commandContext.getSender(), tuple));
+        };
+    }
+
+    @Override
     public @NonNull List<@NonNull Suggestion> suggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
@@ -146,6 +94,6 @@ public final class CompoundParser<T extends Tuple, C, O> implements ArgumentPars
         in the context, so we can then extract that number and forward the request
          */
         final int argument = commandContext.getOrDefault("__parsing_argument__", 1) - 1;
-        return ((ArgumentParser<C, ?>) this.parsers[argument]).suggestions(commandContext, input);
+        return this.components.get(argument).parser().suggestions(commandContext, input);
     }
 }

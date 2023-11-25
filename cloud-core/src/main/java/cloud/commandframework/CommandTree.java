@@ -25,7 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.LiteralParser;
-import cloud.commandframework.arguments.compound.CompoundParser;
+import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
@@ -98,7 +98,7 @@ public final class CommandTree<C> {
 
     /**
      * Stores the index of the argument that is currently being parsed when parsing
-     * using {@link CompoundParser}
+     * using {@link cloud.commandframework.arguments.compound.CompoundParser}
      */
     public static final CloudKey<Integer> PARSING_ARGUMENT_KEY = SimpleCloudKey.of(
             "__parsing_argument__",
@@ -758,11 +758,10 @@ public final class CommandTree<C> {
             return CompletableFuture.completedFuture(context);
         }
 
-        if (component.parser() instanceof CompoundParser) {
+        if (component.parser() instanceof AggregateCommandParser) {
             // If we're working with a compound argument then we attempt to pop the required arguments from the input queue.
-            final CompoundParser<?, C, ?> compoundParser =
-                    (CompoundParser<?, C, ?>) component.parser();
-            this.popRequiredArguments(context.commandContext(), commandInput, compoundParser);
+            final AggregateCommandParser<C, ?> aggregateParser = (AggregateCommandParser<C, ?>) component.parser();
+            this.popRequiredArguments(context.commandContext(), commandInput, aggregateParser);
         } else if (component.parser() instanceof CommandFlagParser) {
             // Use the flag argument parser to deduce what flag is being suggested right now
             // If empty, then no flag value is being typed, and the different flag options should
@@ -791,7 +790,7 @@ public final class CommandTree<C> {
             return CompletableFuture.completedFuture(context);
         } else if (commandInput.remainingTokens() == 1) {
             return this.addArgumentSuggestions(context, child, commandInput.peekString());
-        } else if (child.isLeaf() && child.component().parser() instanceof CompoundParser) {
+        } else if (child.isLeaf() && child.component().parser() instanceof AggregateCommandParser) {
             return this.addArgumentSuggestions(context, child, commandInput.tokenize().getLast());
         }
 
@@ -881,20 +880,20 @@ public final class CommandTree<C> {
     }
 
     /**
-     * Removes as many arguments from the {@code commandQueue} as the given {@code compoundParser} requires. If the
+     * Removes as many arguments from the {@code commandQueue} as the given {@code aggregateParser} requires. If the
      * {@code commandQueue} fewer than the required arguments then no arguments are popped
      *
      * @param commandContext  the command context
      * @param commandInput    the input
-     * @param compoundParser the compound parser
+     * @param aggregateParser the aggregate parser
      */
     private void popRequiredArguments(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput,
-            final @NonNull CompoundParser<?, C, ?> compoundParser
+            final @NonNull AggregateCommandParser<C, ?> aggregateParser
     ) {
         /* See how many arguments it requires */
-        final int requiredArguments = compoundParser.parsers().length;
+        final int requiredArguments = aggregateParser.getRequestedArgumentCount();
         /* Figure out whether we even need to care about this */
         if (commandInput.remainingTokens() <= requiredArguments) {
             /* Attempt to pop as many arguments from the stack as possible */
