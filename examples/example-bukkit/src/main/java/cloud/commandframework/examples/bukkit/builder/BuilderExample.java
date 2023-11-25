@@ -33,10 +33,10 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.feature.CommandBeanExample;
 import cloud.commandframework.examples.bukkit.builder.feature.CompoundArgumentExample;
+import cloud.commandframework.examples.bukkit.builder.feature.ConfirmationExample;
 import cloud.commandframework.examples.bukkit.builder.feature.StringArrayExample;
 import cloud.commandframework.examples.bukkit.builder.feature.TaskRecipeExample;
 import cloud.commandframework.examples.bukkit.builder.feature.minecraft.SelectorExample;
-import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.RichDescription;
 import cloud.commandframework.types.tuples.Pair;
@@ -44,7 +44,6 @@ import io.leangen.geantyref.TypeToken;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang.StringUtils;
@@ -80,13 +79,13 @@ public final class BuilderExample {
     private static final List<BuilderFeature> FEATURES = Arrays.asList(
             new CommandBeanExample(),
             new CompoundArgumentExample(),
+            new ConfirmationExample(),
             new StringArrayExample(),
             new TaskRecipeExample(),
             // Minecraft-specific features
             new SelectorExample()
     );
 
-    private CommandConfirmationManager<CommandSender> confirmationManager;
     private final ExamplePlugin examplePlugin;
     private final BukkitCommandManager<CommandSender> manager;
 
@@ -111,15 +110,6 @@ public final class BuilderExample {
         // Base command builder
         //
         final Command.Builder<CommandSender> builder = this.manager.commandBuilder("example");
-        //
-        // Add a confirmation command
-        //
-        this.confirmationManager = new CommandConfirmationManager<>(
-                0, TimeUnit.DAYS, e -> {}, e -> {}
-        );
-        this.manager.command(builder.literal("confirm")
-                .meta(CommandMeta.DESCRIPTION, "Confirm a pending command")
-                .handler(this.confirmationManager.createConfirmationExecutionHandler()));
         //
         // Create a teleportation command
         //
