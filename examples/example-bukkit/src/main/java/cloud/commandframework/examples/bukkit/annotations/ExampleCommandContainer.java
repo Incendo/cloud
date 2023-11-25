@@ -21,29 +21,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework;
+package cloud.commandframework.examples.bukkit.annotations;
 
-import java.util.List;
-import org.apiguardian.api.API;
+import cloud.commandframework.annotations.AnnotationParser;
+import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.processing.CommandContainer;
+import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Factory producing command instances
- *
- * @param <C> the command sender type
- */
-@API(status = API.Status.STABLE, since = "2.0.0")
-@FunctionalInterface
-public interface CommandFactory<C> {
+@CommandContainer
+public final class ExampleCommandContainer {
 
     /**
-     * Creates commands using the given {@code commandManager}. Each invocation produces unique instances of the commands.
-     * <p>
-     * This method has no side effects, meaning that the created commands will not be automatically registered to the
-     * {@link CommandManager command manager}.
+     * The constructor. {@link AnnotationParser} is an optional parameter.
      *
-     * @param commandManager the command manager
-     * @return the created commands
+     * @param parser the parser
      */
-    @NonNull List<@NonNull Command<? extends C>> createCommands(@NonNull CommandManager<C> commandManager);
+    public ExampleCommandContainer(final @NonNull AnnotationParser<CommandSender> parser) {
+        // Woo...
+    }
+
+    /**
+     * This one gets parsed automatically!
+     *
+     * @param sender the sender
+     */
+    @CommandMethod("annotations container")
+    public void containerCommand(final CommandSender sender) {
+        sender.sendMessage("This is sent from a container!!");
+    }
 }

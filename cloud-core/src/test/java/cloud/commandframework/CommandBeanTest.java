@@ -56,7 +56,7 @@ class CommandBeanTest {
         final CommandNode<TestCommandSender> node = this.commandManager.commandTree().getNamedNode("test");
         assertThat(node).isNotNull();
 
-        final CommandComponent<TestCommandSender> component = node.component();
+        final CommandComponent<TestCommandSender> component = node.children().get(0).component();
         assertThat(component).isNotNull();
 
         final Command<TestCommandSender> command = component.owningCommand();
@@ -79,8 +79,8 @@ class CommandBeanTest {
         }
 
         @Override
-        protected void configure(final Command.@NonNull Builder<TestCommandSender> builder) {
-            builder.required("argument", IntegerParser.integerParser());
+        protected Command.@NonNull Builder<TestCommandSender> configure(final Command.@NonNull Builder<TestCommandSender> builder) {
+            return builder.required("argument", IntegerParser.integerParser());
         }
     }
 }

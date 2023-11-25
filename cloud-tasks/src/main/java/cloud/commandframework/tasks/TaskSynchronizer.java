@@ -72,4 +72,22 @@ public interface TaskSynchronizer {
      * @return Future that completes with the output
      */
     <I, O> CompletableFuture<O> runAsynchronous(@NonNull I input, @NonNull TaskFunction<I, O> function);
+
+    /**
+     * Invoke the runnable asynchronously
+     *
+     * @param runnable The runnable to invoke
+     * @return Future that completes when the runnable is done
+     * @since 2.0.0
+     */
+    CompletableFuture<Void> runSynchronous(@NonNull TaskRunnable runnable);
+
+    /**
+     * Invoke the runnable synchronously
+     *
+     * @param runnable The runnable to invoke
+     * @return Future that completes when the runnable is done
+     * @since 2.0.0
+     */
+    CompletableFuture<Void> runAsynchronous(@NonNull TaskRunnable runnable);
 }

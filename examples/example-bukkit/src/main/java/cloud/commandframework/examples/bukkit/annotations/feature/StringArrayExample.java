@@ -21,33 +21,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.examples.bukkit;
+package cloud.commandframework.examples.bukkit.annotations.feature;
 
 import cloud.commandframework.annotations.AnnotationParser;
+import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.annotations.processing.CommandContainer;
+import cloud.commandframework.examples.bukkit.ExamplePlugin;
+import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@CommandContainer
-public final class ExampleCommandContainer {
+/**
+ * Example of a command that consumes the entire input in the form of an array. This is useful when delegating to existing
+ * Bukkit commands.
+ */
+public final class StringArrayExample implements AnnotationFeature {
 
-    /**
-     * The constructor. {@link AnnotationParser} is an optional parameter.
-     *
-     * @param parser the parser
-     */
-    public ExampleCommandContainer(final @NonNull AnnotationParser<CommandSender> parser) {
-        // Woo...
+    @Override
+    public void registerFeature(
+            final @NonNull ExamplePlugin examplePlugin,
+            final @NonNull AnnotationParser<CommandSender> annotationParser
+    ) {
+        annotationParser.parse(this);
     }
 
-    /**
-     * This one gets parsed automatically!
-     *
-     * @param sender the sender
-     */
-    @CommandMethod("container")
-    public void containerCommand(final CommandSender sender) {
-        sender.sendMessage("This is sent from a container!!");
+    @CommandMethod("annotations arraycommand [args]")
+    public void arrayCommand(
+            final @NonNull CommandSender sender,
+            @Argument(value = "args", defaultValue = "") final @NonNull String[] args
+    ) {
+        sender.sendMessage("You wrote: " + StringUtils.join(args, " "));
     }
 }

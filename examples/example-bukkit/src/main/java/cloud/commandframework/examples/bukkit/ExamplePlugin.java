@@ -23,90 +23,22 @@
 //
 package cloud.commandframework.examples.bukkit;
 
-import cloud.commandframework.ArgumentDescription;
-import cloud.commandframework.Command;
-import cloud.commandframework.CommandHelpHandler;
-import cloud.commandframework.CommandTree;
-import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandDescription;
-import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.annotations.CommandPermission;
-import cloud.commandframework.annotations.Confirmation;
-import cloud.commandframework.annotations.Flag;
-import cloud.commandframework.annotations.Regex;
-import cloud.commandframework.annotations.specifier.Greedy;
-import cloud.commandframework.annotations.suggestions.Suggestions;
-import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.arguments.parser.StandardParameters;
-import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
-import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
-import cloud.commandframework.bukkit.data.ProtoItemStack;
-import cloud.commandframework.captions.Caption;
-import cloud.commandframework.captions.SimpleCaptionRegistry;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
+import cloud.commandframework.examples.bukkit.annotations.AnnotationParserExample;
+import cloud.commandframework.examples.bukkit.builder.BuilderExample;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
-import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
-import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
-import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
-import cloud.commandframework.minecraft.extras.RichDescription;
 import cloud.commandframework.paper.PaperCommandManager;
-import cloud.commandframework.permission.PredicatePermission;
-import cloud.commandframework.tasks.TaskConsumer;
-import cloud.commandframework.types.tuples.Pair;
-import cloud.commandframework.types.tuples.Triplet;
-import io.leangen.geantyref.TypeToken;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextDecoration;
-import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
-import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
-import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
-import static cloud.commandframework.arguments.standard.StringArrayParser.stringArrayParser;
-import static cloud.commandframework.bukkit.parsers.EnchantmentParser.enchantmentParser;
-import static cloud.commandframework.bukkit.parsers.MaterialParser.materialParser;
-import static cloud.commandframework.bukkit.parsers.NamespacedKeyParser.namespacedKeyParser;
-import static cloud.commandframework.bukkit.parsers.WorldParser.worldParser;
-import static cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorParser.singleEntitySelectorParser;
-import static cloud.commandframework.minecraft.extras.TextColorParser.textColorParser;
-import static cloud.commandframework.paper.parser.KeyedWorldParser.keyedWorldParser;
 import static net.kyori.adventure.text.Component.text;
 
 /**
@@ -115,37 +47,27 @@ import static net.kyori.adventure.text.Component.text;
 @SuppressWarnings("unused")
 public final class ExamplePlugin extends JavaPlugin {
 
-    private BukkitCommandManager<CommandSender> manager;
     private BukkitAudiences bukkitAudiences;
     private MinecraftHelp<CommandSender> minecraftHelp;
-    private CommandConfirmationManager<CommandSender> confirmationManager;
-    private AnnotationParser<CommandSender> annotationParser;
 
     @Override
     public void onEnable() {
-        //
-        // This is a function that will provide a command execution coordinator that parses and executes commands
-        // asynchronously
-        //
-        final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
-                AsynchronousCommandExecutionCoordinator.<CommandSender>builder().build();
-        //
-        // However, in many cases it is fine for to run everything synchronously:
-        //
-        // final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
-        //        CommandExecutionCoordinator.simpleCoordinator();
-        //
-        // This function maps the command sender type of our choice to the bukkit command sender.
-        // However, in this example we use the Bukkit command sender, and so we just need to map it
-        // to itself
-        //
-        final Function<CommandSender, CommandSender> mapperFunction = Function.identity();
+        final BukkitCommandManager<CommandSender> manager;
         try {
-            this.manager = new PaperCommandManager<>(
+            //
+            // (1) The execution coordinator determines how commands are executed. The simple execution coordinator will
+            //     run the command on the thread that is calling it. In the case of Bukkit, this is the primary server thread.
+            //     It is possible to execute (and parse!) commands asynchronously by using the
+            //     AsynchronousCommandExecutionCoordinator.
+            // (2) This functions maps the Bukkit command sender to your custom sender type. If you're not using a custom
+            //     type, then Function.identity() maps CommandSender to itself.
+            // (3) The same concept as (2), but mapping from your custom type to a Bukkit command sender.
+            //
+            manager = new PaperCommandManager<>(
                     /* Owning plugin */ this,
-                    /* Coordinator function */ executionCoordinatorFunction,
-                    /* Command Sender -> C */ mapperFunction,
-                    /* C -> Command Sender */ mapperFunction
+                    /* (1) */ CommandExecutionCoordinator.simpleCoordinator(),
+                    /* (2) */ Function.identity(),
+                    /* (3) */ Function.identity()
             );
         } catch (final Exception e) {
             this.getLogger().severe("Failed to initialize the command this.manager");
@@ -153,69 +75,34 @@ public final class ExamplePlugin extends JavaPlugin {
             this.getServer().getPluginManager().disablePlugin(this);
             return;
         }
-
+        //
         // Use contains to filter suggestions instead of default startsWith
-        this.manager.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
+        //
+        manager.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
                 FilteringCommandSuggestionProcessor.Filter.<CommandSender>contains(true).andTrimBeforeLastSpace()
         ));
-
         //
-        // Create a BukkitAudiences instance (adventure) in order to use the minecraft-extras
-        // help system
+        // Register Brigadier mappings. The capability tells us whether Brigadier is natively available
+        // on the current server. If it is, we can safely register the Brigadier integration.
+        //
+        if (manager.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
+            manager.registerBrigadier();
+        }
+        //
+        // Register asynchronous completions. The capability tells us whether asynchronous completions
+        // are available on the server that is running the plugin. The asynchronous completion method
+        // is only available in cloud-paper, not cloud-bukkit.
+        //
+        if (manager.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
+            ((PaperCommandManager<CommandSender>) manager).registerAsynchronousCompletions();
+        }
+        //
+        // Create the Bukkit audiences that maps command senders to adventure audience. This is not needed
+        // if you're using paper-api instead of Bukkit.
         //
         this.bukkitAudiences = BukkitAudiences.create(this);
         //
-        // Create the Minecraft help menu system
-        //
-        this.minecraftHelp = new MinecraftHelp<>(
-                /* Help Prefix */ "/example help",
-                /* Audience mapper */ this.bukkitAudiences::sender,
-                /* Manager */ this.manager
-        );
-        //
-        // Register Brigadier mappings
-        //
-        if (this.manager.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
-            this.manager.registerBrigadier();
-        }
-        //
-        // Register asynchronous completions
-        //
-        if (this.manager.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
-            ((PaperCommandManager<CommandSender>) this.manager).registerAsynchronousCompletions();
-        }
-        //
-        // Create the confirmation this.manager. This allows us to require certain commands to be
-        // confirmed before they can be executed
-        //
-        this.confirmationManager = new CommandConfirmationManager<>(
-                /* Timeout */ 30L,
-                /* Timeout unit */ TimeUnit.SECONDS,
-                /* Action when confirmation is required */ context -> context.getCommandContext().getSender().sendMessage(
-                ChatColor.RED + "Confirmation required. Confirm using /example confirm."),
-                /* Action when no confirmation is pending */ sender -> sender.sendMessage(
-                ChatColor.RED + "You don't have any pending commands.")
-        );
-        //
-        // Register the confirmation processor. This will enable confirmations for commands that require it
-        //
-        this.confirmationManager.registerConfirmationProcessor(this.manager);
-        //
-        // Create the annotation parser. This allows you to define commands using methods annotated with
-        // @CommandMethod
-        //
-        final Function<ParserParameters, CommandMeta> commandMetaFunction = p ->
-                CommandMeta.simple()
-                        // This will allow you to decorate commands with descriptions
-                        .with(CommandMeta.DESCRIPTION, p.get(StandardParameters.DESCRIPTION, "No description"))
-                        .build();
-        this.annotationParser = new AnnotationParser<>(
-                /* Manager */ this.manager,
-                /* Command sender type */ CommandSender.class,
-                /* Mapper for command meta instances */ commandMetaFunction
-        );
-        //
-        // Override the default exception handlers
+        // Override the default exception handlers and use the exception handlers from cloud-minecraft-extras instead.
         //
         new MinecraftExceptionHandler<CommandSender>()
                 .withInvalidSyntaxHandler()
@@ -229,387 +116,43 @@ public final class ExamplePlugin extends JavaPlugin {
                                 .append(text("Example", NamedTextColor.GOLD))
                                 .append(text("] ", NamedTextColor.DARK_GRAY))
                                 .append(component).build()
-                ).apply(this.manager, this.bukkitAudiences::sender);
+                ).apply(manager, this.bukkitAudiences::sender);
         //
-        // Create the commands
+        // Create a help instance which is used in TextColorExample and HelpExample.
         //
-        this.constructCommands();
-    }
-
-    private void constructCommands() {
-        // Add a custom permission checker
-        this.annotationParser.registerBuilderModifier(
-                GameModeRequirement.class,
-                (requirement, builder) -> builder.permission(
-                        PredicatePermission.of(SimpleCloudKey.of("gamemode"), sender ->
-                                !(sender instanceof Player) || ((Player) sender).getGameMode() == requirement.value()
-                        )
-                )
+        this.minecraftHelp = new MinecraftHelp<>(
+                // The help command. This gets prefixed onto all the clickable queries.
+                "/builder help",
+                // Tells the help manager how to map command senders to adventure audiences.
+                this.bukkitAudiences()::sender,
+                // The command manager instance that is used to look up the commands.
+                manager
         );
         //
-        // Parse all @CommandMethod-annotated methods
+        // Create the annotation examples.
         //
-        this.annotationParser.parse(this);
-        // Parse all @CommandContainer-annotated classes
-        try {
-            this.annotationParser.parseContainers();
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
+        new AnnotationParserExample(this, manager);
         //
-        // Base command builder
+        // Create the builder examples.
         //
-        final Command.Builder<CommandSender> builder = this.manager.commandBuilder("example");
-        //
-        // Add a confirmation command
-        //
-        this.manager.command(builder.literal("confirm")
-                .meta(CommandMeta.DESCRIPTION, "Confirm a pending command")
-                .handler(this.confirmationManager.createConfirmationExecutionHandler()));
-        //
-        // Create a world argument
-        //
-        final CloudKey<World> worldKey = SimpleCloudKey.of("world", World.class);
-        //
-        // Create a teleportation command
-        //
-        this.manager.command(builder.literal("teleport")
-                        .literal("me")
-                        // Require a player sender
-                        .senderType(Player.class)
-                        .required(worldKey, worldParser(), ArgumentDescription.of("World name"))
-                        .requiredArgumentTriplet(
-                                "coords",
-                                TypeToken.get(Vector.class),
-                                Triplet.of("x", "y", "z"),
-                                Triplet.of(Integer.class, Integer.class, Integer.class),
-                                (sender, triplet) -> new Vector(triplet.getFirst(), triplet.getSecond(),
-                                        triplet.getThird()
-                                ),
-                                ArgumentDescription.of("Coordinates")
-                        )
-                        .handler(context -> this.manager.taskRecipe().begin(context)
-                                .synchronous(commandContext -> {
-                                    final Player player = commandContext.getSender();
-                                    final World world = commandContext.get(worldKey);
-                                    final Vector coords = commandContext.get("coords");
-                                    final Location location = coords.toLocation(world);
-                                    player.teleport(location);
-                                }).execute()))
-                .command(builder.literal("teleport")
-                        .literal("entity")
-                        .senderType(Player.class)
-                        .required("entity", singleEntitySelectorParser(), ArgumentDescription.of("Entity to teleport"))
-                        .literal("here")
-                        .handler(
-                                context -> this.manager.taskRecipe().begin(context)
-                                        .synchronous(commandContext -> {
-                                            final Player player = commandContext.getSender();
-                                            final SingleEntitySelector singleEntitySelector = commandContext
-                                                    .get("entity");
-                                            if (singleEntitySelector.hasAny()) {
-                                                singleEntitySelector.getEntity().teleport(player);
-                                                player.sendMessage(ChatColor.GREEN + "The entity was teleported to you!");
-                                            } else {
-                                                player.sendMessage(ChatColor.RED + "No entity matched your query.");
-                                            }
-                                        }).execute()
-                        ))
-                .command(builder.literal("teleport")
-                        .meta(CommandMeta.DESCRIPTION, "Teleport to a world")
-                        .senderType(Player.class)
-                        .required("world", worldParser(), ArgumentDescription.of("World to teleport to"))
-                        .handler(context -> this.manager.taskRecipe().begin(context).synchronous(ctx -> {
-                            final Player player = ctx.getSender();
-                            player.teleport(ctx.<World>get("world").getSpawnLocation());
-                            player.sendMessage(ChatColor.GREEN + "You have been teleported!");
-                        }).execute()));
-        this.manager.command(builder.literal("tasktest")
-                .handler(context -> this.manager.taskRecipe()
-                        .begin(context)
-                        .asynchronous(c -> {
-                            c.getSender().sendMessage("ASYNC: " + !Bukkit.isPrimaryThread());
-                            return c;
-                        })
-                        .synchronous(c -> {
-                            c.getSender().sendMessage("SYNC: " + Bukkit.isPrimaryThread());
-                        })
-                        .execute(() -> context.getSender().sendMessage("DONE!"))
-                ));
-        this.manager.command(this.manager.commandBuilder("give")
-                .senderType(Player.class)
-                .required("material", materialParser())
-                .required("amount", integerParser())
-                .handler(c -> {
-                    final Material material = c.get("material");
-                    final int amount = c.get("amount");
-                    final ItemStack itemStack = new ItemStack(material, amount);
-                    c.getSender().getInventory().addItem(itemStack);
-                    c.getSender().sendMessage("You've been given stuff, bro.");
-                }));
-        this.manager.command(builder.literal("summon")
-                .senderType(Player.class)
-                .required("type", enumParser(EntityType.class))
-                .handler(c -> this.manager.taskRecipe().begin(c).synchronous(ctx -> {
-                    final Location loc = ctx.getSender().getLocation();
-                    loc.getWorld().spawnEntity(loc, ctx.get("type"));
-                }).execute()));
-        this.manager.command(builder.literal("enchant")
-                .senderType(Player.class)
-                .required("enchant", enchantmentParser())
-                .required("level", integerParser())
-                .handler(c -> this.manager.taskRecipe().begin(c).synchronous(ctx -> {
-                    final Player player = ctx.getSender();
-                    player.getInventory().getItemInMainHand().addEnchantment(ctx.get("enchant"), ctx.get("level"));
-                }).execute()));
-
-        //
-        // A command to change the color scheme for the help command
-        //
-        this.manager.command(builder
-                .meta(CommandMeta.DESCRIPTION, "Sets the color scheme for '/example help'")
-                .literal("helpcolors")
-                .required(
-                        "primary", textColorParser(),
-                        RichDescription.of(text("The primary color for the color scheme", Style.style(TextDecoration.ITALIC)))
-                )
-                .required(
-                        "highlight", textColorParser(),
-                        RichDescription.of(text("The primary color used to highlight commands and queries"))
-                )
-                .required(
-                        "alternate_highlight",
-                        textColorParser(),
-                        RichDescription.of(text("The secondary color used to highlight commands and queries"))
-                ).required("text", textColorParser(), RichDescription.of(text("The color used for description text")))
-                .required("accent", textColorParser(), RichDescription.of(text("The color used for accents and symbols")))
-                .handler(c -> this.minecraftHelp.setHelpColors(MinecraftHelp.HelpColors.of(
-                        c.get("primary"),
-                        c.get("highlight"),
-                        c.get("alternate_highlight"),
-                        c.get("text"),
-                        c.get("accent")
-                )))
-        );
-
-        // Commands using MC 1.13+ argument types
-        if (this.manager.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
-            new Mc113(this.manager).registerCommands();
-        }
-
-        this.registerNamespacedKeyUsingCommand();
-
-        //
-        // Create a Bukkit-like command
-        //
-        this.manager.command(
-                this.manager.commandBuilder(
-                        "arraycommand",
-                        ArgumentDescription.of("Bukkit-esque cmmand")
-                ).optional(
-                        "args",
-                        stringArrayParser(),
-                        ArgumentDescription.of("Arguments"),
-                        (context, lastString) -> {
-                            final CommandInput allArgs = context.rawInput();
-                            if (allArgs.remainingTokens() > 1 && allArgs.readString().equals("curry")) {
-                                return Collections.singletonList(Suggestion.simple("hot"));
-                            }
-                            return Collections.emptyList();
-                        }
-                ).handler(context -> {
-                    final String[] args = context.getOrDefault("args", new String[0]);
-                    context.getSender().sendMessage("You wrote: " + StringUtils.join(args, " "));
-                })
-        );
-
-        /* Register a custom regex caption */
-        final Caption moneyCaption = Caption.of("regex.money");
-        if (this.manager.captionRegistry() instanceof SimpleCaptionRegistry) {
-            ((SimpleCaptionRegistry<CommandSender>) this.manager.captionRegistry()).registerMessageFactory(
-                    moneyCaption,
-                    (sender, key) -> "'{input}' is not very cash money of you"
-            );
-        }
-
-        // compound itemstack arg
-        this.manager.command(this.manager.commandBuilder("gib")
-                .senderType(Player.class)
-                .requiredArgumentPair(
-                        "itemstack",
-                        TypeToken.get(ItemStack.class),
-                        Pair.of("item", "amount"),
-                        Pair.of(ProtoItemStack.class, Integer.class),
-                        (sender, pair) -> {
-                            final ProtoItemStack proto = pair.getFirst();
-                            final int amount = pair.getSecond();
-                            return proto.createItemStack(amount, true);
-                        },
-                        ArgumentDescription.of("The ItemStack to give")
-                )
-                .handler(ctx -> {
-                    final ItemStack stack = ctx.get("itemstack");
-                    ctx.getSender().getInventory().addItem(stack);
-                }));
-
-        this.manager.command(builder.literal("keyed_world")
-                .required("world", keyedWorldParser())
-                .senderType(Player.class)
-                .handler(ctx -> {
-                    final World world = ctx.get("world");
-                    final Player sender = ctx.getSender();
-                    this.getServer().getScheduler().runTask(this, () -> sender.teleport(world.getSpawnLocation()));
-                }));
+        new BuilderExample(this, manager);
     }
-
-    private void registerNamespacedKeyUsingCommand() {
-        boolean nsk = true;
-        try {
-            Class.forName("org.bukkit.NamespacedKey");
-        } catch (final ClassNotFoundException e) {
-            nsk = false;
-        }
-
-        if (!nsk) {
-            return;
-        }
-
-        this.manager.command(this.manager.commandBuilder("example")
-                .literal("namespacedkey")
-                .required("key", namespacedKeyParser())
-                .handler(ctx -> {
-                    final NamespacedKey namespacedKey = ctx.get("key");
-                    final String key = namespacedKey.getNamespace() + ":" + namespacedKey.getKey();
-                    ctx.getSender().sendMessage("The key you typed is '" + key + "'.");
-                }));
-    }
-
-    @Suggestions("help_queries")
-    public @NonNull List<String> suggestHelpQueries(
-            final @NonNull CommandContext<CommandSender> ctx,
-            final @NonNull String input
-    ) {
-        return this.manager.createCommandHelpHandler().queryRootIndex(ctx.getSender()).getEntries().stream()
-                .map(CommandHelpHandler.VerboseHelpEntry::getSyntaxString)
-                .collect(Collectors.toList());
-    }
-
-    @CommandMethod("example|e|ex help [query]")
-    @CommandDescription("Help menu")
-    public void commandHelp(
-            final @NonNull CommandSender sender,
-            final @Argument(value = "query", suggestions = "help_queries") @Greedy String query
-    ) {
-        this.minecraftHelp.queryCommands(query == null ? "" : query, sender);
-    }
-
-    @Confirmation
-    @CommandMethod("example clear")
-    @CommandDescription("Clear your inventory")
-    @CommandPermission("example.clear")
-    public void commandClear(final @NonNull Player player) {
-        player.getInventory().clear();
-        this.bukkitAudiences.player(player)
-                .sendMessage(text("Your inventory has been cleared", NamedTextColor.GOLD));
-    }
-
-    @CommandMethod("example give <material> <amount>")
-    @CommandDescription("Give yourself an item")
-    public void commandGive(
-            final @NonNull Player player,
-            final @NonNull @Argument("material") Material material,
-            final @Argument("amount") int number,
-            final @Nullable @Flag("color") ChatColor nameColor,
-            final @Nullable @Flag("enchant") Enchantment enchant
-    ) {
-        final ItemStack itemStack = new ItemStack(material, number);
-        String itemName = String.format(
-                "%s's %s",
-                player.getName(),
-                material.name()
-                        .toLowerCase()
-                        .replace('_', ' ')
-        );
-        if (nameColor != null) {
-            itemName = nameColor + itemName;
-        }
-        final ItemMeta meta = itemStack.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(itemName);
-            itemStack.setItemMeta(meta);
-        }
-        if (enchant != null) {
-            itemStack.addUnsafeEnchantment(enchant, 10);
-        }
-        player.getInventory().addItem(itemStack);
-        player.sendMessage(ChatColor.GREEN + String.format("You have been given %d x %s", number, material));
-    }
-
-    @CommandMethod("example pay <money>")
-    @CommandDescription("Command to test the preprocessing system")
-    public void commandPay(
-            final @NonNull CommandSender sender,
-            final @Argument("money") @Regex(value = "(?=.*?\\d)^\\$?(([1-9]\\d{0,2}(,\\d{3})*)|\\d+)?(\\.\\d{1,2})?$",
-                    failureCaption = "regex.money") String money
-    ) {
-        this.bukkitAudiences.sender(sender).sendMessage(
-                text().append(text("You have been given ", NamedTextColor.AQUA))
-                        .append(text(money, NamedTextColor.GOLD))
-        );
-    }
-
-    @CommandMethod("example teleport complex <location>")
-    public void teleportComplex(
-            final @NonNull Player sender,
-            final @NonNull @Argument("location") Location location
-    ) {
-        this.manager.taskRecipe().begin(location).synchronous((@NonNull TaskConsumer<Location>) sender::teleport)
-                .execute(() -> sender.sendMessage("You have been teleported!"));
-    }
-
-    @CommandMethod("removeall")
-    public void removeAll(
-            final @NonNull CommandSender sender
-    ) {
-        this.manager.rootCommands().forEach(this.manager::deleteRootCommand);
-        sender.sendMessage("All root commands have been deleted :)");
-    }
-
-    @CommandMethod("removesingle <command>")
-    public void removeSingle(
-            final @NonNull CommandSender sender,
-            final @Argument(value = "command", suggestions = "commands") String command
-    ) {
-        this.manager.deleteRootCommand(command);
-        sender.sendMessage("Deleted the root command :)");
-    }
-
-    @Suggestions("commands")
-    public List<String> commands(
-            final @NonNull CommandContext<CommandSender> context,
-            final @NonNull String input
-    ) {
-        return new ArrayList<>(this.manager.rootCommands());
-    }
-
-    @CommandMethod("disableme")
-    public void disableMe() {
-        this.getServer().getPluginManager().disablePlugin(this);
-    }
-
 
     /**
-     * Command must have the given game mode
+     * Returns the {@link BukkitAudiences} instance.
+     *
+     * @return audiences
      */
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface GameModeRequirement {
+    public @NonNull BukkitAudiences bukkitAudiences() {
+        return this.bukkitAudiences;
+    }
 
-        /**
-         * The required game mode
-         *
-         * @return Required game mode
-         */
-        GameMode value();
+    /**
+     * Returns the {@link MinecraftHelp} instance.
+     *
+     * @return minecraft help
+     */
+    public @NonNull MinecraftHelp<CommandSender> minecraftHelp() {
+        return this.minecraftHelp;
     }
 }

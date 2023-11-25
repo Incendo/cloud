@@ -292,7 +292,7 @@ public abstract class CommandManager<C> {
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull @This CommandManager<C> command(final @NonNull CommandFactory<C> commandFactory) {
-        commandFactory.createCommand(this).forEach(this::command);
+        commandFactory.createCommands(this).forEach(this::command);
         return this;
     }
 

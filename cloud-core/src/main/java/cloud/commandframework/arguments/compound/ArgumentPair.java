@@ -68,7 +68,6 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
      * Construct a builder for an argument pair
      *
      * @param manager Command manager
-     * @param name    Argument name
      * @param names   Sub-argument names
      * @param types   Pair containing the types of the sub-arguments. There must be parsers for these types registered
      *                in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
@@ -80,7 +79,6 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
      */
     public static <C, U, V> @NonNull ArgumentPairIntermediaryBuilder<C, U, V> of(
             final @NonNull CommandManager<C> manager,
-            final @NonNull String name,
             final @NonNull Pair<@NonNull String,
                     @NonNull String> names,
             final @NonNull Pair<@NonNull Class<U>,
