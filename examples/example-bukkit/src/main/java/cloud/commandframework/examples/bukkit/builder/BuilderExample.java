@@ -25,15 +25,15 @@ package cloud.commandframework.examples.bukkit.builder;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
-import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.feature.CommandBeanExample;
 import cloud.commandframework.examples.bukkit.builder.feature.CompoundArgumentExample;
 import cloud.commandframework.examples.bukkit.builder.feature.ConfirmationExample;
+import cloud.commandframework.examples.bukkit.builder.feature.EnumExample;
+import cloud.commandframework.examples.bukkit.builder.feature.FlagExample;
 import cloud.commandframework.examples.bukkit.builder.feature.StringArrayExample;
 import cloud.commandframework.examples.bukkit.builder.feature.TaskRecipeExample;
 import cloud.commandframework.examples.bukkit.builder.feature.minecraft.SelectorExample;
@@ -42,11 +42,9 @@ import cloud.commandframework.minecraft.extras.RichDescription;
 import cloud.commandframework.types.tuples.Pair;
 import io.leangen.geantyref.TypeToken;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -61,7 +59,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
-import static cloud.commandframework.arguments.standard.StringArrayParser.stringArrayParser;
 import static cloud.commandframework.bukkit.parsers.EnchantmentParser.enchantmentParser;
 import static cloud.commandframework.bukkit.parsers.MaterialParser.materialParser;
 import static cloud.commandframework.bukkit.parsers.NamespacedKeyParser.namespacedKeyParser;
@@ -80,6 +77,8 @@ public final class BuilderExample {
             new CommandBeanExample(),
             new CompoundArgumentExample(),
             new ConfirmationExample(),
+            new EnumExample(),
+            new FlagExample(),
             new StringArrayExample(),
             new TaskRecipeExample(),
             // Minecraft-specific features
@@ -187,30 +186,6 @@ public final class BuilderExample {
         }
 
         this.registerNamespacedKeyUsingCommand();
-
-        //
-        // Create a Bukkit-like command
-        //
-        this.manager.command(
-                this.manager.commandBuilder(
-                        "arraycommand",
-                        ArgumentDescription.of("Bukkit-esque cmmand")
-                ).optional(
-                        "args",
-                        stringArrayParser(),
-                        ArgumentDescription.of("Arguments"),
-                        (context, lastString) -> {
-                            final CommandInput allArgs = context.rawInput();
-                            if (allArgs.remainingTokens() > 1 && allArgs.readString().equals("curry")) {
-                                return Collections.singletonList(Suggestion.simple("hot"));
-                            }
-                            return Collections.emptyList();
-                        }
-                ).handler(context -> {
-                    final String[] args = context.getOrDefault("args", new String[0]);
-                    context.getSender().sendMessage("You wrote: " + StringUtils.join(args, " "));
-                })
-        );
 
         // compound itemstack arg
         this.manager.command(this.manager.commandBuilder("gib")
