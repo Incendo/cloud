@@ -61,7 +61,7 @@ public abstract class CommandBean<C> implements CommandExecutionHandler<C>, Comm
      * @return the constructed command
      */
     @Override
-    public @NonNull List<@NonNull Command<? extends C>> createCommand(final @NonNull CommandManager<C> commandManager) {
+    public @NonNull List<@NonNull Command<? extends C>> createCommands(final @NonNull CommandManager<C> commandManager) {
         final Command.Builder<C> builder = commandManager.commandBuilder(
                 this.properties().name(),
                 this.properties().aliases(),

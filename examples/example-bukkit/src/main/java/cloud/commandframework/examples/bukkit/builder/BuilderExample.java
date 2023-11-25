@@ -31,6 +31,7 @@ import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
+import cloud.commandframework.examples.bukkit.builder.feature.CommandBeanExample;
 import cloud.commandframework.examples.bukkit.builder.feature.CompoundArgumentExample;
 import cloud.commandframework.examples.bukkit.builder.feature.StringArrayExample;
 import cloud.commandframework.examples.bukkit.builder.feature.TaskRecipeExample;
@@ -77,6 +78,7 @@ import static net.kyori.adventure.text.Component.text;
 public final class BuilderExample {
 
     private static final List<BuilderFeature> FEATURES = Arrays.asList(
+            new CommandBeanExample(),
             new CompoundArgumentExample(),
             new StringArrayExample(),
             new TaskRecipeExample(),

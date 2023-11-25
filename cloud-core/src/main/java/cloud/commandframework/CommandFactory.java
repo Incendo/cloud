@@ -45,5 +45,5 @@ public interface CommandFactory<C> {
      * @param commandManager the command manager
      * @return the created commands
      */
-    @NonNull List<@NonNull Command<? extends C>> createCommand(@NonNull CommandManager<C> commandManager);
+    @NonNull List<@NonNull Command<? extends C>> createCommands(@NonNull CommandManager<C> commandManager);
 }
