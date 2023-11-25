@@ -67,8 +67,7 @@ public abstract class CommandBean<C> implements CommandExecutionHandler<C>, Comm
                 this.properties().aliases(),
                 this.meta()
         ).handler(this);
-        this.configure(builder);
-        return Collections.singletonList(builder.build());
+        return Collections.singletonList(this.configure(builder).build());
     }
 
     /**
@@ -94,8 +93,9 @@ public abstract class CommandBean<C> implements CommandExecutionHandler<C>, Comm
      * The builder has been pre-configured to use {@code this} instance as the {@link CommandExecutionHandler}.
      *
      * @param builder the command builder
+     * @return the updated builder
      */
-    protected abstract void configure(Command.@NonNull Builder<C> builder);
+    protected abstract Command.@NonNull Builder<C> configure(Command.@NonNull Builder<C> builder);
 
     /**
      * Default command handler for this command bean. Does nothing unless override.

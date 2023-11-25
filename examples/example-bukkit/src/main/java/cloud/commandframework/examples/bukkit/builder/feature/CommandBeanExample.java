@@ -61,8 +61,8 @@ public final class CommandBeanExample extends CommandBean<CommandSender> impleme
     }
 
     @Override
-    protected void configure(@NotNull final Command.Builder<CommandSender> builder) {
-        builder.literal("bean").required(NUMBER_KEY, integerParser());
+    protected Command.@NonNull Builder<CommandSender> configure(@NotNull final Command.Builder<CommandSender> builder) {
+        return builder.literal("bean").required(NUMBER_KEY, integerParser());
     }
 
     @Override

@@ -23,48 +23,50 @@
 //
 package cloud.commandframework.examples.bukkit.builder.feature;
 
-import cloud.commandframework.CommandHelpHandler;
-import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.preprocessor.RegexPreprocessor;
 import cloud.commandframework.bukkit.BukkitCommandManager;
+import cloud.commandframework.captions.Caption;
+import cloud.commandframework.captions.SimpleCaptionRegistry;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
-import cloud.commandframework.minecraft.extras.MinecraftHelp;
-import java.util.stream.Collectors;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import static cloud.commandframework.arguments.standard.StringParser.greedyStringParser;
+import static net.kyori.adventure.text.Component.text;
 
 /**
- * Example that uses an annotated command to query commands.
- * <p>
- * This relies on {@link MinecraftHelp} from cloud-minecraft-extras.
+ * Example showcasing the regex processing. This also showcases how to register custom captions.
  */
-public final class HelpExample implements BuilderFeature {
+public final class RegexExample implements BuilderFeature {
+
+    private static final String MONEY_PATTERN = "(?=.*?\\d)^\\$?(([1-9]\\d{0,2}(,\\d{3})*)|\\d+)?(\\.\\d{1,2})?$";
 
     @Override
     public void registerFeature(
             final @NonNull ExamplePlugin examplePlugin,
             final @NonNull BukkitCommandManager<CommandSender> manager
     ) {
+        final Caption moneyCaption = Caption.of("annotations.regex.money");
+        if (manager.captionRegistry() instanceof SimpleCaptionRegistry) {
+            ((SimpleCaptionRegistry<CommandSender>) manager.captionRegistry()).registerMessageFactory(
+                    moneyCaption,
+                    (sender, key) -> "'{input}' is not very cash money of you"
+            );
+        }
+
         manager.command(
                 manager.commandBuilder("builder")
-                        .literal("help")
-                        .optional(
-                                "query",
-                                greedyStringParser(),
-                                DefaultValue.constant(""),
-                                (ctx, in) -> manager.createCommandHelpHandler()
-                                        .queryRootIndex(ctx.getSender())
-                                        .getEntries()
-                                        .stream()
-                                        .map(CommandHelpHandler.VerboseHelpEntry::getSyntaxString)
-                                        .map(Suggestion::simple)
-                                        .collect(Collectors.toList())
-                        )
-                        .handler(context -> {
-                            examplePlugin.minecraftHelp().queryCommands(context.get("query"), context.getSender());
+                        .literal("pay")
+                        .required(
+                                manager.componentBuilder(String.class, "money")
+                                        .preprocessor(RegexPreprocessor.of(MONEY_PATTERN))
+                        ).handler(commandContext -> {
+                            final String money = commandContext.get("money");
+                            examplePlugin.bukkitAudiences()
+                                    .sender(commandContext.getSender())
+                                    .sendMessage(text().append(text("You have been given ", NamedTextColor.AQUA))
+                                                    .append(text(money, NamedTextColor.GOLD)));
                         })
         );
     }

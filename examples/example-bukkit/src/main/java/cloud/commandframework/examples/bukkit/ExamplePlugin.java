@@ -30,6 +30,7 @@ import cloud.commandframework.examples.bukkit.builder.BuilderExample;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
+import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.paper.PaperCommandManager;
 import java.util.function.Function;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -47,6 +48,7 @@ import static net.kyori.adventure.text.Component.text;
 public final class ExamplePlugin extends JavaPlugin {
 
     private BukkitAudiences bukkitAudiences;
+    private MinecraftHelp<CommandSender> minecraftHelp;
 
     @Override
     public void onEnable() {
@@ -116,6 +118,17 @@ public final class ExamplePlugin extends JavaPlugin {
                                 .append(component).build()
                 ).apply(manager, this.bukkitAudiences::sender);
         //
+        // Create a help instance which is used in TextColorExample and HelpExample.
+        //
+        this.minecraftHelp = new MinecraftHelp<>(
+                // The help command. This gets prefixed onto all the clickable queries.
+                "/builder help",
+                // Tells the help manager how to map command senders to adventure audiences.
+                this.bukkitAudiences()::sender,
+                // The command manager instance that is used to look up the commands.
+                manager
+        );
+        //
         // Create the annotation examples.
         //
         new AnnotationParserExample(this, manager);
@@ -132,5 +145,14 @@ public final class ExamplePlugin extends JavaPlugin {
      */
     public @NonNull BukkitAudiences bukkitAudiences() {
         return this.bukkitAudiences;
+    }
+
+    /**
+     * Returns the {@link MinecraftHelp} instance.
+     *
+     * @return minecraft help
+     */
+    public @NonNull MinecraftHelp<CommandSender> minecraftHelp() {
+        return this.minecraftHelp;
     }
 }
