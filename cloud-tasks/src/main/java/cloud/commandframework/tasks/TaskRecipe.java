@@ -66,7 +66,6 @@ public final class TaskRecipe {
         return new TaskRecipeComponentOutputting<>(new Object());
     }
 
-
     private void addAsynchronous(final TaskRecipeStep taskRecipeStep) {
         this.recipeSteps.put(taskRecipeStep, false);
     }
