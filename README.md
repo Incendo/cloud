@@ -15,39 +15,59 @@ Cloud commands consist out of deterministic chains of strongly typed arguments. 
 you know exactly what type of data you're going to be working with, and you know that there will be no
 ambiguity at runtime. Cloud promotes writing reusable code, making it very easy to define new commands.
 
-Cloud allows for commands to be defined using builder patterns, like this:
+Cloud allows you to use command builders, in Java:
 ```java
 manager.command(
-        manager.commandBuilder("command", Description.of("Test cloud command using a builder"), "alias")
-                .argument(StringArgument.of("input"))
-                .argument(IntegerArgument.<CommandSender>builder("number").withMin(1).withMax(100).build())
-                .handler(context -> {
-                    String input = context.get("input");
-                    int number = context.get("number");
-                    context.getSender().sendMessage(String.format(
-                            "I am %d%% hyped for %s!",
-                            number,
-                            input
-                    ));
-                })
+    manager.commandBuilder("command", "alias")
+        .literal("literal")
+        .required("number", integerParser())
+        .optional("string", stringParser(), ArgumentDescription.of("A string!"))
+        .handler(commandContext -> {
+            final int number = commandContext.get("number");
+            final String string = commandContext.getOrDefault("string", "");
+            // ...
+        })
 );
 ```
-or using annotated methods, like this:
-```java
-@CommandDescription("Test cloud command using @CommandMethod")
-@CommandMethod("command|alias <input> <number>")
-private void yourCommand(
-        CommandSender sender,
-        @Argument("input") String input,
-        @Argument("number") @Range(min = "1", max = "100") int number
-) {
-    sender.sendMessage(String.format(
-            "I am %d%% hyped for %s!",
-            number,
-            input
-    ));
+or in Kotlin:
+```kotlin
+manager.buildAndRegister("command", aliases = arrayOf("alias")) {
+    literal("literal")
+    required("number", integerParser())
+    optional("string", stringParser()) {
+        description { "A string!" }
+    }
+    handler { context ->
+        val number: Int = context["number"]
+        val string: String = context.getOrDefault("string", "")
+        // ...
+    }
 }
 ```
+
+or using annotated methods, in Java:
+```java
+@CommandMethod("command literal <number> [string]")
+public void yourCommand(
+        CommandSender sender,
+        @Argument("number") int number, 
+        @Argument(value = "string", defaultValue = "") String string
+) {
+    // ...
+}
+```
+or in Kotlin:
+```kotlin
+@CommandMethod("command literal <number> [string]")
+public suspend fun yourCommand(
+    sender: CommandSender,
+    @Argument("number") number: Int,
+    @Argument("string") string: String = ""
+) {
+    // ...
+}
+```
+
 depending on your preference.
 
 Cloud is built to be very customisable, in order to fit your needs. You can inject handlers and processors
