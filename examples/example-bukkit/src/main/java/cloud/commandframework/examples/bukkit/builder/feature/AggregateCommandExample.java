@@ -23,18 +23,29 @@
 //
 package cloud.commandframework.examples.bukkit.builder.feature;
 
+import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
+import cloud.commandframework.types.tuples.Pair;
+import io.leangen.geantyref.TypeToken;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
+import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 import static cloud.commandframework.bukkit.parsers.WorldParser.worldParser;
 
 /**
@@ -47,6 +58,11 @@ public final class AggregateCommandExample implements BuilderFeature {
             @NonNull final ExamplePlugin examplePlugin,
             @NonNull final BukkitCommandManager<CommandSender> manager
     ) {
+        this.registerLocationExample(manager);
+        this.registerRenameExample(manager);
+    }
+
+    private void registerLocationExample(final CommandManager<CommandSender> manager) {
         final AggregateCommandParser<CommandSender, Location> locationParser = AggregateCommandParser.<CommandSender>builder()
                 .withComponent("world", worldParser())
                 .withComponent("x", integerParser())
@@ -63,9 +79,54 @@ public final class AggregateCommandExample implements BuilderFeature {
         manager.command(
                 manager.commandBuilder("builder")
                         .literal("aggregate")
+                        .literal("teleport")
                         .required("location", locationParser)
                         .senderType(Player.class)
                         .handler(commandContext -> commandContext.getSender().teleport(commandContext.<Location>get("location")))
         );
+    }
+
+    private void registerRenameExample(final CommandManager<CommandSender> manager) {
+        final AggregateCommandParser<CommandSender, Pair<Integer, String>> parser =
+                AggregateCommandParser.<CommandSender>builder()
+                        .withComponent("slot", integerParser(), this.slotSuggestions())
+                        .withComponent("name", stringParser(), this.nameSuggestions())
+                        .withMapper(new TypeToken<Pair<Integer, String>>(){}, (commandContext, context) -> {
+                            final int slot = context.get("slot");
+                            final String name = context.get("name");
+                            return CompletableFuture.completedFuture(Pair.of(slot, name));
+                        })
+                        .build();
+        manager.command(
+                manager.commandBuilder("builder")
+                        .literal("aggregate")
+                        .literal("rename")
+                        .required("name", parser)
+                        .senderType(Player.class)
+                        .handler(commandContext -> {
+                            final Pair<Integer, String> name = commandContext.get("name");
+                            final ItemStack stack = commandContext.getSender().getInventory().getItem(name.getFirst());
+                            if (stack == null) {
+                                return;
+                            }
+                            final ItemMeta meta = stack.getItemMeta();
+                            meta.setDisplayName(name.getSecond());
+                            stack.setItemMeta(meta);
+                        })
+        );
+    }
+
+    private @NonNull SuggestionProvider<CommandSender> slotSuggestions() {
+        return (context, input) -> IntStream.rangeClosed(1, 9)
+                .mapToObj(Integer::toString)
+                .map(Suggestion::simple)
+                .collect(Collectors.toList());
+    }
+
+    private @NonNull SuggestionProvider<CommandSender> nameSuggestions() {
+        return (context, input) -> Stream.of(context.<Integer>get("slot"), context.getSender().getName())
+                .map(Object::toString)
+                .map(Suggestion::simple)
+                .collect(Collectors.toList());
     }
 }

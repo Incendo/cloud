@@ -601,43 +601,40 @@ public final class CloudBrigadierManager<C, S> {
             command = command.substring(leading.split(":")[0].length() + 1);
         }
 
-        final List<Suggestion> suggestionsUnfiltered = this.commandManager.suggest(
-                commandContext.getSender(),
-                command
-        );
+        return this.commandManager.suggestFuture(commandContext.getSender(), command).thenCompose(suggestionsUnfiltered -> {
+            /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
+            final List<Suggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
+            if (parentNode != null) {
+                final Set<String> siblingLiterals = parentNode.children().stream()
+                        .map(cloud.commandframework.internal.CommandNode::component)
+                        .filter(Objects::nonNull)
+                        .flatMap(commandComponent -> commandComponent.aliases().stream())
+                        .collect(Collectors.toSet());
 
-        /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
-        final List<Suggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
-        if (parentNode != null) {
-            final Set<String> siblingLiterals = parentNode.children().stream()
-                    .map(cloud.commandframework.internal.CommandNode::component)
-                    .filter(Objects::nonNull)
-                    .flatMap(commandComponent -> commandComponent.aliases().stream())
-                    .collect(Collectors.toSet());
-
-            suggestions.removeIf(suggestion -> siblingLiterals.contains(suggestion.suggestion()));
-        }
-
-        SuggestionsBuilder suggestionsBuilder = builder;
-
-        final int lastIndexOfSpaceInRemainingString = builder.getRemaining().lastIndexOf(' ');
-        if (lastIndexOfSpaceInRemainingString != -1) {
-            suggestionsBuilder = builder.createOffset(builder.getStart() + lastIndexOfSpaceInRemainingString + 1);
-        }
-
-        for (final Suggestion suggestion : suggestions) {
-            String tooltip = component.name();
-            if (component.type() != CommandComponent.ComponentType.LITERAL) {
-                if (component.required()) {
-                    tooltip = '<' + tooltip + '>';
-                } else {
-                    tooltip = '[' + tooltip + ']';
-                }
+                suggestions.removeIf(suggestion -> siblingLiterals.contains(suggestion.suggestion()));
             }
-            suggestionsBuilder = suggestionsBuilder.suggest(suggestion.suggestion(), new LiteralMessage(tooltip));
-        }
 
-        return suggestionsBuilder.buildFuture();
+            SuggestionsBuilder suggestionsBuilder = builder;
+
+            final int lastIndexOfSpaceInRemainingString = builder.getRemaining().lastIndexOf(' ');
+            if (lastIndexOfSpaceInRemainingString != -1) {
+                suggestionsBuilder = builder.createOffset(builder.getStart() + lastIndexOfSpaceInRemainingString + 1);
+            }
+
+            for (final Suggestion suggestion : suggestions) {
+                String tooltip = component.name();
+                if (component.type() != CommandComponent.ComponentType.LITERAL) {
+                    if (component.required()) {
+                        tooltip = '<' + tooltip + '>';
+                    } else {
+                        tooltip = '[' + tooltip + ']';
+                    }
+                }
+                suggestionsBuilder = suggestionsBuilder.suggest(suggestion.suggestion(), new LiteralMessage(tooltip));
+            }
+
+            return suggestionsBuilder.buildFuture();
+        });
     }
 
     /**

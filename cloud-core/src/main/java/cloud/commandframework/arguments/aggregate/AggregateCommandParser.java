@@ -102,8 +102,8 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
         return this.components()
                 .stream()
                 .filter(arg -> !context.contains(arg.name()))
-                .map(CommandComponent::parser)
-                .map(parser -> parser.suggestionsFuture(context, input))
+                .map(CommandComponent::suggestionProvider)
+                .map(suggestionProvider -> suggestionProvider.suggestionsFuture(context, input))
                 .findFirst()
                 .orElse(CompletableFuture.completedFuture(Collections.emptyList()));
     }
