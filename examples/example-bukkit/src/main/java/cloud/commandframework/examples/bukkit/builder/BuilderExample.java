@@ -33,6 +33,7 @@ import cloud.commandframework.examples.bukkit.builder.feature.CompoundArgumentEx
 import cloud.commandframework.examples.bukkit.builder.feature.ConfirmationExample;
 import cloud.commandframework.examples.bukkit.builder.feature.EnumExample;
 import cloud.commandframework.examples.bukkit.builder.feature.FlagExample;
+import cloud.commandframework.examples.bukkit.builder.feature.HelpExample;
 import cloud.commandframework.examples.bukkit.builder.feature.StringArrayExample;
 import cloud.commandframework.examples.bukkit.builder.feature.TaskRecipeExample;
 import cloud.commandframework.examples.bukkit.builder.feature.minecraft.ItemStackExample;
@@ -77,6 +78,7 @@ public final class BuilderExample {
             new ConfirmationExample(),
             new EnumExample(),
             new FlagExample(),
+            new HelpExample(),
             new StringArrayExample(),
             new TaskRecipeExample(),
             // Minecraft-specific features
