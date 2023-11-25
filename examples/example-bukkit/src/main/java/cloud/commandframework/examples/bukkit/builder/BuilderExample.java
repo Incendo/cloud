@@ -34,6 +34,7 @@ import cloud.commandframework.examples.bukkit.builder.feature.ConfirmationExampl
 import cloud.commandframework.examples.bukkit.builder.feature.EnumExample;
 import cloud.commandframework.examples.bukkit.builder.feature.FlagExample;
 import cloud.commandframework.examples.bukkit.builder.feature.HelpExample;
+import cloud.commandframework.examples.bukkit.builder.feature.PermissionExample;
 import cloud.commandframework.examples.bukkit.builder.feature.StringArrayExample;
 import cloud.commandframework.examples.bukkit.builder.feature.TaskRecipeExample;
 import cloud.commandframework.examples.bukkit.builder.feature.minecraft.ItemStackExample;
@@ -79,6 +80,7 @@ public final class BuilderExample {
             new EnumExample(),
             new FlagExample(),
             new HelpExample(),
+            new PermissionExample(),
             new StringArrayExample(),
             new TaskRecipeExample(),
             // Minecraft-specific features
