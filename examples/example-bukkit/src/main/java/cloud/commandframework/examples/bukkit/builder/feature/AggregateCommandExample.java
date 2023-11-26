@@ -68,12 +68,12 @@ public final class AggregateCommandExample implements BuilderFeature {
                 .withComponent("x", integerParser())
                 .withComponent("y", integerParser())
                 .withComponent("z", integerParser())
-                .withMapper(Location.class, (commandContext, aggregateCommandContext) -> {
+                .withDirectMapper(Location.class, (commandContext, aggregateCommandContext) -> {
                     final World world = aggregateCommandContext.get("world");
                     final int x = aggregateCommandContext.get("x");
                     final int y = aggregateCommandContext.get("y");
                     final int z = aggregateCommandContext.get("z");
-                    return CompletableFuture.completedFuture(new Location(world, x, y, z));
+                    return new Location(world, x, y, z);
                 })
                 .build();
         manager.command(

@@ -46,4 +46,32 @@ public interface AggregateResultMapper<C, O> {
      * @return future that completes with the result
      */
     @NonNull CompletableFuture<O> map(@NonNull CommandContext<C> commandContext, @NonNull AggregateCommandContext<C> context);
+
+
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    interface DirectAggregateResultMapper<C, O> extends AggregateResultMapper<C, O> {
+
+        /**
+         * Maps the given {@code context} into the output of type {@link O}.
+         *
+         * @param commandContext the command context
+         * @param context        the context to map
+         * @return the result
+         */
+        @NonNull O mapImmediately(@NonNull CommandContext<C> commandContext, @NonNull AggregateCommandContext<C> context);
+
+        @Override
+        default @NonNull CompletableFuture<O> map(
+                @NonNull CommandContext<C> commandContext,
+                @NonNull AggregateCommandContext<C> context
+        ) {
+            final CompletableFuture<O> result = new CompletableFuture<>();
+            try {
+                result.complete(this.mapImmediately(commandContext, context));
+            } catch (final Exception e) {
+                result.completeExceptionally(e);
+            }
+            return result;
+        }
+    }
 }
