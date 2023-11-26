@@ -102,8 +102,8 @@ class StringProcessingTest {
 
         final Command<TestCommandSender> command = commands.get(0);
         assertThat(command.toString()).isEqualTo(String.format("%s argument flags", testProperty));
-        assertThat(command.getCommandPermission().toString()).isEqualTo(testProperty);
-        assertThat(command.getCommandMeta().get(CommandMeta.DESCRIPTION)).hasValue(testProperty);
+        assertThat(command.commandPermission().toString()).isEqualTo(testProperty);
+        assertThat(command.commandMeta().get(CommandMeta.DESCRIPTION)).hasValue(testProperty);
 
         final List<CommandComponent<TestCommandSender>> components = command.components();
         assertThat(components).hasSize(3);

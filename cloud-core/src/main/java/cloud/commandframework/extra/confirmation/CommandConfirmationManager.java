@@ -152,7 +152,7 @@ public class CommandConfirmationManager<C> {
             if (pending.isPresent()) {
                 final CommandPostprocessingContext<C> postprocessingContext = pending.get();
                 return postprocessingContext.getCommand()
-                        .getCommandExecutionHandler()
+                        .commandExecutionHandler()
                         .executeFuture(postprocessingContext.getCommandContext());
             } else {
                 this.errorNotifier.accept(context.getSender());
@@ -166,7 +166,7 @@ public class CommandConfirmationManager<C> {
         @Override
         public void accept(final @NonNull CommandPostprocessingContext<C> context) {
             if (!context.getCommand()
-                    .getCommandMeta()
+                    .commandMeta()
                     .getOrDefault(META_CONFIRMATION_REQUIRED, false)) {
                 return;
             }

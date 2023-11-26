@@ -605,6 +605,30 @@ public class MutableCommandBuilder<C : Any>(
     }
 
     /**
+     * Sets a new command execution handler that invokes the given {@code handler} before the current
+     * {@link #handler() handler}.
+     *
+     * @param handler the handler to invoke before the current handler
+     * @return this mutable builder
+     * @since 2.0.0
+     */
+    public fun prependHandler(handler: CommandExecutionHandler<C>): MutableCommandBuilder<C> = mutate {
+        it.prependHandler(handler)
+    }
+
+    /**
+     * Sets a new command execution handler that invokes the given {@code handler} after the current
+     * {@link #handler() handler}.
+     *
+     * @param handler the handler to invoke after the current handler
+     * @return this mutable builder
+     * @since 2.0.0
+     */
+    public fun appendHandler(handler: CommandExecutionHandler<C>): MutableCommandBuilder<C> = mutate {
+        it.appendHandler(handler)
+    }
+
+    /**
      * Add a new flag component to this command
      *
      * @param name name of the flag

@@ -872,7 +872,7 @@ public final class AnnotationParser<C> {
         if (proxy.contains(" ")) {
             throw new IllegalArgumentException("@ProxiedBy proxies may only contain single literals");
         }
-        Command.Builder<C> proxyBuilder = this.manager.commandBuilder(proxy, command.getCommandMeta())
+        Command.Builder<C> proxyBuilder = this.manager.commandBuilder(proxy, command.commandMeta())
                 .proxies(command);
         if (proxyAnnotation.hidden()) {
             proxyBuilder = proxyBuilder.hidden();

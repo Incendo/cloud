@@ -394,7 +394,7 @@ public final class MinecraftHelp<C> {
                 },
                 (helpEntry, isLastOfPage) -> {
                     final Optional<Component> richDescription =
-                            helpEntry.getCommand().getCommandMeta().get(MinecraftExtrasMetaKeys.DESCRIPTION);
+                            helpEntry.getCommand().commandMeta().get(MinecraftExtrasMetaKeys.DESCRIPTION);
                     final Component description;
                     if (richDescription.isPresent()) {
                         description = richDescription.get();
@@ -481,8 +481,8 @@ public final class MinecraftHelp<C> {
         );
         /* Topics will use the long description if available, but fall back to the short description. */
         final Component richDescription =
-                helpTopic.getCommand().getCommandMeta().get(MinecraftExtrasMetaKeys.LONG_DESCRIPTION)
-                        .orElse(helpTopic.getCommand().getCommandMeta().get(MinecraftExtrasMetaKeys.DESCRIPTION)
+                helpTopic.getCommand().commandMeta().get(MinecraftExtrasMetaKeys.LONG_DESCRIPTION)
+                        .orElse(helpTopic.getCommand().commandMeta().get(MinecraftExtrasMetaKeys.DESCRIPTION)
                                 .orElse(null));
 
         final Component topicDescription;

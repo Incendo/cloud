@@ -110,7 +110,7 @@ public abstract class CommandExecutionCoordinator<C> {
         ) {
             return this.getCommandTree().parse(commandContext, commandInput).thenCompose(command -> {
                 if (this.getCommandTree().commandManager().postprocessContext(commandContext, command) == State.ACCEPTED) {
-                    return command.getCommandExecutionHandler()
+                    return command.commandExecutionHandler()
                             .executeFuture(commandContext)
                             .thenApply(v -> new CommandResult<>(commandContext));
                 }

@@ -198,13 +198,13 @@ public final class CommandTree<C> {
                 commandInput,
                 this.internalTree
         ).thenCompose(command -> {
-            if (command != null && command.getSenderType().isPresent() && !command.getSenderType().get()
+            if (command != null && command.senderType().isPresent() && !command.senderType().get()
                     .isAssignableFrom(commandContext.getSender().getClass())
             ) {
                 return this.failedCompletable(
                         new InvalidCommandSenderException(
                                 commandContext.getSender(),
-                                command.getSenderType().get(),
+                                command.senderType().get(),
                                 new ArrayList<>(command.components()),
                                 command
                         )
@@ -336,11 +336,11 @@ public final class CommandTree<C> {
                         final Command<C> command = rootComponent.owningCommand();
                         if (!this.commandManager().hasPermission(
                                 commandContext.getSender(),
-                                command.getCommandPermission()
+                                command.commandPermission()
                         )) {
                             return this.failedCompletable(
                                     new NoPermissionException(
-                                            command.getCommandPermission(),
+                                            command.commandPermission(),
                                             commandContext.getSender(),
                                             this.getChain(root)
                                                     .stream()
@@ -467,12 +467,12 @@ public final class CommandTree<C> {
                 }
 
                 final Command<C> command = rootComponent.owningCommand();
-                if (this.commandManager().hasPermission(commandContext.getSender(), command.getCommandPermission())) {
+                if (this.commandManager().hasPermission(commandContext.getSender(), command.commandPermission())) {
                     return CompletableFuture.completedFuture(command);
                 }
                 return this.failedCompletable(
                         new NoPermissionException(
-                                command.getCommandPermission(),
+                                command.commandPermission(),
                                 commandContext.getSender(),
                                 this.getChain(root)
                                         .stream()
@@ -502,13 +502,13 @@ public final class CommandTree<C> {
 
                 // If the sender has permission to use the command, then we're completely done
                 final Command<C> command = Objects.requireNonNull(rootComponent.owningCommand());
-                if (this.commandManager().hasPermission(commandContext.getSender(), command.getCommandPermission())) {
+                if (this.commandManager().hasPermission(commandContext.getSender(), command.commandPermission())) {
                     return CompletableFuture.completedFuture(command);
                 }
 
                 return this.failedCompletable(
                         new NoPermissionException(
-                                command.getCommandPermission(),
+                                command.commandPermission(),
                                 commandContext.getSender(),
                                 this.getChain(root)
                                         .stream()
@@ -1054,8 +1054,8 @@ public final class CommandTree<C> {
             final Command<C> command = Objects.requireNonNull(component.owningCommand(), "command");
             return this.commandManager.hasPermission(
                     sender,
-                    command.getCommandPermission()
-            ) ? null : command.getCommandPermission();
+                    command.commandPermission()
+            ) ? null : command.commandPermission();
         }
         /*
           if any of the children would permit the execution, then the sender has a valid
@@ -1107,7 +1107,7 @@ public final class CommandTree<C> {
      */
     private void updatePermission(final @NonNull CommandNode<C> node) {
         // noinspection all
-        final CommandPermission commandPermission = node.component().owningCommand().getCommandPermission();
+        final CommandPermission commandPermission = node.component().owningCommand().commandPermission();
         /* All leaves must necessarily have an owning command */
         node.nodeMeta().put("permission", commandPermission);
         // Get chain and order it tail->head then skip the tail (leaf node)
@@ -1132,9 +1132,9 @@ public final class CommandTree<C> {
                 if (this
                         .commandManager()
                         .getSetting(CommandManager.ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS)) {
-                    permission = command.getCommandPermission();
+                    permission = command.commandPermission();
                 } else {
-                    permission = OrPermission.of(Arrays.asList(permission, command.getCommandPermission()));
+                    permission = OrPermission.of(Arrays.asList(permission, command.commandPermission()));
                 }
             }
 

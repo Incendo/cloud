@@ -78,7 +78,7 @@ public final class ProcessorExample {
         @Override
         public void accept(final @NonNull CommandPostprocessingContext<CommandSender> context) {
             final Command<CommandSender> command = context.getCommand();
-            if (!command.getCommandMeta().getOrDefault(REQUIRES_BOOTS, false)) {
+            if (!command.commandMeta().getOrDefault(REQUIRES_BOOTS, false)) {
                 return;
             }
             final CommandSender sender = context.getCommandContext().getSender();

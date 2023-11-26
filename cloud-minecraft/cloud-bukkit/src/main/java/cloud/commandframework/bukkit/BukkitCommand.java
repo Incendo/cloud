@@ -74,7 +74,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     ) {
         super(
                 label,
-                cloudCommand.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, ""),
+                cloudCommand.commandMeta().getOrDefault(CommandMeta.DESCRIPTION, ""),
                 "",
                 aliases
         );
@@ -82,7 +82,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         this.manager = manager;
         this.cloudCommand = cloudCommand;
         if (this.command.owningCommand() != null) {
-            this.setPermission(this.command.owningCommand().getCommandPermission().toString());
+            this.setPermission(this.command.owningCommand().commandPermission().toString());
         }
         this.disabled = false;
     }
@@ -188,7 +188,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
     @Override
     public @NonNull String getDescription() {
-        return this.cloudCommand.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
+        return this.cloudCommand.commandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
     }
 
     @Override
