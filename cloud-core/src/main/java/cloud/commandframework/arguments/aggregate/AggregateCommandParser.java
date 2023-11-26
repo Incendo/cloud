@@ -39,6 +39,17 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * An argument parser that delegates to multiple inner {@link #components()} and transforms the aggregate results into
  * an output using the {@link #mapper()}.
+ * <p>
+ * You may either implement this interface to create a new parser type, or create an aggregate parser by using a
+ * {@link #builder()}.
+ * <p>
+ * The parsers {@link #components()} will be invoked in the order of the returned collection.
+ * When parsing, each parser will be invoked and the result will be stored in a {@link AggregateCommandContext}.
+ * After parsing, the {@link #mapper()} will be invoked, turning the intermediate results into the output type which is then
+ * returned by this parser.
+ * <p>
+ * When evaluating the suggestions for this parser, some {@link #components() component} parsers will be invoked, which allows
+ * the suggestion providers to rely on the results from the preceding components.
  *
  * @param <C> the command sender type
  * @param <O> the output type

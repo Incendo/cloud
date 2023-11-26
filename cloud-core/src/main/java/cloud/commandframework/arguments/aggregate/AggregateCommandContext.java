@@ -27,6 +27,14 @@ import cloud.commandframework.keys.CloudKey;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+/**
+ * Context that stores the individual result of invoking the child parsers of a {@link AggregateCommandParser}.
+ * <p>
+ * This is used in {@link AggregateResultMapper} to map to the output type using the intermediate results.
+ *
+ * @param <C> the command sender type
+ * @since 2.0.0
+ */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface AggregateCommandContext<C> {
 
