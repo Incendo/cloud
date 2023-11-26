@@ -94,8 +94,8 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
             final @NonNull String label,
             final @NonNull Command<C> command
     ) {
-        final LiteralCommandNode<?> literalCommandNode = this.brigadierManager
-                .createLiteralCommandNode(label, command, (commandSourceStack, commandPermission) -> {
+        final LiteralCommandNode<?> literalCommandNode = this.brigadierManager.literalBrigadierNodeFactory()
+                .createNode(label, command, (commandSourceStack, commandPermission) -> {
                     // We need to check that the command still exists...
                     if (this.commandManager.commandTree().getNamedNode(label) == null) {
                         return false;

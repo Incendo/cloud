@@ -25,14 +25,14 @@ package cloud.commandframework.paper;
 
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.brigadier.LiteralBrigadierNodeFactory;
+import cloud.commandframework.brigadier.permission.BrigadierPermissionChecker;
 import cloud.commandframework.bukkit.BukkitBrigadierMapper;
 import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.internal.CommandNode;
-import cloud.commandframework.permission.CommandPermission;
 import com.destroystokyo.paper.brigadier.BukkitBrigadierCommandSource;
 import java.lang.reflect.Method;
-import java.util.function.BiPredicate;
 import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginIdentifiableCommand;
@@ -105,16 +105,18 @@ class PaperBrigadierListener<C> implements Listener {
             return;
         }
 
-        final BiPredicate<BukkitBrigadierCommandSource, CommandPermission> permissionChecker = (s, p) -> {
+        final BrigadierPermissionChecker<BukkitBrigadierCommandSource> permissionChecker = (sender, permission) -> {
             // We need to check that the command still exists...
             if (commandTree.getNamedNode(label) == null) {
                 return false;
             }
 
-            final C sender = this.paperCommandManager.getCommandSenderMapper().apply(s.getBukkitSender());
-            return this.paperCommandManager.hasPermission(sender, p);
+            final C commandSender = this.paperCommandManager.getCommandSenderMapper().apply(sender.getBukkitSender());
+            return this.paperCommandManager.hasPermission(commandSender, permission);
         };
-        event.setLiteral(this.brigadierManager.createLiteralCommandNode(
+        final LiteralBrigadierNodeFactory<C, BukkitBrigadierCommandSource> literalFactory =
+                this.brigadierManager.literalBrigadierNodeFactory();
+        event.setLiteral(literalFactory.createNode(
                 node,
                 event.getLiteral(),
                 event.getBrigadierCommand(),

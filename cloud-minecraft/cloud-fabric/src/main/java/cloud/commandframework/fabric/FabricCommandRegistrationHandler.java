@@ -25,6 +25,7 @@ package cloud.commandframework.fabric;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.brigadier.permission.BrigadierPermissionChecker;
 import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import com.mojang.brigadier.CommandDispatcher;
@@ -164,7 +165,8 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
             final CommandComponent<C> component = command.rootComponent();
             final CommandNode<FabricClientCommandSource> baseNode = this.commandManager()
                     .brigadierManager()
-                    .createLiteralCommandNode(
+                    .literalBrigadierNodeFactory()
+                    .createNode(
                             component.name(),
                             command,
                             (src, perm) -> this.commandManager().hasPermission(
@@ -232,15 +234,24 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
 
         private void registerCommand(final RootCommandNode<CommandSourceStack> dispatcher, final Command<C> command) {
             final CommandComponent<C> component = command.rootComponent();
-            final CommandNode<CommandSourceStack> baseNode = this.commandManager().brigadierManager().createLiteralCommandNode(
-                    component.name(),
-                    command,
-                    (src, perm) -> this.commandManager().hasPermission(
-                            this.commandManager().commandSourceMapper().apply(src),
-                            perm
-                    ),
-                    true,
-                    new FabricExecutor<>(this.commandManager(), CommandSourceStack::getTextName, CommandSourceStack::sendFailure)
+            final FabricExecutor<C, CommandSourceStack> executor = new FabricExecutor<>(
+                    this.commandManager(),
+                    CommandSourceStack::getTextName,
+                    CommandSourceStack::sendFailure
+            );
+            final BrigadierPermissionChecker<CommandSourceStack> permission = (src, perm) -> this.commandManager().hasPermission(
+                    this.commandManager().commandSourceMapper().apply(src),
+                    perm
+            );
+            final CommandNode<CommandSourceStack> baseNode = this.commandManager()
+                    .brigadierManager()
+                    .literalBrigadierNodeFactory()
+                    .createNode(
+                        component.name(),
+                        command,
+                        permission,
+                        true /* forceRegister */,
+                        executor
             );
 
             dispatcher.addChild(baseNode);
