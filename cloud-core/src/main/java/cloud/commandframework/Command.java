@@ -44,6 +44,7 @@ import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -1997,6 +1998,32 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "1.7.0")
         public @NonNull CommandExecutionHandler<C> handler() {
             return this.commandExecutionHandler;
+        }
+
+        /**
+         * Sets a new command execution handler that invokes the given {@code handler} before the current
+         * {@link #handler() handler}.
+         *
+         * @param handler the handler to invoke before the current handler
+         * @return new builder instance
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Builder<C> prependHandler(final @NonNull CommandExecutionHandler<C> handler) {
+            return this.handler(CommandExecutionHandler.delegatingExecutionHandler(Arrays.asList(handler, this.handler())));
+        }
+
+        /**
+         * Sets a new command execution handler that invokes the given {@code handler} after the current
+         * {@link #handler() handler}.
+         *
+         * @param handler the handler to invoke after the current handler
+         * @return new builder instance
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Builder<C> appendHandler(final @NonNull CommandExecutionHandler<C> handler) {
+            return this.handler(CommandExecutionHandler.delegatingExecutionHandler(Arrays.asList(this.handler(), handler)));
         }
 
         /**
