@@ -67,7 +67,7 @@ public final class CommandHelpHandler<C> {
             }
 
             final List<CommandComponent<C>> components = command.components();
-            final String description = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
+            final String description = command.commandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
             syntaxHints.add(new VerboseHelpEntry<>(
                     command,
                     this.commandManager.commandSyntaxFormatter()
@@ -138,7 +138,7 @@ public final class CommandHelpHandler<C> {
         final List<VerboseHelpEntry<C>> commands = this.getAllCommands();
         commands.removeIf(command -> recipient != null && !this.commandManager.hasPermission(
                 recipient,
-                command.getCommand().getCommandPermission()
+                command.getCommand().commandPermission()
         ));
         if (query.replace(" ", "").isEmpty()) {
             return new IndexHelpTopic<>(commands);
@@ -188,7 +188,7 @@ public final class CommandHelpHandler<C> {
             final List<VerboseHelpEntry<C>> syntaxHints = new ArrayList<>();
             for (final Command<C> command : availableCommands) {
                 final List<CommandComponent<C>> components = command.components();
-                final String description = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
+                final String description = command.commandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
                 syntaxHints.add(new VerboseHelpEntry<>(
                         command,
                         this.commandManager.commandSyntaxFormatter()
@@ -198,7 +198,7 @@ public final class CommandHelpHandler<C> {
             }
             syntaxHints.sort(Comparator.comparing(VerboseHelpEntry::getSyntaxString));
             syntaxHints.removeIf(command -> recipient != null
-                    && !this.commandManager.hasPermission(recipient, command.getCommand().getCommandPermission()));
+                    && !this.commandManager.hasPermission(recipient, command.getCommand().commandPermission()));
             return new IndexHelpTopic<>(syntaxHints);
         }
 
@@ -219,7 +219,7 @@ public final class CommandHelpHandler<C> {
                 if (head.isLeaf() || index == queryFragments.length) {
                     if (recipient == null || this.commandManager.hasPermission(recipient, head.component()
                             .owningCommand()
-                            .getCommandPermission())) {
+                            .commandPermission())) {
                         return new VerboseHelpTopic<>(head.component().owningCommand());
                     }
                 }
@@ -265,7 +265,7 @@ public final class CommandHelpHandler<C> {
                             || child.component().owningCommand() == null
                             || this.commandManager.hasPermission(
                             recipient,
-                            child.component().owningCommand().getCommandPermission()
+                            child.component().owningCommand().commandPermission()
                     )) {
                         traversedNodesSub.add(child.component());
                         childSuggestions.add(this.commandManager.commandSyntaxFormatter().apply(traversedNodesSub, child));
@@ -465,8 +465,8 @@ public final class CommandHelpHandler<C> {
 
         private VerboseHelpTopic(final @NonNull Command<C> command) {
             this.command = command;
-            final String shortDescription = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "No description");
-            this.description = command.getCommandMeta().getOrDefault(CommandMeta.LONG_DESCRIPTION, shortDescription);
+            final String shortDescription = command.commandMeta().getOrDefault(CommandMeta.DESCRIPTION, "No description");
+            this.description = command.commandMeta().getOrDefault(CommandMeta.LONG_DESCRIPTION, shortDescription);
         }
 
         /**

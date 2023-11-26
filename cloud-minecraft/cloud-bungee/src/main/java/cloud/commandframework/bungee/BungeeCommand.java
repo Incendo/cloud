@@ -60,7 +60,7 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
     ) {
         super(
                 command.name(),
-                cloudCommand.getCommandPermission().toString(),
+                cloudCommand.commandPermission().toString(),
                 command.alternativeAliases().toArray(new String[0])
         );
         this.command = command;

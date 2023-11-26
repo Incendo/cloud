@@ -95,7 +95,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
                         return CompletableFuture.completedFuture(new CommandResult<>(commandContext));
                     }
 
-                    return command.getCommandExecutionHandler()
+                    return command.commandExecutionHandler()
                             .executeFuture(commandContext)
                             .handle((result, throwable) -> {
                                 if (throwable != null) {
