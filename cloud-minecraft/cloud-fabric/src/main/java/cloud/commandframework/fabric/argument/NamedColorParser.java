@@ -26,44 +26,44 @@ package cloud.commandframework.fabric.argument;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.ChatFormatting;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * An argument parsing a {@link ResourceLocation}.
+ * An argument for named colors in the {@link ChatFormatting} enum.
  *
  * @param <C> the sender type
  * @since 2.0.0
  */
-public final class ResourceLocationArgument<C> extends WrappedBrigadierParser<C, ResourceLocation> {
+public final class NamedColorParser<C> extends WrappedBrigadierParser<C, ChatFormatting> {
 
     /**
-     * Creates a new resource location parser.
+     * Creates a new named color parser.
      *
      * @param <C> command sender type
      * @return the created parser
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> @NonNull ParserDescriptor<C, ResourceLocation> resourceLocationParser() {
-        return ParserDescriptor.of(new ResourceLocationArgument<>(), ResourceLocation.class);
+    public static <C> @NonNull ParserDescriptor<C, ChatFormatting> namedColorParser() {
+        return ParserDescriptor.of(new NamedColorParser<>(), ChatFormatting.class);
     }
 
     /**
-     * Returns a {@link CommandComponent.Builder} using {@link #resourceLocationParser()} as the parser.
+     * Returns a {@link CommandComponent.Builder} using {@link #namedColorParser()} as the parser.
      *
      * @param <C> the command sender type
      * @return the component builder
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> CommandComponent.@NonNull Builder<C, ResourceLocation> resourceLocationComponent() {
-        return CommandComponent.<C, ResourceLocation>builder().parser(resourceLocationParser());
+    public static <C> CommandComponent.@NonNull Builder<C, ChatFormatting> namedColorComponent() {
+        return CommandComponent.<C, ChatFormatting>builder().parser(namedColorParser());
     }
 
-    ResourceLocationArgument() {
-        super(net.minecraft.commands.arguments.ResourceLocationArgument.id());
+    NamedColorParser() {
+        super(net.minecraft.commands.arguments.ColorArgument.color());
     }
 
 }

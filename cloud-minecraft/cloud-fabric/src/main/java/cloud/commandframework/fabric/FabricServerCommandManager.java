@@ -28,7 +28,7 @@ import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.annotations.specifier.Center;
-import cloud.commandframework.fabric.argument.FabricArgumentParsers;
+import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
 import cloud.commandframework.fabric.data.Coordinates;
 import cloud.commandframework.fabric.data.Message;
 import cloud.commandframework.fabric.data.MultipleEntitySelector;
@@ -136,7 +136,10 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
     }
 
     private void registerParsers() {
-        this.parserRegistry().registerParserSupplier(TypeToken.get(Message.class), params -> FabricArgumentParsers.message());
+        this.parserRegistry().registerParserSupplier(
+                TypeToken.get(Message.class),
+                params -> FabricVanillaArgumentParsers.<C>messageParser().parser()
+        );
 
         // Location arguments
         this.parserRegistry().registerAnnotationMapper(
@@ -145,43 +148,43 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
         );
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(Coordinates.class),
-                params -> FabricArgumentParsers.vec3(params.get(
+                params -> FabricVanillaArgumentParsers.<C>vec3Parser(params.get(
                         FabricParserParameters.CENTER_INTEGERS,
                         false
-                ))
+                )).parser()
         );
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(Coordinates.CoordinatesXZ.class),
-                params -> FabricArgumentParsers.vec2(params.get(
+                params -> FabricVanillaArgumentParsers.<C>vec2Parser(params.get(
                         FabricParserParameters.CENTER_INTEGERS,
                         false
-                ))
+                )).parser()
         );
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(Coordinates.BlockCoordinates.class),
-                params -> FabricArgumentParsers.blockPos()
+                params -> FabricVanillaArgumentParsers.<C>blockPosParser().parser()
         );
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(Coordinates.ColumnCoordinates.class),
-                params -> FabricArgumentParsers.columnPos()
+                params -> FabricVanillaArgumentParsers.<C>columnPosParser().parser()
         );
 
         // Entity selectors
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(SinglePlayerSelector.class),
-                params -> FabricArgumentParsers.singlePlayerSelector()
+                params -> FabricVanillaArgumentParsers.<C>singlePlayerSelectorParser().parser()
         );
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(MultiplePlayerSelector.class),
-                params -> FabricArgumentParsers.multiplePlayerSelector()
+                params -> FabricVanillaArgumentParsers.<C>multiplePlayerSelectorParser().parser()
         );
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(SingleEntitySelector.class),
-                params -> FabricArgumentParsers.singleEntitySelector()
+                params -> FabricVanillaArgumentParsers.<C>singleEntitySelectorParser().parser()
         );
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(MultipleEntitySelector.class),
-                params -> FabricArgumentParsers.multipleEntitySelector()
+                params -> FabricVanillaArgumentParsers.<C>multipleEntitySelectorParser().parser()
         );
     }
 

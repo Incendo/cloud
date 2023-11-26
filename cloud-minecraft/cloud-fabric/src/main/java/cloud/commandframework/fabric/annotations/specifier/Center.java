@@ -23,15 +23,15 @@
 //
 package cloud.commandframework.fabric.annotations.specifier;
 
-import cloud.commandframework.fabric.argument.server.Vec2dArgument;
-import cloud.commandframework.fabric.argument.server.Vec3dArgument;
+import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used to enable coordinate centering for {@link Vec3dArgument} and {@link Vec2dArgument}.
+ * Annotation used to enable coordinate centering for
+ * {@link FabricVanillaArgumentParsers#vec3Parser} and {@link FabricVanillaArgumentParsers#vec2Parser}.
  *
  * @since 1.5.0
  */

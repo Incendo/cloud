@@ -26,44 +26,43 @@ package cloud.commandframework.fabric.argument;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.commands.arguments.EntityAnchorArgument.Anchor;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * An argument parsing a {@link ResourceLocation}.
+ * An argument parsing an {@link Anchor}.
  *
  * @param <C> the sender type
  * @since 2.0.0
  */
-public final class ResourceLocationArgument<C> extends WrappedBrigadierParser<C, ResourceLocation> {
+public final class EntityAnchorParser<C> extends WrappedBrigadierParser<C, Anchor> {
 
     /**
-     * Creates a new resource location parser.
+     * Creates a new entity anchor parser.
      *
      * @param <C> command sender type
      * @return the created parser
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> @NonNull ParserDescriptor<C, ResourceLocation> resourceLocationParser() {
-        return ParserDescriptor.of(new ResourceLocationArgument<>(), ResourceLocation.class);
+    public static <C> @NonNull ParserDescriptor<C, Anchor> entityAnchorParser() {
+        return ParserDescriptor.of(new EntityAnchorParser<>(), Anchor.class);
     }
 
     /**
-     * Returns a {@link CommandComponent.Builder} using {@link #resourceLocationParser()} as the parser.
+     * Returns a {@link CommandComponent.Builder} using {@link #entityAnchorParser()} as the parser.
      *
      * @param <C> the command sender type
      * @return the component builder
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> CommandComponent.@NonNull Builder<C, ResourceLocation> resourceLocationComponent() {
-        return CommandComponent.<C, ResourceLocation>builder().parser(resourceLocationParser());
+    public static <C> CommandComponent.@NonNull Builder<C, Anchor> entityAnchorComponent() {
+        return CommandComponent.<C, Anchor>builder().parser(entityAnchorParser());
     }
 
-    ResourceLocationArgument() {
-        super(net.minecraft.commands.arguments.ResourceLocationArgument.id());
+    EntityAnchorParser() {
+        super(net.minecraft.commands.arguments.EntityAnchorArgument.anchor());
     }
-
 }

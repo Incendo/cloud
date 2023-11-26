@@ -27,7 +27,7 @@ import cloud.commandframework.Command;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricClientCommandManager;
-import cloud.commandframework.fabric.argument.ItemInputArgument;
+import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
 import cloud.commandframework.meta.CommandMeta;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.Streams;
@@ -48,6 +48,7 @@ import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.commands.synchronization.ArgumentUtils;
 import net.minecraft.network.chat.ClickEvent;
@@ -118,7 +119,7 @@ public final class FabricClientExample implements ClientModInitializer {
 
         // Test argument which requires CommandBuildContext/RegistryAccess
         commandManager.command(base.literal("show_item")
-                .required(ItemInputArgument.of("item"))
+                .required("item", FabricVanillaArgumentParsers.contextualParser(ItemArgument::item, ItemInput.class))
                 .handler(ctx -> {
                     try {
                         ctx.getSender().sendFeedback(

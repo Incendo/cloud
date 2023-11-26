@@ -26,44 +26,45 @@ package cloud.commandframework.fabric.argument;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * An argument parsing a {@link ResourceLocation}.
+ * An argument for a {@linkplain ObjectiveCriteria criterion} in a scoreboard.
  *
  * @param <C> the sender type
  * @since 2.0.0
  */
-public final class ResourceLocationArgument<C> extends WrappedBrigadierParser<C, ResourceLocation> {
+public final class ObjectiveCriteriaParser<C> extends WrappedBrigadierParser<C, ObjectiveCriteria> {
+
 
     /**
-     * Creates a new resource location parser.
+     * Creates a new objective criteria parser.
      *
      * @param <C> command sender type
      * @return the created parser
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> @NonNull ParserDescriptor<C, ResourceLocation> resourceLocationParser() {
-        return ParserDescriptor.of(new ResourceLocationArgument<>(), ResourceLocation.class);
+    public static <C> @NonNull ParserDescriptor<C, ObjectiveCriteria> objectiveCriteriaParser() {
+        return ParserDescriptor.of(new ObjectiveCriteriaParser<>(), ObjectiveCriteria.class);
     }
 
     /**
-     * Returns a {@link CommandComponent.Builder} using {@link #resourceLocationParser()} as the parser.
+     * Returns a {@link CommandComponent.Builder} using {@link #objectiveCriteriaParser()} as the parser.
      *
      * @param <C> the command sender type
      * @return the component builder
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> CommandComponent.@NonNull Builder<C, ResourceLocation> resourceLocationComponent() {
-        return CommandComponent.<C, ResourceLocation>builder().parser(resourceLocationParser());
+    public static <C> CommandComponent.@NonNull Builder<C, ObjectiveCriteria> objectiveCriteriaComponent() {
+        return CommandComponent.<C, ObjectiveCriteria>builder().parser(objectiveCriteriaParser());
     }
 
-    ResourceLocationArgument() {
-        super(net.minecraft.commands.arguments.ResourceLocationArgument.id());
+    ObjectiveCriteriaParser() {
+        super(net.minecraft.commands.arguments.ObjectiveCriteriaArgument.criteria());
     }
 
 }
