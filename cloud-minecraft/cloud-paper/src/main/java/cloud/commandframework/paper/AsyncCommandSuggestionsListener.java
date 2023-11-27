@@ -66,7 +66,7 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
         final C cloudSender = this.paperCommandManager.getCommandSenderMapper().apply(sender);
         final String inputBuffer = this.paperCommandManager.stripNamespace(event.getBuffer());
 
-        final List<String> suggestions = new ArrayList<>(this.paperCommandManager.suggest(
+        final List<String> suggestions = new ArrayList<>(this.paperCommandManager.suggestionFactory().suggestImmediately(
                 cloudSender,
                 inputBuffer
         )).stream().map(Suggestion::suggestion).collect(Collectors.toList());

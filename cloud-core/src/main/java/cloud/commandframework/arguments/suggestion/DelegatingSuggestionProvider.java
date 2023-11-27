@@ -21,10 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments;
+package cloud.commandframework.arguments.suggestion;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
 import org.apiguardian.api.API;
@@ -33,11 +31,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 final class DelegatingSuggestionProvider<C> implements SuggestionProvider<C> {
 
-    private final String argumentName;
     private final SuggestionProvider<C> suggestionProvider;
 
-    DelegatingSuggestionProvider(final @NonNull String argumentName, final @NonNull SuggestionProvider<C> suggestionProvider) {
-        this.argumentName = argumentName;
+    DelegatingSuggestionProvider(final @NonNull SuggestionProvider<C> suggestionProvider) {
         this.suggestionProvider = suggestionProvider;
     }
 
@@ -48,8 +44,6 @@ final class DelegatingSuggestionProvider<C> implements SuggestionProvider<C> {
 
     @Override
     public String toString() {
-        return String.format("DelegatingSuggestionProvider{name='%s',parser='%s'}", this.argumentName,
-                this.suggestionProvider.getClass().getCanonicalName()
-        );
+        return String.format("DelegatingSuggestionProvider{parser='%s'}", this.suggestionProvider.getClass().getCanonicalName());
     }
 }

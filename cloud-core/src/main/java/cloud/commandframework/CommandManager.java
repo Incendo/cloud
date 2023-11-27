@@ -25,9 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.CommandSuggestionEngine;
 import cloud.commandframework.arguments.CommandSyntaxFormatter;
-import cloud.commandframework.arguments.DelegatingCommandSuggestionEngineFactory;
 import cloud.commandframework.arguments.StandardCommandSyntaxFormatter;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -35,6 +33,8 @@ import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.arguments.parser.StandardParserRegistry;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionFactory;
+import cloud.commandframework.arguments.suggestion.SuggestionMapper;
 import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.captions.CaptionVariableReplacementHandler;
 import cloud.commandframework.captions.SimpleCaptionRegistryFactory;
@@ -70,13 +70,11 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -90,7 +88,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
 /**
  * The manager is responsible for command registration, parsing delegation, etc.
  *
- * @param <C> Command sender type
+ * @param <C> the command sender type used to execute commands
  */
 @API(status = API.Status.STABLE)
 public abstract class CommandManager<C> {
@@ -106,7 +104,7 @@ public abstract class CommandManager<C> {
     private final ParameterInjectorRegistry<C> parameterInjectorRegistry = new ParameterInjectorRegistry<>();
     private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
     private final CommandTree<C> commandTree;
-    private final CommandSuggestionEngine<C> commandSuggestionEngine;
+    private final SuggestionFactory<C, ? extends Suggestion> suggestionFactory;
     private final Set<CloudCapability> capabilities = new HashSet<>();
 
     private CaptionVariableReplacementHandler captionVariableReplacementHandler = new SimpleCaptionVariableReplacementHandler();
@@ -139,7 +137,7 @@ public abstract class CommandManager<C> {
         this.commandTree = CommandTree.newTree(this);
         this.commandExecutionCoordinator = commandExecutionCoordinator.apply(this.commandTree);
         this.commandRegistrationHandler = commandRegistrationHandler;
-        this.commandSuggestionEngine = new DelegatingCommandSuggestionEngineFactory<>(this).create();
+        this.suggestionFactory = SuggestionFactory.delegating(this, SuggestionMapper.identity());
         /* Register service types */
         this.servicePipeline.registerServiceType(new TypeToken<CommandPreprocessor<C>>() {
         }, new AcceptingCommandPreprocessor<>());
@@ -201,55 +199,22 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get command suggestions for the "next" argument that would yield a correctly parsing command input. The command
-     * suggestions provided by the command argument parsers will be filtered using the {@link CommandSuggestionProcessor}
-     * before being returned.
-     *
-     * @param commandSender Sender of the command
-     * @param input         Input provided by the sender. Prefixes should be removed before the method is being called, and
-     *                      the input here will be passed directly to the command parsing pipeline, after having been tokenized.
-     * @return List of suggestions
+     * Returns the suggestion factory.
+     * <p>
+     * Platform implementations of command manager may override this method to make it easier to work with platform
+     * suggestion types, for example:
+     * <pre>{@code
+     * @Override
+     * public @NonNull SuggestionFactory<C, YourType> suggestionFactory() {
+     *    return super.suggestionFactory().mapped(suggestion -> yourType);
+     * }
+     * }</pre>
+     * @return the suggestion factory
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull List<@NonNull Suggestion> suggest(
-            final @NonNull C commandSender,
-            final @NonNull String input
-    ) {
-        try {
-            return this.suggestFuture(commandSender, input).join();
-        } catch (final CompletionException completionException) {
-            final Throwable cause = completionException.getCause();
-            // We unwrap if we can, otherwise we don't. There's no point in wrapping again.
-            if (cause instanceof RuntimeException) {
-                throw ((RuntimeException) cause);
-            }
-            throw completionException;
-        }
-    }
-
-    /**
-     * Get command suggestions for the "next" argument that would yield a correctly parsing command input. The command
-     * suggestions provided by the command argument parsers will be filtered using the {@link CommandSuggestionProcessor}
-     * before being returned.
-     *
-     * @param commandSender Sender of the command
-     * @param input         Input provided by the sender. Prefixes should be removed before the method is being called, and
-     *                      the input here will be passed directly to the command parsing pipeline, after having been tokenized.
-     * @return List of suggestions
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull CompletableFuture<List<@NonNull Suggestion>> suggestFuture(
-            final @NonNull C commandSender,
-            final @NonNull String input
-    ) {
-        final CommandContext<C> context = this.commandContextFactory.create(
-                true,
-                commandSender,
-                this
-        );
-        return this.commandSuggestionEngine.getSuggestions(context, input);
+    public @NonNull SuggestionFactory<C, ? extends Suggestion> suggestionFactory() {
+        return this.suggestionFactory;
     }
 
     /**
@@ -305,6 +270,17 @@ public abstract class CommandManager<C> {
     @SuppressWarnings("unchecked")
     public @NonNull CommandManager<C> command(final Command.@NonNull Builder<? extends C> command) {
         return this.command(((Command.Builder<C>) command).manager(this).build());
+    }
+
+    /**
+     * Returns the factory used to create {@link CommandContext} instances.
+     *
+     * @return the command context factory
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CommandContextFactory<C> commandContextFactory() {
+        return this.commandContextFactory;
     }
 
     /**
@@ -876,7 +852,7 @@ public abstract class CommandManager<C> {
     /**
      * Sets the command suggestion processor.
      * <p>
-     * This will be called every time {@link #suggest(Object, String)} is called, in order to process the list
+     * This will be called every time {@link SuggestionFactory#suggest(CommandContext, String)} is called, to process the list
      * of suggestions before it's returned to the caller.
      *
      * @param commandSuggestionProcessor the new command suggestion processor

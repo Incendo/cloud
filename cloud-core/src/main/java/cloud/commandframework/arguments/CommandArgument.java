@@ -228,7 +228,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
     }
 
     private static <C> @NonNull SuggestionProvider<C> buildDefaultSuggestionProvider(final @NonNull CommandArgument<C, ?> argument) {
-        return new DelegatingSuggestionProvider<>(argument.getName(), argument.getParser());
+        return SuggestionProvider.delegating(argument.getParser());
     }
 
     /**
@@ -498,7 +498,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
                         .failure(new UnsupportedOperationException("No parser was specified"));
             }
             if (this.suggestionProvider == null) {
-                this.suggestionProvider = new DelegatingSuggestionProvider<>(this.name, this.parser);
+                this.suggestionProvider = SuggestionProvider.delegating(this.parser);
             }
             return new CommandArgument<>(
                     this.name,

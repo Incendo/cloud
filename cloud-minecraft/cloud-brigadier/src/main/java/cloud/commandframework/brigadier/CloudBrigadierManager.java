@@ -604,7 +604,7 @@ public final class CloudBrigadierManager<C, S> {
             command = command.substring(leading.split(":")[0].length() + 1);
         }
 
-        final List<Suggestion> suggestionsUnfiltered = this.commandManager.suggest(
+        final List<? extends Suggestion> suggestionsUnfiltered = this.commandManager.suggestionFactory().suggestImmediately(
                 commandContext.getSender(),
                 command
         );

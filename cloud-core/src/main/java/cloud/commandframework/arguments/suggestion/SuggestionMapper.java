@@ -21,35 +21,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments;
+package cloud.commandframework.arguments.suggestion;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.context.CommandContext;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Handler that produces command suggestions depending on input
+ * Maps from {@link cloud.commandframework.arguments.suggestion.Suggestion} to {@link S}.
  *
- * @param <C> Command sender type
+ * @param <S> the suggestion type
+ * @since 2.0.0
  */
-@API(status = API.Status.STABLE)
-public interface CommandSuggestionEngine<C> {
+@FunctionalInterface
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface SuggestionMapper<S extends Suggestion> {
 
     /**
-     * Returns command suggestions for the "next" argument that would yield a correctly
-     * parsing command input
+     * Returns a suggestion mapper that maps from {@link Suggestion} to {@link Suggestion}.
      *
-     * @param context Request context
-     * @param input   Input provided by the sender
-     * @return List of suggestions
-     * @since 2.0.0
+     * @return the identity mapper
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    @NonNull CompletableFuture<List<@NonNull Suggestion>> getSuggestions(
-            @NonNull CommandContext<C> context,
-            @NonNull String input
-    );
+    static @NonNull SuggestionMapper<Suggestion> identity() {
+        return suggestion -> suggestion;
+    }
+
+    /**
+     * Maps the suggestion to the responding suggestion of type {@link S}.
+     *
+     * @param suggestion the input suggestion
+     * @return the output suggestion
+     */
+    @NonNull S map(@NonNull Suggestion suggestion);
 }
