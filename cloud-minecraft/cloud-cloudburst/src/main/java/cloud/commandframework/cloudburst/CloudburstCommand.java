@@ -31,7 +31,6 @@ import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
-import cloud.commandframework.meta.CommandMeta;
 import java.util.Collection;
 import java.util.concurrent.CompletionException;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -61,7 +60,7 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
         super(manager.getOwningPlugin(), CommandData.builder(label)
                 .addAliases(aliases.toArray(new String[0]))
                 .addPermission(cloudCommand.commandPermission().toString())
-                .setDescription(cloudCommand.commandMeta().getOrDefault(CommandMeta.DESCRIPTION, ""))
+                .setDescription(cloudCommand.commandDescription().description().getDescription())
                 .build());
         this.command = command;
         this.manager = manager;

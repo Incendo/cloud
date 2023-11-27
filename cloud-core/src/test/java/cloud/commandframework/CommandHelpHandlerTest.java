@@ -23,8 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.types.tuples.Pair;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,6 +34,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static cloud.commandframework.CommandDescription.commandDescription;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
@@ -47,21 +46,24 @@ class CommandHelpHandlerTest {
     @BeforeAll
     static void setup() {
         manager = createManager();
-        final SimpleCommandMeta meta1 = SimpleCommandMeta
-                .builder()
-                .with(CommandMeta.DESCRIPTION, "Command with only literals")
-                .build();
-        manager.command(manager.commandBuilder("test", meta1).literal("this").literal("thing").build());
-        final SimpleCommandMeta meta2 = SimpleCommandMeta
-                .builder()
-                .with(CommandMeta.DESCRIPTION, "Command with variables")
-                .build();
-        manager.command(manager.commandBuilder("test", meta2).literal("int").
-                required("int", integerParser(), ArgumentDescription.of("A number")).build());
+        manager.command(
+                manager.commandBuilder("test")
+                        .commandDescription(commandDescription("Command with only literals"))
+                        .literal("this")
+                        .literal("thing")
+                        .build()
+        );
+        manager.command(
+                manager.commandBuilder("test")
+                        .commandDescription(commandDescription("Command with variables"))
+                        .literal("int")
+                        .required("int", integerParser(), ArgumentDescription.of("A number"))
+                        .build()
+        );
         manager.command(manager.commandBuilder("test").required("potato", stringParser()));
 
         manager.command(manager.commandBuilder("vec")
-                .meta(CommandMeta.DESCRIPTION, "Takes in a vector")
+                .commandDescription(commandDescription("Takes in a vector"))
                 .requiredArgumentPair("vec", Pair.of("x", "y"),
                         Pair.of(Double.class, Double.class), ArgumentDescription.of("Vector")
                 )
@@ -73,11 +75,11 @@ class CommandHelpHandlerTest {
         final List<CommandHelpHandler.VerboseHelpEntry<TestCommandSender>> syntaxHints
                 = manager.createCommandHelpHandler().getAllCommands();
         final CommandHelpHandler.VerboseHelpEntry<TestCommandSender> entry0 = syntaxHints.get(0);
-        Assertions.assertEquals("test <potato>", entry0.getSyntaxString());
+        Assertions.assertEquals("test <potato>", entry0.syntaxString());
         final CommandHelpHandler.VerboseHelpEntry<TestCommandSender> entry1 = syntaxHints.get(1);
-        Assertions.assertEquals("test int <int>", entry1.getSyntaxString());
+        Assertions.assertEquals("test int <int>", entry1.syntaxString());
         final CommandHelpHandler.VerboseHelpEntry<TestCommandSender> entry2 = syntaxHints.get(2);
-        Assertions.assertEquals("test this thing", entry2.getSyntaxString());
+        Assertions.assertEquals("test this thing", entry2.syntaxString());
     }
 
     @Test
@@ -155,7 +157,7 @@ class CommandHelpHandlerTest {
                     (CommandHelpHandler.IndexHelpTopic<TestCommandSender>) helpTopic;
 
             return index.getEntries().stream()
-                    .map(CommandHelpHandler.VerboseHelpEntry::getSyntaxString)
+                    .map(CommandHelpHandler.VerboseHelpEntry::syntaxString)
                     .sorted()
                     .collect(Collectors.toList());
         } else if (helpTopic instanceof CommandHelpHandler.MultiHelpTopic) {
@@ -171,7 +173,7 @@ class CommandHelpHandlerTest {
 
             //TODO: Use CommandManager syntax for this
             StringBuilder syntax = new StringBuilder();
-            for (CommandComponent<TestCommandSender> component : verbose.getCommand().components()) {
+            for (CommandComponent<TestCommandSender> component : verbose.command().components()) {
                 if (component.type() == CommandComponent.ComponentType.LITERAL) {
                     syntax.append(component.name());
                 } else if (component.required()) {
@@ -212,7 +214,7 @@ class CommandHelpHandlerTest {
         while (iterator.hasNext()) {
             final CommandHelpHandler.VerboseHelpEntry<TestCommandSender> entry = iterator.next();
             final String prefix = iterator.hasNext() ? "├──" : "└──";
-            System.out.printf("    %s /%s: %s\n", prefix, entry.getSyntaxString(), entry.getDescription());
+            System.out.printf("    %s /%s: %s\n", prefix, entry.syntaxString(), entry.description().getDescription());
         }
     }
 
@@ -238,10 +240,10 @@ class CommandHelpHandlerTest {
 
     private void printVerboseHelpTopic(final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> helpTopic) {
         System.out.printf("└── Command: /%s\n", manager.commandSyntaxFormatter()
-                .apply(helpTopic.getCommand().components(), null));
-        System.out.printf("    ├── Description: %s\n", helpTopic.getDescription());
+                .apply(helpTopic.command().components(), null));
+        System.out.printf("    ├── Description: %s\n", helpTopic.commandDescription().getDescription());
         System.out.println("    └── Args: ");
-        final Iterator<CommandComponent<TestCommandSender>> iterator = helpTopic.getCommand().components().iterator();
+        final Iterator<CommandComponent<TestCommandSender>> iterator = helpTopic.command().components().iterator();
         while (iterator.hasNext()) {
             final CommandComponent<TestCommandSender> component = iterator.next();
 

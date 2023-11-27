@@ -32,7 +32,6 @@ import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
-import cloud.commandframework.meta.CommandMeta;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -199,7 +198,7 @@ final class CloudCommandCallable<C> implements CommandCallable {
             return richDesc;
         }
 
-        return this.cloudCommand.commandMeta().get(CommandMeta.DESCRIPTION).map(Text::of);
+        return Optional.of(Text.of(this.cloudCommand.commandDescription().description().getDescription()));
     }
 
     @Override
@@ -209,7 +208,7 @@ final class CloudCommandCallable<C> implements CommandCallable {
             return richLongDesc;
         }
 
-        return this.cloudCommand.commandMeta().get(CommandMeta.LONG_DESCRIPTION).map(Text::of);
+        return Optional.of(Text.of(this.cloudCommand.commandDescription().verboseDescription().getDescription()));
     }
 
     @Override

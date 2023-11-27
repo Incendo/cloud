@@ -90,24 +90,27 @@ public class Command<C> {
     private final Class<? extends C> senderType;
     private final CommandPermission commandPermission;
     private final CommandMeta commandMeta;
+    private final CommandDescription commandDescription;
 
     /**
-     * Constructs a new command.
+     * Constructs a new command instance.
      *
      * @param commandComponents       command component argument and description
      * @param commandExecutionHandler execution handler
      * @param senderType              required sender type. May be {@code null}
      * @param commandPermission       command permission
      * @param commandMeta             command meta instance
-     * @since 1.3.0
+     * @param commandDescription      description of the command
+     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "1.3.0")
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public Command(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
             final @Nullable Class<? extends C> senderType,
             final @NonNull CommandPermission commandPermission,
-            final @NonNull CommandMeta commandMeta
+            final @NonNull CommandMeta commandMeta,
+            final @NonNull CommandDescription commandDescription
     ) {
         this.components = Objects.requireNonNull(commandComponents, "Command components may not be null");
         if (this.components.isEmpty()) {
@@ -140,6 +143,7 @@ public class Command<C> {
         this.senderType = senderType;
         this.commandPermission = commandPermission;
         this.commandMeta = commandMeta;
+        this.commandDescription = commandDescription;
     }
 
     /**
@@ -158,7 +162,7 @@ public class Command<C> {
             final @Nullable Class<? extends C> senderType,
             final @NonNull CommandMeta commandMeta
     ) {
-        this(commandComponents, commandExecutionHandler, senderType, Permission.empty(), commandMeta);
+        this(commandComponents, commandExecutionHandler, senderType, Permission.empty(), commandMeta, CommandDescription.empty());
     }
 
     /**
@@ -177,7 +181,7 @@ public class Command<C> {
             final @NonNull CommandPermission commandPermission,
             final @NonNull CommandMeta commandMeta
     ) {
-        this(commandComponents, commandExecutionHandler, null, commandPermission, commandMeta);
+        this(commandComponents, commandExecutionHandler, null, commandPermission, commandMeta, CommandDescription.empty());
     }
 
     /**
@@ -187,7 +191,7 @@ public class Command<C> {
      *
      * @param commandName base command argument
      * @param commandMeta command meta instance
-     * @param description command description
+     * @param description description of the root literal
      * @param aliases     command aliases
      * @param <C>         command sender type
      * @return command builder
@@ -216,7 +220,8 @@ public class Command<C> {
                 commands,
                 new CommandExecutionHandler.NullCommandExecutionHandler<>(),
                 Permission.empty(),
-                Collections.emptyList()
+                Collections.emptyList(),
+                CommandDescription.empty()
         );
     }
 
@@ -251,7 +256,8 @@ public class Command<C> {
                 commands,
                 new CommandExecutionHandler.NullCommandExecutionHandler<>(),
                 Permission.empty(),
-                Collections.emptyList()
+                Collections.emptyList(),
+                CommandDescription.empty()
         );
     }
 
@@ -376,6 +382,20 @@ public class Command<C> {
         return this.commandMeta;
     }
 
+    /**
+     * Returns the description of the command.
+     * <p>
+     * This is not the same as the description of the root component.
+     * The command description used to be configured through the {@link #commandMeta()}.
+     *
+     * @return the command description
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CommandDescription commandDescription() {
+        return this.commandDescription;
+    }
+
     @Override
     public final String toString() {
         final StringBuilder stringBuilder = new StringBuilder();
@@ -412,6 +432,7 @@ public class Command<C> {
         private final CommandPermission commandPermission;
         private final CommandManager<C> commandManager;
         private final Collection<CommandFlag<?>> flags;
+        private final CommandDescription commandDescription;
 
         private Builder(
                 final @Nullable CommandManager<C> commandManager,
@@ -420,7 +441,8 @@ public class Command<C> {
                 final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
                 final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
                 final @NonNull CommandPermission commandPermission,
-                final @NonNull Collection<CommandFlag<?>> flags
+                final @NonNull Collection<CommandFlag<?>> flags,
+                final @NonNull CommandDescription commandDescription
         ) {
             this.commandManager = commandManager;
             this.senderType = senderType;
@@ -429,6 +451,7 @@ public class Command<C> {
             this.commandPermission = Objects.requireNonNull(commandPermission, "Permission may not be null");
             this.commandMeta = Objects.requireNonNull(commandMeta, "Meta may not be null");
             this.flags = Objects.requireNonNull(flags, "Flags may not be null");
+            this.commandDescription = Objects.requireNonNull(commandDescription, "Command description may not be null");
         }
 
         /**
@@ -490,7 +513,8 @@ public class Command<C> {
                     this.commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
-                    this.flags
+                    this.flags,
+                    this.commandDescription
             );
         }
 
@@ -513,7 +537,30 @@ public class Command<C> {
                     this.commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
-                    this.flags
+                    this.flags,
+                    this.commandDescription
+            );
+        }
+
+        /**
+         * Returns a new builder with the given {@code commandDescription}.
+         * <p>
+         * See {@link Command#commandDescription()} for information about the description.
+         *
+         * @param commandDescription the new command description
+         * @return new builder instance using the provided command description
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Builder<C> commandDescription(final @NonNull CommandDescription commandDescription) {
+            return new Builder<>(
+                    this.commandManager,
+                    this.commandMeta,
+                    this.senderType,
+                    this.commandComponents,
+                    this.commandExecutionHandler,
+                    this.commandPermission,
+                    this.flags,
+                    commandDescription
             );
         }
 
@@ -1380,7 +1427,8 @@ public class Command<C> {
                     commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
-                    this.flags
+                    this.flags,
+                    this.commandDescription
             );
         }
 
@@ -2031,7 +2079,8 @@ public class Command<C> {
                     this.commandComponents,
                     commandExecutionHandler,
                     this.commandPermission,
-                    this.flags
+                    this.flags,
+                    this.commandDescription
             );
         }
 
@@ -2088,7 +2137,8 @@ public class Command<C> {
                     this.commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
-                    this.flags
+                    this.flags,
+                    this.commandDescription
             );
         }
 
@@ -2106,7 +2156,8 @@ public class Command<C> {
                     this.commandComponents,
                     this.commandExecutionHandler,
                     permission,
-                    this.flags
+                    this.flags,
+                    this.commandDescription
             );
         }
 
@@ -2124,7 +2175,8 @@ public class Command<C> {
                     this.commandComponents,
                     this.commandExecutionHandler,
                     permission,
-                    this.flags
+                    this.flags,
+                    this.commandDescription
             );
         }
 
@@ -2142,7 +2194,8 @@ public class Command<C> {
                     this.commandComponents,
                     this.commandExecutionHandler,
                     Permission.of(permission),
-                    this.flags
+                    this.flags,
+                    this.commandDescription
             );
         }
 
@@ -2200,7 +2253,8 @@ public class Command<C> {
                     this.commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
-                    Collections.unmodifiableList(flags)
+                    Collections.unmodifiableList(flags),
+                    this.commandDescription
             );
         }
 
@@ -2239,7 +2293,8 @@ public class Command<C> {
                     this.commandExecutionHandler,
                     this.senderType,
                     this.commandPermission,
-                    this.commandMeta
+                    this.commandMeta,
+                    this.commandDescription
             );
         }
 

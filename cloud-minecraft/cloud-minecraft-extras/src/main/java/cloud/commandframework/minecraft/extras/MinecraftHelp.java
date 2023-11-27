@@ -26,6 +26,7 @@ package cloud.commandframework.minecraft.extras;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.CommandDescription;
 import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.CommandManager;
 import java.util.ArrayList;
@@ -34,7 +35,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -393,15 +393,14 @@ public final class MinecraftHelp<C> {
                     return header;
                 },
                 (helpEntry, isLastOfPage) -> {
-                    final Optional<Component> richDescription =
-                            helpEntry.getCommand().commandMeta().get(MinecraftExtrasMetaKeys.DESCRIPTION);
+                    final CommandDescription commandDescription = helpEntry.command().commandDescription();
                     final Component description;
-                    if (richDescription.isPresent()) {
-                        description = richDescription.get();
-                    } else if (helpEntry.getDescription().isEmpty()) {
+                    if (commandDescription.description() instanceof RichDescription) {
+                        description = ((RichDescription) commandDescription.description()).getContents();
+                    } else if (helpEntry.description().isEmpty()) {
                         description = this.messageProvider.provide(sender, MESSAGE_CLICK_TO_SHOW_HELP);
                     } else {
-                        description = this.descriptionDecorator.apply(sender, helpEntry.getDescription());
+                        description = this.descriptionDecorator.apply(sender, helpEntry.description().getDescription());
                     }
 
                     final boolean lastBranch =
@@ -411,11 +410,11 @@ public final class MinecraftHelp<C> {
                             .append(text("   "))
                             .append(lastBranch ? this.lastBranch() : this.branch())
                             .append(this.highlight(text(
-                                                    String.format(" /%s", helpEntry.getSyntaxString()),
+                                                    String.format(" /%s", helpEntry.syntaxString()),
                                                     this.colors.highlight
                                             ))
                                             .hoverEvent(description.color(this.colors.text))
-                                            .clickEvent(runCommand(this.commandPrefix + " " + helpEntry.getSyntaxString()))
+                                            .clickEvent(runCommand(this.commandPrefix + " " + helpEntry.syntaxString()))
                             )
                             .build();
                 },
@@ -471,7 +470,7 @@ public final class MinecraftHelp<C> {
         audience.sendMessage(this.basicHeader(sender));
         audience.sendMessage(this.showingResults(sender, query));
         final String command = this.commandManager.commandSyntaxFormatter()
-                .apply(helpTopic.getCommand().components(), null);
+                .apply(helpTopic.command().components(), null);
         audience.sendMessage(text()
                 .append(this.lastBranch())
                 .append(space())
@@ -480,21 +479,21 @@ public final class MinecraftHelp<C> {
                 .append(this.highlight(text("/" + command, this.colors.highlight)))
         );
         /* Topics will use the long description if available, but fall back to the short description. */
-        final Component richDescription =
-                helpTopic.getCommand().commandMeta().get(MinecraftExtrasMetaKeys.LONG_DESCRIPTION)
-                        .orElse(helpTopic.getCommand().commandMeta().get(MinecraftExtrasMetaKeys.DESCRIPTION)
-                                .orElse(null));
+        final ArgumentDescription commandDescription = helpTopic.commandDescription();
 
         final Component topicDescription;
-        if (richDescription != null) {
-            topicDescription = richDescription;
-        } else if (helpTopic.getDescription().isEmpty()) {
+        if (commandDescription instanceof RichDescription) {
+            topicDescription = ((RichDescription) commandDescription).getContents();
+        } else if (helpTopic.commandDescription().isEmpty()) {
             topicDescription = this.messageProvider.provide(sender, MESSAGE_NO_DESCRIPTION);
         } else {
-            topicDescription = this.descriptionDecorator.apply(sender, helpTopic.getDescription());
+            topicDescription = this.descriptionDecorator.apply(
+                    sender,
+                    helpTopic.commandDescription().getDescription()
+            );
         }
 
-        final boolean hasArguments = helpTopic.getCommand().components().size() > 1;
+        final boolean hasArguments = helpTopic.command().components().size() > 1;
         audience.sendMessage(text()
                 .append(text("   "))
                 .append(hasArguments ? this.branch() : this.lastBranch())
@@ -512,7 +511,7 @@ public final class MinecraftHelp<C> {
                     .append(text(":", this.colors.primary))
             );
 
-            final Iterator<CommandComponent<C>> iterator = helpTopic.getCommand().components().iterator();
+            final Iterator<CommandComponent<C>> iterator = helpTopic.command().components().iterator();
             /* Skip the first one because it's the command literal */
             iterator.next();
 

@@ -33,7 +33,6 @@ import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.internal.CommandNode;
-import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
 import java.util.Collections;
@@ -74,7 +73,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     ) {
         super(
                 label,
-                cloudCommand.commandMeta().getOrDefault(CommandMeta.DESCRIPTION, ""),
+                cloudCommand.commandDescription().description().getDescription(),
                 "",
                 aliases
         );
@@ -188,7 +187,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
     @Override
     public @NonNull String getDescription() {
-        return this.cloudCommand.commandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
+        return this.cloudCommand.commandDescription().description().getDescription();
     }
 
     @Override

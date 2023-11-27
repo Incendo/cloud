@@ -90,7 +90,7 @@ public final class HelpExample implements AnnotationFeature {
                 .queryRootIndex(ctx.getSender())
                 .getEntries()
                 .stream()
-                .map(CommandHelpHandler.VerboseHelpEntry::getSyntaxString)
+                .map(CommandHelpHandler.VerboseHelpEntry::syntaxString)
                 .collect(Collectors.toList());
     }
 

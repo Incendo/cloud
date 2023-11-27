@@ -75,7 +75,7 @@ class Issue262 {
 
         final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> topic =
                 (CommandHelpHandler.VerboseHelpTopic<TestCommandSender>) result;
-        assertThat(topic.getCommand().toString()).isEqualTo("cloudcommand sub2 argument");
+        assertThat(topic.command().toString()).isEqualTo("cloudcommand sub2 argument");
     }
 
     @Test
@@ -91,7 +91,7 @@ class Issue262 {
 
         final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> topic =
                 (CommandHelpHandler.VerboseHelpTopic<TestCommandSender>) result;
-        assertThat(topic.getCommand().toString()).isEqualTo("cloudcommand sub2 argument");
+        assertThat(topic.command().toString()).isEqualTo("cloudcommand sub2 argument");
     }
 
     @Test
@@ -109,7 +109,7 @@ class Issue262 {
 
         final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> topic =
                 (CommandHelpHandler.VerboseHelpTopic<TestCommandSender>) result;
-        assertThat(topic.getCommand().toString()).isEqualTo("cloudcommand sub2 argument");
+        assertThat(topic.command().toString()).isEqualTo("cloudcommand sub2 argument");
     }
 
     @Test
@@ -127,7 +127,7 @@ class Issue262 {
 
         final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> topic =
                 (CommandHelpHandler.VerboseHelpTopic<TestCommandSender>) result;
-        assertThat(topic.getCommand().toString()).isEqualTo("cloudcommand sub1 argument");
+        assertThat(topic.command().toString()).isEqualTo("cloudcommand sub1 argument");
     }
 
     @Test

@@ -25,8 +25,6 @@ package cloud.commandframework.examples.bukkit.annotations;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.feature.BuilderModifierExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.CommandContainerExample;
@@ -42,10 +40,8 @@ import cloud.commandframework.examples.bukkit.annotations.feature.TaskRecipeExam
 import cloud.commandframework.examples.bukkit.annotations.feature.minecraft.LocationExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.minecraft.NamespacedKeyExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.minecraft.SelectorExample;
-import cloud.commandframework.meta.CommandMeta;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -81,16 +77,7 @@ public final class AnnotationParserExample {
             final @NonNull CommandManager<CommandSender> manager
     ) {
         this.examplePlugin = examplePlugin;
-
-        final Function<ParserParameters, CommandMeta> commandMetaFunction = p ->
-                CommandMeta.simple()
-                        .with(CommandMeta.DESCRIPTION, p.get(StandardParameters.DESCRIPTION, "No description"))
-                        .build();
-        this.annotationParser = new AnnotationParser<>(
-                manager,
-                CommandSender.class,
-                commandMetaFunction
-        );
+        this.annotationParser = new AnnotationParser<>(manager, CommandSender.class);
 
         // Set up the example modules.
         this.setupExamples();

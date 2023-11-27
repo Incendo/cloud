@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.kotlin
 
+import cloud.commandframework.CommandDescription
 import cloud.commandframework.CommandManager
 import cloud.commandframework.arguments.standard.StringParser.stringParser
 import cloud.commandframework.execution.CommandExecutionCoordinator
@@ -31,7 +32,6 @@ import cloud.commandframework.kotlin.extension.argumentDescription
 import cloud.commandframework.kotlin.extension.buildAndRegister
 import cloud.commandframework.kotlin.extension.command
 import cloud.commandframework.kotlin.extension.commandBuilder
-import cloud.commandframework.meta.CommandMeta
 import cloud.commandframework.meta.SimpleCommandMeta
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -69,15 +69,15 @@ class CommandBuildingDSLTest {
         )
 
         manager.buildAndRegister("is") {
-            commandDescription("Command description")
+            commandDescription(CommandDescription.commandDescription("Command description"))
 
             registerCopy {
                 literal("this")
-                CommandMeta.DESCRIPTION to "Command description"
+                commandDescription(CommandDescription.commandDescription("Command description"))
 
                 registerCopy {
                     literal("going")
-                    meta(CommandMeta.DESCRIPTION, "Command Description")
+                    commandDescription(CommandDescription.commandDescription("Command Description"))
 
                     registerCopy("too_far") {
                         // ?
@@ -90,7 +90,7 @@ class CommandBuildingDSLTest {
         manager.executeCommand(SpecificCommandSender(), "kotlin dsl time bruh_moment")
 
         Assertions.assertEquals(
-            manager.createCommandHelpHandler().allCommands.map { it.syntaxString }.sorted(),
+            manager.createCommandHelpHandler().allCommands.map { it.syntaxString() }.sorted(),
             setOf(
                 "kotlin dsl <moment>",
                 "kotlin dsl <moment> bruh_moment",
