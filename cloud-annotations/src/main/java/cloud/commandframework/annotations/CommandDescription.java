@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.arguments.parser.StandardParameters;
+import cloud.commandframework.Command;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -31,7 +31,9 @@ import java.lang.annotation.Target;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Maps to {@link StandardParameters#DESCRIPTION}
+ * Annotation that modifies the command builder
+ * to invoke {@link Command.Builder#commandDescription(cloud.commandframework.CommandDescription)}
+ * using {@link cloud.commandframework.CommandDescription#commandDescription(String)}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})

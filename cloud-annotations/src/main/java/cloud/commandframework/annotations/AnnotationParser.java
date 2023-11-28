@@ -37,7 +37,6 @@ import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.preprocessor.RegexPreprocessor;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.Caption;
@@ -76,6 +75,8 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import static cloud.commandframework.CommandDescription.commandDescription;
 
 /**
  * Parser that parses class instances {@link Command commands}
@@ -128,6 +129,19 @@ public final class AnnotationParser<C> {
     /**
      * Construct a new annotation parser
      *
+     * @param manager            Command manager instance
+     * @param commandSenderClass Command sender class
+     */
+    public AnnotationParser(
+            final @NonNull CommandManager<C> manager,
+            final @NonNull Class<C> commandSenderClass
+    ) {
+        this(manager, TypeToken.get(commandSenderClass), parameters -> SimpleCommandMeta.empty());
+    }
+
+    /**
+     * Construct a new annotation parser
+     *
      * @param manager           Command manager instance
      * @param commandSenderType Command sender type
      * @param metaMapper        Function that is used to create {@link CommandMeta} instances from annotations on the
@@ -156,8 +170,11 @@ public final class AnnotationParser<C> {
         this.argumentAssembler = new ArgumentAssemblerImpl<>(this);
         this.commandExtractor = new CommandExtractorImpl(this);
         this.suggestionProviderFactory = SuggestionProviderFactory.defaultFactory();
-        this.registerAnnotationMapper(CommandDescription.class, d ->
-                ParserParameters.single(StandardParameters.DESCRIPTION, this.processString(d.value())));
+        // TODO(City): Add mapper so that we can map this to rich descriptions easily.
+        this.registerBuilderModifier(
+                CommandDescription.class,
+                (description, builder) -> builder.commandDescription(commandDescription(this.processString(description.value())))
+        );
         this.registerPreprocessorMapper(Regex.class, annotation -> RegexPreprocessor.of(
                 this.processString(annotation.value()),
                 Caption.of(this.processString(annotation.failureCaption()))

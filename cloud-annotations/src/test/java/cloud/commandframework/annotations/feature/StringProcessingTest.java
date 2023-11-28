@@ -36,7 +36,6 @@ import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
-import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.meta.CommandMeta;
 import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
@@ -61,9 +60,7 @@ class StringProcessingTest {
         this.annotationParser = new AnnotationParser<>(
                 this.commandManager,
                 TestCommandSender.class,
-                p -> CommandMeta.simple()
-                        .with(CommandMeta.DESCRIPTION, p.get(StandardParameters.DESCRIPTION, "No description"))
-                        .build()
+                p -> CommandMeta.simple().build()
         );
     }
 
@@ -103,7 +100,7 @@ class StringProcessingTest {
         final Command<TestCommandSender> command = commands.get(0);
         assertThat(command.toString()).isEqualTo(String.format("%s argument flags", testProperty));
         assertThat(command.commandPermission().toString()).isEqualTo(testProperty);
-        assertThat(command.commandMeta().get(CommandMeta.DESCRIPTION)).hasValue(testProperty);
+        assertThat(command.commandDescription().description().getDescription()).isEqualTo(testProperty);
 
         final List<CommandComponent<TestCommandSender>> components = command.components();
         assertThat(components).hasSize(3);

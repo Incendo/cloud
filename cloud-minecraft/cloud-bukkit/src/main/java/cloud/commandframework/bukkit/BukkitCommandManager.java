@@ -261,7 +261,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      */
     @Override
     public @NonNull CommandMeta createDefaultCommandMeta() {
-        return CommandMeta.simple().with(CommandMeta.DESCRIPTION, "").build();
+        return CommandMeta.simple().build();
     }
 
     /**

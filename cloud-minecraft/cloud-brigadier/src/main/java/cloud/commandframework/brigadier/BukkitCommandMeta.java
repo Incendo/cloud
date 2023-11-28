@@ -21,38 +21,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.minecraft.extras;
+package cloud.commandframework.brigadier;
 
 import cloud.commandframework.meta.CommandMeta;
-import net.kyori.adventure.text.Component;
+import org.apiguardian.api.API;
 
-/**
- * Extra command metadata for providing rich text.
- *
- * @since 1.4.0
- */
-public final class MinecraftExtrasMetaKeys {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public final class BukkitCommandMeta {
 
     /**
-     * A component short description.
-     *
-     * <p>This will not set the plain-text description, but will be used in place of that meta key in help.</p>
+     * The description to show for the Bukkit command.
+     * <p>
+     * If this is not set then Bukkit will attempt to retrieve the {@link cloud.commandframework.CommandDescription}
+     * for the command.
+     * <p>
+     * If the command description is empty, then Bukkit will attempt to fall back on the argument description of
+     * the root literal.
      */
-    public static final CommandMeta.Key<Component> DESCRIPTION = CommandMeta.Key.of(
-            Component.class,
-            "cloud:minecraft_extras/description"
-    );
+    public static final CommandMeta.Key<String> BUKKIT_DESCRIPTION = CommandMeta.Key.of(String.class, "bukkit_description");
 
-    /**
-     * A component long description.
-     *
-     * <p>This will not set the plain-text long description, but will be used in place of that meta key in help.</p>
-     */
-    public static final CommandMeta.Key<Component> LONG_DESCRIPTION = CommandMeta.Key.of(
-            Component.class,
-            "cloud:minecraft_extras/long_description"
-    );
-
-    private MinecraftExtrasMetaKeys() {
+    private BukkitCommandMeta() {
     }
 }

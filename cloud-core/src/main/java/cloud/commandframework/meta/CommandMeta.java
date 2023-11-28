@@ -45,13 +45,9 @@ import static java.util.Objects.requireNonNull;
 @API(status = API.Status.STABLE)
 public abstract class CommandMeta {
 
-    private static final Key<String> LEGACY_HIDDEN = Key.of(String.class, "hidden");
-    public static final Key<String> DESCRIPTION = Key.of(String.class, "description");
-    public static final Key<String> LONG_DESCRIPTION = Key.of(String.class, "long-description");
     public static final Key<Boolean> HIDDEN = Key.of(
             Boolean.class,
-            "cloud:hidden",
-            meta -> Boolean.valueOf(meta.getOrDefault(LEGACY_HIDDEN, "false"))
+            "cloud:hidden"
     );
 
     /**
