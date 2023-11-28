@@ -24,7 +24,6 @@
 package cloud.commandframework;
 
 import cloud.commandframework.internal.CommandNode;
-import cloud.commandframework.meta.CommandMeta;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -67,15 +66,15 @@ public final class CommandHelpHandler<C> {
             }
 
             final List<CommandComponent<C>> components = command.components();
-            final String description = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
+            final CommandDescription commandDescription = command.commandDescription();
             syntaxHints.add(new VerboseHelpEntry<>(
                     command,
                     this.commandManager.commandSyntaxFormatter()
                             .apply(components, null),
-                    description
+                    commandDescription
             ));
         }
-        syntaxHints.sort(Comparator.comparing(VerboseHelpEntry::getSyntaxString));
+        syntaxHints.sort(Comparator.comparing(VerboseHelpEntry::syntaxString));
         return syntaxHints;
     }
 
@@ -138,7 +137,7 @@ public final class CommandHelpHandler<C> {
         final List<VerboseHelpEntry<C>> commands = this.getAllCommands();
         commands.removeIf(command -> recipient != null && !this.commandManager.hasPermission(
                 recipient,
-                command.getCommand().getCommandPermission()
+                command.command().commandPermission()
         ));
         if (query.replace(" ", "").isEmpty()) {
             return new IndexHelpTopic<>(commands);
@@ -154,7 +153,7 @@ public final class CommandHelpHandler<C> {
         boolean exactMatch = false;
 
         for (final VerboseHelpEntry<C> entry : commands) {
-            final Command<C> command = entry.getCommand();
+            final Command<C> command = entry.command();
 
             final CommandComponent<C> component = command.rootComponent();
             for (final String alias : component.aliases()) {
@@ -188,17 +187,17 @@ public final class CommandHelpHandler<C> {
             final List<VerboseHelpEntry<C>> syntaxHints = new ArrayList<>();
             for (final Command<C> command : availableCommands) {
                 final List<CommandComponent<C>> components = command.components();
-                final String description = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
+                final CommandDescription commandDescription = command.commandDescription();
                 syntaxHints.add(new VerboseHelpEntry<>(
                         command,
                         this.commandManager.commandSyntaxFormatter()
                                 .apply(components, null),
-                        description
+                        commandDescription
                 ));
             }
-            syntaxHints.sort(Comparator.comparing(VerboseHelpEntry::getSyntaxString));
+            syntaxHints.sort(Comparator.comparing(VerboseHelpEntry::syntaxString));
             syntaxHints.removeIf(command -> recipient != null
-                    && !this.commandManager.hasPermission(recipient, command.getCommand().getCommandPermission()));
+                    && !this.commandManager.hasPermission(recipient, command.command().commandPermission()));
             return new IndexHelpTopic<>(syntaxHints);
         }
 
@@ -219,7 +218,7 @@ public final class CommandHelpHandler<C> {
                 if (head.isLeaf() || index == queryFragments.length) {
                     if (recipient == null || this.commandManager.hasPermission(recipient, head.component()
                             .owningCommand()
-                            .getCommandPermission())) {
+                            .commandPermission())) {
                         return new VerboseHelpTopic<>(head.component().owningCommand());
                     }
                 }
@@ -265,7 +264,7 @@ public final class CommandHelpHandler<C> {
                             || child.component().owningCommand() == null
                             || this.commandManager.hasPermission(
                             recipient,
-                            child.component().owningCommand().getCommandPermission()
+                            child.component().owningCommand().commandPermission()
                     )) {
                         traversedNodesSub.add(child.component());
                         childSuggestions.add(this.commandManager.commandSyntaxFormatter().apply(traversedNodesSub, child));
@@ -325,12 +324,12 @@ public final class CommandHelpHandler<C> {
 
         private final Command<C> command;
         private final String syntaxString;
-        private final String description;
+        private final CommandDescription description;
 
         private VerboseHelpEntry(
                 final @NonNull Command<C> command,
                 final @NonNull String syntaxString,
-                final @NonNull String description
+                final @NonNull CommandDescription description
         ) {
             this.command = command;
             this.syntaxString = syntaxString;
@@ -338,11 +337,13 @@ public final class CommandHelpHandler<C> {
         }
 
         /**
-         * Get the command
+         * Returns the command.
          *
-         * @return Command
+         * @return the command
+         * @since 2.0.0
          */
-        public @NonNull Command<C> getCommand() {
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Command<C> command() {
             return this.command;
         }
 
@@ -351,17 +352,18 @@ public final class CommandHelpHandler<C> {
          *
          * @return Syntax string
          */
-        public @NonNull String getSyntaxString() {
+        public @NonNull String syntaxString() {
             return this.syntaxString;
         }
 
         /**
-         * Get the command description
+         * Returns the command description.
          *
-         * @return Command description
+         * @return the description
+         * @since 2.0.0
          */
-        public @NonNull String getDescription() {
-            return this.description;
+        public @NonNull ArgumentDescription description() {
+            return this.description.description();
         }
 
         @Override
@@ -461,30 +463,32 @@ public final class CommandHelpHandler<C> {
     public static final class VerboseHelpTopic<C> implements HelpTopic<C> {
 
         private final Command<C> command;
-        private final String description;
+        private final CommandDescription description;
 
         private VerboseHelpTopic(final @NonNull Command<C> command) {
             this.command = command;
-            final String shortDescription = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "No description");
-            this.description = command.getCommandMeta().getOrDefault(CommandMeta.LONG_DESCRIPTION, shortDescription);
+            this.description = command.commandDescription();
         }
 
         /**
-         * Get the command
+         * Returns the command.
          *
-         * @return Command
+         * @return the command
+         * @since 2.0.0
          */
-        public @NonNull Command<C> getCommand() {
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Command<C> command() {
             return this.command;
         }
 
         /**
-         * Get the command description
+         * Returns the command description.
          *
-         * @return Command description
+         * @return the description
+         * @since 2.0.0
          */
-        public @NonNull String getDescription() {
-            return this.description;
+        public @NonNull ArgumentDescription commandDescription() {
+            return this.description.verboseDescription();
         }
 
         @Override

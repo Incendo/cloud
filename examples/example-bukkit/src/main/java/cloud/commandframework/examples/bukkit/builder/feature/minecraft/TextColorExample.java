@@ -26,14 +26,15 @@ package cloud.commandframework.examples.bukkit.builder.feature.minecraft;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
-import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.minecraft.extras.RichDescription;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import static cloud.commandframework.CommandDescription.commandDescription;
 import static cloud.commandframework.minecraft.extras.TextColorParser.textColorParser;
 import static net.kyori.adventure.text.Component.text;
 
@@ -49,7 +50,14 @@ public final class TextColorExample implements BuilderFeature {
     ) {
         manager.command(
                 manager.commandBuilder("builder")
-                        .meta(CommandMeta.DESCRIPTION, "Sets the color scheme for '/example help'")
+                        .commandDescription(
+                                commandDescription(
+                                        RichDescription.of(text(
+                                                "Sets the color scheme for '/example help'",
+                                                NamedTextColor.GREEN
+                                        ))
+                                )
+                        )
                         .literal("helpcolors")
                         .required(
                                 "primary", textColorParser(),

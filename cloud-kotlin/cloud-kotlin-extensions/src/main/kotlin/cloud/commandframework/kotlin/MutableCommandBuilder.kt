@@ -26,6 +26,7 @@ package cloud.commandframework.kotlin
 import cloud.commandframework.ArgumentDescription
 import cloud.commandframework.Command
 import cloud.commandframework.CommandComponent
+import cloud.commandframework.CommandDescription
 import cloud.commandframework.CommandManager
 import cloud.commandframework.TypedCommandComponent
 import cloud.commandframework.arguments.CommandArgument
@@ -270,24 +271,15 @@ public class MutableCommandBuilder<C : Any>(
         meta(this, value)
 
     /**
-     * Set the [CommandMeta.DESCRIPTION] meta for this command
+     * Sets the command description meta for this command
      *
-     * @param description command description
+     * @param commandDescription command description
      * @return this mutable builder
-     * @since 1.3.0
+     * @since 2.0.0
      */
-    public fun commandDescription(description: String): MutableCommandBuilder<C> =
-        meta(CommandMeta.DESCRIPTION, description)
-
-    /**
-     * Set the [CommandMeta.LONG_DESCRIPTION] meta for this command
-     *
-     * @param description command description
-     * @return this mutable builder
-     * @since 1.3.0
-     */
-    public fun longCommandDescription(description: String): MutableCommandBuilder<C> =
-        meta(CommandMeta.LONG_DESCRIPTION, description)
+    public fun commandDescription(commandDescription: CommandDescription): MutableCommandBuilder<C> = mutate {
+        it.commandDescription(commandDescription)
+    }
 
     /**
      * Set the [CommandMeta.HIDDEN] meta for this command
@@ -602,6 +594,30 @@ public class MutableCommandBuilder<C : Any>(
      */
     public fun handler(handler: CommandExecutionHandler<C>): MutableCommandBuilder<C> = mutate {
         it.handler(handler)
+    }
+
+    /**
+     * Sets a new command execution handler that invokes the given {@code handler} before the current
+     * {@link #handler() handler}.
+     *
+     * @param handler the handler to invoke before the current handler
+     * @return this mutable builder
+     * @since 2.0.0
+     */
+    public fun prependHandler(handler: CommandExecutionHandler<C>): MutableCommandBuilder<C> = mutate {
+        it.prependHandler(handler)
+    }
+
+    /**
+     * Sets a new command execution handler that invokes the given {@code handler} after the current
+     * {@link #handler() handler}.
+     *
+     * @param handler the handler to invoke after the current handler
+     * @return this mutable builder
+     * @since 2.0.0
+     */
+    public fun appendHandler(handler: CommandExecutionHandler<C>): MutableCommandBuilder<C> = mutate {
+        it.appendHandler(handler)
     }
 
     /**

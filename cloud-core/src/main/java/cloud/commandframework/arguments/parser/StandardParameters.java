@@ -42,10 +42,6 @@ public final class StandardParameters {
      */
     public static final ParserParameter<Number> RANGE_MAX = create("max", TypeToken.get(Number.class));
     /**
-     * Command description
-     */
-    public static final ParserParameter<String> DESCRIPTION = create("description", TypeToken.get(String.class));
-    /**
      * Command confirmation
      */
     public static final ParserParameter<Boolean> CONFIRMATION = create("confirmation", TypeToken.get(Boolean.class));

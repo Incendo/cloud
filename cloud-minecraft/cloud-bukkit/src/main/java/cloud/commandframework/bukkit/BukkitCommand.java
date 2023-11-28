@@ -25,7 +25,9 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.CommandDescription;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.brigadier.BukkitCommandMeta;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -33,12 +35,12 @@ import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.internal.CommandNode;
-import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletionException;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -65,6 +67,20 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
     private boolean disabled;
 
+    private static @NonNull String description(final @NonNull Command<?> command) {
+        final Optional<String> bukkitDescription = command.commandMeta().get(BukkitCommandMeta.BUKKIT_DESCRIPTION);
+        if (bukkitDescription.isPresent()) {
+            return bukkitDescription.get();
+        }
+
+        final CommandDescription description = command.commandDescription();
+        if (!description.isEmpty()) {
+            return description.description().getDescription();
+        }
+
+        return command.rootComponent().argumentDescription().getDescription();
+    }
+
     BukkitCommand(
             final @NonNull String label,
             final @NonNull List<@NonNull String> aliases,
@@ -74,7 +90,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     ) {
         super(
                 label,
-                cloudCommand.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, ""),
+                description(cloudCommand),
                 "",
                 aliases
         );
@@ -82,7 +98,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         this.manager = manager;
         this.cloudCommand = cloudCommand;
         if (this.command.owningCommand() != null) {
-            this.setPermission(this.command.owningCommand().getCommandPermission().toString());
+            this.setPermission(this.command.owningCommand().commandPermission().toString());
         }
         this.disabled = false;
     }
@@ -188,7 +204,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
     @Override
     public @NonNull String getDescription() {
-        return this.cloudCommand.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
+        return description(this.cloudCommand);
     }
 
     @Override

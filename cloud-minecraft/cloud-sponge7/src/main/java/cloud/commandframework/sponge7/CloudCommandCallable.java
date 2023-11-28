@@ -32,7 +32,6 @@ import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
-import cloud.commandframework.meta.CommandMeta;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -188,28 +187,28 @@ final class CloudCommandCallable<C> implements CommandCallable {
     public boolean testPermission(final @NonNull CommandSource source) {
         return this.manager.hasPermission(
                 this.manager.getCommandSourceMapper().apply(source),
-                this.cloudCommand.getCommandPermission()
+                this.cloudCommand.commandPermission()
         );
     }
 
     @Override
     public @NonNull Optional<Text> getShortDescription(final @NonNull CommandSource source) {
-        final Optional<Text> richDesc = this.cloudCommand.getCommandMeta().get(SpongeMetaKeys.RICH_DESCRIPTION);
+        final Optional<Text> richDesc = this.cloudCommand.commandMeta().get(SpongeMetaKeys.RICH_DESCRIPTION);
         if (richDesc.isPresent()) {
             return richDesc;
         }
 
-        return this.cloudCommand.getCommandMeta().get(CommandMeta.DESCRIPTION).map(Text::of);
+        return Optional.of(Text.of(this.cloudCommand.commandDescription().description().getDescription()));
     }
 
     @Override
     public @NonNull Optional<Text> getHelp(final @NonNull CommandSource source) {
-        final Optional<Text> richLongDesc = this.cloudCommand.getCommandMeta().get(SpongeMetaKeys.RICH_LONG_DESCRIPTION);
+        final Optional<Text> richLongDesc = this.cloudCommand.commandMeta().get(SpongeMetaKeys.RICH_LONG_DESCRIPTION);
         if (richLongDesc.isPresent()) {
             return richLongDesc;
         }
 
-        return this.cloudCommand.getCommandMeta().get(CommandMeta.LONG_DESCRIPTION).map(Text::of);
+        return Optional.of(Text.of(this.cloudCommand.commandDescription().verboseDescription().getDescription()));
     }
 
     @Override

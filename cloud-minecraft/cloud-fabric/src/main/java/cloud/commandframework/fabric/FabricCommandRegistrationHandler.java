@@ -215,7 +215,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                     () -> {
                         for (final Command<C> command : this.registeredCommands) {
                             /* Only register commands in the declared environment */
-                            final Commands.CommandSelection env = command.getCommandMeta().getOrDefault(
+                            final Commands.CommandSelection env = command.commandMeta().getOrDefault(
                                     FabricServerCommandManager.META_REGISTRATION_ENVIRONMENT,
                                     Commands.CommandSelection.ALL
                             );

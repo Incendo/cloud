@@ -62,8 +62,8 @@ class CommandBeanTest {
         final Command<TestCommandSender> command = component.owningCommand();
         assertThat(command).isNotNull();
         assertThat(command.nonFlagArguments().get(0).aliases()).containsExactly("t", "test");
-        assertThat(command.getCommandMeta().getOrDefault(META_KEY, "otherValue")).isEqualTo("value");
-        assertThat(command.getCommandExecutionHandler()).isEqualTo(testCommandBean);
+        assertThat(command.commandMeta().getOrDefault(META_KEY, "otherValue")).isEqualTo("value");
+        assertThat(command.commandExecutionHandler()).isEqualTo(testCommandBean);
     }
 
     public static class TestCommandBean extends CommandBean<TestCommandSender> {

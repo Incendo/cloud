@@ -25,6 +25,7 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.context.CommandContext;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -153,7 +154,15 @@ public interface CommandExecutionHandler<C> {
         private MulticastDelegateFutureCommandExecutionHandler(
                 final @NonNull List<@NonNull CommandExecutionHandler<C>> handlers
         ) {
-            this.handlers = Collections.unmodifiableList(handlers);
+            final List<CommandExecutionHandler<C>> unwrappedHandlers = new ArrayList<>();
+            for (final CommandExecutionHandler<C> handler : handlers) {
+                if (handler instanceof MulticastDelegateFutureCommandExecutionHandler) {
+                    unwrappedHandlers.addAll(((MulticastDelegateFutureCommandExecutionHandler<C>) handler).handlers);
+                } else {
+                    unwrappedHandlers.add(handler);
+                }
+            }
+            this.handlers = Collections.unmodifiableList(unwrappedHandlers);
         }
 
         @Override

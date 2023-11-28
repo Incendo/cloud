@@ -44,6 +44,7 @@ import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -56,10 +57,30 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * A command consists out of a chain of {@link CommandComponent command components}.
+ * A command is a chain of {@link CommandComponent command components} with an associated {@link #commandExecutionHandler()}.
+ * <p>
+ * The recommended way of creating a command is by using a {@link Command.Builder command builder}.
+ * You may either create the command builder using {@link #newBuilder(String, CommandMeta, String...)} or
+ * {@link CommandManager#commandBuilder(String, String...)}.
+ * Getting a builder from the command manager means that the builder is linked to the manager.
+ * When the command builder is linked to the manager, it is able to retrieve parsers from the associated
+ * {@link cloud.commandframework.arguments.parser.ParserRegistry} in the case that only a parsed type is given to the builder,
+ * and not a complete parser.
+ * You may link any command builder to a command manager by using {@link Command.Builder#manager(CommandManager)}.
+ * <p>
+ * All command flags added to a command builder will be collected into a single component.
+ * If there are flags added to the command, then they may be retrieved from the {@link #flagComponent()} or from the
+ * {@link #flagParser()}.
+ * <p>
+ * Commands may have meta-data associated with them, which can be accessed using {@link #commandMeta()}.
+ * A common way of using the command meta is by using it to filter out commands in post-processing.
+ * <p>
+ * A command may have a {@link #senderType()} that is different from the sender type of the command manager.
+ * The command tree will enforce this type when parsing the command.
  *
  * @param <C> Command sender type
  */
+@SuppressWarnings("unused")
 @API(status = API.Status.STABLE)
 public class Command<C> {
 
@@ -69,24 +90,27 @@ public class Command<C> {
     private final Class<? extends C> senderType;
     private final CommandPermission commandPermission;
     private final CommandMeta commandMeta;
+    private final CommandDescription commandDescription;
 
     /**
-     * Construct a new command
+     * Constructs a new command instance.
      *
-     * @param commandComponents       Command component argument and description
-     * @param commandExecutionHandler Execution handler
-     * @param senderType              Required sender type. May be {@code null}
-     * @param commandPermission       Command permission
-     * @param commandMeta             Command meta instance
-     * @since 1.3.0
+     * @param commandComponents       command component argument and description
+     * @param commandExecutionHandler execution handler
+     * @param senderType              required sender type. May be {@code null}
+     * @param commandPermission       command permission
+     * @param commandMeta             command meta instance
+     * @param commandDescription      description of the command
+     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "1.3.0")
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public Command(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
             final @Nullable Class<? extends C> senderType,
             final @NonNull CommandPermission commandPermission,
-            final @NonNull CommandMeta commandMeta
+            final @NonNull CommandMeta commandMeta,
+            final @NonNull CommandDescription commandDescription
     ) {
         this.components = Objects.requireNonNull(commandComponents, "Command components may not be null");
         if (this.components.isEmpty()) {
@@ -119,15 +143,16 @@ public class Command<C> {
         this.senderType = senderType;
         this.commandPermission = commandPermission;
         this.commandMeta = commandMeta;
+        this.commandDescription = commandDescription;
     }
 
     /**
-     * Construct a new command
+     * Constructs a new command.
      *
-     * @param commandComponents       Command components
-     * @param commandExecutionHandler Execution handler
-     * @param senderType              Required sender type. May be {@code null}
-     * @param commandMeta             Command meta instance
+     * @param commandComponents       command components
+     * @param commandExecutionHandler execution handler
+     * @param senderType              required sender type. May be {@code null}
+     * @param commandMeta             command meta instance
      * @since 1.3.0
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
@@ -137,16 +162,16 @@ public class Command<C> {
             final @Nullable Class<? extends C> senderType,
             final @NonNull CommandMeta commandMeta
     ) {
-        this(commandComponents, commandExecutionHandler, senderType, Permission.empty(), commandMeta);
+        this(commandComponents, commandExecutionHandler, senderType, Permission.empty(), commandMeta, CommandDescription.empty());
     }
 
     /**
-     * Construct a new command
+     * Constructs a new command.
      *
-     * @param commandComponents       Command components
-     * @param commandExecutionHandler Execution handler
-     * @param commandPermission       Command permission
-     * @param commandMeta             Command meta instance
+     * @param commandComponents       command components
+     * @param commandExecutionHandler execution handler
+     * @param commandPermission       command permission
+     * @param commandMeta             command meta instance
      * @since 1.3.0
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
@@ -156,19 +181,20 @@ public class Command<C> {
             final @NonNull CommandPermission commandPermission,
             final @NonNull CommandMeta commandMeta
     ) {
-        this(commandComponents, commandExecutionHandler, null, commandPermission, commandMeta);
+        this(commandComponents, commandExecutionHandler, null, commandPermission, commandMeta, CommandDescription.empty());
     }
 
     /**
-     * Create a new command builder. Is recommended to use the builder methods
-     * in {@link CommandManager} rather than invoking this method directly.
+     * Creates a new command builder.
+     * <p>
+     * Is recommended to use the builder methods in {@link CommandManager} rather than invoking this method directly.
      *
-     * @param commandName Base command argument
-     * @param commandMeta Command meta instance
-     * @param description Command description
-     * @param aliases     Command aliases
-     * @param <C>         Command sender type
-     * @return Command builder
+     * @param commandName base command argument
+     * @param commandMeta command meta instance
+     * @param description description of the root literal
+     * @param aliases     command aliases
+     * @param <C>         command sender type
+     * @return command builder
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
@@ -176,7 +202,7 @@ public class Command<C> {
             final @NonNull String commandName,
             final @NonNull CommandMeta commandMeta,
             final @NonNull ArgumentDescription description,
-            final @NonNull String... aliases
+            final @NonNull String @NonNull... aliases
     ) {
         final List<CommandComponent<C>> commands = new ArrayList<>();
         final ParserDescriptor<C, String> staticParser = LiteralParser.literal(commandName, aliases);
@@ -194,24 +220,26 @@ public class Command<C> {
                 commands,
                 new CommandExecutionHandler.NullCommandExecutionHandler<>(),
                 Permission.empty(),
-                Collections.emptyList()
+                Collections.emptyList(),
+                CommandDescription.empty()
         );
     }
 
     /**
-     * Create a new command builder. Is recommended to use the builder methods
-     * in {@link CommandManager} rather than invoking this method directly.
+     * Creates a new command builder.
+     * <p>
+     * Is recommended to use the builder methods in {@link CommandManager} rather than invoking this method directly.
      *
-     * @param commandName Base command argument
-     * @param commandMeta Command meta instance
-     * @param aliases     Command aliases
-     * @param <C>         Command sender type
-     * @return Command builder
+     * @param commandName base command argument
+     * @param commandMeta command meta instance
+     * @param aliases     command aliases
+     * @param <C>         command sender type
+     * @return command builder
      */
     public static <C> @NonNull Builder<C> newBuilder(
             final @NonNull String commandName,
             final @NonNull CommandMeta commandMeta,
-            final @NonNull String... aliases
+            final @NonNull String @NonNull... aliases
     ) {
         final List<CommandComponent<C>> commands = new ArrayList<>();
         final ParserDescriptor<C, String> staticParser = LiteralParser.literal(commandName, aliases);
@@ -228,7 +256,8 @@ public class Command<C> {
                 commands,
                 new CommandExecutionHandler.NullCommandExecutionHandler<>(),
                 Permission.empty(),
-                Collections.emptyList()
+                Collections.emptyList(),
+                CommandDescription.empty()
         );
     }
 
@@ -255,7 +284,7 @@ public class Command<C> {
     }
 
     /**
-     * Return a mutable copy of the command components, ignoring flag arguments.
+     * Returns a mutable copy of the command components, ignoring flag arguments.
      *
      * @return argument list
      * @since 1.8.0
@@ -281,9 +310,9 @@ public class Command<C> {
     }
 
     /**
-     * Returns the flag parser for this command, or null if no flags are supported.
+     * Returns the flag parser for this command, of {@code null} if the command has no flags.
      *
-     * @return flag parser or null
+     * @return flag parser, or {@code null} if no flags have been registered
      * @since 2.0.0
      */
     @SuppressWarnings("unchecked")
@@ -297,39 +326,74 @@ public class Command<C> {
     }
 
     /**
-     * Get the command execution handler
+     * Returns the command execution handler.
+     * <p>
+     * The command execution handler is invoked after a parsing a command.
+     * It has access to the {@link cloud.commandframework.context.CommandContext} which contains
+     * the parsed component values.
      *
-     * @return Command execution handler
+     * @return the command execution handler
+     * @since 2.0.0
      */
-    public CommandExecutionHandler<@NonNull C> getCommandExecutionHandler() {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler() {
         return this.commandExecutionHandler;
     }
 
     /**
-     * Get the required sender type, if one has been specified
+     * Returns the specific command sender type for the command if one has been defined.
+     * <p>
+     * A command may have a sender that is different from the sender type of the command manager.
+     * The command tree will enforce this type when parsing the command.
      *
-     * @return Required sender type
+     * @return the special sender type for the command, or {@link Optional#empty()} if the command uses the same sender type
+     * as the command manager
+     * @since 2.0.0
      */
-    public @NonNull Optional<Class<? extends C>> getSenderType() {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull Optional<Class<? extends C>> senderType() {
         return Optional.ofNullable(this.senderType);
     }
 
     /**
-     * Get the command permission
+     * Returns the permission required to execute the command.
+     * <p>
+     * If the sender does not have the required permission a {@link cloud.commandframework.exceptions.NoPermissionException}
+     * will be thrown when parsing the command.
      *
-     * @return Command permission
+     * @return the command permission
+     * @since 2.0.0
      */
-    public @NonNull CommandPermission getCommandPermission() {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CommandPermission commandPermission() {
         return this.commandPermission;
     }
 
     /**
-     * Get the command meta instance
+     * Returns the meta-data associated with the command.
+     * <p>
+     * A common way of using the command meta is by using it to filter out commands in post-processing.
      *
      * @return Command meta
+     * @since 2.0.0
      */
-    public @NonNull CommandMeta getCommandMeta() {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CommandMeta commandMeta() {
         return this.commandMeta;
+    }
+
+    /**
+     * Returns the description of the command.
+     * <p>
+     * This is not the same as the description of the root component.
+     * The command description used to be configured through the {@link #commandMeta()}.
+     *
+     * @return the command description
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CommandDescription commandDescription() {
+        return this.commandDescription;
     }
 
     @Override
@@ -343,12 +407,12 @@ public class Command<C> {
     }
 
     /**
-     * Check whether the command is hidden
+     * Returns whether the command is hidden.
      *
      * @return {@code true} if the command is hidden, {@code false} if not
      */
     public boolean isHidden() {
-        return this.getCommandMeta().getOrDefault(CommandMeta.HIDDEN, false);
+        return this.commandMeta().getOrDefault(CommandMeta.HIDDEN, false);
     }
 
 
@@ -368,6 +432,7 @@ public class Command<C> {
         private final CommandPermission commandPermission;
         private final CommandManager<C> commandManager;
         private final Collection<CommandFlag<?>> flags;
+        private final CommandDescription commandDescription;
 
         private Builder(
                 final @Nullable CommandManager<C> commandManager,
@@ -376,7 +441,8 @@ public class Command<C> {
                 final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
                 final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
                 final @NonNull CommandPermission commandPermission,
-                final @NonNull Collection<CommandFlag<?>> flags
+                final @NonNull Collection<CommandFlag<?>> flags,
+                final @NonNull CommandDescription commandDescription
         ) {
             this.commandManager = commandManager;
             this.senderType = senderType;
@@ -385,12 +451,13 @@ public class Command<C> {
             this.commandPermission = Objects.requireNonNull(commandPermission, "Permission may not be null");
             this.commandMeta = Objects.requireNonNull(commandMeta, "Meta may not be null");
             this.flags = Objects.requireNonNull(flags, "Flags may not be null");
+            this.commandDescription = Objects.requireNonNull(commandDescription, "Command description may not be null");
         }
 
         /**
-         * Get the required sender type for this builder
+         * Returns the required sender type for this builder.
          * <p>
-         * Returns {@code null} when there is not a specific required sender type
+         * Returns {@code null} when there is not a specific required sender type.
          *
          * @return required sender type
          * @since 1.3.0
@@ -401,9 +468,9 @@ public class Command<C> {
         }
 
         /**
-         * Get the required command permission for this builder
+         * Returns the required command permission for this builder.
          * <p>
-         * Will return {@link Permission#empty()} if there is no required permission
+         * Will return {@link Permission#empty()} if there is no required permission.
          *
          * @return required permission
          * @since 1.3.0
@@ -428,12 +495,12 @@ public class Command<C> {
         }
 
         /**
-         * Add command meta to the internal command meta map
+         * Adds command meta to the internal command meta-map.
          *
-         * @param <V>   Meta value type
-         * @param key   Meta key
-         * @param value Meta value
-         * @return New builder instance using the inserted meta key-value pair
+         * @param <V>   meta value type
+         * @param key   meta key
+         * @param value meta value
+         * @return new builder instance using the inserted meta key-value pair
          * @since 1.3.0
          */
         @API(status = API.Status.STABLE, since = "1.3.0")
@@ -446,17 +513,21 @@ public class Command<C> {
                     this.commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
-                    this.flags
+                    this.flags,
+                    this.commandDescription
             );
         }
 
         /**
-         * Supply a command manager instance to the builder. This will be used when attempting to
-         * retrieve command argument parsers, in the case that they're needed. This
-         * is optional
+         * Supplies a command manager instance to the builder.
+         * <p>
+         * This will be used when attempting to
+         * retrieve command argument parsers, in the case that they're needed.
+         * <p>
+         * This is optional.
          *
          * @param commandManager Command manager
-         * @return New builder instance using the provided command manager
+         * @return new builder instance using the provided command manager
          */
         public @NonNull Builder<C> manager(final @Nullable CommandManager<C> commandManager) {
             return new Builder<>(
@@ -466,16 +537,39 @@ public class Command<C> {
                     this.commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
-                    this.flags
+                    this.flags,
+                    this.commandDescription
             );
         }
 
         /**
-         * Inserts a required literal into the command chain
+         * Returns a new builder with the given {@code commandDescription}.
+         * <p>
+         * See {@link Command#commandDescription()} for information about the description.
          *
-         * @param main    Main argument name
-         * @param aliases Argument aliases
-         * @return New builder instance with the modified command chain
+         * @param commandDescription the new command description
+         * @return new builder instance using the provided command description
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Builder<C> commandDescription(final @NonNull CommandDescription commandDescription) {
+            return new Builder<>(
+                    this.commandManager,
+                    this.commandMeta,
+                    this.senderType,
+                    this.commandComponents,
+                    this.commandExecutionHandler,
+                    this.commandPermission,
+                    this.flags,
+                    commandDescription
+            );
+        }
+
+        /**
+         * Inserts a required literal into the command chain.
+         *
+         * @param main    main argument name
+         * @param aliases argument aliases
+         * @return new builder instance with the modified command chain
          */
         public @NonNull Builder<C> literal(
                 final @NonNull String main,
@@ -485,12 +579,12 @@ public class Command<C> {
         }
 
         /**
-         * Inserts a required literal into the command chain
+         * Inserts a required literal into the command chain.
          *
-         * @param main        Main argument name
-         * @param description Literal description
-         * @param aliases     Argument aliases
-         * @return New builder instance with the modified command chain
+         * @param main        main argument name
+         * @param description literal description
+         * @param aliases     argument aliases
+         * @return new builder instance with the modified command chain
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
@@ -505,10 +599,10 @@ public class Command<C> {
         /**
          * Adds the given required {@code argument} to the command
          *
-         * @param argument    Argument to add
-         * @param description Description of the argument
-         * @param <U>         Type of the argument
-         * @return New builder instance with the command argument inserted into the argument list
+         * @param argument    argument to add
+         * @param description description of the argument
+         * @param <U>         type of the argument
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @SuppressWarnings({"unchecked", "rawtypes"})
@@ -535,7 +629,7 @@ public class Command<C> {
          *
          * @param name    the name that will be inserted into the builder
          * @param builder the component builder
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          */
         @SuppressWarnings({"rawtypes"})
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -551,7 +645,7 @@ public class Command<C> {
          *
          * @param name    the name that will be inserted into the builder
          * @param builder the component builder
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          */
         @SuppressWarnings({"rawtypes"})
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -566,7 +660,7 @@ public class Command<C> {
          * Marks the {@code builder} as required and adds it to the command.
          *
          * @param builder the component builder
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          */
         @SuppressWarnings({"rawtypes"})
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -580,7 +674,7 @@ public class Command<C> {
          * Marks the {@code builder} as required and adds it to the command.
          *
          * @param builder the component builder
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          */
         @SuppressWarnings({"rawtypes"})
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -591,12 +685,12 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional {@code argument} to the command with no default value
+         * Adds the given optional {@code argument} to the command with no default value.
          *
-         * @param argument    Argument to add
-         * @param description Description of the argument
-         * @param <U>         Type of the argument
-         * @return New builder instance with the command argument inserted into the argument list
+         * @param argument    argument to add
+         * @param description description of the argument
+         * @param <U>         type of the argument
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @SuppressWarnings({"unchecked", "rawtypes"})
@@ -620,11 +714,11 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given required argument to the command
+         * Adds the given required argument to the command.
          *
          * @param argument the argument
          * @param <U>      type of the argument
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @SuppressWarnings({"unchecked", "rawtypes"})
@@ -645,11 +739,11 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param argument the argument
          * @param <U>      type of the argument
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @SuppressWarnings({"unchecked", "rawtypes"})
@@ -671,12 +765,12 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given required argument to the command
+         * Adds the given required argument to the command.
          *
          * @param name   the name of the argument
          * @param parser the parser
          * @param <T>    the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -688,13 +782,13 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given required argument to the command
+         * Adds the given required argument to the command.
          *
          * @param name        the name of the argument
          * @param parser      the parser
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -713,12 +807,12 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given required argument to the command
+         * Adds the given required argument to the command.
          *
          * @param name   the name of the argument
          * @param parser the parser
          * @param <T>    the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -730,13 +824,13 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given required argument to the command
+         * Adds the given required argument to the command.
          *
          * @param name        the name of the argument
          * @param parser      the parser
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -755,13 +849,13 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given required argument to the command
+         * Adds the given required argument to the command.
          *
          * @param name        the name of the argument
          * @param parser      the parser
          * @param description the description of the argument
          * @param <T>         the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -774,14 +868,14 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given required argument to the command
+         * Adds the given required argument to the command.
          *
          * @param name        the name of the argument
          * @param parser      the parser
          * @param description the description of the argument
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -802,13 +896,13 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given required argument to the command
+         * Adds the given required argument to the command.
          *
          * @param name        the name of the argument
          * @param parser      the parser
          * @param description the description of the argument
          * @param <T>         the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -821,14 +915,14 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given required argument to the command
+         * Adds the given required argument to the command.
          *
          * @param name        the name of the argument
          * @param parser      the parser
          * @param description the description of the argument
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -850,12 +944,12 @@ public class Command<C> {
 
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name   the name of the argument
          * @param parser the parser
          * @param <T>    the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -867,13 +961,13 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name        the name of the argument
          * @param parser      the parser
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -893,12 +987,12 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name   the name of the argument
          * @param parser the parser
          * @param <T>    the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -910,13 +1004,13 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name        the name of the argument
          * @param parser      the parser
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -936,13 +1030,13 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name        the name of the argument
          * @param parser      the parser
          * @param description the description of the argument
          * @param <T>         the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -962,14 +1056,14 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name        the name of the argument
          * @param parser      the parser
          * @param description the description of the argument
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -991,13 +1085,13 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name        the name of the argument
          * @param parser      the parser
          * @param description the description of the argument
          * @param <T>         the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1017,14 +1111,14 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name        the name of the argument
          * @param parser      the parser
          * @param description the description of the argument
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1046,13 +1140,13 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name         the name of the argument
          * @param parser       the parser
          * @param defaultValue the default value
          * @param <T>          the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1071,14 +1165,14 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name         the name of the argument
          * @param parser       the parser
          * @param defaultValue the default value
          * @param suggestions  the suggestion provider
          * @param <T>          the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1099,13 +1193,13 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name         the name of the argument
          * @param parser       the parser
          * @param defaultValue the default value
          * @param <T>          the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1124,14 +1218,14 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name         the name of the argument
          * @param parser       the parser
          * @param defaultValue the default value
          * @param suggestions  the suggestion provider
          * @param <T>          the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1152,14 +1246,14 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name         the name of the argument
          * @param parser       the parser
          * @param defaultValue the default value
          * @param description  the description of the argument
          * @param <T>          the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1180,7 +1274,7 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name         the name of the argument
          * @param parser       the parser
@@ -1188,7 +1282,7 @@ public class Command<C> {
          * @param description  the description of the argument
          * @param suggestions  the suggestion provider
          * @param <T>          the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1211,14 +1305,14 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name         the name of the argument
          * @param parser       the parser
          * @param defaultValue the default value
          * @param description  the description of the argument
          * @param <T>          the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1239,7 +1333,7 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given optional argument to the command
+         * Adds the given optional argument to the command.
          *
          * @param name         the name of the argument
          * @param parser       the parser
@@ -1247,7 +1341,7 @@ public class Command<C> {
          * @param description  the description of the argument
          * @param suggestions  the suggestion provider
          * @param <T>          the type produced by the parser
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1270,13 +1364,13 @@ public class Command<C> {
         }
 
         /**
-         * Adds a new required command argument by interacting with a constructed command argument builder
+         * Adds a new required command argument by interacting with a constructed command argument builder.
          *
-         * @param clazz           Argument class
-         * @param name            Argument name
-         * @param builderConsumer Builder consumer
-         * @param <T>             Argument type
-         * @return New builder instance with the command argument inserted into the argument list
+         * @param clazz           argument class
+         * @param name            argument name
+         * @param builderConsumer builder consumer
+         * @param <T>             argument type
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1291,13 +1385,13 @@ public class Command<C> {
         }
 
         /**
-         * Adds a new optional command argument by interacting with a constructed command argument builder
+         * Adds a new optional command argument by interacting with a constructed command argument builder.
          *
-         * @param clazz           Argument class
-         * @param name            Argument name
-         * @param builderConsumer Builder consumer
-         * @param <T>             Argument type
-         * @return New builder instance with the command argument inserted into the argument list
+         * @param clazz           argument class
+         * @param name            argument name
+         * @param builderConsumer builder consumer
+         * @param <T>             argument type
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1312,12 +1406,12 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given {@code argument} to the command
+         * Adds the given {@code argument} to the command.
          * <p>
          * The component will be copied using {@link CommandComponent#copy()} before being inserted into the command tree.
          *
-         * @param argument Argument to add
-         * @return New builder instance with the command argument inserted into the argument list
+         * @param argument argument to add
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1333,17 +1427,18 @@ public class Command<C> {
                     commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
-                    this.flags
+                    this.flags,
+                    this.commandDescription
             );
         }
 
         /**
-         * Adds the given {@code argument} to the command
+         * Adds the given {@code argument} to the command.
          * <p>
          * The component will be copied using {@link CommandComponent#copy()} before being inserted into the command tree.
          *
          * @param builder builder that builds the component to add
-         * @return New builder instance with the command argument inserted into the argument list
+         * @return new builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
         @SuppressWarnings({"unchecked", "rawtypes"})
@@ -1361,21 +1456,21 @@ public class Command<C> {
         // Compound helper methods
 
         /**
-         * Create a new argument pair that maps to {@link Pair}
+         * Creates a new argument pair that maps to {@link Pair}.
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}..
          *
-         * @param name        Name of the argument
-         * @param names       Pair containing the names of the sub-arguments
-         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         * @param name        name of the argument
+         * @param names       pair containing the names of the sub-arguments
+         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
          *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
-         * @param description Description of the argument
-         * @param <U>         First type
-         * @param <V>         Second type
-         * @return Builder instance with the argument inserted
+         * @param description description of the argument
+         * @param <U>         first type
+         * @param <V>         second type
+         * @return new builder instance with the argument inserted
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
@@ -1396,21 +1491,21 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument pair that maps to {@link Pair}
+         * Creates a new argument pair that maps to {@link Pair}.
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}..
          *
-         * @param name        Name of the argument
-         * @param names       Pair containing the names of the sub-arguments
-         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         * @param name        name of the argument
+         * @param names       pair containing the names of the sub-arguments
+         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
          *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
-         * @param description Description of the argument
-         * @param <U>         First type
-         * @param <V>         Second type
-         * @return Builder instance with the argument inserted
+         * @param description description of the argument
+         * @param <U>         first type
+         * @param <V>         second type
+         * @return new builder instance with the argument inserted
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1431,21 +1526,21 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument pair that maps to {@link Pair}
+         * Creates a new argument pair that maps to {@link Pair}.
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}..
          *
-         * @param name        Name of the argument
-         * @param names       Pair containing the names of the sub-arguments
-         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         * @param name        name of the argument
+         * @param names       pair containing the names of the sub-arguments
+         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
          *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
-         * @param description Description of the argument
-         * @param <U>         First type
-         * @param <V>         Second type
-         * @return Builder instance with the argument inserted
+         * @param description description of the argument
+         * @param <U>         first type
+         * @param <V>         second type
+         * @return new builder instance with the argument inserted
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
@@ -1466,21 +1561,21 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument pair that maps to {@link Pair}
+         * Creates a new argument pair that maps to {@link Pair}.
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}..
          *
-         * @param name        Name of the argument
-         * @param names       Pair containing the names of the sub-arguments
-         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         * @param name        name of the argument
+         * @param names       pair containing the names of the sub-arguments
+         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
          *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
-         * @param description Description of the argument
-         * @param <U>         First type
-         * @param <V>         Second type
-         * @return Builder instance with the argument inserted
+         * @param description description of the argument
+         * @param <U>         first type
+         * @param <V>         second type
+         * @return new builder instance with the argument inserted
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1501,24 +1596,24 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument pair that maps to a custom type.
+         * Creates a new argument pair that maps to a custom type.
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}..
          *
-         * @param name        Name of the argument
-         * @param outputType  The output type
-         * @param names       Pair containing the names of the sub-arguments
-         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         * @param name        name of the argument
+         * @param outputType  the output type
+         * @param names       pair containing the names of the sub-arguments
+         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
          *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
-         * @param mapper      Mapper that maps from {@link Pair} to the custom type
-         * @param description Description of the argument
-         * @param <U>         First type
-         * @param <V>         Second type
-         * @param <O>         Output type
-         * @return Builder instance with the argument inserted
+         * @param mapper      mapper that maps from {@link Pair} to the custom type
+         * @param description description of the argument
+         * @param <U>         first type
+         * @param <V>         second type
+         * @param <O>         output type
+         * @return new builder instance with the argument inserted
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
@@ -1541,24 +1636,24 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument pair that maps to a custom type.
+         * Creates a new argument pair that maps to a custom type.
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}..
          *
-         * @param name        Name of the argument
-         * @param outputType  The output type
-         * @param names       Pair containing the names of the sub-arguments
-         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         * @param name        name of the argument
+         * @param outputType  the output type
+         * @param names       pair containing the names of the sub-arguments
+         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
          *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
-         * @param mapper      Mapper that maps from {@link Pair} to the custom type
-         * @param description Description of the argument
-         * @param <U>         First type
-         * @param <V>         Second type
-         * @param <O>         Output type
-         * @return Builder instance with the argument inserted
+         * @param mapper      mapper that maps from {@link Pair} to the custom type
+         * @param description description of the argument
+         * @param <U>         first type
+         * @param <V>         second type
+         * @param <O>         output type
+         * @return new builder instance with the argument inserted
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1581,24 +1676,24 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument pair that maps to a custom type.
+         * Creates a new argument pair that maps to a custom type.
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name        Name of the argument
-         * @param outputType  The output type
-         * @param names       Pair containing the names of the sub-arguments
-         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         * @param name        name of the argument
+         * @param outputType  the output type
+         * @param names       pair containing the names of the sub-arguments
+         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
          *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
-         * @param mapper      Mapper that maps from {@link Pair} to the custom type
-         * @param description Description of the argument
-         * @param <U>         First type
-         * @param <V>         Second type
-         * @param <O>         Output type
-         * @return Builder instance with the argument inserted
+         * @param mapper      mapper that maps from {@link Pair} to the custom type
+         * @param description description of the argument
+         * @param <U>         first type
+         * @param <V>         second type
+         * @param <O>         output type
+         * @return new builder instance with the argument inserted
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
@@ -1621,24 +1716,24 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument pair that maps to a custom type.
+         * Creates a new argument pair that maps to a custom type.
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name        Name of the argument
-         * @param outputType  The output type
-         * @param names       Pair containing the names of the sub-arguments
-         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         * @param name        name of the argument
+         * @param outputType  the output type
+         * @param names       pair containing the names of the sub-arguments
+         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
          *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
-         * @param mapper      Mapper that maps from {@link Pair} to the custom type
-         * @param description Description of the argument
-         * @param <U>         First type
-         * @param <V>         Second type
-         * @param <O>         Output type
-         * @return Builder instance with the argument inserted
+         * @param mapper      mapper that maps from {@link Pair} to the custom type
+         * @param description description of the argument
+         * @param <U>         first type
+         * @param <V>         second type
+         * @param <O>         output type
+         * @return new builder instance with the argument inserted
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1665,18 +1760,18 @@ public class Command<C> {
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name          Name of the argument
-         * @param names         Triplet containing the names of the sub-arguments
-         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         * @param name          name of the argument
+         * @param names         triplet containing the names of the sub-arguments
+         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
          *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry}
          *                      used by the {@link CommandManager} attached to this command
-         * @param description   Description of the argument
-         * @param <U>           First type
-         * @param <V>           Second type
-         * @param <W>           Third type
-         * @return Builder instance with the argument inserted
+         * @param description   description of the argument
+         * @param <U>           first type
+         * @param <V>           second type
+         * @param <W>           third type
+         * @return new builder instance with the argument inserted
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
@@ -1701,18 +1796,18 @@ public class Command<C> {
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name          Name of the argument
-         * @param names         Triplet containing the names of the sub-arguments
-         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         * @param name          name of the argument
+         * @param names         triplet containing the names of the sub-arguments
+         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
          *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry}
          *                      used by the {@link CommandManager} attached to this command
-         * @param description   Description of the argument
-         * @param <U>           First type
-         * @param <V>           Second type
-         * @param <W>           Third type
-         * @return Builder instance with the argument inserted
+         * @param description   description of the argument
+         * @param <U>           first type
+         * @param <V>           second type
+         * @param <W>           third type
+         * @return new builder instance with the argument inserted
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1737,18 +1832,18 @@ public class Command<C> {
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name          Name of the argument
-         * @param names         Triplet containing the names of the sub-arguments
-         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         * @param name          name of the argument
+         * @param names         triplet containing the names of the sub-arguments
+         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
          *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry}
          *                      used by the {@link CommandManager} attached to this command
-         * @param description   Description of the argument
-         * @param <U>           First type
-         * @param <V>           Second type
-         * @param <W>           Third type
-         * @return Builder instance with the argument inserted
+         * @param description   description of the argument
+         * @param <U>           first type
+         * @param <V>           second type
+         * @param <W>           third type
+         * @return new builder instance with the argument inserted
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
@@ -1773,18 +1868,18 @@ public class Command<C> {
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name          Name of the argument
-         * @param names         Triplet containing the names of the sub-arguments
-         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         * @param name          name of the argument
+         * @param names         triplet containing the names of the sub-arguments
+         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
          *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry}
          *                      used by the {@link CommandManager} attached to this command
-         * @param description   Description of the argument
-         * @param <U>           First type
-         * @param <V>           Second type
-         * @param <W>           Third type
-         * @return Builder instance with the argument inserted
+         * @param description   description of the argument
+         * @param <U>           first type
+         * @param <V>           second type
+         * @param <W>           third type
+         * @return new builder instance with the argument inserted
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1805,25 +1900,25 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument triplet that maps to a custom type.
+         * Creates a new argument triplet that maps to a custom type.
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name          Name of the argument
-         * @param outputType    The output type
-         * @param names         Triplet containing the names of the sub-arguments
-         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         * @param name          name of the argument
+         * @param outputType    the output type
+         * @param names         triplet containing the names of the sub-arguments
+         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
          *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by
          *                      the {@link CommandManager} attached to this command
-         * @param mapper        Mapper that maps from {@link Triplet} to the custom type
-         * @param description   Description of the argument
-         * @param <U>           First type
-         * @param <V>           Second type
-         * @param <W>           Third type
-         * @param <O>           Output type
-         * @return Builder instance with the argument inserted
+         * @param mapper        mapper that maps from {@link Triplet} to the custom type
+         * @param description   description of the argument
+         * @param <U>           first type
+         * @param <V>           second type
+         * @param <W>           third type
+         * @param <O>           output type
+         * @return new builder instance with the argument inserted
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
@@ -1846,25 +1941,25 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument triplet that maps to a custom type.
+         * Creates a new argument triplet that maps to a custom type.
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name          Name of the argument
-         * @param outputType    The output type
-         * @param names         Triplet containing the names of the sub-arguments
-         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         * @param name          name of the argument
+         * @param outputType    the output type
+         * @param names         triplet containing the names of the sub-arguments
+         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
          *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by
          *                      the {@link CommandManager} attached to this command
          * @param mapper        Mapper that maps from {@link Triplet} to the custom type
-         * @param description   Description of the argument
-         * @param <U>           First type
-         * @param <V>           Second type
-         * @param <W>           Third type
-         * @param <O>           Output type
-         * @return Builder instance with the argument inserted
+         * @param description   description of the argument
+         * @param <U>           first type
+         * @param <V>           second type
+         * @param <W>           third type
+         * @param <O>           output type
+         * @return new builder instance with the argument inserted
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1887,25 +1982,25 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument triplet that maps to a custom type.
+         * Creates a new argument triplet that maps to a custom type.
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name          Name of the argument
-         * @param outputType    The output type
-         * @param names         Triplet containing the names of the sub-arguments
-         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         * @param name          name of the argument
+         * @param outputType    the output type
+         * @param names         triplet containing the names of the sub-arguments
+         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
          *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by
          *                      the {@link CommandManager} attached to this command
-         * @param mapper        Mapper that maps from {@link Triplet} to the custom type
-         * @param description   Description of the argument
-         * @param <U>           First type
-         * @param <V>           Second type
-         * @param <W>           Third type
-         * @param <O>           Output type
-         * @return Builder instance with the argument inserted
+         * @param mapper        mapper that maps from {@link Triplet} to the custom type
+         * @param description   description of the argument
+         * @param <U>           first type
+         * @param <V>           second type
+         * @param <W>           third type
+         * @param <O>           output type
+         * @return new builder instance with the argument inserted
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
@@ -1928,25 +2023,25 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument triplet that maps to a custom type.
+         * Creates a new argument triplet that maps to a custom type.
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
+         * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name          Name of the argument
-         * @param outputType    The output type
-         * @param names         Triplet containing the names of the sub-arguments
-         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         * @param name          name of the argument
+         * @param outputType    the output type
+         * @param names         triplet containing the names of the sub-arguments
+         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
          *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by
          *                      the {@link CommandManager} attached to this command
-         * @param mapper        Mapper that maps from {@link Triplet} to the custom type
-         * @param description   Description of the argument
-         * @param <U>           First type
-         * @param <V>           Second type
-         * @param <W>           Third type
-         * @param <O>           Output type
-         * @return Builder instance with the argument inserted
+         * @param mapper        mapper that maps from {@link Triplet} to the custom type
+         * @param description   description of the argument
+         * @param <U>           first type
+         * @param <V>           second type
+         * @param <W>           third type
+         * @param <O>           output type
+         * @return new builder instance with the argument inserted
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
@@ -1971,10 +2066,10 @@ public class Command<C> {
         // End of compound helper methods
 
         /**
-         * Specify the command execution handler
+         * Specifies the command execution handler.
          *
          * @param commandExecutionHandler New execution handler
-         * @return New builder instance using the command execution handler
+         * @return new builder instance using the command execution handler
          */
         public @NonNull Builder<C> handler(final @NonNull CommandExecutionHandler<C> commandExecutionHandler) {
             return new Builder<>(
@@ -1984,7 +2079,8 @@ public class Command<C> {
                     this.commandComponents,
                     commandExecutionHandler,
                     this.commandPermission,
-                    this.flags
+                    this.flags,
+                    this.commandDescription
             );
         }
 
@@ -2000,11 +2096,37 @@ public class Command<C> {
         }
 
         /**
-         * Specify a required sender type
+         * Sets a new command execution handler that invokes the given {@code handler} before the current
+         * {@link #handler() handler}.
          *
-         * @param <N> The new sender type or a superclass thereof
-         * @param senderType Required sender type
-         * @return New builder instance using the required sender type
+         * @param handler the handler to invoke before the current handler
+         * @return new builder instance
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Builder<C> prependHandler(final @NonNull CommandExecutionHandler<C> handler) {
+            return this.handler(CommandExecutionHandler.delegatingExecutionHandler(Arrays.asList(handler, this.handler())));
+        }
+
+        /**
+         * Sets a new command execution handler that invokes the given {@code handler} after the current
+         * {@link #handler() handler}.
+         *
+         * @param handler the handler to invoke after the current handler
+         * @return new builder instance
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Builder<C> appendHandler(final @NonNull CommandExecutionHandler<C> handler) {
+            return this.handler(CommandExecutionHandler.delegatingExecutionHandler(Arrays.asList(this.handler(), handler)));
+        }
+
+        /**
+         * Specifies a required sender type.
+         *
+         * @param <N>        the new sender type or a superclass thereof
+         * @param senderType required sender type
+         * @return new builder instance using the required sender type
          */
         @SuppressWarnings("unchecked")
         public <N extends C> @NonNull Builder<N> senderType(final @NonNull Class<? extends N> senderType) {
@@ -2015,15 +2137,16 @@ public class Command<C> {
                     this.commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
-                    this.flags
+                    this.flags,
+                    this.commandDescription
             );
         }
 
         /**
-         * Specify a command permission
+         * Specifies a command permission.
          *
-         * @param permission Command permission
-         * @return New builder instance using the command permission
+         * @param permission the command permission
+         * @return new builder instance using the command permission
          */
         public @NonNull Builder<C> permission(final @NonNull CommandPermission permission) {
             return new Builder<>(
@@ -2033,15 +2156,16 @@ public class Command<C> {
                     this.commandComponents,
                     this.commandExecutionHandler,
                     permission,
-                    this.flags
+                    this.flags,
+                    this.commandDescription
             );
         }
 
         /**
-         * Specify a command permission
+         * Specifies a command permission.
          *
-         * @param permission Command permission
-         * @return New builder instance using the command permission
+         * @param permission the command permission
+         * @return new builder instance using the command permission
          */
         public @NonNull Builder<C> permission(final @NonNull PredicatePermission<C> permission) {
             return new Builder<>(
@@ -2051,15 +2175,16 @@ public class Command<C> {
                     this.commandComponents,
                     this.commandExecutionHandler,
                     permission,
-                    this.flags
+                    this.flags,
+                    this.commandDescription
             );
         }
 
         /**
-         * Specify a command permission
+         * Specifies a command permission.
          *
-         * @param permission Command permission
-         * @return New builder instance using the command permission
+         * @param permission the command permission
+         * @return new builder instance using the command permission
          */
         public @NonNull Builder<C> permission(final @NonNull String permission) {
             return new Builder<>(
@@ -2069,20 +2194,22 @@ public class Command<C> {
                     this.commandComponents,
                     this.commandExecutionHandler,
                     Permission.of(permission),
-                    this.flags
+                    this.flags,
+                    this.commandDescription
             );
         }
 
         /**
-         * Make the current command be a proxy of the supplied command. This means that
-         * all of the proxied command's variable command arguments will be inserted into this
+         * Makes the current command be a proxy of the supplied command. T
+         * <p>
+         * his means that all the proxied command's variable command arguments will be inserted into this
          * builder instance, in the order they are declared in the proxied command. Furthermore,
          * the proxied command's command handler will be shown by the command that is currently
          * being built. If the current command builder does not have a permission node set, this
          * too will be copied.
          *
-         * @param command Command to proxy
-         * @return New builder that proxies the given command
+         * @param command the command to proxy
+         * @return new builder that proxies the given command
          */
         public @NonNull Builder<C> proxies(final @NonNull Command<C> command) {
             Builder<C> builder = this;
@@ -2094,27 +2221,27 @@ public class Command<C> {
                 builder = builder.argument(componentCopy);
             }
             if (this.commandPermission.toString().isEmpty()) {
-                builder = builder.permission(command.getCommandPermission());
+                builder = builder.permission(command.commandPermission());
             }
             return builder.handler(command.commandExecutionHandler);
         }
 
         /**
-         * Indicate that the command should be hidden from help menus
-         * and other places where commands are exposed to users
+         * Indicates that the command should be hidden from help menus
+         * and other places where commands are exposed to users.
          *
-         * @return New builder instance that indicates that the constructed command should be hidden
+         * @return new builder instance that indicates that the constructed command should be hidden
          */
         public @NonNull Builder<C> hidden() {
             return this.meta(CommandMeta.HIDDEN, true);
         }
 
         /**
-         * Register a new command flag
+         * Registers a new command flag.
          *
-         * @param flag Flag
-         * @param <T>  Flag value type
-         * @return New builder instance that uses the provided flag
+         * @param flag flag
+         * @param <T>  flag value type
+         * @return new builder instance that uses the provided flag
          */
         public @NonNull <T> Builder<C> flag(final @NonNull CommandFlag<T> flag) {
             final List<CommandFlag<?>> flags = new ArrayList<>(this.flags);
@@ -2126,25 +2253,26 @@ public class Command<C> {
                     this.commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
-                    Collections.unmodifiableList(flags)
+                    Collections.unmodifiableList(flags),
+                    this.commandDescription
             );
         }
 
         /**
-         * Register a new command flag
+         * Registers a new command flag.
          *
-         * @param builder Flag builder. {@link CommandFlag.Builder#build()} will be invoked.
-         * @param <T>     Flag value type
-         * @return New builder instance that uses the provided flag
+         * @param builder flag builder. {@link CommandFlag.Builder#build()} will be invoked.
+         * @param <T>     flag value type
+         * @return new builder instance that uses the provided flag
          */
         public @NonNull <T> Builder<C> flag(final CommandFlag.@NonNull Builder<T> builder) {
             return this.flag(builder.build());
         }
 
         /**
-         * Build a command using the builder instance
+         * Builds a command using the builder instance.
          *
-         * @return Built command
+         * @return built command
          */
         public @NonNull Command<C> build() {
             final List<CommandComponent<C>> commandComponents = new ArrayList<>(this.commandComponents);
@@ -2165,7 +2293,8 @@ public class Command<C> {
                     this.commandExecutionHandler,
                     this.senderType,
                     this.commandPermission,
-                    this.commandMeta
+                    this.commandMeta,
+                    this.commandDescription
             );
         }
 
