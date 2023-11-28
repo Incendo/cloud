@@ -57,11 +57,11 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  * @since 1.3.0
  */
 @API(status = API.Status.STABLE, since = "1.3.0")
-public class CommandComponent<C> implements Comparable<CommandComponent<C>>, PreprocessorHolder<C> {
+public class CommandComponent<C> implements Comparable<CommandComponent<C>>, PreprocessorHolder<C>, Describable {
 
     private final String name;
     private final ArgumentParser<C, ?> parser;
-    private final ArgumentDescription description;
+    private final Description description;
     private final ComponentType componentType;
     private final DefaultValue<C, ?> defaultValue;
     private final TypeToken<?> valueType;
@@ -105,7 +105,7 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
         final @NonNull String name,
         final @NonNull ArgumentParser<C, ?> parser,
         final @NonNull TypeToken<?> valueType,
-        final @NonNull ArgumentDescription description,
+        final @NonNull Description description,
         final @NonNull ComponentType componentType,
         final @Nullable DefaultValue<C, ?> defaultValue,
         final @NonNull SuggestionProvider<C> suggestionProvider,
@@ -190,14 +190,8 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
         return Collections.emptyList();
     }
 
-    /**
-     * Gets the command component description
-     *
-     * @return command component description
-     * @since 1.4.0
-     */
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public final @NonNull ArgumentDescription argumentDescription() {
+    @Override
+    public final @NonNull Description description() {
         return this.description;
     }
 
@@ -387,7 +381,7 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
                 this.name(),
                 this.parser(),
                 this.valueType(),
-                this.argumentDescription(),
+                this.description(),
                 this.type(),
                 this.defaultValue(),
                 this.suggestionProvider(),
@@ -416,7 +410,7 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
         private CommandManager<C> commandManager;
         private String name;
         private ArgumentParser<C, T> parser;
-        private ArgumentDescription description = ArgumentDescription.empty();
+        private Description description = Description.empty();
         private boolean required = true;
         private DefaultValue<C, ?> defaultValue;
         private TypeToken<T> valueType;
@@ -537,12 +531,12 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
         }
 
         /**
-         * Sets the {@code description}. Defaults to {@link ArgumentDescription#empty()}.
+         * Sets the {@code description}. Defaults to {@link Description#empty()}.
          *
          * @param description the description
          * @return {@code this}
          */
-        public @NonNull @This Builder<C, T> description(final @NonNull ArgumentDescription description) {
+        public @NonNull @This Builder<C, T> description(final @NonNull Description description) {
             this.description = description;
             return this;
         }

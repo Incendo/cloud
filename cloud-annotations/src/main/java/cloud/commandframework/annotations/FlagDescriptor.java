@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Description;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.permission.CommandPermission;
 import java.lang.reflect.Parameter;
@@ -45,7 +45,7 @@ public final class FlagDescriptor implements Descriptor {
     private final String parserName;
     private final String suggestions;
     private final CommandPermission permission;
-    private final ArgumentDescription description;
+    private final Description description;
     private final boolean repeatable;
 
     /**
@@ -64,7 +64,7 @@ public final class FlagDescriptor implements Descriptor {
             final @Nullable String parserName,
             final @Nullable String suggestions,
             final @Nullable CommandPermission permission,
-            final @Nullable ArgumentDescription description,
+            final @Nullable Description description,
             final boolean repeatable
     ) {
         this.parameter = parameter;
@@ -147,7 +147,7 @@ public final class FlagDescriptor implements Descriptor {
      *
      * @return the flag description, or {@code null}
      */
-    public @Nullable ArgumentDescription description() {
+    public @Nullable Description description() {
         return this.description;
     }
 
@@ -203,7 +203,7 @@ public final class FlagDescriptor implements Descriptor {
         private final String parserName;
         private final String suggestions;
         private final CommandPermission permission;
-        private final ArgumentDescription description;
+        private final Description description;
         private final boolean repeatable;
 
         private Builder(
@@ -213,7 +213,7 @@ public final class FlagDescriptor implements Descriptor {
                 final @Nullable String parserName,
                 final @Nullable String suggestions,
                 final @Nullable CommandPermission permission,
-                final @Nullable ArgumentDescription description,
+                final @Nullable Description description,
                 final boolean repeatable
         ) {
             this.parameter = parameter;
@@ -365,7 +365,7 @@ public final class FlagDescriptor implements Descriptor {
          * @param description the new description
          * @return the builder containing the updated description
          */
-        public @NonNull Builder description(final @Nullable ArgumentDescription description) {
+        public @NonNull Builder description(final @Nullable Description description) {
             return new Builder(
                     this.parameter,
                     this.name,

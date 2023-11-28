@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.examples.bukkit.builder.feature.minecraft;
 
-import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Description;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
@@ -48,7 +48,7 @@ public final class SelectorExample implements BuilderFeature {
         manager.command(manager.commandBuilder("builder")
                 .literal("teleport")
                 .literal("entity")
-                .required("entity", singleEntitySelectorParser(), ArgumentDescription.of("Entity to teleport"))
+                .required("entity", singleEntitySelectorParser(), Description.of("Entity to teleport"))
                 .literal("here")
                 .senderType(Player.class)
                 .handler(commandContext -> {

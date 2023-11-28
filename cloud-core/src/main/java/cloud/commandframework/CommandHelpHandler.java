@@ -362,7 +362,7 @@ public final class CommandHelpHandler<C> {
          * @return the description
          * @since 2.0.0
          */
-        public @NonNull ArgumentDescription description() {
+        public @NonNull Description description() {
             return this.description.description();
         }
 
@@ -487,7 +487,7 @@ public final class CommandHelpHandler<C> {
          * @return the description
          * @since 2.0.0
          */
-        public @NonNull ArgumentDescription commandDescription() {
+        public @NonNull Description commandDescription() {
             return this.description.verboseDescription();
         }
 

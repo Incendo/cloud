@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.examples.bukkit.builder.feature.minecraft;
 
-import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Description;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
@@ -59,7 +59,7 @@ public final class ItemStackExample implements BuilderFeature {
                                     final int amount = pair.getSecond();
                                     return proto.createItemStack(amount, true);
                                 },
-                                ArgumentDescription.of("The ItemStack to give")
+                                Description.of("The ItemStack to give")
                         )
                         .handler(ctx -> {
                             final ItemStack stack = ctx.get("itemstack");

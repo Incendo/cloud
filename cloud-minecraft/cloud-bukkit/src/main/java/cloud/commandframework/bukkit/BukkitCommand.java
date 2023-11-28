@@ -75,10 +75,10 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
         final CommandDescription description = command.commandDescription();
         if (!description.isEmpty()) {
-            return description.description().getDescription();
+            return description.description().textDescription();
         }
 
-        return command.rootComponent().argumentDescription().getDescription();
+        return command.rootComponent().description().textDescription();
     }
 
     BukkitCommand(

@@ -201,7 +201,7 @@ public class Command<C> {
     public static <C> @NonNull Builder<C> newBuilder(
             final @NonNull String commandName,
             final @NonNull CommandMeta commandMeta,
-            final @NonNull ArgumentDescription description,
+            final @NonNull Description description,
             final @NonNull String @NonNull... aliases
     ) {
         final List<CommandComponent<C>> commands = new ArrayList<>();
@@ -590,7 +590,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "1.4.0")
         public @NonNull Builder<C> literal(
                 final @NonNull String main,
-                final @NonNull ArgumentDescription description,
+                final @NonNull Description description,
                 final @NonNull String... aliases
         ) {
             return this.required(main, LiteralParser.literal(main, aliases), description);
@@ -609,7 +609,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <U extends CloudKeyHolder & ParserDescriptor> @NonNull Builder<C> required(
                 final @NonNull U argument,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             final CommandComponent.Builder builder = CommandComponent.builder()
                     .key(argument.getKey())
@@ -697,7 +697,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <U extends CloudKeyHolder & ParserDescriptor> @NonNull Builder<C> optional(
                 final @NonNull U argument,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             final CommandComponent.Builder builder = CommandComponent.builder()
                     .key(argument.getKey())
@@ -862,7 +862,7 @@ public class Command<C> {
         public <T> @NonNull Builder<C> required(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             return this.argument(CommandComponent.<C, T>builder().key(name).parser(parser).description(description).build());
         }
@@ -882,7 +882,7 @@ public class Command<C> {
         public <T> @NonNull Builder<C> required(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull ArgumentDescription description,
+                final @NonNull Description description,
                 final @NonNull SuggestionProvider<C> suggestions
         ) {
             return this.argument(
@@ -909,7 +909,7 @@ public class Command<C> {
         public <T> @NonNull Builder<C> required(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             return this.argument(CommandComponent.<C, T>builder().name(name).parser(parser).description(description).build());
         }
@@ -929,7 +929,7 @@ public class Command<C> {
         public <T> @NonNull Builder<C> required(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull ArgumentDescription description,
+                final @NonNull Description description,
                 final @NonNull SuggestionProvider<C> suggestions
         ) {
             return this.argument(
@@ -1043,7 +1043,7 @@ public class Command<C> {
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1070,7 +1070,7 @@ public class Command<C> {
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull ArgumentDescription description,
+                final @NonNull Description description,
                 final @NonNull SuggestionProvider<C> suggestions
         ) {
             return this.argument(
@@ -1098,7 +1098,7 @@ public class Command<C> {
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1125,7 +1125,7 @@ public class Command<C> {
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull ArgumentDescription description,
+                final @NonNull Description description,
                 final @NonNull SuggestionProvider<C> suggestions
         ) {
             return this.argument(
@@ -1261,7 +1261,7 @@ public class Command<C> {
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<C, T> parser,
                 final @NonNull DefaultValue<C, T> defaultValue,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1290,7 +1290,7 @@ public class Command<C> {
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<C, T> parser,
                 final @NonNull DefaultValue<C, T> defaultValue,
-                final @NonNull ArgumentDescription description,
+                final @NonNull Description description,
                 final @NonNull SuggestionProvider<C> suggestions
         ) {
             return this.argument(
@@ -1320,7 +1320,7 @@ public class Command<C> {
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<C, T> parser,
                 final @NonNull DefaultValue<C, T> defaultValue,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1349,7 +1349,7 @@ public class Command<C> {
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<C, T> parser,
                 final @NonNull DefaultValue<C, T> defaultValue,
-                final @NonNull ArgumentDescription description,
+                final @NonNull Description description,
                 final @NonNull SuggestionProvider<C> suggestions
         ) {
             return this.argument(
@@ -1478,7 +1478,7 @@ public class Command<C> {
                 final @NonNull String name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
                 final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1513,7 +1513,7 @@ public class Command<C> {
                 final @NonNull CloudKey<Pair<U, V>> name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
                 final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1548,7 +1548,7 @@ public class Command<C> {
                 final @NonNull String name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
                 final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1583,7 +1583,7 @@ public class Command<C> {
                 final @NonNull CloudKey<Pair<U, V>> name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
                 final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1623,7 +1623,7 @@ public class Command<C> {
                 final @NonNull Pair<String, String> names,
                 final @NonNull Pair<Class<U>, Class<V>> parserPair,
                 final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1663,7 +1663,7 @@ public class Command<C> {
                 final @NonNull Pair<String, String> names,
                 final @NonNull Pair<Class<U>, Class<V>> parserPair,
                 final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1703,7 +1703,7 @@ public class Command<C> {
                 final @NonNull Pair<String, String> names,
                 final @NonNull Pair<Class<U>, Class<V>> parserPair,
                 final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1743,7 +1743,7 @@ public class Command<C> {
                 final @NonNull Pair<String, String> names,
                 final @NonNull Pair<Class<U>, Class<V>> parserPair,
                 final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1779,7 +1779,7 @@ public class Command<C> {
                 final @NonNull String name,
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1815,7 +1815,7 @@ public class Command<C> {
                 final @NonNull CloudKey<Triplet<U, V, W>> name,
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1851,7 +1851,7 @@ public class Command<C> {
                 final @NonNull String name,
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1887,7 +1887,7 @@ public class Command<C> {
                 final @NonNull CloudKey<Triplet<U, V, W>> name,
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1928,7 +1928,7 @@ public class Command<C> {
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
                 final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1969,7 +1969,7 @@ public class Command<C> {
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
                 final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -2010,7 +2010,7 @@ public class Command<C> {
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
                 final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -2051,7 +2051,7 @@ public class Command<C> {
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
                 final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -2284,7 +2284,7 @@ public class Command<C> {
                                 .name("flags")
                                 .parser(flagParser)
                                 .valueType(Object.class)
-                                .description(ArgumentDescription.of("Command flags"))
+                                .description(Description.of("Command flags"))
                                 .build();
                 commandComponents.add(flagComponent);
             }

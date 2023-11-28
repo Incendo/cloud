@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.fabric.argument;
 
-import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Description;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
@@ -53,7 +53,7 @@ public final class TeamArgument<C> extends CommandArgument<C, PlayerTeam> {
     TeamArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull Description defaultDescription
     ) {
         super(
                 name,
