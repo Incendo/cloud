@@ -62,7 +62,17 @@ public class CompoundArgument<T extends Tuple, C, O> implements ParserDescriptor
             final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory,
             final @NonNull TypeToken<O> valueType
     ) {
-        this.parser = ParserDescriptor.of(new CompoundParser<>(names, types, parserTuple, mapper, tupleFactory), valueType);
+        this.parser = ParserDescriptor.of(
+                new CompoundParser<>(
+                        names.toArray(),
+                        types.toArray(),
+                        parserTuple.toArray(),
+                        mapper,
+                        tupleFactory,
+                        valueType
+                ),
+                valueType
+        );
     }
 
     @Override

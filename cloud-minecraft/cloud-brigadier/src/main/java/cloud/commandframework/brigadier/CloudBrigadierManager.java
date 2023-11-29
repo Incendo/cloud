@@ -26,7 +26,7 @@ package cloud.commandframework.brigadier;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.compound.CompoundParser;
+import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.MappedArgumentParser;
@@ -480,27 +480,24 @@ public final class CloudBrigadierManager<C, S> {
             final com.mojang.brigadier.@NonNull Command<S> executor,
             final SuggestionProvider<S> suggestionProvider
     ) {
-        if (root.component().parser() instanceof CompoundParser) {
-            final CompoundParser<?, C, ?> compoundParser =
-                    (CompoundParser<?, C, ?>) root.component().parser();
-            final Object[] parsers = compoundParser.parsers();
-            final Object[] types = compoundParser.types();
-            final Object[] names = compoundParser.names();
+        if (root.component().parser() instanceof AggregateCommandParser) {
+            final AggregateCommandParser<C, ?> aggregateParser = (AggregateCommandParser<C, ?>) root.component().parser();
+            final List<? extends CommandComponent<?>> components = aggregateParser.components();
 
             /* Build nodes backwards */
-            final ArgumentBuilder<S, ?>[] argumentBuilders = new ArgumentBuilder[parsers.length];
+            final ArgumentBuilder<S, ?>[] argumentBuilders = new ArgumentBuilder[components.size()];
 
-            for (int i = parsers.length - 1; i >= 0; i--) {
-                @SuppressWarnings("unchecked") final ArgumentParser<C, ?> parser = (ArgumentParser<C, ?>) parsers[i];
-                final Pair<ArgumentType<?>, SuggestionProvider<S>> pair = this.getArgument(
-                        TypeToken.get((Class<?>) types[i]),
-                        parser
-                );
-                final SuggestionProvider<S> provider = pair.getSecond() == delegateSuggestions() ? suggestionProvider
+            for (int i = components.size() - 1; i >= 0; i--) {
+                final CommandComponent<C> component = (CommandComponent<C>) components.get(i);
+
+                final ArgumentParser<C, ?> parser = component.parser();
+                final Pair<ArgumentType<?>, SuggestionProvider<S>> pair = this.getArgument(component.valueType(), parser);
+                final SuggestionProvider<S> provider = pair.getSecond() == delegateSuggestions()
+                        ? suggestionProvider
                         : pair.getSecond();
 
                 final ArgumentBuilder<S, ?> fragmentBuilder = RequiredArgumentBuilder
-                        .<S, Object>argument((String) names[i], (ArgumentType<Object>) pair.getFirst())
+                        .<S, Object>argument(component.name(), (ArgumentType<Object>) pair.getFirst())
                         .suggests(provider)
                         .requires(sender -> permissionChecker.test(
                                 sender,
@@ -512,18 +509,18 @@ public final class CloudBrigadierManager<C, S> {
                         ));
                 argumentBuilders[i] = fragmentBuilder;
 
-                if (forceExecutor || ((i == parsers.length - 1) && (root.isLeaf() || !root.component().required()))) {
+                if (forceExecutor || ((i == components.size() - 1) && (root.isLeaf() || !root.component().required()))) {
                     fragmentBuilder.executes(executor);
                 }
 
                 /* Link all previous builder to this one */
-                if ((i + 1) < parsers.length) {
+                if ((i + 1) < components.size()) {
                     fragmentBuilder.then(argumentBuilders[i + 1]);
                 }
             }
 
             for (final cloud.commandframework.internal.CommandNode<C> node : root.children()) {
-                argumentBuilders[parsers.length - 1]
+                argumentBuilders[components.size() - 1]
                         .then(this.constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
             }
 
@@ -604,43 +601,40 @@ public final class CloudBrigadierManager<C, S> {
             command = command.substring(leading.split(":")[0].length() + 1);
         }
 
-        final List<Suggestion> suggestionsUnfiltered = this.commandManager.suggest(
-                commandContext.getSender(),
-                command
-        );
+        return this.commandManager.suggestFuture(commandContext.getSender(), command).thenCompose(suggestionsUnfiltered -> {
+            /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
+            final List<Suggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
+            if (parentNode != null) {
+                final Set<String> siblingLiterals = parentNode.children().stream()
+                        .map(cloud.commandframework.internal.CommandNode::component)
+                        .filter(Objects::nonNull)
+                        .flatMap(commandComponent -> commandComponent.aliases().stream())
+                        .collect(Collectors.toSet());
 
-        /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
-        final List<Suggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
-        if (parentNode != null) {
-            final Set<String> siblingLiterals = parentNode.children().stream()
-                    .map(cloud.commandframework.internal.CommandNode::component)
-                    .filter(Objects::nonNull)
-                    .flatMap(commandComponent -> commandComponent.aliases().stream())
-                    .collect(Collectors.toSet());
-
-            suggestions.removeIf(suggestion -> siblingLiterals.contains(suggestion.suggestion()));
-        }
-
-        SuggestionsBuilder suggestionsBuilder = builder;
-
-        final int lastIndexOfSpaceInRemainingString = builder.getRemaining().lastIndexOf(' ');
-        if (lastIndexOfSpaceInRemainingString != -1) {
-            suggestionsBuilder = builder.createOffset(builder.getStart() + lastIndexOfSpaceInRemainingString + 1);
-        }
-
-        for (final Suggestion suggestion : suggestions) {
-            String tooltip = component.name();
-            if (component.type() != CommandComponent.ComponentType.LITERAL) {
-                if (component.required()) {
-                    tooltip = '<' + tooltip + '>';
-                } else {
-                    tooltip = '[' + tooltip + ']';
-                }
+                suggestions.removeIf(suggestion -> siblingLiterals.contains(suggestion.suggestion()));
             }
-            suggestionsBuilder = suggestionsBuilder.suggest(suggestion.suggestion(), new LiteralMessage(tooltip));
-        }
 
-        return suggestionsBuilder.buildFuture();
+            SuggestionsBuilder suggestionsBuilder = builder;
+
+            final int lastIndexOfSpaceInRemainingString = builder.getRemaining().lastIndexOf(' ');
+            if (lastIndexOfSpaceInRemainingString != -1) {
+                suggestionsBuilder = builder.createOffset(builder.getStart() + lastIndexOfSpaceInRemainingString + 1);
+            }
+
+            for (final Suggestion suggestion : suggestions) {
+                String tooltip = component.name();
+                if (component.type() != CommandComponent.ComponentType.LITERAL) {
+                    if (component.required()) {
+                        tooltip = '<' + tooltip + '>';
+                    } else {
+                        tooltip = '[' + tooltip + ']';
+                    }
+                }
+                suggestionsBuilder = suggestionsBuilder.suggest(suggestion.suggestion(), new LiteralMessage(tooltip));
+            }
+
+            return suggestionsBuilder.buildFuture();
+        });
     }
 
     /**
