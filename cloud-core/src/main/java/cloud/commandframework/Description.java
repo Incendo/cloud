@@ -23,44 +23,67 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import static java.util.Objects.requireNonNull;
+
 /**
- * {@link CommandArgument} description
+ * A description for a command or a command component.
+ *
+ * @since 2.0.0
  */
-@API(status = API.Status.INTERNAL, since = "2.0.0")
-final class Description implements ArgumentDescription {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface Description {
 
     /**
-     * Empty command description
-     */
-    static final Description EMPTY = new Description("");
-
-    private final String description;
-
-    Description(final @NonNull String description) {
-        this.description = description;
-    }
-
-    /**
-     * Get the command description
+     * Returns an empty command description.
      *
      * @return Command description
      */
-    @Override
-    public @NonNull String getDescription() {
-        return this.description;
+    static @NonNull Description empty() {
+        return DescriptionImpl.EMPTY;
     }
 
     /**
-     * Get the command description
+     * Creates a command description instance.
      *
-     * @return Command description
+     * @param string Command description
+     * @return Created command description
      */
-    @Override
-    public @NonNull String toString() {
-        return this.description;
+    static @NonNull Description of(final @NonNull String string) {
+        if (requireNonNull(string, "string").isEmpty()) {
+            return DescriptionImpl.EMPTY;
+        } else {
+            return new DescriptionImpl(string);
+        }
+    }
+
+    /**
+     * Creates a command description instance.
+     *
+     * @param string Command description
+     * @return Created command description
+     */
+    static @NonNull Description description(final @NonNull String string) {
+        return of(string);
+    }
+
+    /**
+     * Returns the plain-text version of this description.
+     * <p>
+     * If {@link #isEmpty()} is {@code true} this will return an empty string.
+     *
+     * @return plain-text description
+     */
+    @NonNull String textDescription();
+
+    /**
+     * Returns whether this description contains contents.
+     *
+     * @return {@code true} if the description is empty, or {@code false} if not
+     */
+    default boolean isEmpty() {
+        return this.textDescription().isEmpty();
     }
 }

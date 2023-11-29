@@ -24,11 +24,11 @@
 package cloud.commandframework.fabric.testmod;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.CommandDescription;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricClientCommandManager;
 import cloud.commandframework.fabric.argument.ItemInputArgument;
-import cloud.commandframework.meta.CommandMeta;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
@@ -68,7 +68,7 @@ public final class FabricClientExample implements ClientModInitializer {
         final Command.Builder<FabricClientCommandSource> base = commandManager.commandBuilder("cloud_client");
 
         commandManager.command(base.literal("dump")
-                .meta(CommandMeta.DESCRIPTION, "Dump the client's Brigadier command tree")
+                .commandDescription(CommandDescription.commandDescription("Dump the client's Brigadier command tree"))
                 .handler(ctx -> {
                     final Path target = FabricLoader.getInstance().getGameDir().resolve(
                             "cloud-dump-" + Instant.now().toString().replace(':', '-') + ".json"

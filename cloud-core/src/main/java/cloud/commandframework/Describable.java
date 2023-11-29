@@ -26,52 +26,21 @@ package cloud.commandframework;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import static java.util.Objects.requireNonNull;
-
 /**
- * A description for a {@link CommandComponent}
+ * Something that has an associated {@link Description}.
  *
- * @since 1.4.0
+ * @since 2.0.0
  */
-@API(status = API.Status.STABLE, since = "1.4.0")
-public interface ArgumentDescription {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface Describable {
 
     /**
-     * Get an empty command description.
+     * Returns the description that describes this object.
+     * <p>
+     * This will never return {@code null}, and will instead return {@link Description#empty()} in the case
+     * that no description is present. You may check for emptiness by using {@link Description#isEmpty()}.
      *
-     * @return Command description
+     * @return the description
      */
-    static @NonNull ArgumentDescription empty() {
-        return Description.EMPTY;
-    }
-
-    /**
-     * Create a command description instance.
-     *
-     * @param string Command description
-     * @return Created command description
-     */
-    static @NonNull ArgumentDescription of(final @NonNull String string) {
-        if (requireNonNull(string, "string").isEmpty()) {
-            return Description.EMPTY;
-        } else {
-            return new Description(string);
-        }
-    }
-
-    /**
-     * Get the plain-text description.
-     *
-     * @return Command description
-     */
-    @NonNull String getDescription();
-
-    /**
-     * Get whether this description contains contents.
-     *
-     * @return if this description is empty or not
-     */
-    default boolean isEmpty() {
-        return this.getDescription().isEmpty();
-    }
+    @NonNull Description description();
 }

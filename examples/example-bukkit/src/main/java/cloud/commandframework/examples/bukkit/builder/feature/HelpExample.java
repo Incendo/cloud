@@ -59,7 +59,7 @@ public final class HelpExample implements BuilderFeature {
                                         .queryRootIndex(ctx.getSender())
                                         .getEntries()
                                         .stream()
-                                        .map(CommandHelpHandler.VerboseHelpEntry::getSyntaxString)
+                                        .map(CommandHelpHandler.VerboseHelpEntry::syntaxString)
                                         .map(Suggestion::simple)
                                         .collect(Collectors.toList())
                         )

@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.arguments.flags;
 
-import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.Description;
 import cloud.commandframework.TypedCommandComponent;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.permission.CommandPermission;
@@ -51,7 +51,7 @@ public final class CommandFlag<T> {
 
     private final @NonNull String name;
     private final @NonNull String @NonNull [] aliases;
-    private final @NonNull ArgumentDescription description;
+    private final @NonNull Description description;
     private final @NonNull CommandPermission permission;
     private final @NonNull FlagMode mode;
 
@@ -60,7 +60,7 @@ public final class CommandFlag<T> {
     private CommandFlag(
             final @NonNull String name,
             final @NonNull String @NonNull [] aliases,
-            final @NonNull ArgumentDescription description,
+            final @NonNull Description description,
             final @NonNull CommandPermission permission,
             final @Nullable TypedCommandComponent<?, T> commandComponent,
             final @NonNull FlagMode mode
@@ -120,7 +120,7 @@ public final class CommandFlag<T> {
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public @NonNull ArgumentDescription getArgumentDescription() {
+    public @NonNull Description getArgumentDescription() {
         return this.description;
     }
 
@@ -174,7 +174,7 @@ public final class CommandFlag<T> {
 
         private final String name;
         private final String[] aliases;
-        private final ArgumentDescription description;
+        private final Description description;
         private final CommandPermission permission;
         private final TypedCommandComponent<?, T> commandComponent;
         private final FlagMode mode;
@@ -182,7 +182,7 @@ public final class CommandFlag<T> {
         private Builder(
                 final @NonNull String name,
                 final @NonNull String[] aliases,
-                final @NonNull ArgumentDescription description,
+                final @NonNull Description description,
                 final @NonNull CommandPermission permission,
                 final @Nullable TypedCommandComponent<?, T> commandComponent,
                 final @NonNull FlagMode mode
@@ -196,7 +196,7 @@ public final class CommandFlag<T> {
         }
 
         private Builder(final @NonNull String name) {
-            this(name, new String[0], ArgumentDescription.empty(), Permission.empty(), null, FlagMode.SINGLE);
+            this(name, new String[0], Description.empty(), Permission.empty(), null, FlagMode.SINGLE);
         }
 
         /**
@@ -253,7 +253,7 @@ public final class CommandFlag<T> {
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
-        public @NonNull Builder<T> withDescription(final @NonNull ArgumentDescription description) {
+        public @NonNull Builder<T> withDescription(final @NonNull Description description) {
             return new Builder<>(this.name, this.aliases, description, this.permission, this.commandComponent, this.mode);
         }
 

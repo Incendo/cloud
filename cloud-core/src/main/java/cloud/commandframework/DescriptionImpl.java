@@ -21,28 +21,47 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework;
 
-import cloud.commandframework.Command;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.Objects;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Annotation that modifies the command builder
- * to invoke {@link Command.Builder#commandDescription(cloud.commandframework.CommandDescription)}
- * using {@link cloud.commandframework.CommandDescription#commandDescription(String)}.
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
-public @interface CommandDescription {
+@API(status = API.Status.INTERNAL, since = "2.0.0")
+final class DescriptionImpl implements Description {
 
-    /**
-     * Command description
-     *
-     * @return Command syntax
-     */
-    @NonNull String value() default "";
+    static final DescriptionImpl EMPTY = new DescriptionImpl("");
+
+    private final String description;
+
+    DescriptionImpl(final @NonNull String description) {
+        this.description = description;
+    }
+
+    @Override
+    public @NonNull String textDescription() {
+        return this.description;
+    }
+
+    @Override
+    public @NonNull String toString() {
+        return this.description;
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        final DescriptionImpl that = (DescriptionImpl) object;
+        return Objects.equals(this.description, that.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.description);
+    }
 }

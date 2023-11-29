@@ -566,7 +566,7 @@ public abstract class CommandManager<C> {
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
             final @NonNull Collection<String> aliases,
-            final @NonNull ArgumentDescription description,
+            final @NonNull Description description,
             final @NonNull CommandMeta meta
     ) {
         return Command.<C>newBuilder(
@@ -602,7 +602,7 @@ public abstract class CommandManager<C> {
         return Command.<C>newBuilder(
                 name,
                 meta,
-                ArgumentDescription.empty(),
+                Description.empty(),
                 aliases.toArray(new String[0])
         ).manager(this);
     }
@@ -628,7 +628,7 @@ public abstract class CommandManager<C> {
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
             final @NonNull CommandMeta meta,
-            final @NonNull ArgumentDescription description,
+            final @NonNull Description description,
             final @NonNull String... aliases
     ) {
         return Command.<C>newBuilder(
@@ -664,7 +664,7 @@ public abstract class CommandManager<C> {
         return Command.<C>newBuilder(
                 name,
                 meta,
-                ArgumentDescription.empty(),
+                Description.empty(),
                 aliases
         ).manager(this);
     }
@@ -692,7 +692,7 @@ public abstract class CommandManager<C> {
     @API(status = API.Status.STABLE, since = "1.4.0")
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
-            final @NonNull ArgumentDescription description,
+            final @NonNull Description description,
             final @NonNull String... aliases
     ) {
         return Command.<C>newBuilder(
@@ -729,7 +729,7 @@ public abstract class CommandManager<C> {
         return Command.<C>newBuilder(
                 name,
                 this.createDefaultCommandMeta(),
-                ArgumentDescription.empty(),
+                Description.empty(),
                 aliases
         ).manager(this);
     }

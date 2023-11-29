@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Description;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -39,10 +39,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 class ArgumentExtractorImpl implements ArgumentExtractor {
 
-    private final Function<@NonNull Argument, @Nullable ArgumentDescription> descriptionMapper;
+    private final Function<@NonNull Argument, @Nullable Description> descriptionMapper;
 
     ArgumentExtractorImpl() {
-        this.descriptionMapper = argument -> ArgumentDescription.of(argument.description());
+        this.descriptionMapper = argument -> Description.of(argument.description());
     }
 
     @Override

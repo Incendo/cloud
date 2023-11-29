@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.examples.bukkit.builder.feature;
 
-import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Description;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
@@ -45,9 +45,9 @@ public final class StringArrayExample implements BuilderFeature {
             final @NonNull BukkitCommandManager<CommandSender> manager
     ) {
         manager.command(
-                manager.commandBuilder("builder", ArgumentDescription.of("Bukkit-esque cmmand"))
+                manager.commandBuilder("builder", Description.of("Bukkit-esque cmmand"))
                         .literal("arraycommand")
-                        .optional("args", stringArrayParser(), ArgumentDescription.of("Arguments"))
+                        .optional("args", stringArrayParser(), Description.of("Arguments"))
                         .handler(context -> {
                             final String[] args = context.getOrDefault("args", new String[0]);
                             context.getSender().sendMessage("You wrote: " + StringUtils.join(args, " "));

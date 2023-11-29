@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Description;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import java.lang.reflect.Parameter;
 import java.util.Objects;
@@ -39,7 +39,7 @@ public final class ArgumentDescriptor implements Descriptor {
     private final String parserName;
     private final String suggestions;
     private final String defaultValue;
-    private final ArgumentDescription description;
+    private final Description description;
 
     /**
      * Creates a new builder.
@@ -56,7 +56,7 @@ public final class ArgumentDescriptor implements Descriptor {
             final @Nullable String parserName,
             final @Nullable String suggestions,
             final @Nullable String defaultValue,
-            final @Nullable ArgumentDescription description
+            final @Nullable Description description
     ) {
         this.parameter = parameter;
         this.name = name;
@@ -127,7 +127,7 @@ public final class ArgumentDescriptor implements Descriptor {
      *
      * @return the argument description, or {@code null}
      */
-    public @Nullable ArgumentDescription description() {
+    public @Nullable Description description() {
         return this.description;
     }
 
@@ -161,7 +161,7 @@ public final class ArgumentDescriptor implements Descriptor {
         private final String parserName;
         private final String suggestions;
         private final String defaultValue;
-        private final ArgumentDescription description;
+        private final Description description;
 
         private Builder(
                 final @Nullable Parameter parameter,
@@ -169,7 +169,7 @@ public final class ArgumentDescriptor implements Descriptor {
                 final @Nullable String parserName,
                 final @Nullable String suggestions,
                 final @Nullable String defaultValue,
-                final @Nullable ArgumentDescription description
+                final @Nullable Description description
         ) {
             this.parameter = parameter;
             this.name = name;
@@ -260,7 +260,7 @@ public final class ArgumentDescriptor implements Descriptor {
          * @param description the new description
          * @return the builder containing the updated description
          */
-        public @NonNull Builder description(final @Nullable ArgumentDescription description) {
+        public @NonNull Builder description(final @Nullable Description description) {
             return new Builder(this.parameter, this.name, this.parserName, this.suggestions, this.defaultValue, description);
         }
 

@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.examples.bukkit.builder.feature;
 
-import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Description;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
@@ -55,7 +55,7 @@ public final class CompoundArgumentExample implements BuilderFeature {
                 .literal("me")
                 // Require a player sender
                 .senderType(Player.class)
-                .required(worldKey, worldParser(), ArgumentDescription.of("World name"))
+                .required(worldKey, worldParser(), Description.of("World name"))
                 .requiredArgumentTriplet(
                         coordsKey,
                         TypeToken.get(Vector.class),
@@ -64,7 +64,7 @@ public final class CompoundArgumentExample implements BuilderFeature {
                         (sender, triplet) -> new Vector(triplet.getFirst(), triplet.getSecond(),
                                 triplet.getThird()
                         ),
-                        ArgumentDescription.of("Coordinates")
+                        Description.of("Coordinates")
                 )
                 .handler(context -> {
                     final Player player = context.getSender();

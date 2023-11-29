@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.kotlin.extension
 
-import cloud.commandframework.ArgumentDescription
 import cloud.commandframework.Command
 import cloud.commandframework.CommandManager
+import cloud.commandframework.Description
 import cloud.commandframework.kotlin.MutableCommandBuilder
 import kotlin.reflect.KClass
 
@@ -40,7 +40,7 @@ import kotlin.reflect.KClass
  */
 public fun <C : Any> CommandManager<C>.commandBuilder(
     name: String,
-    description: ArgumentDescription = ArgumentDescription.empty(),
+    description: Description = Description.empty(),
     aliases: Array<String> = emptyArray(),
     lambda: MutableCommandBuilder<C>.() -> Unit
 ): MutableCommandBuilder<C> = MutableCommandBuilder(name, description, aliases, this, lambda)
@@ -57,7 +57,7 @@ public fun <C : Any> CommandManager<C>.commandBuilder(
  */
 public fun <C : Any> CommandManager<C>.buildAndRegister(
     name: String,
-    description: ArgumentDescription = ArgumentDescription.empty(),
+    description: Description = Description.empty(),
     aliases: Array<String> = emptyArray(),
     lambda: MutableCommandBuilder<C>.() -> Unit
 ): MutableCommandBuilder<C> = commandBuilder(name, description, aliases, lambda).register()
@@ -108,11 +108,11 @@ public fun <C : Any> Command.Builder<C>.mutate(
 ): MutableCommandBuilder<C> = MutableCommandBuilder(this, commandManager).also(lambda)
 
 /**
- * Get a [ArgumentDescription], defaulting to [ArgumentDescription.empty]
+ * Get a [Description], defaulting to [Description.empty]
  *
  * @param description description string
  * @return the description
  * @since 1.4.0
  */
-public fun argumentDescription(description: String = ""): ArgumentDescription =
-    if (description.isEmpty()) ArgumentDescription.empty() else ArgumentDescription.of(description)
+public fun argumentDescription(description: String = ""): Description =
+    if (description.isEmpty()) Description.empty() else Description.of(description)
