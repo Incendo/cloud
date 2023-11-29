@@ -57,7 +57,7 @@ class CommandHelpHandlerTest {
                 manager.commandBuilder("test")
                         .commandDescription(commandDescription("Command with variables"))
                         .literal("int")
-                        .required("int", integerParser(), ArgumentDescription.of("A number"))
+                        .required("int", integerParser(), Description.of("A number"))
                         .build()
         );
         manager.command(manager.commandBuilder("test").required("potato", stringParser()));
@@ -65,7 +65,7 @@ class CommandHelpHandlerTest {
         manager.command(manager.commandBuilder("vec")
                 .commandDescription(commandDescription("Takes in a vector"))
                 .requiredArgumentPair("vec", Pair.of("x", "y"),
-                        Pair.of(Double.class, Double.class), ArgumentDescription.of("Vector")
+                        Pair.of(Double.class, Double.class), Description.of("Vector")
                 )
                 .build());
     }
@@ -214,7 +214,7 @@ class CommandHelpHandlerTest {
         while (iterator.hasNext()) {
             final CommandHelpHandler.VerboseHelpEntry<TestCommandSender> entry = iterator.next();
             final String prefix = iterator.hasNext() ? "├──" : "└──";
-            System.out.printf("    %s /%s: %s\n", prefix, entry.syntaxString(), entry.description().getDescription());
+            System.out.printf("    %s /%s: %s\n", prefix, entry.syntaxString(), entry.description().textDescription());
         }
     }
 
@@ -241,13 +241,13 @@ class CommandHelpHandlerTest {
     private void printVerboseHelpTopic(final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> helpTopic) {
         System.out.printf("└── Command: /%s\n", manager.commandSyntaxFormatter()
                 .apply(helpTopic.command().components(), null));
-        System.out.printf("    ├── Description: %s\n", helpTopic.commandDescription().getDescription());
+        System.out.printf("    ├── Description: %s\n", helpTopic.commandDescription().textDescription());
         System.out.println("    └── Args: ");
         final Iterator<CommandComponent<TestCommandSender>> iterator = helpTopic.command().components().iterator();
         while (iterator.hasNext()) {
             final CommandComponent<TestCommandSender> component = iterator.next();
 
-            String description = component.argumentDescription().getDescription();
+            String description = component.description().textDescription();
             if (!description.isEmpty()) {
                 description = ": " + description;
             }

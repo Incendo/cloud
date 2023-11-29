@@ -29,17 +29,17 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 @SuppressWarnings("unused")
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface CommandDescription {
+public interface CommandDescription extends Describable {
 
     /**
      * Returns an empty command description.
      * <p>
-     * Both {@link #description()} and {@link #verboseDescription()} will return {@link ArgumentDescription#empty()}.
+     * Both {@link #description()} and {@link #verboseDescription()} will return {@link Description#empty()}.
      *
      * @return the description instance
      */
     static @NonNull CommandDescription empty() {
-        return new CommandDescriptionImpl(ArgumentDescription.empty());
+        return new CommandDescriptionImpl(Description.empty());
     }
 
     /**
@@ -50,8 +50,8 @@ public interface CommandDescription {
      * @return the description instance
      */
     static @NonNull CommandDescription commandDescription(
-            final @NonNull ArgumentDescription description,
-            final @NonNull ArgumentDescription verboseDescription
+            final @NonNull Description description,
+            final @NonNull Description verboseDescription
     ) {
         return new CommandDescriptionImpl(description, verboseDescription);
     }
@@ -64,7 +64,7 @@ public interface CommandDescription {
      * @param description the command description
      * @return the description instance
      */
-    static @NonNull CommandDescription commandDescription(final @NonNull ArgumentDescription description) {
+    static @NonNull CommandDescription commandDescription(final @NonNull Description description) {
         return new CommandDescriptionImpl(description);
     }
 
@@ -79,7 +79,7 @@ public interface CommandDescription {
             final @NonNull String description,
             final @NonNull String verboseDescription
     ) {
-        return new CommandDescriptionImpl(ArgumentDescription.of(description), ArgumentDescription.of(verboseDescription));
+        return new CommandDescriptionImpl(Description.of(description), Description.of(verboseDescription));
     }
 
     /**
@@ -91,7 +91,7 @@ public interface CommandDescription {
      * @return the description instance
      */
     static @NonNull CommandDescription commandDescription(final @NonNull String description) {
-        return new CommandDescriptionImpl(ArgumentDescription.of(description));
+        return new CommandDescriptionImpl(Description.of(description));
     }
 
     /**
@@ -99,51 +99,52 @@ public interface CommandDescription {
      *
      * @return the command description
      */
-    @NonNull ArgumentDescription description();
+    @Override
+    @NonNull Description description();
 
     /**
      * Returns the verbose version of the command description.
      *
      * @return the verbose command description
      */
-    @NonNull ArgumentDescription verboseDescription();
+    @NonNull Description verboseDescription();
 
     /**
      * Returns whether the description is empty.
      *
-     * @return whether the description equals {@link ArgumentDescription#empty()}
+     * @return whether the description equals {@link Description#empty()}
      */
     default boolean isEmpty() {
-        return this.description().equals(ArgumentDescription.empty());
+        return this.description().equals(Description.empty());
     }
 
 
     final class CommandDescriptionImpl implements CommandDescription {
 
-        private final ArgumentDescription description;
-        private final ArgumentDescription verboseDescription;
+        private final Description description;
+        private final Description verboseDescription;
 
         private CommandDescriptionImpl(
-                final @NonNull ArgumentDescription description,
-                final @NonNull ArgumentDescription verboseDescription
+                final @NonNull Description description,
+                final @NonNull Description verboseDescription
         ) {
             this.description = description;
             this.verboseDescription = verboseDescription;
         }
 
         private CommandDescriptionImpl(
-                final @NonNull ArgumentDescription description
+                final @NonNull Description description
         ) {
             this(description, description);
         }
 
         @Override
-        public @NonNull ArgumentDescription description() {
+        public @NonNull Description description() {
             return this.description;
         }
 
         @Override
-        public @NonNull ArgumentDescription verboseDescription() {
+        public @NonNull Description verboseDescription() {
             return this.verboseDescription;
         }
 

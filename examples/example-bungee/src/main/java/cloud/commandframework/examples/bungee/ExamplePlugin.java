@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.examples.bungee;
 
-import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.Description;
 import cloud.commandframework.bungee.BungeeCommandManager;
 import cloud.commandframework.bungee.arguments.PlayerParser;
 import cloud.commandframework.bungee.arguments.ServerParser;
@@ -138,7 +138,7 @@ public final class ExamplePlugin extends Plugin {
         this.manager.command(
                 this.manager.commandBuilder("server")
                         .senderType(ProxiedPlayer.class)
-                        .required("server", ServerParser.serverParser(), ArgumentDescription.of("Server name"))
+                        .required("server", ServerParser.serverParser(), Description.of("Server name"))
                         .handler(context -> {
                             final ServerInfo server = context.get("server");
                             this.bungeeAudiences.sender(context.getSender()).sendMessage(

@@ -23,12 +23,12 @@
 //
 package cloud.commandframework.minecraft.extras;
 
-import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandDescription;
 import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.Description;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -396,11 +396,11 @@ public final class MinecraftHelp<C> {
                     final CommandDescription commandDescription = helpEntry.command().commandDescription();
                     final Component description;
                     if (commandDescription.description() instanceof RichDescription) {
-                        description = ((RichDescription) commandDescription.description()).getContents();
+                        description = ((RichDescription) commandDescription.description()).contents();
                     } else if (helpEntry.description().isEmpty()) {
                         description = this.messageProvider.provide(sender, MESSAGE_CLICK_TO_SHOW_HELP);
                     } else {
-                        description = this.descriptionDecorator.apply(sender, helpEntry.description().getDescription());
+                        description = this.descriptionDecorator.apply(sender, helpEntry.description().textDescription());
                     }
 
                     final boolean lastBranch =
@@ -479,17 +479,17 @@ public final class MinecraftHelp<C> {
                 .append(this.highlight(text("/" + command, this.colors.highlight)))
         );
         /* Topics will use the long description if available, but fall back to the short description. */
-        final ArgumentDescription commandDescription = helpTopic.commandDescription();
+        final Description commandDescription = helpTopic.commandDescription();
 
         final Component topicDescription;
         if (commandDescription instanceof RichDescription) {
-            topicDescription = ((RichDescription) commandDescription).getContents();
+            topicDescription = ((RichDescription) commandDescription).contents();
         } else if (helpTopic.commandDescription().isEmpty()) {
             topicDescription = this.messageProvider.provide(sender, MESSAGE_NO_DESCRIPTION);
         } else {
             topicDescription = this.descriptionDecorator.apply(
                     sender,
-                    helpTopic.commandDescription().getDescription()
+                    helpTopic.commandDescription().textDescription()
             );
         }
 
@@ -532,7 +532,7 @@ public final class MinecraftHelp<C> {
                     );
                     textComponent.append(text(")", this.colors.alternateHighlight));
                 }
-                final ArgumentDescription description = component.argumentDescription();
+                final Description description = component.description();
                 if (!description.isEmpty()) {
                     textComponent.append(text(" - ", this.colors.accent));
                     textComponent.append(this.formatDescription(sender, description).colorIfAbsent(this.colors.text));
@@ -544,11 +544,11 @@ public final class MinecraftHelp<C> {
         audience.sendMessage(this.footer(sender));
     }
 
-    private Component formatDescription(final C sender, final ArgumentDescription description) {
+    private Component formatDescription(final C sender, final Description description) {
         if (description instanceof RichDescription) {
-            return ((RichDescription) description).getContents();
+            return ((RichDescription) description).contents();
         } else {
-            return this.descriptionDecorator.apply(sender, description.getDescription());
+            return this.descriptionDecorator.apply(sender, description.textDescription());
         }
     }
 

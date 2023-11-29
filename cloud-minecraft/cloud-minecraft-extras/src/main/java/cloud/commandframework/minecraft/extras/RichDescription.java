@@ -23,27 +23,29 @@
 //
 package cloud.commandframework.minecraft.extras;
 
-import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Description;
 import java.util.Locale;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.translation.GlobalTranslator;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * An argument description implementation that uses Adventure components.
+ * A description implementation that uses Adventure components.
  *
  * @since 1.4.0
  */
-public final class RichDescription implements ArgumentDescription {
+public final class RichDescription implements Description {
 
     private static final RichDescription EMPTY = new RichDescription(Component.empty());
 
     private final Component contents;
 
-    RichDescription(final Component contents) {
+    RichDescription(final @NonNull Component contents) {
         this.contents = contents;
     }
 
@@ -106,26 +108,45 @@ public final class RichDescription implements ArgumentDescription {
      * {@inheritDoc}
      *
      * @deprecated to discourage use. A plain serialization is a somewhat expensive and lossy operation, use
-     *         {@link #getContents()} instead.
+     *         {@link #contents()} instead.
      */
     @Override
     @Deprecated
-    public @NonNull String getDescription() {
+    public @NonNull String textDescription() {
         return net.kyori.adventure.text.serializer.plain.PlainComponentSerializer.plain()
                 .serialize(GlobalTranslator.render(this.contents, Locale.getDefault()));
     }
 
     /**
-     * Get the contents of this description.
+     * Returns the contents of this description.
      *
      * @return the component contents of this description
+     * @since 2.0.0
      */
-    public @NonNull Component getContents() {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull Component contents() {
         return this.contents;
     }
 
     @Override
     public boolean isEmpty() {
         return Component.empty().equals(this.contents);
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        final RichDescription that = (RichDescription) object;
+        return Objects.equals(this.contents, that.contents);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.contents);
     }
 }

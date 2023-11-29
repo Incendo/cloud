@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.Description;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserRegistry;
@@ -50,9 +50,9 @@ final class FlagAssemblerImpl implements FlagAssembler {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public @NonNull CommandFlag<?> assembleFlag(@NonNull final FlagDescriptor descriptor) {
-        final ArgumentDescription description;
+        final Description description;
         if (descriptor.description() == null) {
-            description = ArgumentDescription.empty();
+            description = Description.empty();
         } else {
             description = descriptor.description();
         }
