@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.arguments;
 
-import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.Description;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
@@ -111,7 +111,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             final @NonNull ArgumentParser<C, T> parser,
             final @NonNull TypeToken<T> valueType,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull Description defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
@@ -152,7 +152,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
                 parser,
                 valueType,
                 suggestionProvider,
-                ArgumentDescription.empty(),
+                Description.empty(),
                 argumentPreprocessors
         );
     }
@@ -207,7 +207,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             final @NonNull ArgumentParser<C, T> parser,
             final @NonNull Class<T> valueType,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull Description defaultDescription
     ) {
         this(name, parser, TypeToken.get(valueType), suggestionProvider);
     }
@@ -521,8 +521,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             return this.suggestionProvider;
         }
 
-        protected final @NonNull ArgumentDescription getDefaultDescription() {
-            return ArgumentDescription.empty();
+        protected final @NonNull Description getDefaultDescription() {
+            return Description.empty();
         }
 
         protected final @NonNull TypeToken<T> getValueType() {

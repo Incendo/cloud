@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.fabric.argument;
 
-import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Description;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
@@ -41,7 +41,7 @@ public final class AngleArgument<C> extends CommandArgument<C, net.minecraft.com
     AngleArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull Description defaultDescription
     ) {
         super(
                 name,

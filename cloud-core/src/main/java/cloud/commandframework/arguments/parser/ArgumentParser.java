@@ -222,5 +222,30 @@ public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
                 @NonNull CommandContext<@NonNull C> commandContext,
                 @NonNull CommandInput commandInput
         );
+
+        @Override
+        default @NonNull List<@NonNull Suggestion> suggestions(
+                @NonNull CommandContext<C> context,
+                @NonNull String input
+        ) {
+            try {
+                return this.suggestionsFuture(context, input).join();
+            } catch (final CompletionException exception) {
+                final Throwable cause = exception.getCause();
+                if (cause instanceof RuntimeException) {
+                    throw (RuntimeException) cause;
+                }
+                throw exception;
+            }
+        }
+
+        @Override
+        @NonNull
+        default CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
+                @NonNull CommandContext<C> context,
+                @NonNull String input
+        ) {
+            return CompletableFuture.completedFuture(Collections.emptyList());
+        }
     }
 }

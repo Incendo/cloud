@@ -24,9 +24,11 @@
 package cloud.commandframework.examples.bukkit.builder;
 
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.Description;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
+import cloud.commandframework.examples.bukkit.builder.feature.AggregateCommandExample;
 import cloud.commandframework.examples.bukkit.builder.feature.CommandBeanExample;
 import cloud.commandframework.examples.bukkit.builder.feature.CompoundArgumentExample;
 import cloud.commandframework.examples.bukkit.builder.feature.ConfirmationExample;
@@ -56,6 +58,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class BuilderExample {
 
     private static final List<BuilderFeature> FEATURES = Arrays.asList(
+            new AggregateCommandExample(),
             new CommandBeanExample(),
             new CompoundArgumentExample(),
             new ConfirmationExample(),
@@ -96,6 +99,11 @@ public final class BuilderExample {
     ) {
         this.examplePlugin = examplePlugin;
         this.manager = manager;
+
+        // Creates the root node.
+        this.manager.command(
+                this.manager.commandBuilder("builder",  Description.of("Builder examples"), "b")
+        );
 
         // Set up the example modules.
         this.setupExamples();

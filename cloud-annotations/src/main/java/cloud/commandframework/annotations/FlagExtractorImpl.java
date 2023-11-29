@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Description;
 import cloud.commandframework.permission.Permission;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -53,7 +53,7 @@ final class FlagExtractorImpl implements FlagExtractor {
             final FlagDescriptor flagDescriptor = FlagDescriptor.builder()
                     .parameter(parameter)
                     .name(flagName)
-                    .description(ArgumentDescription.of(this.annotationParser.processString(flag.description())))
+                    .description(Description.of(this.annotationParser.processString(flag.description())))
                     .aliases(this.annotationParser.processStrings(Arrays.asList(flag.aliases())))
                     .permission(Permission.of(this.annotationParser.processString(flag.permission())))
                     .repeatable(flag.repeatable())

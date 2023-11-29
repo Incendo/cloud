@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.fabric.argument;
 
-import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Description;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import net.minecraft.commands.arguments.item.ItemArgument;
@@ -42,7 +42,7 @@ public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
     ItemInputArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull Description defaultDescription
     ) {
         super(
                 name,

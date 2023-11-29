@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.jda.parsers;
 
-import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Description;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -54,7 +54,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
     private RoleArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull Description defaultDescription,
             final @NonNull Set<ParserMode> modes
     ) {
         super(name, new RoleParser<>(modes), Role.class, suggestionProvider, defaultDescription);

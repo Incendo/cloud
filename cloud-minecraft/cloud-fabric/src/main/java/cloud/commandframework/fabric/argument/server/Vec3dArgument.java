@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.fabric.argument.server;
 
-import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Description;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.fabric.argument.FabricArgumentParsers;
@@ -44,7 +44,7 @@ public final class Vec3dArgument<C> extends CommandArgument<C, Coordinates> {
     Vec3dArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull Description defaultDescription,
             final boolean centerIntegers
     ) {
         super(

@@ -81,13 +81,13 @@ class CommandSuggestionsTest {
 
         this.manager.command(manager.commandBuilder("com")
                 .requiredArgumentPair("com", Pair.of("x", "y"), Pair.of(Integer.class, TestEnum.class),
-                        ArgumentDescription.empty()
+                        Description.empty()
                 )
                 .required("int", integerParser()));
 
         this.manager.command(manager.commandBuilder("com2")
                 .requiredArgumentPair("com", Pair.of("x", "enum"),
-                        Pair.of(Integer.class, TestEnum.class), ArgumentDescription.empty()
+                        Pair.of(Integer.class, TestEnum.class), Description.empty()
                 ));
 
         this.manager.command(manager.commandBuilder("flags3")

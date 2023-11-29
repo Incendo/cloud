@@ -23,10 +23,11 @@
 //
 package cloud.commandframework.kotlin
 
-import cloud.commandframework.ArgumentDescription
 import cloud.commandframework.Command
 import cloud.commandframework.CommandComponent
+import cloud.commandframework.CommandDescription
 import cloud.commandframework.CommandManager
+import cloud.commandframework.Description
 import cloud.commandframework.TypedCommandComponent
 import cloud.commandframework.arguments.CommandArgument
 import cloud.commandframework.arguments.parser.ParserDescriptor
@@ -70,7 +71,7 @@ public class MutableCommandBuilder<C : Any>(
      */
     public constructor(
         name: String,
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: Description = Description.empty(),
         aliases: Array<String> = emptyArray(),
         commandManager: CommandManager<C>
     ) : this(commandManager.commandBuilder(name, description, *aliases), commandManager)
@@ -87,7 +88,7 @@ public class MutableCommandBuilder<C : Any>(
      */
     public constructor(
         name: String,
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: Description = Description.empty(),
         aliases: Array<String> = emptyArray(),
         commandManager: CommandManager<C>,
         lambda: MutableCommandBuilder<C>.() -> Unit
@@ -165,7 +166,7 @@ public class MutableCommandBuilder<C : Any>(
      */
     public fun copy(
         literal: String,
-        description: ArgumentDescription,
+        description: Description,
         lambda: MutableCommandBuilder<C>.() -> Unit
     ): MutableCommandBuilder<C> =
         copy().apply {
@@ -240,7 +241,7 @@ public class MutableCommandBuilder<C : Any>(
      */
     public fun registerCopy(
         literal: String,
-        description: ArgumentDescription,
+        description: Description,
         lambda: MutableCommandBuilder<C>.() -> Unit
     ): MutableCommandBuilder<C> = copy(literal, description, lambda).register()
 
@@ -270,24 +271,15 @@ public class MutableCommandBuilder<C : Any>(
         meta(this, value)
 
     /**
-     * Set the [CommandMeta.DESCRIPTION] meta for this command
+     * Sets the command description meta for this command
      *
-     * @param description command description
+     * @param commandDescription command description
      * @return this mutable builder
-     * @since 1.3.0
+     * @since 2.0.0
      */
-    public fun commandDescription(description: String): MutableCommandBuilder<C> =
-        meta(CommandMeta.DESCRIPTION, description)
-
-    /**
-     * Set the [CommandMeta.LONG_DESCRIPTION] meta for this command
-     *
-     * @param description command description
-     * @return this mutable builder
-     * @since 1.3.0
-     */
-    public fun longCommandDescription(description: String): MutableCommandBuilder<C> =
-        meta(CommandMeta.LONG_DESCRIPTION, description)
+    public fun commandDescription(commandDescription: CommandDescription): MutableCommandBuilder<C> = mutate {
+        it.commandDescription(commandDescription)
+    }
 
     /**
      * Set the [CommandMeta.HIDDEN] meta for this command
@@ -394,7 +386,7 @@ public class MutableCommandBuilder<C : Any>(
      */
     public fun required(
         argument: CommandArgument<C, *>,
-        description: ArgumentDescription = ArgumentDescription.empty()
+        description: Description = Description.empty()
     ): MutableCommandBuilder<C> = mutate { it.required(argument, description) }
 
     /**
@@ -516,7 +508,7 @@ public class MutableCommandBuilder<C : Any>(
      */
     public fun optional(
         argument: CommandArgument<C, *>,
-        description: ArgumentDescription = ArgumentDescription.empty()
+        description: Description = Description.empty()
     ): MutableCommandBuilder<C> = mutate { it.optional(argument, description) }
 
     /**
@@ -528,7 +520,7 @@ public class MutableCommandBuilder<C : Any>(
      * @since 2.0.0
      */
     public fun required(
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: Description = Description.empty(),
         argumentSupplier: () -> CommandArgument<C, *>
     ): MutableCommandBuilder<C> = mutate { it.required(argumentSupplier(), description) }
 
@@ -574,7 +566,7 @@ public class MutableCommandBuilder<C : Any>(
      * @since 2.0.0
      */
     public fun optional(
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: Description = Description.empty(),
         argumentSupplier: () -> CommandArgument<C, *>
     ): MutableCommandBuilder<C> = mutate { it.optional(argumentSupplier(), description) }
 
@@ -589,7 +581,7 @@ public class MutableCommandBuilder<C : Any>(
      */
     public fun literal(
         name: String,
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: Description = Description.empty(),
         vararg aliases: String
     ): MutableCommandBuilder<C> = mutate { it.literal(name, description, *aliases) }
 
@@ -642,7 +634,7 @@ public class MutableCommandBuilder<C : Any>(
     public fun <T> flag(
         name: String,
         aliases: Array<String> = emptyArray(),
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: Description = Description.empty(),
         componentSupplier: () -> TypedCommandComponent<C, T>
     ): MutableCommandBuilder<C> = mutate {
         it.flag(
@@ -669,7 +661,7 @@ public class MutableCommandBuilder<C : Any>(
     public fun <T> flag(
         name: String,
         aliases: Array<String> = emptyArray(),
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: Description = Description.empty(),
         component: TypedCommandComponent<C, T>
     ): MutableCommandBuilder<C> = mutate {
         it.flag(
@@ -696,7 +688,7 @@ public class MutableCommandBuilder<C : Any>(
     public fun <T> flag(
         name: String,
         aliases: Array<String> = emptyArray(),
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: Description = Description.empty(),
         componentBuilder: CommandComponent.Builder<C, T>
     ): MutableCommandBuilder<C> = mutate {
         it.flag(
@@ -721,7 +713,7 @@ public class MutableCommandBuilder<C : Any>(
     public fun flag(
         name: String,
         aliases: Array<String> = emptyArray(),
-        description: ArgumentDescription = ArgumentDescription.empty()
+        description: Description = Description.empty()
     ): MutableCommandBuilder<C> = mutate {
         it.flag(
             this.commandManager

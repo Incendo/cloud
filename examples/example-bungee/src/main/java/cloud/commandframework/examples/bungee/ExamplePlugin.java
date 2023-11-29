@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.examples.bungee;
 
-import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.Description;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.bungee.BungeeCommandManager;
 import cloud.commandframework.bungee.arguments.PlayerArgument;
@@ -33,7 +33,6 @@ import cloud.commandframework.bungee.arguments.ServerArgument;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
-import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.RichDescription;
 import java.util.concurrent.TimeUnit;
@@ -45,6 +44,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
+import static cloud.commandframework.CommandDescription.commandDescription;
 import static net.kyori.adventure.text.Component.text;
 
 public final class ExamplePlugin extends Plugin {
@@ -110,7 +110,7 @@ public final class ExamplePlugin extends Plugin {
         // Add a confirmation command
         //
         this.manager.command(builder.literal("confirm")
-                .meta(CommandMeta.DESCRIPTION, "Confirm a pending command")
+                .commandDescription(commandDescription("Confirm a pending command"))
                 .handler(this.confirmationManager.createConfirmationExecutionHandler()));
 
         final CommandArgument<CommandSender, ProxiedPlayer> playerArgument = PlayerArgument.of("player");
@@ -138,7 +138,7 @@ public final class ExamplePlugin extends Plugin {
         this.manager.command(
                 this.manager.commandBuilder("server")
                         .senderType(ProxiedPlayer.class)
-                        .required(serverArgument, ArgumentDescription.of("Server name"))
+                        .required(serverArgument, Description.of("Server name"))
                         .handler(context -> {
                             final ServerInfo server = context.get("server");
                             this.bungeeAudiences.sender(context.getSender()).sendMessage(

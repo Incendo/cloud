@@ -24,7 +24,7 @@
 package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.compound.CompoundParser;
+import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.internal.CommandNode;
@@ -61,10 +61,9 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
             final CommandComponent<C> commandComponent = iterator.next();
             if (commandComponent.type() == CommandComponent.ComponentType.LITERAL) {
                 formattingInstance.appendLiteral(commandComponent);
-            } else if (commandComponent.parser() instanceof CompoundParser) {
-                final CompoundParser<?, ?, ?> compoundParser =
-                        (CompoundParser<?, ?, ?>) commandComponent.parser();
-                formattingInstance.appendCompound(commandComponent, compoundParser);
+            } else if (commandComponent.parser() instanceof AggregateCommandParser<?, ?>) {
+                final AggregateCommandParser<?, ?> aggregateParser = (AggregateCommandParser<?, ?>) commandComponent.parser();
+                formattingInstance.appendAggregate(commandComponent, aggregateParser);
             } else if (commandComponent.type() == CommandComponent.ComponentType.FLAG) {
                 formattingInstance.appendFlag((CommandFlagParser<?>) commandComponent.parser());
             } else {
@@ -111,11 +110,10 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 break;
             }
             final CommandComponent<C> component = tail.children().get(0).component();
-            if (component.parser() instanceof CompoundParser) {
-                final CompoundParser<?, ?, ?> compoundParser =
-                        (CompoundParser<?, ?, ?>) component.parser();
+            if (component.parser() instanceof AggregateCommandParser<?, ?>) {
+                final AggregateCommandParser<?, ?> aggregateParser = (AggregateCommandParser<?, ?>) component.parser();
                 formattingInstance.appendBlankSpace();
-                formattingInstance.appendCompound(component, compoundParser);
+                formattingInstance.appendAggregate(component, aggregateParser);
             } else if (component.type() == CommandComponent.ComponentType.FLAG) {
                 formattingInstance.appendBlankSpace();
                 formattingInstance.appendFlag((CommandFlagParser<?>) component.parser());
@@ -175,26 +173,28 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
         }
 
         /**
-         * Append a compound argument to the syntax string
+         * Append an aggregate component to the syntax string
          *
          * @param component The component that contained the argument
          * @param parser    Compound argument to append
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
-        public void appendCompound(
+        public void appendAggregate(
                 final @NonNull CommandComponent<?> component,
-                final @NonNull CompoundParser<?, ?, ?> parser
+                final @NonNull AggregateCommandParser<?, ?> parser
         ) {
             final String prefix = component.required() ? this.getRequiredPrefix() : this.getOptionalPrefix();
             final String suffix = component.required() ? this.getRequiredSuffix() : this.getOptionalSuffix();
             this.builder.append(prefix);
-            final Object[] names = parser.names();
-            for (int i = 0; i < names.length; i++) {
+
+            final Iterator<? extends CommandComponent<?>> innerComponents = parser.components().iterator();
+            while (innerComponents.hasNext()) {
+                final CommandComponent<?> innerComponent = innerComponents.next();
                 this.builder.append(prefix);
-                this.appendName(names[i].toString());
+                this.appendName(innerComponent.name());
                 this.builder.append(suffix);
-                if ((i + 1) < names.length) {
+                if (innerComponents.hasNext()) {
                     this.builder.append(' ');
                 }
             }

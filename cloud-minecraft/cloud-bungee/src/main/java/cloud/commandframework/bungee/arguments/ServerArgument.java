@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.bungee.arguments;
 
-import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Description;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -57,7 +57,7 @@ public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
     private ServerArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull Description defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
