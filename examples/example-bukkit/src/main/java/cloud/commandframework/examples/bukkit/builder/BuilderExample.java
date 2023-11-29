@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.examples.bukkit.builder;
 
-import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.Description;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
@@ -102,7 +102,7 @@ public final class BuilderExample {
 
         // Creates the root node.
         this.manager.command(
-                this.manager.commandBuilder("builder",  ArgumentDescription.of("Builder examples"), "b")
+                this.manager.commandBuilder("builder",  Description.of("Builder examples"), "b")
         );
 
         // Set up the example modules.

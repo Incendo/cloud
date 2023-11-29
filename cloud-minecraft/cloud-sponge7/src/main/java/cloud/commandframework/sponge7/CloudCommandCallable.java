@@ -198,7 +198,7 @@ final class CloudCommandCallable<C> implements CommandCallable {
             return richDesc;
         }
 
-        return Optional.of(Text.of(this.cloudCommand.commandDescription().description().getDescription()));
+        return Optional.of(Text.of(this.cloudCommand.commandDescription().description().textDescription()));
     }
 
     @Override
@@ -208,7 +208,7 @@ final class CloudCommandCallable<C> implements CommandCallable {
             return richLongDesc;
         }
 
-        return Optional.of(Text.of(this.cloudCommand.commandDescription().verboseDescription().getDescription()));
+        return Optional.of(Text.of(this.cloudCommand.commandDescription().verboseDescription().textDescription()));
     }
 
     @Override
