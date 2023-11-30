@@ -27,10 +27,8 @@ import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
-import cloud.commandframework.brigadier.TooltipSuggestion;
 import cloud.commandframework.bukkit.annotation.specifier.AllowEmptySelection;
 import cloud.commandframework.bukkit.annotation.specifier.DefaultNamespace;
 import cloud.commandframework.bukkit.annotation.specifier.RequireExplicitNamespace;
@@ -89,7 +87,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
 
     private final Function<CommandSender, C> commandSenderMapper;
     private final Function<C, CommandSender> backwardsCommandSenderMapper;
-    private final SuggestionFactory<C, TooltipSuggestion> suggestionFactory;
 
     private final TaskFactory taskFactory;
 
@@ -141,7 +138,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
                 FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
         ));
-        this.suggestionFactory = super.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion);
 
         /* Register capabilities */
         CloudBukkitCapabilities.CAPABLE.forEach(this::registerCapability);
@@ -275,14 +271,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      */
     public final @NonNull Function<@NonNull CommandSender, @NonNull C> getCommandSenderMapper() {
         return this.commandSenderMapper;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public @NonNull SuggestionFactory<C, TooltipSuggestion> suggestionFactory() {
-        return this.suggestionFactory;
     }
 
     @Override

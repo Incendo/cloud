@@ -25,6 +25,7 @@ package cloud.commandframework.paper;
 
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.brigadier.TooltipSuggestion;
 import cloud.commandframework.bukkit.BukkitBrigadierMapper;
 import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
 import cloud.commandframework.context.CommandContext;
@@ -67,7 +68,7 @@ class PaperBrigadierListener<C> implements Listener {
                     this.paperCommandManager.getCommandSenderMapper().apply(Bukkit.getConsoleSender()),
                     this.paperCommandManager
                 ),
-                paperCommandManager.suggestionFactory()
+                paperCommandManager.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion)
         );
 
         this.brigadierManager.brigadierSenderMapper(sender ->

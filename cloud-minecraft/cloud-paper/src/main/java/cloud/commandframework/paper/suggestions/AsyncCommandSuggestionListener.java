@@ -24,14 +24,11 @@
 package cloud.commandframework.paper.suggestions;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.brigadier.TooltipSuggestion;
 import cloud.commandframework.bukkit.BukkitPluginRegistrationHandler;
 import cloud.commandframework.paper.PaperCommandManager;
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -62,21 +59,25 @@ class AsyncCommandSuggestionListener<C> implements SuggestionListener<C> {
             return;
         }
 
-        final CommandSender sender = event.getSender();
-        final C cloudSender = this.paperCommandManager.getCommandSenderMapper().apply(sender);
-        final String inputBuffer = this.paperCommandManager.stripNamespace(event.getBuffer());
-
-        final List<TooltipSuggestion> suggestions = new ArrayList<>(this.paperCommandManager.suggestionFactory()
-                .suggestImmediately(cloudSender, inputBuffer));
-        this.setSuggestions(event, suggestions);
+        this.setSuggestions(
+                event,
+                this.paperCommandManager.getCommandSenderMapper().apply(event.getSender()),
+                this.paperCommandManager.stripNamespace(event.getBuffer())
+        );
 
         event.setHandled(true);
     }
 
+    protected List<? extends Suggestion> querySuggestions(final @NonNull C commandSender, final @NonNull String input) {
+        return this.paperCommandManager.suggestionFactory().suggestImmediately(commandSender, input);
+    }
+
     protected void setSuggestions(
             final @NonNull AsyncTabCompleteEvent event,
-            final @NonNull List<@NonNull TooltipSuggestion> suggestions
+            final @NonNull C commandSender,
+            final @NonNull String input
     ) {
+        final List<? extends Suggestion> suggestions = this.querySuggestions(commandSender, input);
         event.setCompletions(suggestions.stream().map(Suggestion::suggestion).collect(Collectors.toList()));
     }
 }

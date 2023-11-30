@@ -23,8 +23,9 @@
 //
 package cloud.commandframework.paper.suggestions.tooltips;
 
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.audience.Audience;
 import org.apiguardian.api.API;
+import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.INTERNAL, since = "2.0.0")
@@ -52,11 +53,10 @@ public interface CompletionMapperFactory {
 
         @Override
         public @NonNull CompletionMapper createMapper() {
-            final boolean relocated = !Component.class.getName().equals("net.kyori.adventure.text.Component");
-            if (relocated) {
-                return new ReflectiveCompletionMapper();
+            if (Audience.class.isAssignableFrom(Player.class)) {
+                return new NativeCompletionMapper();
             }
-            return new NativeCompletionMapper();
+            return new ReflectiveCompletionMapper();
         }
     }
 }

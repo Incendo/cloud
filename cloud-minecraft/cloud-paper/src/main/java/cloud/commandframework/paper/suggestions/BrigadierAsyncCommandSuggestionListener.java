@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.paper.suggestions;
 
+import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.TooltipSuggestion;
 import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.paper.suggestions.tooltips.CompletionMapper;
@@ -35,17 +36,26 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 class BrigadierAsyncCommandSuggestionListener<C> extends AsyncCommandSuggestionListener<C> {
 
     private final CompletionMapperFactory completionMapperFactory = CompletionMapperFactory.detectingRelocation();
+    private final SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory;
 
     BrigadierAsyncCommandSuggestionListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
         super(paperCommandManager);
+        this.suggestionFactory = paperCommandManager.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion);
+    }
+
+    @Override
+    protected List<? extends TooltipSuggestion> querySuggestions(@NonNull final C commandSender, final @NonNull String input) {
+        return this.suggestionFactory.suggestImmediately(commandSender, input);
     }
 
     @Override
     protected void setSuggestions(
             final @NonNull AsyncTabCompleteEvent event,
-            final @NonNull List<@NonNull TooltipSuggestion> suggestions
+            final @NonNull C commandSender,
+            final @NonNull String input
     ) {
         final CompletionMapper completionMapper = this.completionMapperFactory.createMapper();
+        final List<? extends TooltipSuggestion> suggestions = this.querySuggestions(commandSender, input);
         event.completions(suggestions.stream().map(completionMapper::map).collect(Collectors.toList()));
     }
 }
