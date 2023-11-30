@@ -91,7 +91,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  * @param <C> the command sender type used to execute commands
  */
 @API(status = API.Status.STABLE)
-public abstract class CommandManager<C> implements SuggestionMapper<Suggestion> {
+public abstract class CommandManager<C> {
 
     private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = new HashMap<>();
     private final EnumSet<ManagerSettings> managerSettings = EnumSet.of(
@@ -138,7 +138,7 @@ public abstract class CommandManager<C> implements SuggestionMapper<Suggestion> 
         this.commandTree = CommandTree.newTree(this);
         this.commandExecutionCoordinator = commandExecutionCoordinator.apply(this.commandTree);
         this.commandRegistrationHandler = commandRegistrationHandler;
-        this.suggestionFactory = SuggestionFactory.delegating(this, this);
+        this.suggestionFactory = SuggestionFactory.delegating(this, (suggestion) -> this.suggestionMapper.map(suggestion));
         /* Register service types */
         this.servicePipeline.registerServiceType(new TypeToken<CommandPreprocessor<C>>() {
         }, new AcceptingCommandPreprocessor<>());
@@ -471,11 +471,6 @@ public abstract class CommandManager<C> implements SuggestionMapper<Suggestion> 
      * @return {@code true} if the sender has the permission, else {@code false}
      */
     public abstract boolean hasPermission(@NonNull C sender, @NonNull String permission);
-
-    @Override
-    public final @NonNull Suggestion map(@NonNull final Suggestion suggestion) {
-        return this.suggestionMapper.map(suggestion);
-    }
 
     /**
      * Sets the suggestion mapper.
