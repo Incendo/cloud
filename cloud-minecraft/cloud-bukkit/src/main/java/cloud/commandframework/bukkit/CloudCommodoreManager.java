@@ -25,6 +25,7 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.brigadier.TooltipSuggestion;
 import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
 import cloud.commandframework.context.CommandContext;
 import com.mojang.brigadier.CommandDispatcher;
@@ -57,10 +58,14 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
         }
         this.commandManager = commandManager;
         this.commodore = CommodoreProvider.getCommodore(commandManager.getOwningPlugin());
-        this.brigadierManager = new CloudBrigadierManager<>(commandManager, () -> new CommandContext<>(
-                commandManager.getCommandSenderMapper().apply(Bukkit.getConsoleSender()),
-                commandManager
-        ));
+        this.brigadierManager = new CloudBrigadierManager<>(
+                commandManager,
+                () -> new CommandContext<>(
+                    commandManager.getCommandSenderMapper().apply(Bukkit.getConsoleSender()),
+                    commandManager
+                ),
+                commandManager.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion)
+        );
 
         this.brigadierManager.brigadierSenderMapper(sender -> {
             final CommandSender bukkitSender = getBukkitSender(sender);

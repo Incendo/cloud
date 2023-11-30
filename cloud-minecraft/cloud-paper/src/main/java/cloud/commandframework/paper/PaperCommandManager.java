@@ -29,6 +29,8 @@ import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.paper.suggestions.SuggestionListener;
+import cloud.commandframework.paper.suggestions.SuggestionListenerFactory;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import org.bukkit.Bukkit;
@@ -170,8 +172,12 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
         if (!this.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
             throw new IllegalStateException("Failed to register asynchronous command completion listener.");
         }
+
+        final SuggestionListenerFactory<C> suggestionListenerFactory = SuggestionListenerFactory.create(this);
+        final SuggestionListener<C> suggestionListener = suggestionListenerFactory.createListener();
+
         Bukkit.getServer().getPluginManager().registerEvents(
-                new AsyncCommandSuggestionsListener<>(this),
+                suggestionListener,
                 this.getOwningPlugin()
         );
     }
