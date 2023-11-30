@@ -36,6 +36,7 @@ import cloud.commandframework.arguments.standard.LongParser;
 import cloud.commandframework.arguments.standard.ShortParser;
 import cloud.commandframework.arguments.standard.StringArrayParser;
 import cloud.commandframework.arguments.standard.StringParser;
+import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -95,16 +96,19 @@ public final class CloudBrigadierManager<C, S> {
      *
      * @param commandManager       Command manager
      * @param dummyContextProvider Provider of dummy context for completions
+     * @param suggestionFactory    The factory that produces suggestions
      */
     public CloudBrigadierManager(
             final @NonNull CommandManager<C> commandManager,
-            final @NonNull Supplier<@NonNull CommandContext<C>> dummyContextProvider
+            final @NonNull Supplier<@NonNull CommandContext<C>> dummyContextProvider,
+            final @NonNull SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory
     ) {
         this.defaultArgumentTypeSuppliers = new HashMap<>();
         this.literalBrigadierNodeFactory = new LiteralBrigadierNodeFactory<>(
                 this,
                 commandManager,
-                dummyContextProvider
+                dummyContextProvider,
+                suggestionFactory
         );
         this.registerInternalMappings();
         commandManager.registerCommandPreProcessor(ctx -> {

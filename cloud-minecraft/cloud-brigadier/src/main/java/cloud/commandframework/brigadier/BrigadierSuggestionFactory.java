@@ -25,10 +25,9 @@ package cloud.commandframework.brigadier;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.types.tuples.Pair;
-import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.context.ParsedCommandNode;
 import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -57,15 +56,18 @@ final class BrigadierSuggestionFactory<C, S> {
     private final CloudBrigadierManager<C, S> cloudBrigadierManager;
     private final CommandManager<C> commandManager;
     private final Supplier<CommandContext<C>> dummyContextProvider;
+    private final SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory;
 
     BrigadierSuggestionFactory(
             final @NonNull CloudBrigadierManager<C, S> cloudBrigadierManager,
             final @NonNull CommandManager<C> commandManager,
-            final @NonNull Supplier<CommandContext<C>> dummyContextProvider
+            final @NonNull Supplier<CommandContext<C>> dummyContextProvider,
+            final @NonNull SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory
     ) {
         this.cloudBrigadierManager = cloudBrigadierManager;
         this.commandManager = commandManager;
         this.dummyContextProvider = dummyContextProvider;
+        this.suggestionFactory = suggestionFactory;
     }
 
     @NonNull CompletableFuture<Suggestions> buildSuggestions(
@@ -97,9 +99,9 @@ final class BrigadierSuggestionFactory<C, S> {
             command = command.substring(leading.split(":")[0].length() + 1);
         }
 
-        return this.commandManager.suggestFuture(commandContext.getSender(), command).thenCompose(suggestionsUnfiltered -> {
+        return this.suggestionFactory.suggest(commandContext.getSender(), command).thenCompose(suggestionsUnfiltered -> {
             /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
-            final List<Suggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
+            final List<TooltipSuggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
             if (parentNode != null) {
                 final Set<String> siblingLiterals = parentNode.children().stream()
                         .map(cloud.commandframework.internal.CommandNode::component)
@@ -117,16 +119,8 @@ final class BrigadierSuggestionFactory<C, S> {
                 suggestionsBuilder = builder.createOffset(builder.getStart() + lastIndexOfSpaceInRemainingString + 1);
             }
 
-            for (final Suggestion suggestion : suggestions) {
-                String tooltip = component.name();
-                if (component.type() != CommandComponent.ComponentType.LITERAL) {
-                    if (component.required()) {
-                        tooltip = '<' + tooltip + '>';
-                    } else {
-                        tooltip = '[' + tooltip + ']';
-                    }
-                }
-                suggestionsBuilder = suggestionsBuilder.suggest(suggestion.suggestion(), new LiteralMessage(tooltip));
+            for (final TooltipSuggestion suggestion : suggestions) {
+                suggestionsBuilder = suggestionsBuilder.suggest(suggestion.suggestion(), suggestion.tooltip());
             }
 
             return suggestionsBuilder.buildFuture();

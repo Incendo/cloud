@@ -25,8 +25,8 @@ package cloud.commandframework.paper;
 
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
-import cloud.commandframework.brigadier.TooltipSuggestion;
 import cloud.commandframework.brigadier.LiteralBrigadierNodeFactory;
+import cloud.commandframework.brigadier.TooltipSuggestion;
 import cloud.commandframework.brigadier.permission.BrigadierPermissionChecker;
 import cloud.commandframework.bukkit.BukkitBrigadierMapper;
 import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;

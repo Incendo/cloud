@@ -28,6 +28,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.MappedArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.permission.BrigadierPermissionChecker;
 import cloud.commandframework.brigadier.permission.BrigadierPermissionPredicate;
 import cloud.commandframework.context.CommandContext;
@@ -56,16 +57,19 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
     private final BrigadierSuggestionFactory<C, S> brigadierSuggestionFactory;
 
    LiteralBrigadierNodeFactory(
-            final @NonNull CloudBrigadierManager<C, S> cloudBrigadierManager,
-            final @NonNull CommandManager<C> commandManager,
-            final @NonNull Supplier<CommandContext<C>> dummyContextProvider
-    ) {
+           final @NonNull CloudBrigadierManager<C, S> cloudBrigadierManager,
+           final @NonNull CommandManager<C> commandManager,
+           final @NonNull Supplier<CommandContext<C>> dummyContextProvider,
+           final @NonNull SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory
+           ) {
         this.cloudBrigadierManager = cloudBrigadierManager;
         this.commandManager = commandManager;
         this.brigadierSuggestionFactory = new BrigadierSuggestionFactory<>(
                 cloudBrigadierManager,
                 commandManager,
-                dummyContextProvider);
+                dummyContextProvider,
+                suggestionFactory
+        );
     }
 
     @Override
