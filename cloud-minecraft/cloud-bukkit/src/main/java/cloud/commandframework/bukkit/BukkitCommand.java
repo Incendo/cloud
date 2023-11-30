@@ -113,7 +113,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         for (final String string : args) {
             builder.append(" ").append(string);
         }
-        return this.manager.suggest(
+        return this.manager.suggestionFactory().suggestImmediately(
                 this.manager.getCommandSenderMapper().apply(sender),
                 builder.toString()
         ).stream().map(Suggestion::suggestion).collect(Collectors.toList());

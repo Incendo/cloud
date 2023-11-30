@@ -21,24 +21,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.paper;
+package cloud.commandframework.paper.suggestions;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitPluginRegistrationHandler;
+import cloud.commandframework.paper.PaperCommandManager;
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class AsyncCommandSuggestionsListener<C> implements Listener {
+class AsyncCommandSuggestionListener<C> implements SuggestionListener<C> {
 
     private final PaperCommandManager<C> paperCommandManager;
 
-    AsyncCommandSuggestionsListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
+    AsyncCommandSuggestionListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
         this.paperCommandManager = paperCommandManager;
     }
 
@@ -52,7 +50,6 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
             return;
         }
 
-        @SuppressWarnings("unchecked")
         final BukkitPluginRegistrationHandler<C> bukkitPluginRegistrationHandler =
                 (BukkitPluginRegistrationHandler<C>) this.paperCommandManager.commandRegistrationHandler();
 
@@ -62,16 +59,25 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
             return;
         }
 
-        final CommandSender sender = event.getSender();
-        final C cloudSender = this.paperCommandManager.getCommandSenderMapper().apply(sender);
-        final String inputBuffer = this.paperCommandManager.stripNamespace(event.getBuffer());
+        this.setSuggestions(
+                event,
+                this.paperCommandManager.getCommandSenderMapper().apply(event.getSender()),
+                this.paperCommandManager.stripNamespace(event.getBuffer())
+        );
 
-        final List<String> suggestions = new ArrayList<>(this.paperCommandManager.suggest(
-                cloudSender,
-                inputBuffer
-        )).stream().map(Suggestion::suggestion).collect(Collectors.toList());
-
-        event.setCompletions(suggestions);
         event.setHandled(true);
+    }
+
+    protected List<? extends Suggestion> querySuggestions(final @NonNull C commandSender, final @NonNull String input) {
+        return this.paperCommandManager.suggestionFactory().suggestImmediately(commandSender, input);
+    }
+
+    protected void setSuggestions(
+            final @NonNull AsyncTabCompleteEvent event,
+            final @NonNull C commandSender,
+            final @NonNull String input
+    ) {
+        final List<? extends Suggestion> suggestions = this.querySuggestions(commandSender, input);
+        event.setCompletions(suggestions.stream().map(Suggestion::suggestion).collect(Collectors.toList()));
     }
 }

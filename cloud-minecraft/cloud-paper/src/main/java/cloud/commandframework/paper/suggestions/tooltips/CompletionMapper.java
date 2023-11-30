@@ -21,35 +21,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments;
+package cloud.commandframework.paper.suggestions.tooltips;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.context.CommandContext;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import cloud.commandframework.brigadier.TooltipSuggestion;
+import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Handler that produces command suggestions depending on input
- *
- * @param <C> Command sender type
- */
-@API(status = API.Status.STABLE)
-public interface CommandSuggestionEngine<C> {
+@API(status = API.Status.INTERNAL, since = "2.0.0")
+public interface CompletionMapper {
 
     /**
-     * Returns command suggestions for the "next" argument that would yield a correctly
-     * parsing command input
+     * Maps the given {@code suggestion} into a Paper {@link AsyncTabCompleteEvent.Completion}.
      *
-     * @param context Request context
-     * @param input   Input provided by the sender
-     * @return List of suggestions
-     * @since 2.0.0
+     * @param suggestion the suggestion
+     * @return the mapped completion
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    @NonNull CompletableFuture<List<@NonNull Suggestion>> getSuggestions(
-            @NonNull CommandContext<C> context,
-            @NonNull String input
-    );
+    AsyncTabCompleteEvent.@NonNull Completion map(@NonNull TooltipSuggestion suggestion);
 }

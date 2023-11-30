@@ -176,7 +176,7 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
         for (final String string : args) {
             builder.append(" ").append(string);
         }
-        return this.manager.suggest(
+        return this.manager.suggestionFactory().suggestImmediately(
                 this.manager.getCommandSenderMapper().apply(sender),
                 builder.toString()
         ).stream().map(Suggestion::suggestion).collect(Collectors.toList());

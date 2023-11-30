@@ -112,7 +112,10 @@ class AnnotationParserTest {
 
     @Test
     void testNamedSuggestionProvider() {
-        Assertions.assertEquals(NAMED_SUGGESTIONS, manager.suggest(new TestCommandSender(), "namedsuggestions "));
+        Assertions.assertEquals(
+                NAMED_SUGGESTIONS,
+                manager.suggestionFactory().suggestImmediately(new TestCommandSender(), "namedsuggestions ")
+        );
     }
 
     @Test

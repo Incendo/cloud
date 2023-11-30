@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.parser;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -58,8 +59,8 @@ public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
      * This method may be called when a command chain is being parsed for execution
      * (using {@link cloud.commandframework.CommandManager#executeCommand(Object, String)})
      * or when a command is being parsed to provide context for suggestions
-     * (using {@link cloud.commandframework.CommandManager#suggest(Object, String)}). It is
-     * possible to use {@link CommandContext#isSuggestions()}} to see what the purpose of the
+     * (using {@link SuggestionFactory#suggest(Object, String)}).
+     * It is possible to use {@link CommandContext#isSuggestions()}} to see what the purpose of the
      * parsing is. Particular care should be taken when parsing for suggestions, as the parsing
      * method is then likely to be called once for every character written by the command sender.
      * <p>
@@ -86,8 +87,8 @@ public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
      * This method may be called when a command chain is being parsed for execution
      * (using {@link cloud.commandframework.CommandManager#executeCommand(Object, String)})
      * or when a command is being parsed to provide context for suggestions
-     * (using {@link cloud.commandframework.CommandManager#suggest(Object, String)}). It is
-     * possible to use {@link CommandContext#isSuggestions()}} to see what the purpose of the
+     * (using {@link SuggestionFactory#suggest(Object, String)}).
+     * It is possible to use {@link CommandContext#isSuggestions()}} to see what the purpose of the
      * parsing is. Particular care should be taken when parsing for suggestions, as the parsing
      * method is then likely to be called once for every character written by the command sender.
      * <p>

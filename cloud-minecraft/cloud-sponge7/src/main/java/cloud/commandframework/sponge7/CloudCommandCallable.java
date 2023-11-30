@@ -170,8 +170,12 @@ final class CloudCommandCallable<C> implements CommandCallable {
             final @NonNull String arguments,
             final @Nullable Location<World> targetPosition
     ) {
-        return this.manager.suggest(this.manager.getCommandSourceMapper().apply(source), this.formatCommand(arguments))
-                .stream().map(Suggestion::suggestion)
+        return this.manager.suggestionFactory()
+                .suggestImmediately(
+                        this.manager.getCommandSourceMapper().apply(source),
+                        this.formatCommand(arguments)
+                ).stream()
+                .map(Suggestion::suggestion)
                 .collect(Collectors.toList());
     }
 
