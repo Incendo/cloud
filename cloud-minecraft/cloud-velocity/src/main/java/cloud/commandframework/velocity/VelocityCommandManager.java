@@ -25,8 +25,10 @@ package cloud.commandframework.velocity;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.brigadier.TooltipSuggestion;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
@@ -52,6 +54,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * <p>
  * This can be injected if {@link CloudInjectionModule} is registered in the
  * injector. This can be achieved by using {@link com.google.inject.Injector#createChildInjector(Module...)}
+ * <p>
+ * {@link #suggestionFactory()} has been overridden to map suggestions to {@link TooltipSuggestion}.
+ * You may use {@link TooltipSuggestion} to display tooltips for your suggestions.
+ * {@link com.velocitypowered.api.command.VelocityBrigadierMessage} can be used to make use of Adventure
+ * {@link net.kyori.adventure.text.Component components} in the tooltips.
  *
  * @param <C> Command sender type
  */
@@ -71,6 +78,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
     private final ProxyServer proxyServer;
     private final Function<CommandSource, C> commandSenderMapper;
     private final Function<C, CommandSource> backwardsCommandSenderMapper;
+    private final SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory;
 
     /**
      * Create a new command manager instance
@@ -99,6 +107,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
         this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
                 FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
         ));
+        this.suggestionFactory = super.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion);
 
         /* Register Velocity Preprocessor */
         this.registerCommandPreProcessor(new VelocityCommandPreprocessor<>(this));
@@ -150,6 +159,11 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
     @Override
     public @NonNull CloudBrigadierManager<C, CommandSource> brigadierManager() {
         return ((VelocityPluginRegistrationHandler<C>) this.commandRegistrationHandler()).brigadierManager();
+    }
+
+    @Override
+    public final @NonNull SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory() {
+        return this.suggestionFactory;
     }
 
     final @NonNull ProxyServer proxyServer() {

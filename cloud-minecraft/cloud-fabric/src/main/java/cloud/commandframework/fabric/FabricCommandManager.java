@@ -26,8 +26,10 @@ package cloud.commandframework.fabric;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.standard.UUIDParser;
+import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.brigadier.TooltipSuggestion;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
@@ -112,6 +114,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
     private final Function<S, C> commandSourceMapper;
     private final Function<C, S> backwardsCommandSourceMapper;
     private final CloudBrigadierManager<C, S> brigadierManager;
+    private final SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory;
 
 
     /**
@@ -142,14 +145,20 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         super(commandExecutionCoordinator, registrationHandler);
         this.commandSourceMapper = commandSourceMapper;
         this.backwardsCommandSourceMapper = backwardsCommandSourceMapper;
+        this.suggestionFactory = super.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion);
 
         // We're always brigadier
-        this.brigadierManager = new CloudBrigadierManager<>(this, () -> new CommandContext<>(
-                // This looks ugly, but it's what the server does when loading datapack functions in 1.16+
-                // See net.minecraft.server.function.FunctionLoader.reload for reference
-                this.commandSourceMapper.apply(dummyCommandSourceProvider.get()),
-                this
-        ));
+        this.brigadierManager = new CloudBrigadierManager<>(
+                this,
+                () -> new CommandContext<>(
+                        // This looks ugly, but it's what the server does when loading datapack functions in 1.16+
+                        // See net.minecraft.server.function.FunctionLoader.reload for reference
+                        this.commandSourceMapper.apply(dummyCommandSourceProvider.get()),
+                        this
+                ),
+                this.suggestionFactory()
+        );
+
         this.brigadierManager.backwardsBrigadierSenderMapper(this.backwardsCommandSourceMapper);
         this.brigadierManager.brigadierSenderMapper(this.commandSourceMapper);
         this.registerNativeBrigadierMappings(this.brigadierManager);
@@ -321,6 +330,11 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
      */
     public final @NonNull Function<@NonNull S, @NonNull C> commandSourceMapper() {
         return this.commandSourceMapper;
+    }
+
+    @Override
+    public final @NonNull SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory() {
+        return this.suggestionFactory;
     }
 
     /**

@@ -41,6 +41,17 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface SuggestionProvider<C> {
 
     /**
+     * Returns a suggestion provider that delegates to the {@code other} provider.
+     *
+     * @param <C>   the command sender type
+     * @param other the other provider
+     * @return the returned provider
+     */
+    static <C> @NonNull SuggestionProvider<C> delegating(final @NonNull SuggestionProvider<C> other) {
+        return new DelegatingSuggestionProvider<>(other);
+    }
+
+    /**
      * Returns the suggestions for the given {@code input}.
      *
      * @param context the context of the suggestion lookup
