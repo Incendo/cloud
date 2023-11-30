@@ -51,6 +51,9 @@ public interface CompletionMapperFactory {
 
     final class CompletionMapperFactoryImpl implements CompletionMapperFactory {
 
+        private CompletionMapperFactoryImpl() {
+        }
+
         @Override
         public @NonNull CompletionMapper createMapper() {
             if (Audience.class.isAssignableFrom(Player.class)) {

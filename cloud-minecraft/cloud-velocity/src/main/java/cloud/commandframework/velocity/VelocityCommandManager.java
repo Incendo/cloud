@@ -54,6 +54,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * <p>
  * This can be injected if {@link CloudInjectionModule} is registered in the
  * injector. This can be achieved by using {@link com.google.inject.Injector#createChildInjector(Module...)}
+ * <p>
+ * {@link #suggestionFactory()} has been overridden to map suggestions to {@link TooltipSuggestion}.
+ * You may use {@link TooltipSuggestion} to display tooltips for your suggestions.
+ * {@link com.velocitypowered.api.command.VelocityBrigadierMessage} can be used to make use of Adventure
+ * {@link net.kyori.adventure.text.Component components} in the tooltips.
  *
  * @param <C> Command sender type
  */

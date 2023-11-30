@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
+@API(status = API.Status.INTERNAL, since = "2.0.0", consumers = "cloud.commandframework.*")
 final class MappingSuggestionFactory<C, S extends Suggestion> implements SuggestionFactory<C, S> {
 
     private final SuggestionFactory<C, ? extends Suggestion> other;

@@ -29,6 +29,11 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * {@link Suggestion} that has an optional Brigadier {@link Message message} tooltip.
+ *
+ * @since 2.0.0
+ */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface TooltipSuggestion extends Suggestion {
 
