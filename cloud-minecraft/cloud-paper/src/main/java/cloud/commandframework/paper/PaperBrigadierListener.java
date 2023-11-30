@@ -61,10 +61,14 @@ class PaperBrigadierListener<C> implements Listener {
 
     PaperBrigadierListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
         this.paperCommandManager = paperCommandManager;
-        this.brigadierManager = new CloudBrigadierManager<>(this.paperCommandManager, () -> new CommandContext<>(
-                this.paperCommandManager.getCommandSenderMapper().apply(Bukkit.getConsoleSender()),
-                this.paperCommandManager
-        ));
+        this.brigadierManager = new CloudBrigadierManager<>(
+                this.paperCommandManager,
+                () -> new CommandContext<>(
+                    this.paperCommandManager.getCommandSenderMapper().apply(Bukkit.getConsoleSender()),
+                    this.paperCommandManager
+                ),
+                paperCommandManager.suggestionFactory()
+        );
 
         this.brigadierManager.brigadierSenderMapper(sender ->
                 this.paperCommandManager.getCommandSenderMapper().apply(sender.getBukkitSender()));

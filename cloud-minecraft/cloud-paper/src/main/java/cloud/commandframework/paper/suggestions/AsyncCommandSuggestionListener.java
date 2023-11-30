@@ -21,29 +21,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.paper;
+package cloud.commandframework.paper.suggestions;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.brigadier.TooltipSuggestion;
 import cloud.commandframework.bukkit.BukkitPluginRegistrationHandler;
+import cloud.commandframework.paper.PaperCommandManager;
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class AsyncCommandSuggestionsListener<C> implements Listener {
+class AsyncCommandSuggestionListener<C> implements SuggestionListener<C> {
 
     private final PaperCommandManager<C> paperCommandManager;
 
-    AsyncCommandSuggestionsListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
+    AsyncCommandSuggestionListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
         this.paperCommandManager = paperCommandManager;
     }
 
     @EventHandler
-    void onTabCompletion(final @NonNull AsyncTabCompleteEvent event) {
+    final void onTabCompletion(final @NonNull AsyncTabCompleteEvent event) {
         // Strip leading slash
         final String strippedBuffer = event.getBuffer().startsWith("/")
                 ? event.getBuffer().substring(1)
@@ -52,7 +53,6 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
             return;
         }
 
-        @SuppressWarnings("unchecked")
         final BukkitPluginRegistrationHandler<C> bukkitPluginRegistrationHandler =
                 (BukkitPluginRegistrationHandler<C>) this.paperCommandManager.commandRegistrationHandler();
 
@@ -66,12 +66,17 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
         final C cloudSender = this.paperCommandManager.getCommandSenderMapper().apply(sender);
         final String inputBuffer = this.paperCommandManager.stripNamespace(event.getBuffer());
 
-        final List<String> suggestions = new ArrayList<>(this.paperCommandManager.suggestionFactory().suggestImmediately(
-                cloudSender,
-                inputBuffer
-        )).stream().map(Suggestion::suggestion).collect(Collectors.toList());
+        final List<TooltipSuggestion> suggestions = new ArrayList<>(this.paperCommandManager.suggestionFactory()
+                .suggestImmediately(cloudSender, inputBuffer));
+        this.setSuggestions(event, suggestions);
 
-        event.setCompletions(suggestions);
         event.setHandled(true);
+    }
+
+    protected void setSuggestions(
+            final @NonNull AsyncTabCompleteEvent event,
+            final @NonNull List<@NonNull TooltipSuggestion> suggestions
+    ) {
+        event.setCompletions(suggestions.stream().map(Suggestion::suggestion).collect(Collectors.toList()));
     }
 }

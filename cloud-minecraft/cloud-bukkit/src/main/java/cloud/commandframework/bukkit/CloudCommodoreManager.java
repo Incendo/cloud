@@ -57,10 +57,14 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
         }
         this.commandManager = commandManager;
         this.commodore = CommodoreProvider.getCommodore(commandManager.getOwningPlugin());
-        this.brigadierManager = new CloudBrigadierManager<>(commandManager, () -> new CommandContext<>(
-                commandManager.getCommandSenderMapper().apply(Bukkit.getConsoleSender()),
-                commandManager
-        ));
+        this.brigadierManager = new CloudBrigadierManager<>(
+                commandManager,
+                () -> new CommandContext<>(
+                    commandManager.getCommandSenderMapper().apply(Bukkit.getConsoleSender()),
+                    commandManager
+                ),
+                commandManager.suggestionFactory()
+        );
 
         this.brigadierManager.brigadierSenderMapper(sender -> {
             final CommandSender bukkitSender = getBukkitSender(sender);
