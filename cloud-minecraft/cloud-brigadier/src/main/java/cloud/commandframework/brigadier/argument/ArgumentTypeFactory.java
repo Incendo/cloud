@@ -21,21 +21,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.brigadier;
+package cloud.commandframework.brigadier.argument;
 
+import com.mojang.brigadier.arguments.ArgumentType;
 import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-/**
- * Determines how suggestions are retrieved for an argument.
- */
-@API(status = API.Status.INTERNAL, since = "2.0.0")
-enum SuggestionsType {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface ArgumentTypeFactory<T> {
+
     /**
-     * Brigadier will be invoked for suggestions.
+     * Creates the argument type.
+     *
+     * @return the created argument type, or {@code null}
      */
-    BRIGADIER_SUGGESTIONS,
-    /**
-     * Cloud will be invoked for suggestions.
-     */
-    CLOUD_SUGGESTIONS
+    @Nullable ArgumentType<T> create();
 }

@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.brigadier;
+package cloud.commandframework.brigadier.suggestion;
 
 import cloud.commandframework.internal.CommandNode;
 import com.mojang.brigadier.context.CommandContext;
@@ -41,16 +41,22 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 2.0.0
  */
 @API(status = API.Status.INTERNAL, since = "2.0.0")
-final class CloudDelegatingSuggestionProvider<C, S> implements SuggestionProvider<S> {
+public final class CloudDelegatingSuggestionProvider<C, S> implements SuggestionProvider<S> {
 
     private final BrigadierSuggestionFactory<C, S> brigadierSuggestionFactory;
     private final CommandNode<C> node;
 
-    CloudDelegatingSuggestionProvider(
-            final @NonNull BrigadierSuggestionFactory<C, S> brigadierSuggestionFactory,
+    /**
+     * Creates a new suggestion provider.
+     *
+     * @param suggestionFactory the factory that produces suggestions
+     * @param node              the node to generate suggestions for
+     */
+    public CloudDelegatingSuggestionProvider(
+            final @NonNull BrigadierSuggestionFactory<C, S> suggestionFactory,
             final @NonNull CommandNode<C> node
     ) {
-        this.brigadierSuggestionFactory = brigadierSuggestionFactory;
+        this.brigadierSuggestionFactory = suggestionFactory;
         this.node = node;
     }
 

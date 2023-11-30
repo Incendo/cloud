@@ -21,25 +21,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.brigadier;
+package cloud.commandframework.brigadier.argument;
 
-import cloud.commandframework.meta.CommandMeta;
-import org.apiguardian.api.API;
+import cloud.commandframework.arguments.parser.ArgumentParser;
+import java.util.HashMap;
+import java.util.Map;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-@API(status = API.Status.STABLE, since = "2.0.0")
-public final class BukkitCommandMeta {
+@SuppressWarnings("unchecked")
+final class BrigadierMappingsImpl<C, S> implements BrigadierMappings<C, S> {
 
-    /**
-     * The description to show for the Bukkit command.
-     * <p>
-     * If this is not set then Bukkit will attempt to retrieve the {@link cloud.commandframework.CommandDescription}
-     * for the command.
-     * <p>
-     * If the command description is empty, then Bukkit will attempt to fall back on the argument description of
-     * the root literal.
-     */
-    public static final CommandMeta.Key<String> BUKKIT_DESCRIPTION = CommandMeta.Key.of(String.class, "bukkit_description");
+    private final Map<Class<?>, BrigadierMapping<?, ?, S>> mappers = new HashMap<>();
 
-    private BukkitCommandMeta() {
+    @Override
+    public @Nullable <T, K extends ArgumentParser<C, T>> BrigadierMapping<C, K, S> mapping(@NonNull final Class<K> parserType) {
+        final BrigadierMapping<?, ?, S> mapper = this.mappers.get(parserType);
+        if (mapper == null) {
+            return null;
+        }
+        return (BrigadierMapping<C, K, S>) mapper;
+    }
+
+    @Override
+    public <K extends ArgumentParser<C, ?>> void registerMappingUnsafe(
+            @NonNull final Class<K> parserType,
+            @NonNull final BrigadierMapping<?, ?, S> mapping
+    ) {
+        this.mappers.put(parserType, mapping);
     }
 }

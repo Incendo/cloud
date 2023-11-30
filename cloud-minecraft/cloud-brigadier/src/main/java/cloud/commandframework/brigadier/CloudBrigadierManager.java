@@ -37,16 +37,20 @@ import cloud.commandframework.arguments.standard.ShortParser;
 import cloud.commandframework.arguments.standard.StringArrayParser;
 import cloud.commandframework.arguments.standard.StringParser;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
+import cloud.commandframework.brigadier.argument.ArgumentTypeFactory;
+import cloud.commandframework.brigadier.argument.BrigadierMapping;
+import cloud.commandframework.brigadier.argument.BrigadierMappingBuilder;
+import cloud.commandframework.brigadier.argument.BrigadierMappings;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
+import cloud.commandframework.brigadier.node.LiteralBrigadierNodeFactory;
+import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.context.CommandContext;
-import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
@@ -73,23 +77,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @SuppressWarnings({"unchecked", "unused"})
 public final class CloudBrigadierManager<C, S> {
 
-    private static final SuggestionProvider<?> DELEGATE_TO_CLOUD = (c, b) -> b.buildFuture();
-
-    private final BrigadierMappings<C, S> brigadierMappings = new BrigadierMappingsImpl<>();
+    private final BrigadierMappings<C, S> brigadierMappings = BrigadierMappings.create();
     private final LiteralBrigadierNodeFactory<C, S> literalBrigadierNodeFactory;
-    private final Map<@NonNull Class<?>, @NonNull Supplier<@Nullable ArgumentType<?>>> defaultArgumentTypeSuppliers;
+    private final Map<@NonNull Class<?>, @NonNull ArgumentTypeFactory<?>> defaultArgumentTypeSuppliers;
     private Function<S, C> brigadierCommandSenderMapper;
     private Function<C, S> backwardsBrigadierCommandSenderMapper;
-
-    /**
-     * Returns a sentinel value for declaring that suggestions should be delegated to cloud.
-     *
-     * @param <T> the sender type
-     * @return a singleton sentinel suggestion provider
-     */
-    static <T> SuggestionProvider<T> delegateSuggestions() {
-        return (SuggestionProvider<T>) DELEGATE_TO_CLOUD;
-    }
 
     /**
      * Create a new cloud brigadier manager
@@ -312,22 +304,20 @@ public final class CloudBrigadierManager<C, S> {
             final @NonNull TypeToken<K> parserType,
             final Consumer<BrigadierMappingBuilder<K, S>> configurer
     ) {
-        final BrigadierMapping.BuilderImpl<C, K, S> builder = new BrigadierMapping.BuilderImpl<>();
+        final BrigadierMappingBuilder<K, S> builder = BrigadierMapping.builder();
         configurer.accept(builder);
         this.mappings().registerMappingUnsafe((Class<K>) GenericTypeReflector.erase(parserType.getType()), builder.build());
     }
 
     /**
-     * Register a default mapping to between a class and a Brigadier argument type
+     * Returns the mappings between Cloud and Brigadier types.
      *
-     * @param clazz    Type to map
-     * @param supplier Supplier that supplies the argument type
+     * @return the mappings
+     * @since 2.0.0
      */
-    public void registerDefaultArgumentTypeSupplier(
-            final @NonNull Class<?> clazz,
-            final @NonNull Supplier<@Nullable ArgumentType<?>> supplier
-    ) {
-        this.defaultArgumentTypeSuppliers.put(clazz, supplier);
+    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    public @NonNull BrigadierMappings<C, S> mappings() {
+        return this.brigadierMappings;
     }
 
     /**
@@ -341,11 +331,30 @@ public final class CloudBrigadierManager<C, S> {
         return this.literalBrigadierNodeFactory;
     }
 
-    @NonNull BrigadierMappings<C, S> mappings() {
-        return this.brigadierMappings;
+    /**
+     * Register a default mapping to between a class and a Brigadier argument type
+     *
+     * @param <T>     the type
+     * @param clazz   the type to map
+     * @param factory factory that creates the argument type
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public <T> void registerDefaultArgumentTypeSupplier(
+            final @NonNull Class<T> clazz,
+            final @NonNull ArgumentTypeFactory<T> factory
+    ) {
+        this.defaultArgumentTypeSuppliers.put(clazz, factory);
     }
 
-    @NonNull Map<@NonNull Class<?>, @NonNull Supplier<@Nullable ArgumentType<?>>> defaultArgumentTypeSuppliers() {
+    /**
+     * Returns the default argument type factories.
+     *
+     * @return immutable view of the factories
+     * @since 2.0.0
+     */
+    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    public @NonNull Map<@NonNull Class<?>, @NonNull ArgumentTypeFactory<?>> defaultArgumentTypeFactories() {
         return Collections.unmodifiableMap(this.defaultArgumentTypeSuppliers);
     }
 }

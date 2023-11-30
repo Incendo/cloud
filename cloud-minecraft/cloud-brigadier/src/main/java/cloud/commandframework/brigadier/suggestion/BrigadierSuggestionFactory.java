@@ -21,11 +21,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.brigadier;
+package cloud.commandframework.brigadier.suggestion;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
+import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.types.tuples.Pair;
 import com.mojang.brigadier.context.ParsedCommandNode;
@@ -42,6 +43,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -50,15 +52,25 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @param <C> command sender type
  * @param <S> Brigadier sender type
+ * @since 2.0.0
  */
-final class BrigadierSuggestionFactory<C, S> {
+@API(status = API.Status.INTERNAL, since = "2.0.0")
+public final class BrigadierSuggestionFactory<C, S> {
 
     private final CloudBrigadierManager<C, S> cloudBrigadierManager;
     private final CommandManager<C> commandManager;
     private final Supplier<CommandContext<C>> dummyContextProvider;
     private final SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory;
 
-    BrigadierSuggestionFactory(
+    /**
+     * Creates a new suggestion factory.
+     *
+     * @param cloudBrigadierManager the brigadier manager
+     * @param commandManager        the command manager
+     * @param dummyContextProvider  creates the context provided when retrieving suggestions
+     * @param suggestionFactory     the suggestion factory-producing tooltip suggestions
+     */
+    public BrigadierSuggestionFactory(
             final @NonNull CloudBrigadierManager<C, S> cloudBrigadierManager,
             final @NonNull CommandManager<C> commandManager,
             final @NonNull Supplier<CommandContext<C>> dummyContextProvider,
@@ -70,7 +82,16 @@ final class BrigadierSuggestionFactory<C, S> {
         this.suggestionFactory = suggestionFactory;
     }
 
-    @NonNull CompletableFuture<Suggestions> buildSuggestions(
+    /**
+     * Builds suggestions for the given component.
+     *
+     * @param senderContext the brigadier context
+     * @param parentNode    the parent command node
+     * @param component     the command component to generate suggestions for
+     * @param builder       the suggestion builder to generate suggestions with
+     * @return future that completes with the suggestions
+     */
+    public @NonNull CompletableFuture<@NonNull Suggestions> buildSuggestions(
             final com.mojang.brigadier.context.@Nullable CommandContext<S> senderContext,
             final cloud.commandframework.internal.@Nullable CommandNode<C> parentNode,
             final @NonNull CommandComponent<C> component,

@@ -31,6 +31,7 @@ import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionMapper;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.bukkit.annotation.specifier.AllowEmptySelection;
 import cloud.commandframework.bukkit.annotation.specifier.DefaultNamespace;
 import cloud.commandframework.bukkit.annotation.specifier.RequireExplicitNamespace;
@@ -279,7 +280,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      * Sets the suggestion mapper.
      * <p>
      * If you're using Brigadier and you want to be able to use suggestions with tooltips, then
-     * your suggestion mapper should output {@link cloud.commandframework.brigadier.TooltipSuggestion}.
+     * your suggestion mapper should output {@link TooltipSuggestion}.
      *
      * @param <S>              the custom type
      * @param suggestionMapper the suggestion mapper

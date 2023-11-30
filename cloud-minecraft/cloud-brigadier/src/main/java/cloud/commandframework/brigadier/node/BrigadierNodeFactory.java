@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.brigadier;
+package cloud.commandframework.brigadier.node;
 
 import cloud.commandframework.brigadier.permission.BrigadierPermissionChecker;
 import com.mojang.brigadier.Command;

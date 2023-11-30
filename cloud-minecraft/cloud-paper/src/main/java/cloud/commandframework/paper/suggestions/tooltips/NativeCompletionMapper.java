@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.paper.suggestions.tooltips;
 
-import cloud.commandframework.brigadier.TooltipSuggestion;
+import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 import com.mojang.brigadier.Message;
 import io.papermc.paper.brigadier.PaperBrigadier;

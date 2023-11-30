@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.brigadier;
+package cloud.commandframework.brigadier.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import org.apiguardian.api.API;
@@ -29,7 +29,18 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @API(status = API.Status.INTERNAL, since = "2.0.0")
-interface BrigadierMappings<C, S> {
+public interface BrigadierMappings<C, S> {
+
+    /**
+     * Returns a new instance of the default implementation.
+     *
+     * @param <C> the Cloud command sender type
+     * @param <S> the Brigadier command sender type
+     * @return the mapping instance
+     */
+    static <C, S> @NonNull BrigadierMappings<C, S> create() {
+        return new BrigadierMappingsImpl<>();
+    }
 
     /**
      * Returns the mapper for the given {@code parserType}.
@@ -51,7 +62,7 @@ interface BrigadierMappings<C, S> {
      */
     default <T, K extends ArgumentParser<C, T>> void registerMapping(
             @NonNull Class<K> parserType,
-            @NonNull BrigadierMapping<C, K, S> mapping
+            @NonNull BrigadierMapping<?, K, S> mapping
     ) {
         this.registerMappingUnsafe(parserType, mapping);
     }
@@ -65,6 +76,6 @@ interface BrigadierMappings<C, S> {
      */
     <K extends ArgumentParser<C, ?>> void registerMappingUnsafe(
             @NonNull Class<K> parserType,
-            @NonNull BrigadierMapping<C, ?, S> mapping
+            @NonNull BrigadierMapping<?, ?, S> mapping
     );
 }

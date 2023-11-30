@@ -27,7 +27,6 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandDescription;
 import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.brigadier.BukkitCommandMeta;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;

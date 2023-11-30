@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.brigadier;
+package cloud.commandframework.brigadier.node;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
@@ -29,8 +29,15 @@ import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.MappedArgumentParser;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
+import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.brigadier.argument.ArgumentTypeFactory;
+import cloud.commandframework.brigadier.argument.BrigadierMapping;
 import cloud.commandframework.brigadier.permission.BrigadierPermissionChecker;
 import cloud.commandframework.brigadier.permission.BrigadierPermissionPredicate;
+import cloud.commandframework.brigadier.suggestion.BrigadierSuggestionFactory;
+import cloud.commandframework.brigadier.suggestion.CloudDelegatingSuggestionProvider;
+import cloud.commandframework.brigadier.suggestion.SuggestionsType;
+import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.context.CommandContext;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -56,12 +63,20 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
     private final CommandManager<C> commandManager;
     private final BrigadierSuggestionFactory<C, S> brigadierSuggestionFactory;
 
-   LiteralBrigadierNodeFactory(
+    /**
+     * Creates a new factory that produces literal command nodes.
+     *
+     * @param cloudBrigadierManager the brigadier manager
+     * @param commandManager        the command manager
+     * @param dummyContextProvider  creates the context provided when retrieving suggestions
+     * @param suggestionFactory     the suggestion factory-producing tooltip suggestions
+     */
+    public LiteralBrigadierNodeFactory(
            final @NonNull CloudBrigadierManager<C, S> cloudBrigadierManager,
            final @NonNull CommandManager<C> commandManager,
            final @NonNull Supplier<CommandContext<C>> dummyContextProvider,
            final @NonNull SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory
-           ) {
+    ) {
         this.cloudBrigadierManager = cloudBrigadierManager;
         this.commandManager = commandManager;
         this.brigadierSuggestionFactory = new BrigadierSuggestionFactory<>(
@@ -266,19 +281,19 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
         }
 
         final BrigadierMapping<C, K, S> mapping = this.cloudBrigadierManager.mappings().mapping(argumentParser.getClass());
-        if (mapping == null || mapping.getMapper() == null) {
+        if (mapping == null || mapping.mapper() == null) {
             return this.getDefaultMapping(valueType);
         }
 
         final SuggestionProvider<S> suggestionProvider = mapping.makeSuggestionProvider(argumentParser);
-        if (suggestionProvider == CloudBrigadierManager.delegateSuggestions()) {
+        if (suggestionProvider == BrigadierMapping.delegateSuggestions()) {
             return new ArgumentMapping<>(
-                    (ArgumentType) ((Function) mapping.getMapper()).apply(argumentParser),
+                    (ArgumentType) ((Function) mapping.mapper()).apply(argumentParser),
                     SuggestionsType.CLOUD_SUGGESTIONS
             );
         }
         return new ArgumentMapping<>(
-                (ArgumentType) ((Function) mapping.getMapper()).apply(argumentParser),
+                (ArgumentType) ((Function) mapping.mapper()).apply(argumentParser),
                 suggestionProvider
         );
     }
@@ -291,10 +306,13 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
      * @return the argument mapping
      */
     private @NonNull ArgumentMapping<S> getDefaultMapping(final @NonNull TypeToken<?> type) {
-        final Supplier<ArgumentType<?>> argumentTypeSupplier = this.cloudBrigadierManager.defaultArgumentTypeSuppliers()
+        final ArgumentTypeFactory<?> argumentTypeSupplier = this.cloudBrigadierManager.defaultArgumentTypeFactories()
                 .get(GenericTypeReflector.erase(type.getType()));
         if (argumentTypeSupplier != null) {
-            return new ArgumentMapping<>(argumentTypeSupplier.get());
+            final ArgumentType<?> argumentType = argumentTypeSupplier.create();
+            if (argumentType != null) {
+                return new ArgumentMapping<>(argumentType);
+            }
         }
         return new ArgumentMapping<>(StringArgumentType.word(), SuggestionsType.CLOUD_SUGGESTIONS);
     }
