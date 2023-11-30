@@ -25,6 +25,7 @@ package cloud.commandframework.examples.bukkit;
 
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
+import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationParserExample;
 import cloud.commandframework.examples.bukkit.builder.BuilderExample;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
@@ -32,6 +33,7 @@ import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.paper.PaperCommandManager;
+import cloud.commandframework.paper.suggestions.tooltips.ComponentTooltipSuggestionMapper;
 import java.util.function.Function;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -101,6 +103,12 @@ public final class ExamplePlugin extends JavaPlugin {
         // if you're using paper-api instead of Bukkit.
         //
         this.bukkitAudiences = BukkitAudiences.create(this);
+        //
+        // Install support for suggestions with adventure component tooltips.
+        //
+        if (CraftBukkitReflection.classExists("io.papermc.paper.brigadier.PaperBrigadier")) {
+            manager.suggestionMapper(new ComponentTooltipSuggestionMapper());
+        }
         //
         // Override the default exception handlers and use the exception handlers from cloud-minecraft-extras instead.
         //

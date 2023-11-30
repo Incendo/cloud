@@ -31,6 +31,7 @@ import cloud.commandframework.paper.suggestions.tooltips.CompletionMapperFactory
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.bukkit.event.EventHandler;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 class BrigadierAsyncCommandSuggestionListener<C> extends AsyncCommandSuggestionListener<C> {
@@ -41,6 +42,12 @@ class BrigadierAsyncCommandSuggestionListener<C> extends AsyncCommandSuggestionL
     BrigadierAsyncCommandSuggestionListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
         super(paperCommandManager);
         this.suggestionFactory = paperCommandManager.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion);
+    }
+
+    @EventHandler
+    @Override
+    void onTabCompletion(final @NonNull AsyncTabCompleteEvent event) {
+        super.onTabCompletion(event);
     }
 
     @Override

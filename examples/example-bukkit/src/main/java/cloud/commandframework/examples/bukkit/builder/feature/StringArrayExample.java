@@ -27,11 +27,15 @@ import cloud.commandframework.Description;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
+import java.util.Collections;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static cloud.commandframework.arguments.standard.StringArrayParser.stringArrayParser;
+import static cloud.commandframework.paper.suggestions.tooltips.ComponentTooltipSuggestion.tooltipSuggestion;
 
 /**
  * Example of a command that consumes the entire input in the form of an array. This is useful when delegating to existing
@@ -47,7 +51,17 @@ public final class StringArrayExample implements BuilderFeature {
         manager.command(
                 manager.commandBuilder("builder", Description.of("Bukkit-esque cmmand"))
                         .literal("arraycommand")
-                        .optional("args", stringArrayParser(), Description.of("Arguments"))
+                        .optional(
+                                "args",
+                                stringArrayParser(),
+                                Description.of("Arguments"),
+                                (ctx, in) -> Collections.singletonList(
+                                        tooltipSuggestion(
+                                                "Hello",
+                                                Component.text("Hello", NamedTextColor.GREEN)
+                                        )
+                                )
+                        )
                         .handler(context -> {
                             final String[] args = context.getOrDefault("args", new String[0]);
                             context.getSender().sendMessage("You wrote: " + StringUtils.join(args, " "));

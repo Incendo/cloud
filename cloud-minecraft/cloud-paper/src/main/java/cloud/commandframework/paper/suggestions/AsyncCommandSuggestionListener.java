@@ -41,7 +41,7 @@ class AsyncCommandSuggestionListener<C> implements SuggestionListener<C> {
     }
 
     @EventHandler
-    final void onTabCompletion(final @NonNull AsyncTabCompleteEvent event) {
+    void onTabCompletion(final @NonNull AsyncTabCompleteEvent event) {
         // Strip leading slash
         final String strippedBuffer = event.getBuffer().startsWith("/")
                 ? event.getBuffer().substring(1)
