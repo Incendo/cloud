@@ -50,41 +50,68 @@ class DurationParserSuggestionsTest {
     @Test
     void testDurationSuggestions() {
         final String input = "duration ";
-        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
+        final List<? extends Suggestion> suggestions = manager.suggestionFactory().suggestImmediately(
+                new TestCommandSender(),
+                input
+        );
         Assertions.assertEquals(suggestionList("1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
 
         final String input2 = "duration 1";
-        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        final List<? extends Suggestion> suggestions2 = manager.suggestionFactory().suggestImmediately(
+                new TestCommandSender(),
+                input2
+        );
         Assertions.assertEquals(suggestionList("1d", "1h", "1m", "1s"), suggestions2);
 
         final String input3 = "duration 1d";
-        final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        final List<? extends Suggestion> suggestions3 = manager.suggestionFactory().suggestImmediately(
+                new TestCommandSender(),
+                input3
+        );
         Assertions.assertEquals(Collections.emptyList(), suggestions3);
 
         final String input4 = "duration 1d2";
-        final List<Suggestion> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        final List<? extends Suggestion> suggestions4 = manager.suggestionFactory().suggestImmediately(
+                new TestCommandSender(),
+                input4
+        );
         Assertions.assertTrue(suggestions4.containsAll(suggestionList("1d2h", "1d2m", "1d2s")));
         Assertions.assertFalse(suggestions4.contains(Suggestion.simple("1d2d")));
 
         final String input9 = "duration 1d22";
-        final List<Suggestion> suggestions9 = manager.suggest(new TestCommandSender(), input9);
+        final List<? extends Suggestion> suggestions9 = manager.suggestionFactory().suggestImmediately(
+                new TestCommandSender(),
+                input9
+        );
         Assertions.assertTrue(suggestions9.containsAll(suggestionList("1d22h", "1d22m", "1d22s")));
         Assertions.assertFalse(suggestions9.contains(Suggestion.simple("1d22d")));
 
         final String input5 = "duration d";
-        final List<Suggestion> suggestions5 = manager.suggest(new TestCommandSender(), input5);
+        final List<? extends Suggestion> suggestions5 = manager.suggestionFactory().suggestImmediately(
+                new TestCommandSender(),
+                input5
+        );
         Assertions.assertEquals(Collections.emptyList(), suggestions5);
 
         final String input6 = "duration 1d2d";
-        final List<Suggestion> suggestions6 = manager.suggest(new TestCommandSender(), input6);
+        final List<? extends Suggestion> suggestions6 = manager.suggestionFactory().suggestImmediately(
+                new TestCommandSender(),
+                input6
+        );
         Assertions.assertEquals(Collections.emptyList(), suggestions6);
 
         final String input7 = "duration 1d2h3m4s";
-        final List<Suggestion> suggestions7 = manager.suggest(new TestCommandSender(), input7);
+        final List<? extends Suggestion> suggestions7 = manager.suggestionFactory().suggestImmediately(
+                new TestCommandSender(),
+                input7
+        );
         Assertions.assertEquals(Collections.emptyList(), suggestions7);
 
         final String input8 = "duration dd";
-        final List<Suggestion> suggestions8 = manager.suggest(new TestCommandSender(), input8);
+        final List<? extends Suggestion> suggestions8 = manager.suggestionFactory().suggestImmediately(
+                new TestCommandSender(),
+                input8
+        );
         Assertions.assertEquals(Collections.emptyList(), suggestions8);
     }
 }

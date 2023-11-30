@@ -21,43 +21,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments;
+package cloud.commandframework.paper.suggestions.tooltips;
 
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.CommandTree;
+import net.kyori.adventure.audience.Audience;
 import org.apiguardian.api.API;
+import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Factory that produces {@link DelegatingCommandSuggestionEngine} instances
- *
- * @param <C> Command sender type
- */
-@API(status = API.Status.STABLE)
-public final class DelegatingCommandSuggestionEngineFactory<C> {
-
-    private final CommandManager<C> commandManager;
-    private final CommandTree<C> commandTree;
+@API(status = API.Status.INTERNAL, since = "2.0.0")
+public interface CompletionMapperFactory {
 
     /**
-     * Create a new delegating command suggestion engine factory
+     * Returns a new completion mapper factory that detects whether Adventure has been relocated, and determines which
+     * completion mapper used on the result.
      *
-     * @param commandManager Command manager
+     * @return the completion mapper factory
      */
-    public DelegatingCommandSuggestionEngineFactory(final @NonNull CommandManager<C> commandManager) {
-        this.commandManager = commandManager;
-        this.commandTree = commandManager.commandTree();
+    static @NonNull CompletionMapperFactory detectingRelocation() {
+        return new CompletionMapperFactoryImpl();
     }
 
     /**
-     * Create the engine instance
+     * Returns a relevant {@link CompletionMapper} for the current environment.
      *
-     * @return New engine instance
+     * @return the completion mapper
      */
-    public @NonNull DelegatingCommandSuggestionEngine<C> create() {
-        return new DelegatingCommandSuggestionEngine<>(
-                this.commandManager,
-                this.commandTree
-        );
+    @NonNull CompletionMapper createMapper();
+
+
+    final class CompletionMapperFactoryImpl implements CompletionMapperFactory {
+
+        private CompletionMapperFactoryImpl() {
+        }
+
+        @Override
+        public @NonNull CompletionMapper createMapper() {
+            if (Audience.class.isAssignableFrom(Player.class)) {
+                return new NativeCompletionMapper();
+            }
+            return new ReflectiveCompletionMapper();
+        }
     }
 }

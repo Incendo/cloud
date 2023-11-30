@@ -101,7 +101,7 @@ class RepeatableFlagTest {
         );
 
         // Act
-        final List<Suggestion> suggestions = this.commandManager.suggest(
+        final List<? extends Suggestion> suggestions = this.commandManager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 "test --flag --"
         );

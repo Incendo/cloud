@@ -60,8 +60,10 @@ class CommandPermissionTest {
 
     @Test
     void testCompoundPermission() {
-        assertThat(manager.suggest(new TestCommandSender(), "t")).isEmpty();
-        assertThat(manager.suggest(new TestCommandSender("test.permission.four"), "t")).isNotEmpty();
+        assertThat(manager.suggestionFactory().suggestImmediately(new TestCommandSender(), "t")).isEmpty();
+        assertThat(manager.suggestionFactory().suggestImmediately(
+                new TestCommandSender("test.permission.four"), "t")
+        ).isNotEmpty();
     }
 
     @Test

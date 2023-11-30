@@ -21,35 +21,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments;
+package cloud.commandframework.arguments.suggestion;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
-import cloud.commandframework.context.CommandContext;
-import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-final class DelegatingSuggestionProvider<C> implements SuggestionProvider<C> {
+/**
+ * Maps from {@link cloud.commandframework.arguments.suggestion.Suggestion} to {@link S}.
+ *
+ * @param <S> the suggestion type
+ * @since 2.0.0
+ */
+@FunctionalInterface
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface SuggestionMapper<S extends Suggestion> {
 
-    private final String argumentName;
-    private final SuggestionProvider<C> suggestionProvider;
-
-    DelegatingSuggestionProvider(final @NonNull String argumentName, final @NonNull SuggestionProvider<C> suggestionProvider) {
-        this.argumentName = argumentName;
-        this.suggestionProvider = suggestionProvider;
+    /**
+     * Returns a suggestion mapper that maps from {@link Suggestion} to {@link Suggestion}.
+     *
+     * @return the identity mapper
+     */
+    static @NonNull SuggestionMapper<Suggestion> identity() {
+        return suggestion -> suggestion;
     }
 
-    @Override
-    public @NonNull List<@NonNull Suggestion> suggestions(final @NonNull CommandContext<C> context, final @NonNull String s) {
-        return this.suggestionProvider.suggestions(context, s);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("DelegatingSuggestionProvider{name='%s',parser='%s'}", this.argumentName,
-                this.suggestionProvider.getClass().getCanonicalName()
-        );
-    }
+    /**
+     * Maps the suggestion to the responding suggestion of type {@link S}.
+     *
+     * @param suggestion the input suggestion
+     * @return the output suggestion
+     */
+    @NonNull S map(@NonNull Suggestion suggestion);
 }

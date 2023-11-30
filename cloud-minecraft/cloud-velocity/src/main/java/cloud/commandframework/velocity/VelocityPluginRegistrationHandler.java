@@ -48,7 +48,8 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                                 .apply(velocityCommandManager.proxyServer()
                                         .getConsoleCommandSource()),
                         velocityCommandManager
-                )
+                ),
+                velocityCommandManager.suggestionFactory()
         );
         this.brigadierManager.brigadierSenderMapper(
                 sender -> this.manager.commandSenderMapper().apply(sender)
