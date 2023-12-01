@@ -25,7 +25,7 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
-import cloud.commandframework.brigadier.TooltipSuggestion;
+import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
 import cloud.commandframework.context.CommandContext;
 import com.mojang.brigadier.CommandDispatcher;
@@ -99,8 +99,8 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
             final @NonNull String label,
             final @NonNull Command<C> command
     ) {
-        final LiteralCommandNode<?> literalCommandNode = this.brigadierManager
-                .createLiteralCommandNode(label, command, (commandSourceStack, commandPermission) -> {
+        final LiteralCommandNode<?> literalCommandNode = this.brigadierManager.literalBrigadierNodeFactory()
+                .createNode(label, command, (commandSourceStack, commandPermission) -> {
                     // We need to check that the command still exists...
                     if (this.commandManager.commandTree().getNamedNode(label) == null) {
                         return false;

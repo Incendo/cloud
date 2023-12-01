@@ -21,21 +21,42 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.paper.suggestions.tooltips;
+package cloud.commandframework.brigadier.permission;
 
-import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
-import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
+import cloud.commandframework.internal.CommandNode;
+import cloud.commandframework.permission.CommandPermission;
+import cloud.commandframework.permission.Permission;
+import java.util.function.Predicate;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.INTERNAL, since = "2.0.0")
-public interface CompletionMapper {
+public final class BrigadierPermissionPredicate<S> implements Predicate<S> {
+
+    private final BrigadierPermissionChecker<S> permissionChecker;
+    private final CommandNode<?> node;
 
     /**
-     * Maps the given {@code suggestion} into a Paper {@link AsyncTabCompleteEvent.Completion}.
+     * Returns a new predicate that uses the given {@code permissionChecker} to evaluate the permission attached
+     * to the given {@code node}.
      *
-     * @param suggestion the suggestion
-     * @return the mapped completion
+     * @param permissionChecker the permission checker
+     * @param node              the cloud command node
      */
-    AsyncTabCompleteEvent.@NonNull Completion map(@NonNull TooltipSuggestion suggestion);
+    public BrigadierPermissionPredicate(
+            final @NonNull BrigadierPermissionChecker<S> permissionChecker,
+            final @NonNull CommandNode<?> node
+    ) {
+        this.permissionChecker = permissionChecker;
+        this.node = node;
+    }
+
+    @Override
+    public boolean test(final @NonNull S sender) {
+        final CommandPermission permission = (CommandPermission) this.node.nodeMeta().getOrDefault(
+                "permission",
+                Permission.empty()
+        );
+        return this.permissionChecker.hasPermission(sender, permission);
+    }
 }

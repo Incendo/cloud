@@ -21,21 +21,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.paper.suggestions.tooltips;
+package cloud.commandframework.brigadier.permission;
 
-import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
-import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
+import cloud.commandframework.permission.CommandPermission;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.INTERNAL, since = "2.0.0")
-public interface CompletionMapper {
+@FunctionalInterface
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface BrigadierPermissionChecker<S> {
 
     /**
-     * Maps the given {@code suggestion} into a Paper {@link AsyncTabCompleteEvent.Completion}.
+     * Returns whether the given Brigadier {@code sender} has the given {@code permission}.
      *
-     * @param suggestion the suggestion
-     * @return the mapped completion
+     * @param sender     the brigadier sender
+     * @param permission the permission
+     * @return {@code true} if the {@code sender} has the {@code permission}, else {@code false}
      */
-    AsyncTabCompleteEvent.@NonNull Completion map(@NonNull TooltipSuggestion suggestion);
+    boolean hasPermission(@NonNull S sender, @NonNull CommandPermission permission);
 }

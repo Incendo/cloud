@@ -63,7 +63,7 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
         final CommandComponent<C> component = command.rootComponent();
         final Collection<String> aliases = component.alternativeAliases();
         final BrigadierCommand brigadierCommand = new BrigadierCommand(
-                this.brigadierManager.createLiteralCommandNode(
+                this.brigadierManager.literalBrigadierNodeFactory().createNode(
                         command.rootComponent().name(),
                         command,
                         (c, p) -> this.manager.hasPermission(

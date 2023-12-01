@@ -98,6 +98,23 @@ public class AggregateCommandParserBuilder<C> {
     }
 
     /**
+     * Returns a new builder with the given {@code mapper}.
+     * <p>
+     * This version does not need to wrap the result in a {@link java.util.concurrent.CompletableFuture}.
+     *
+     * @param <O>       the type produced by the mapper
+     * @param valueType the type produced by the mapper
+     * @param mapper    the mapper
+     * @return the new builder
+     */
+    public final <O> @NonNull MappedAggregateCommandParserBuilder<C, O> withDirectMapper(
+            final @NonNull TypeToken<O> valueType,
+            final AggregateResultMapper.@NonNull DirectAggregateResultMapper<C, O> mapper
+    ) {
+        return new MappedAggregateCommandParserBuilder<>(this.components(), valueType, mapper);
+    }
+
+    /**
      * Returns a new builder with the given {@code component} inserted into the component list.
      *
      * @param component the component
