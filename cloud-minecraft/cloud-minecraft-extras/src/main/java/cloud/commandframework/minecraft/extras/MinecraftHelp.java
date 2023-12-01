@@ -29,6 +29,7 @@ import cloud.commandframework.CommandDescription;
 import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
+import cloud.commandframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.LinearComponents;
@@ -88,14 +90,22 @@ public final class MinecraftHelp<C> {
     public static final String MESSAGE_CLICK_FOR_NEXT_PAGE = "click_for_next_page";
     public static final String MESSAGE_CLICK_FOR_PREVIOUS_PAGE = "click_for_previous_page";
 
+    private static final Pattern STRING_PLACEHOLDER_PATTERN = Pattern.compile("<([a-z_]+)>");
+
     private final AudienceProvider<C> audienceProvider;
     private final CommandManager<C> commandManager;
     private final String commandPrefix;
     private final Map<String, String> messageMap = new HashMap<>();
 
     private Predicate<Command<C>> commandFilter = c -> true;
-    private MessageProvider<C> messageProvider =
-            (sender, key, args) -> text(this.messageMap.get(key));
+    private MessageProvider<C> messageProvider = (sender, key, args) -> {
+        final String message = this.messageMap.get(key);
+        if (args.isEmpty()) {
+            return text(message);
+        }
+        return text(StringUtils.replaceAll(
+                message, STRING_PLACEHOLDER_PATTERN, matchResult -> args.get(matchResult.group(1))));
+    };
     private BiFunction<C, String, Component> descriptionDecorator = (sender, description) -> Component.text(description);
     private HelpColors colors = DEFAULT_HELP_COLORS;
     private int headerFooterLength = DEFAULT_HEADER_FOOTER_LENGTH;
@@ -221,12 +231,15 @@ public final class MinecraftHelp<C> {
     }
 
     /**
-     * Configure a message
+     * Configure a plain string message, used by the default {@link MessageProvider}.
+     * Placeholders in the format {@literal <name>} will be replaced.
      *
      * @param key   Message key. These are constants in {@link MinecraftHelp}
      * @param value The text for the message
+     * @since 2.0.0
      */
-    public void setMessage(
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void message(
             final @NonNull String key,
             final @NonNull String value
     ) {
@@ -678,16 +691,7 @@ public final class MinecraftHelp<C> {
         args.put("page", String.valueOf(attemptedPage));
         args.put("max_pages", String.valueOf(maxPages));
         return this.highlight(
-                this.messageProvider.provide(sender, MESSAGE_PAGE_OUT_OF_RANGE, args)
-                        .color(this.colors.text)
-                        .replaceText(config -> {
-                            config.matchLiteral("<page>");
-                            config.replacement(String.valueOf(attemptedPage));
-                        })
-                        .replaceText(config -> {
-                            config.matchLiteral("<max_pages>");
-                            config.replacement(String.valueOf(maxPages));
-                        })
+                this.messageProvider.provide(sender, MESSAGE_PAGE_OUT_OF_RANGE, args).color(this.colors.text)
         );
     }
 
