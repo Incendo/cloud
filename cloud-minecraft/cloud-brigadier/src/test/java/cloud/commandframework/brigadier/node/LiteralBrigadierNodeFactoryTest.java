@@ -26,7 +26,9 @@ package cloud.commandframework.brigadier.node;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.brigadier.suggestion.CloudDelegatingSuggestionProvider;
 import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
@@ -35,19 +37,32 @@ import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.types.tuples.Pair;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.ArgumentCommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.leangen.geantyref.TypeToken;
+import java.util.Arrays;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.arguments.standard.StringParser.greedyStringParser;
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth8.assertThat;
 
 @SuppressWarnings("unchecked")
+@ExtendWith(MockitoExtension.class)
 class LiteralBrigadierNodeFactoryTest {
+
+    @Mock
+    private CommandContext<Object> context;
 
     private TestCommandManager commandManager;
     private LiteralBrigadierNodeFactory<Object, Object> literalBrigadierNodeFactory;
@@ -64,13 +79,15 @@ class LiteralBrigadierNodeFactoryTest {
     }
 
     @Test
-    void testSimple() {
+    void testSimple() throws Exception {
         // Arrange
         final Command<Object> command = this.commandManager.commandBuilder("command")
                 .literal("literal")
                 .required("integer", integerParser(0, 10))
-                .optional("string", greedyStringParser())
-                .build();
+                .optional("string", greedyStringParser(), (ctx, in) -> Arrays.asList(
+                        Suggestion.simple("some"),
+                        Suggestion.simple("suggestions")
+                )).build();
         this.commandManager.command(command);
         final com.mojang.brigadier.Command<Object> brigadierCommand = ctx -> 0;
 
@@ -115,6 +132,16 @@ class LiteralBrigadierNodeFactoryTest {
                 .isEqualTo(StringArgumentType.StringType.GREEDY_PHRASE);
         assertThat(stringArgument.getChildren()).isEmpty();
         assertThat(stringArgument.getCommand()).isEqualTo(brigadierCommand);
+
+        assertThat(stringArgument.getCustomSuggestions()).isInstanceOf(CloudDelegatingSuggestionProvider.class);
+        final String suggestionString = "command literal 9 ";
+        final SuggestionProvider<Object> suggestionProvider = stringArgument.getCustomSuggestions();
+        final Suggestions suggestions = suggestionProvider.getSuggestions(
+                this.context,
+                new SuggestionsBuilder(suggestionString, suggestionString.length())
+        ).get();
+        assertThat(suggestions.getList().stream().map(com.mojang.brigadier.suggestion.Suggestion::getText))
+                .containsExactly("some", "suggestions");
     }
 
     @Test
