@@ -45,6 +45,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static net.kyori.adventure.text.Component.space;
@@ -93,9 +94,8 @@ public final class MinecraftHelp<C> {
     private final Map<String, String> messageMap = new HashMap<>();
 
     private Predicate<Command<C>> commandFilter = c -> true;
-    private BiFunction<C, String, String> stringMessageProvider = (sender, key) -> this.messageMap.get(key);
     private MessageProvider<C> messageProvider =
-            (sender, key, args) -> text(this.stringMessageProvider.apply(sender, key));
+            (sender, key, args) -> text(this.messageMap.get(key));
     private BiFunction<C, String, Component> descriptionDecorator = (sender, description) -> Component.text(description);
     private HelpColors colors = DEFAULT_HELP_COLORS;
     private int headerFooterLength = DEFAULT_HEADER_FOOTER_LENGTH;
@@ -237,20 +237,6 @@ public final class MinecraftHelp<C> {
      * Set a custom message provider function to be used for getting messages from keys.
      * <p>
      * The keys are constants in {@link MinecraftHelp}.
-     *
-     * @param messageProvider The message provider to use
-     */
-    public void setMessageProvider(final @NonNull BiFunction<C, String, String> messageProvider) {
-        this.stringMessageProvider = messageProvider;
-    }
-
-    /**
-     * Set a custom message provider function to be used for getting messages from keys.
-     * <p>
-     * The keys are constants in {@link MinecraftHelp}.
-     * <p>
-     * This version of the method which takes a {@link MessageProvider} will have priority over a message provider
-     * registered through {@link #setMessageProvider(BiFunction)}
      *
      * @param messageProvider The message provider to use
      * @since 1.4.0
@@ -688,13 +674,11 @@ public final class MinecraftHelp<C> {
             final int attemptedPage,
             final int maxPages
     ) {
+        final Map<String, String> args = new HashMap<>();
+        args.put("page", String.valueOf(attemptedPage));
+        args.put("max_pages", String.valueOf(maxPages));
         return this.highlight(
-                this.messageProvider.provide(
-                                sender,
-                                MESSAGE_PAGE_OUT_OF_RANGE,
-                                String.valueOf(attemptedPage),
-                                String.valueOf(maxPages)
-                        )
+                this.messageProvider.provide(sender, MESSAGE_PAGE_OUT_OF_RANGE, args)
                         .color(this.colors.text)
                         .replaceText(config -> {
                             config.matchLiteral("<page>");
@@ -707,6 +691,7 @@ public final class MinecraftHelp<C> {
         );
     }
 
+    @API(status = API.Status.STABLE, since = "1.4.0")
     @FunctionalInterface
     public interface MessageProvider<C> {
 
@@ -718,7 +703,24 @@ public final class MinecraftHelp<C> {
          * @param args   args
          * @return component
          */
-        @NonNull Component provide(@NonNull C sender, @NonNull String key, @NonNull String... args);
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        @NonNull Component provide(
+                @NonNull C sender,
+                @NonNull String key,
+                @NonNull Map<String, String> args
+        );
+
+        /**
+         * Creates a component from a command sender and key.
+         *
+         * @param sender command sender
+         * @param key    message key (constants in {@link MinecraftHelp}
+         * @return component
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        default @NonNull Component provide(final @NonNull C sender, final @NonNull String key) {
+            return this.provide(sender, key, Collections.emptyMap());
+        }
     }
 
     /**
