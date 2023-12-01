@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.brigadier;
+package cloud.commandframework.brigadier.suggestion;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import com.mojang.brigadier.Message;

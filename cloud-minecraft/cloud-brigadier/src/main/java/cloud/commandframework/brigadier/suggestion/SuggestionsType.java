@@ -21,21 +21,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.paper.suggestions.tooltips;
+package cloud.commandframework.brigadier.suggestion;
 
-import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
-import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 import org.apiguardian.api.API;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
+/**
+ * Determines how suggestions are retrieved for an argument.
+ */
 @API(status = API.Status.INTERNAL, since = "2.0.0")
-public interface CompletionMapper {
-
+public enum SuggestionsType {
     /**
-     * Maps the given {@code suggestion} into a Paper {@link AsyncTabCompleteEvent.Completion}.
-     *
-     * @param suggestion the suggestion
-     * @return the mapped completion
+     * Brigadier will be invoked for suggestions.
      */
-    AsyncTabCompleteEvent.@NonNull Completion map(@NonNull TooltipSuggestion suggestion);
+    BRIGADIER_SUGGESTIONS,
+    /**
+     * Cloud will be invoked for suggestions.
+     */
+    CLOUD_SUGGESTIONS
 }

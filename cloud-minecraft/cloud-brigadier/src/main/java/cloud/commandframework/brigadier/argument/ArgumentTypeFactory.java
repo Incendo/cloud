@@ -21,21 +21,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.paper.suggestions.tooltips;
+package cloud.commandframework.brigadier.argument;
 
-import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
-import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
+import com.mojang.brigadier.arguments.ArgumentType;
 import org.apiguardian.api.API;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-@API(status = API.Status.INTERNAL, since = "2.0.0")
-public interface CompletionMapper {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface ArgumentTypeFactory<T> {
 
     /**
-     * Maps the given {@code suggestion} into a Paper {@link AsyncTabCompleteEvent.Completion}.
+     * Creates the argument type.
      *
-     * @param suggestion the suggestion
-     * @return the mapped completion
+     * @return the created argument type, or {@code null}
      */
-    AsyncTabCompleteEvent.@NonNull Completion map(@NonNull TooltipSuggestion suggestion);
+    @Nullable ArgumentType<T> create();
 }

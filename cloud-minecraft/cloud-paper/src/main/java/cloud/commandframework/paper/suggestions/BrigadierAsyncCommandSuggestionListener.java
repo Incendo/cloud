@@ -24,7 +24,7 @@
 package cloud.commandframework.paper.suggestions;
 
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
-import cloud.commandframework.brigadier.TooltipSuggestion;
+import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.paper.suggestions.tooltips.CompletionMapper;
 import cloud.commandframework.paper.suggestions.tooltips.CompletionMapperFactory;

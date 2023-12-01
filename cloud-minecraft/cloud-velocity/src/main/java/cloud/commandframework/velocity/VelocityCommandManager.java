@@ -28,7 +28,7 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
-import cloud.commandframework.brigadier.TooltipSuggestion;
+import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;

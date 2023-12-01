@@ -24,12 +24,9 @@
 package cloud.commandframework.brigadier;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.parser.MappedArgumentParser;
 import cloud.commandframework.arguments.standard.BooleanParser;
 import cloud.commandframework.arguments.standard.ByteParser;
 import cloud.commandframework.arguments.standard.DoubleParser;
@@ -40,43 +37,30 @@ import cloud.commandframework.arguments.standard.ShortParser;
 import cloud.commandframework.arguments.standard.StringArrayParser;
 import cloud.commandframework.arguments.standard.StringParser;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
+import cloud.commandframework.brigadier.argument.ArgumentTypeFactory;
+import cloud.commandframework.brigadier.argument.BrigadierMapping;
+import cloud.commandframework.brigadier.argument.BrigadierMappingBuilder;
+import cloud.commandframework.brigadier.argument.BrigadierMappings;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
+import cloud.commandframework.brigadier.node.LiteralBrigadierNodeFactory;
+import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.permission.CommandPermission;
-import cloud.commandframework.permission.Permission;
-import cloud.commandframework.types.tuples.Pair;
-import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.ArgumentBuilder;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
-import com.mojang.brigadier.context.ParsedCommandNode;
-import com.mojang.brigadier.context.StringRange;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -90,28 +74,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  * @param <S> Brigadier sender type
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "unused"})
 public final class CloudBrigadierManager<C, S> {
 
-    private static final SuggestionProvider<?> DELEGATE_TO_CLOUD = (c, b) -> b.buildFuture();
-
-    private final Map<Class<?>, BrigadierMapping<C, ?, S>> mappers;
-    private final Map<@NonNull Class<?>, @NonNull Supplier<@Nullable ArgumentType<?>>> defaultArgumentTypeSuppliers;
-    private final Supplier<CommandContext<C>> dummyContextProvider;
-    private final CommandManager<C> commandManager;
-    private final SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory;
+    private final BrigadierMappings<C, S> brigadierMappings = BrigadierMappings.create();
+    private final LiteralBrigadierNodeFactory<C, S> literalBrigadierNodeFactory;
+    private final Map<@NonNull Class<?>, @NonNull ArgumentTypeFactory<?>> defaultArgumentTypeSuppliers;
     private Function<S, C> brigadierCommandSenderMapper;
     private Function<C, S> backwardsBrigadierCommandSenderMapper;
-
-    /**
-     * A sentinel value for declaring that suggestions should be delegated to cloud.
-     *
-     * @param <T> the sender type
-     * @return a singleton sentinel suggestion provider
-     */
-    static <T> SuggestionProvider<T> delegateSuggestions() {
-        return (SuggestionProvider<T>) DELEGATE_TO_CLOUD;
-    }
 
     /**
      * Create a new cloud brigadier manager
@@ -125,11 +95,13 @@ public final class CloudBrigadierManager<C, S> {
             final @NonNull Supplier<@NonNull CommandContext<C>> dummyContextProvider,
             final @NonNull SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory
     ) {
-        this.mappers = new HashMap<>();
         this.defaultArgumentTypeSuppliers = new HashMap<>();
-        this.commandManager = commandManager;
-        this.dummyContextProvider = dummyContextProvider;
-        this.suggestionFactory = suggestionFactory;
+        this.literalBrigadierNodeFactory = new LiteralBrigadierNodeFactory<>(
+                this,
+                commandManager,
+                dummyContextProvider,
+                suggestionFactory
+        );
         this.registerInternalMappings();
         commandManager.registerCommandPreProcessor(ctx -> {
             if (this.backwardsBrigadierCommandSenderMapper != null) {
@@ -144,13 +116,9 @@ public final class CloudBrigadierManager<C, S> {
     private void registerInternalMappings() {
         /* Map byte, short and int to IntegerArgumentType */
         this.registerMapping(new TypeToken<ByteParser<C>>() {
-        }, builder -> builder.to(argument -> {
-            return IntegerArgumentType.integer(argument.getMin(), argument.getMax());
-        }));
+        }, builder -> builder.to(argument -> IntegerArgumentType.integer(argument.getMin(), argument.getMax())));
         this.registerMapping(new TypeToken<ShortParser<C>>() {
-        }, builder -> builder.to(argument -> {
-            return IntegerArgumentType.integer(argument.getMin(), argument.getMax());
-        }));
+        }, builder -> builder.to(argument -> IntegerArgumentType.integer(argument.getMin(), argument.getMax())));
         this.registerMapping(new TypeToken<IntegerParser<C>>() {
         }, builder -> builder.to(argument -> {
             if (!argument.hasMin() && !argument.hasMax()) {
@@ -239,6 +207,7 @@ public final class CloudBrigadierManager<C, S> {
      * @param mapper Mapper
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "1.2.0")
     public void brigadierSenderMapper(
             final @NonNull Function<@NonNull S, @Nullable C> mapper
     ) {
@@ -251,6 +220,7 @@ public final class CloudBrigadierManager<C, S> {
      * @return Mapper
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "1.2.0")
     public @Nullable Function<@NonNull S, @Nullable C> brigadierSenderMapper() {
         return this.brigadierCommandSenderMapper;
     }
@@ -263,6 +233,7 @@ public final class CloudBrigadierManager<C, S> {
      * @param mapper the reverse brigadier sender mapper
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "1.5.0")
     public void backwardsBrigadierSenderMapper(final @NonNull Function<@NonNull C, @Nullable S> mapper) {
         this.backwardsBrigadierCommandSenderMapper = mapper;
     }
@@ -272,9 +243,10 @@ public final class CloudBrigadierManager<C, S> {
      * <p>
      * If Brigadier's suggestions are not used, cloud's default number suggestion provider will be used.
      *
-     * @param nativeNumberSuggestions Whether or not Brigadier suggestions should be used for numbers
+     * @param nativeNumberSuggestions whether Brigadier suggestions should be used for numbers
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "1.2.0")
     public void setNativeNumberSuggestions(final boolean nativeNumberSuggestions) {
         this.setNativeSuggestions(new TypeToken<ByteParser<C>>() {
         }, nativeNumberSuggestions);
@@ -296,30 +268,27 @@ public final class CloudBrigadierManager<C, S> {
      * If Brigadier's suggestions are not used, suggestions will fall back to the cloud suggestion provider.
      *
      * @param argumentType      cloud argument parser type
-     * @param nativeSuggestions Whether or not Brigadier suggestions should be used
+     * @param nativeSuggestions whether Brigadier suggestions should be used
      * @param <T>               argument type
      * @param <K>               cloud argument parser type
      * @throws IllegalArgumentException when there is no mapper registered for the provided argument type
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "1.2.0")
     public <T, K extends ArgumentParser<C, T>> void setNativeSuggestions(
             final @NonNull TypeToken<K> argumentType,
             final boolean nativeSuggestions
     ) throws IllegalArgumentException {
-        final BrigadierMapping<C, ?, S> pair = this.mappers.get(
-                GenericTypeReflector.erase(argumentType.getType())
-        );
-        if (pair == null) {
+        final Class<K> parserClass = (Class<K>) GenericTypeReflector.erase(argumentType.getType());
+        final BrigadierMapping<C, K, S> mapping = this.brigadierMappings.mapping(parserClass);
+        if (mapping == null) {
             throw new IllegalArgumentException(
                     "No mapper registered for type: " + GenericTypeReflector
                             .erase(argumentType.getType())
                             .toGenericString()
             );
         }
-        this.mappers.put(
-                GenericTypeReflector.erase(argumentType.getType()),
-                pair.withNativeSuggestions(nativeSuggestions)
-        );
+        this.brigadierMappings.registerMapping(parserClass, mapping.withNativeSuggestions(nativeSuggestions));
     }
 
     /**
@@ -330,343 +299,62 @@ public final class CloudBrigadierManager<C, S> {
      * @param <K>        cloud argument parser type
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "1.5.0")
     public <K extends ArgumentParser<C, ?>> void registerMapping(
             final @NonNull TypeToken<K> parserType,
             final Consumer<BrigadierMappingBuilder<K, S>> configurer
     ) {
-        final BrigadierMapping.BuilderImpl<C, K, S> builder = new BrigadierMapping.BuilderImpl<>();
+        final BrigadierMappingBuilder<K, S> builder = BrigadierMapping.builder();
         configurer.accept(builder);
-        this.mappers.put(GenericTypeReflector.erase(parserType.getType()), builder.build());
+        this.mappings().registerMappingUnsafe((Class<K>) GenericTypeReflector.erase(parserType.getType()), builder.build());
+    }
+
+    /**
+     * Returns the mappings between Cloud and Brigadier types.
+     *
+     * @return the mappings
+     * @since 2.0.0
+     */
+    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    public @NonNull BrigadierMappings<C, S> mappings() {
+        return this.brigadierMappings;
+    }
+
+    /**
+     * Returns a factory that creates {@link LiteralCommandNode literal command nodes} from Cloud commands.
+     *
+     * @return the literal node factory
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull LiteralBrigadierNodeFactory<C, S> literalBrigadierNodeFactory() {
+        return this.literalBrigadierNodeFactory;
     }
 
     /**
      * Register a default mapping to between a class and a Brigadier argument type
      *
-     * @param clazz    Type to map
-     * @param supplier Supplier that supplies the argument type
+     * @param <T>     the type
+     * @param clazz   the type to map
+     * @param factory factory that creates the argument type
+     * @since 2.0.0
      */
-    public void registerDefaultArgumentTypeSupplier(
-            final @NonNull Class<?> clazz,
-            final @NonNull Supplier<@Nullable ArgumentType<?>> supplier
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public <T> void registerDefaultArgumentTypeSupplier(
+            final @NonNull Class<T> clazz,
+            final @NonNull ArgumentTypeFactory<T> factory
     ) {
-        this.defaultArgumentTypeSuppliers.put(clazz, supplier);
-    }
-
-    @SuppressWarnings("all")
-    private <K extends ArgumentParser<C, ?>> @Nullable Pair<@NonNull ArgumentType<?>, @Nullable SuggestionProvider<S>> getArgument(
-            final @NonNull TypeToken<?> valueType,
-            final @NonNull K argumentParser
-    ) {
-        /* Unwrap mapped arguments */
-        ArgumentParser<C, ?> commandArgument = (ArgumentParser<C, ?>) argumentParser;
-        while (commandArgument instanceof MappedArgumentParser<?, ?, ?>) {
-            commandArgument = ((MappedArgumentParser<C, ?, ?>) commandArgument).getBaseParser();
-        }
-
-        final BrigadierMapping<C, K, S> mapping = (BrigadierMapping<C, K, S>) this.mappers
-                .get(commandArgument.getClass());
-        if (mapping == null || mapping.getMapper() == null) {
-            return this.createDefaultMapper(valueType);
-        }
-        return Pair.of(
-                (ArgumentType<?>) ((Function) mapping.getMapper()).apply(commandArgument),
-                mapping.makeSuggestionProvider(argumentParser)
-        );
-    }
-
-    private @NonNull Pair<@NonNull ArgumentType<?>, @Nullable SuggestionProvider<S>> createDefaultMapper(
-            final @NonNull TypeToken<?> clazz
-    ) {
-        final Supplier<ArgumentType<?>> argumentTypeSupplier = this.defaultArgumentTypeSuppliers
-                .get(GenericTypeReflector.erase(clazz.getType()));
-        final @Nullable ArgumentType<?> defaultType;
-        if (argumentTypeSupplier != null) {
-            defaultType = argumentTypeSupplier.get();
-        } else {
-            defaultType = null;
-        }
-        if (defaultType != null) {
-            return Pair.of(argumentTypeSupplier.get(), null);
-        }
-        return Pair.of(StringArgumentType.word(), delegateSuggestions());
+        this.defaultArgumentTypeSuppliers.put(clazz, factory);
     }
 
     /**
-     * Create a new literal command node
+     * Returns the default argument type factories.
      *
-     * @param label             Command label
-     * @param cloudCommand      Cloud command instance
-     * @param permissionChecker Permission checker
-     * @param forceRegister     Whether or not to force register an executor at every node
-     * @param executor          Command executor
-     * @return Literal command node
+     * @return immutable view of the factories
+     * @since 2.0.0
      */
-    public @NonNull LiteralCommandNode<S> createLiteralCommandNode(
-            final @NonNull String label,
-            final @NonNull Command<C> cloudCommand,
-            final @NonNull BiPredicate<@NonNull S,
-                    @NonNull CommandPermission> permissionChecker,
-            final boolean forceRegister,
-            final com.mojang.brigadier.@NonNull Command<S> executor
-    ) {
-        final cloud.commandframework.internal.CommandNode<C> node = this.commandManager
-                .commandTree().getNamedNode(cloudCommand.rootComponent().name());
-        final SuggestionProvider<S> provider = (context, builder) -> this.buildSuggestions(
-                context,
-                null, /* parent node, null for the literal command node root */
-                builder
-        );
-
-        final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder
-                .<S>literal(label)
-                .requires(sender -> permissionChecker.test(sender, (CommandPermission) node.nodeMeta()
-                        .getOrDefault(
-                                "permission",
-                                Permission.empty()
-                        )));
-        if (forceRegister || (node.component() != null && node.component().owningCommand() != null)) {
-            literalArgumentBuilder.executes(executor);
-        }
-        literalArgumentBuilder.executes(executor);
-        final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
-        for (final cloud.commandframework.internal.CommandNode<C> child : node.children()) {
-            constructedRoot.addChild(this.constructCommandNode(forceRegister, child,
-                    permissionChecker, executor, provider
-            ).build());
-        }
-        return constructedRoot;
-    }
-
-    /**
-     * Create a literal command from Brigadier command info, and a cloud command instance
-     *
-     * @param cloudCommand       Cloud root command
-     * @param root               Brigadier root command
-     * @param suggestionProvider Brigadier suggestion provider
-     * @param executor           Brigadier command executor
-     * @param permissionChecker  Permission checker
-     * @return Constructed literal command node
-     */
-    public @NonNull LiteralCommandNode<S> createLiteralCommandNode(
-            final cloud.commandframework.internal.@NonNull CommandNode<C> cloudCommand,
-            final @NonNull LiteralCommandNode<S> root,
-            final @NonNull SuggestionProvider<S> suggestionProvider,
-            final com.mojang.brigadier.@NonNull Command<S> executor,
-            final @NonNull BiPredicate<@NonNull S, @NonNull CommandPermission> permissionChecker
-    ) {
-        final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder.<S>literal(root.getLiteral())
-                .requires(sender -> permissionChecker.test(
-                        sender,
-                        (CommandPermission) cloudCommand.nodeMeta()
-                                .getOrDefault(
-                                        "permission",
-                                        Permission.empty()
-                                )
-                ));
-        if (cloudCommand.component() != null && cloudCommand.component().owningCommand() != null) {
-            literalArgumentBuilder.executes(executor);
-        }
-        final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
-        for (final cloud.commandframework.internal.CommandNode<C> child : cloudCommand.children()) {
-            constructedRoot.addChild(this.constructCommandNode(true, child, permissionChecker,
-                    executor, suggestionProvider
-            ).build());
-        }
-        return constructedRoot;
-    }
-
-    private @NonNull ArgumentBuilder<S, ?> constructCommandNode(
-            final boolean forceExecutor,
-            final cloud.commandframework.internal.@NonNull CommandNode<C> root,
-            final @NonNull BiPredicate<@NonNull S, @NonNull CommandPermission> permissionChecker,
-            final com.mojang.brigadier.@NonNull Command<S> executor,
-            final SuggestionProvider<S> suggestionProvider
-    ) {
-        if (root.component().parser() instanceof AggregateCommandParser) {
-            final AggregateCommandParser<C, ?> aggregateParser = (AggregateCommandParser<C, ?>) root.component().parser();
-            final List<? extends CommandComponent<?>> components = aggregateParser.components();
-
-            /* Build nodes backwards */
-            final ArgumentBuilder<S, ?>[] argumentBuilders = new ArgumentBuilder[components.size()];
-
-            for (int i = components.size() - 1; i >= 0; i--) {
-                final CommandComponent<C> component = (CommandComponent<C>) components.get(i);
-
-                final ArgumentParser<C, ?> parser = component.parser();
-                final Pair<ArgumentType<?>, SuggestionProvider<S>> pair = this.getArgument(component.valueType(), parser);
-                final SuggestionProvider<S> provider = pair.getSecond() == delegateSuggestions()
-                        ? suggestionProvider
-                        : pair.getSecond();
-
-                final ArgumentBuilder<S, ?> fragmentBuilder = RequiredArgumentBuilder
-                        .<S, Object>argument(component.name(), (ArgumentType<Object>) pair.getFirst())
-                        .suggests(provider)
-                        .requires(sender -> permissionChecker.test(
-                                sender,
-                                (CommandPermission) root.nodeMeta()
-                                        .getOrDefault(
-                                                "permission",
-                                                Permission.empty()
-                                        )
-                        ));
-                argumentBuilders[i] = fragmentBuilder;
-
-                if (forceExecutor || ((i == components.size() - 1) && (root.isLeaf() || !root.component().required()))) {
-                    fragmentBuilder.executes(executor);
-                }
-
-                /* Link all previous builder to this one */
-                if ((i + 1) < components.size()) {
-                    fragmentBuilder.then(argumentBuilders[i + 1]);
-                }
-            }
-
-            for (final cloud.commandframework.internal.CommandNode<C> node : root.children()) {
-                argumentBuilders[components.size() - 1]
-                        .then(this.constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
-            }
-
-            return argumentBuilders[0];
-        }
-        final ArgumentBuilder<S, ?> argumentBuilder;
-        if (root.component().type() == CommandComponent.ComponentType.LITERAL) {
-            argumentBuilder = LiteralArgumentBuilder.<S>literal(root.component().name())
-                    .requires(sender -> permissionChecker.test(sender, (CommandPermission) root.nodeMeta()
-                            .getOrDefault(
-                                    "permission",
-                                    Permission.empty()
-                            )))
-                    .executes(executor);
-        } else {
-            // Register argument
-            final Pair<ArgumentType<?>, SuggestionProvider<S>> pair = this.getArgument(
-                    root.component().valueType(),
-                    root.component().parser()
-            );
-            final SuggestionProvider<S> provider = pair.getSecond() == delegateSuggestions()
-                    ? (context, builder) -> this.buildSuggestions(
-                    context,
-                    root.parent(),
-                    builder
-            ) : pair.getSecond();
-            argumentBuilder = RequiredArgumentBuilder
-                    .<S, Object>argument(root.component().name(), (ArgumentType<Object>) pair.getFirst())
-                    .suggests(provider)
-                    .requires(sender -> permissionChecker.test(
-                            sender,
-                            (CommandPermission) root.nodeMeta()
-                                    .getOrDefault(
-                                            "permission",
-                                            Permission.empty()
-                                    )
-                    ));
-        }
-        if (forceExecutor || root.isLeaf() || root.component().optional()) {
-            argumentBuilder.executes(executor);
-        }
-        if (root.children().stream().noneMatch(node -> node.component().required())) {
-            argumentBuilder.executes(executor);
-        }
-        for (final cloud.commandframework.internal.CommandNode<C> node : root.children()) {
-            argumentBuilder.then(this.constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
-        }
-        return argumentBuilder;
-    }
-
-    private @NonNull CompletableFuture<Suggestions> buildSuggestions(
-            final com.mojang.brigadier.context.@Nullable CommandContext<S> senderContext,
-            final cloud.commandframework.internal.@Nullable CommandNode<C> parentNode,
-            final @NonNull SuggestionsBuilder builder
-    ) {
-        final CommandContext<C> commandContext;
-        String command = builder.getInput();
-        if (this.brigadierCommandSenderMapper == null || senderContext == null) {
-            commandContext = this.dummyContextProvider.get();
-            if (command.startsWith("/") /* Minecraft specific */) {
-                command = command.substring(1);
-            }
-        } else {
-            final C cloudSender = this.brigadierCommandSenderMapper.apply(senderContext.getSource());
-            commandContext = new CommandContext<>(
-                    true,
-                    cloudSender,
-                    this.commandManager
-            );
-            command = command.substring(getNodes(senderContext.getLastChild()).get(0).getSecond().getStart());
-        }
-
-        /* Remove namespace */
-        final String leading = command.split(" ")[0];
-        if (leading.contains(":")) {
-            command = command.substring(leading.split(":")[0].length() + 1);
-        }
-
-        return this.suggestionFactory.suggest(commandContext.getSender(), command).thenCompose(suggestionsUnfiltered -> {
-            /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
-            final List<TooltipSuggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
-            if (parentNode != null) {
-                final Set<String> siblingLiterals = parentNode.children().stream()
-                        .map(cloud.commandframework.internal.CommandNode::component)
-                        .filter(Objects::nonNull)
-                        .flatMap(commandComponent -> commandComponent.aliases().stream())
-                        .collect(Collectors.toSet());
-
-                suggestions.removeIf(suggestion -> siblingLiterals.contains(suggestion.suggestion()));
-            }
-
-            SuggestionsBuilder suggestionsBuilder = builder;
-
-            final int lastIndexOfSpaceInRemainingString = builder.getRemaining().lastIndexOf(' ');
-            if (lastIndexOfSpaceInRemainingString != -1) {
-                suggestionsBuilder = builder.createOffset(builder.getStart() + lastIndexOfSpaceInRemainingString + 1);
-            }
-
-            for (final TooltipSuggestion suggestion : suggestions) {
-                suggestionsBuilder = suggestionsBuilder.suggest(suggestion.suggestion(), suggestion.tooltip());
-            }
-
-            return suggestionsBuilder.buildFuture();
-        });
-    }
-
-    /**
-     * Return type changed at some point, but information is essentially the same. This code works for both versions of the
-     * method.
-     *
-     * @param commandContext command context
-     * @param <S>            source type
-     * @return parsed nodes
-     */
-    private static <S> List<Pair<CommandNode<S>, StringRange>> getNodes(
-            final com.mojang.brigadier.context.CommandContext<S> commandContext
-    ) {
-        try {
-            final Method getNodesMethod = commandContext.getClass().getDeclaredMethod("getNodes");
-            final Object nodes = getNodesMethod.invoke(commandContext);
-            if (nodes instanceof List) {
-                return ParsedCommandNodeHandler.toPairList((List) nodes);
-            } else if (nodes instanceof Map) {
-                return ((Map<CommandNode<S>, StringRange>) nodes).entrySet().stream()
-                        .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
-                        .collect(Collectors.toList());
-            } else {
-                throw new IllegalStateException();
-            }
-        } catch (final ReflectiveOperationException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    // Inner class to prevent attempting to load ParsedCommandNode when it doesn't exist
-    private static final class ParsedCommandNodeHandler {
-        private ParsedCommandNodeHandler() {
-        }
-
-        private static <S> List<Pair<CommandNode<S>, StringRange>> toPairList(final List<?> nodes) {
-            return ((List<ParsedCommandNode<S>>) nodes).stream()
-                    .map(n -> Pair.of(n.getNode(), n.getRange()))
-                    .collect(Collectors.toList());
-        }
-
+    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    public @NonNull Map<@NonNull Class<?>, @NonNull ArgumentTypeFactory<?>> defaultArgumentTypeFactories() {
+        return Collections.unmodifiableMap(this.defaultArgumentTypeSuppliers);
     }
 }
