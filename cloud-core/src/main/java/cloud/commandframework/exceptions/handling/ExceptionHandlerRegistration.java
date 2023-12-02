@@ -48,9 +48,9 @@ public final class ExceptionHandlerRegistration<C, T extends Throwable> {
      * @param exceptionHandler the exception handler
      * @return the created registration
      */
-    public static <C, T extends Throwable> @NonNull ExceptionHandlerRegistration<C, T> of(
+    public static <C, T extends Throwable> @NonNull ExceptionHandlerRegistration<C, ? extends T> of(
             final @NonNull TypeToken<T> exceptionType,
-            final @NonNull ExceptionHandler<C, T> exceptionHandler
+            final @NonNull ExceptionHandler<C, ? extends T> exceptionHandler
     ) {
        return ExceptionHandlerRegistration.<C, T>builder(exceptionType).exceptionHandler(exceptionHandler).build();
     }
@@ -72,12 +72,12 @@ public final class ExceptionHandlerRegistration<C, T extends Throwable> {
     }
 
     private final TypeToken<T> exceptionType;
-    private final ExceptionHandler<C, T> exceptionHandler;
+    private final ExceptionHandler<C, ? extends T> exceptionHandler;
     private final Predicate<T> exceptionFilter;
 
     private ExceptionHandlerRegistration(
             final @NonNull TypeToken<T> exceptionType,
-            final @NonNull ExceptionHandler<C, T> exceptionHandler,
+            final @NonNull ExceptionHandler<C, ? extends T> exceptionHandler,
             final @NonNull Predicate<T> exceptionFilter
     ) {
         this.exceptionType = exceptionType;
@@ -102,7 +102,7 @@ public final class ExceptionHandlerRegistration<C, T extends Throwable> {
      *
      * @return the exception handler
      */
-    public @NonNull ExceptionHandler<C, T> exceptionHandler() {
+    public @NonNull ExceptionHandler<C, ? extends T> exceptionHandler() {
         return this.exceptionHandler;
     }
 
@@ -122,12 +122,12 @@ public final class ExceptionHandlerRegistration<C, T extends Throwable> {
     public static final class ExceptionControllerBuilder<C, T extends Throwable> {
 
         private final TypeToken<T> exceptionType;
-        private final ExceptionHandler<C, T> exceptionHandler;
+        private final ExceptionHandler<C, ? extends T> exceptionHandler;
         private final Predicate<T> exceptionFilter;
 
         private ExceptionControllerBuilder(
                 final @NonNull TypeToken<T> exceptionType,
-                final @NonNull ExceptionHandler<C, T> exceptionHandler,
+                final @NonNull ExceptionHandler<C, ? extends T> exceptionHandler,
                 final @NonNull Predicate<T> exceptionFilter
         ) {
             this.exceptionType = exceptionType;
@@ -148,7 +148,7 @@ public final class ExceptionHandlerRegistration<C, T extends Throwable> {
          * @return new builder instance
          */
         public @NonNull ExceptionControllerBuilder<C, T> exceptionHandler(
-                final @NonNull ExceptionHandler<C, T> exceptionHandler
+                final @NonNull ExceptionHandler<C, ? extends T> exceptionHandler
         ) {
             return new ExceptionControllerBuilder<>(this.exceptionType, exceptionHandler, this.exceptionFilter);
         }
@@ -170,7 +170,7 @@ public final class ExceptionHandlerRegistration<C, T extends Throwable> {
          *
          * @return the registration
          */
-        public @NonNull ExceptionHandlerRegistration<C, T> build() {
+        public @NonNull ExceptionHandlerRegistration<C, ? extends T> build() {
             return new ExceptionHandlerRegistration<>(this.exceptionType, this.exceptionHandler, this.exceptionFilter);
         }
     }

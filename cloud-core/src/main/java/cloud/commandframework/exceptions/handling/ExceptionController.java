@@ -115,7 +115,7 @@ public final class ExceptionController<C> {
      * @return {@code this} exception controller
      */
     public synchronized <T extends Throwable> @NonNull @This ExceptionController<C> register(
-            final @NonNull ExceptionHandlerRegistration<C, T> registration
+            final @NonNull ExceptionHandlerRegistration<C, ? extends T> registration
     ) {
         this.registrations.computeIfAbsent(registration.exceptionType().getType(), t -> new LinkedList<>())
                 .addFirst(registration);
@@ -171,7 +171,7 @@ public final class ExceptionController<C> {
      */
     public <T extends Throwable> @NonNull @This ExceptionController<C> registerHandler(
             final @NonNull TypeToken<T> exceptionType,
-            final @NonNull ExceptionHandler<C, T> exceptionHandler
+            final @NonNull ExceptionHandler<C, ? extends T> exceptionHandler
     ) {
         return this.register(ExceptionHandlerRegistration.of(exceptionType, exceptionHandler));
     }
@@ -189,7 +189,7 @@ public final class ExceptionController<C> {
      */
     public <T extends Throwable> @NonNull @This ExceptionController<C> registerHandler(
             final @NonNull Class<T> exceptionType,
-            final @NonNull ExceptionHandler<C, T> exceptionHandler
+            final @NonNull ExceptionHandler<C, ? extends T> exceptionHandler
     ) {
         return this.register(ExceptionHandlerRegistration.of(TypeToken.get(exceptionType), exceptionHandler));
     }
