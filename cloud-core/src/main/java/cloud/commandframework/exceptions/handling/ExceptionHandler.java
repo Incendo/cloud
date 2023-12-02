@@ -33,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <T> the exception type
  * @since 2.0.0
  */
+@SuppressWarnings("unused")
 @FunctionalInterface
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface ExceptionHandler<C, T extends Throwable> {
@@ -46,6 +47,40 @@ public interface ExceptionHandler<C, T extends Throwable> {
      */
     static <C, T extends Throwable> @NonNull ExceptionHandler<C, T> noopHandler() {
         return ctx -> {};
+    }
+
+    /**
+     * Returns an exception handler that re-throws the {@link ExceptionContext#exception()}.
+     * <p>
+     * This will allow other exception handlers to handle the exception.
+     *
+     * @param <C> the command sender type
+     * @param <T> the exception type
+     * @return the exception handler
+     */
+    static <C, T extends Throwable> @NonNull ExceptionHandler<C, T> passThroughHandler() {
+        return ctx -> {
+            throw ctx.exception();
+        };
+    }
+
+    /**
+     * Returns an exception handler that throws the cause of the {@link ExceptionContext#exception()} if it's
+     * not {@code null}.
+     * Otherwise, it will re-throw the {@link ExceptionContext#exception()}.
+     *
+     * @param <C> the command sender type
+     * @param <T> the exception type
+     * @return the exception handler
+     */
+    static <C, T extends Throwable> @NonNull ExceptionHandler<C, T> unwrappingHandler() {
+        return ctx -> {
+            final Throwable cause = ctx.exception().getCause();
+            if (cause != null) {
+                throw cause;
+            }
+            throw ctx.exception();
+        };
     }
 
     /**
