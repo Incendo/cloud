@@ -133,7 +133,7 @@ public final class ExceptionController<C> {
      * @param decorator     the builder decorator
      * @return {@code this} exception controller
      */
-    public synchronized <T extends Throwable> @NonNull @This ExceptionController<C> register(
+    public <T extends Throwable> @NonNull @This ExceptionController<C> register(
             final @NonNull TypeToken<T> exceptionType,
             final ExceptionHandlerRegistration.@NonNull BuilderDecorator<C, T> decorator
     ) {
@@ -151,7 +151,7 @@ public final class ExceptionController<C> {
      * @param decorator     the builder decorator
      * @return {@code this} exception controller
      */
-    public synchronized <T extends Throwable> @NonNull @This ExceptionController<C> register(
+    public <T extends Throwable> @NonNull @This ExceptionController<C> register(
             final @NonNull Class<T> exceptionType,
             final ExceptionHandlerRegistration.@NonNull BuilderDecorator<C, T> decorator
     ) {
@@ -169,7 +169,7 @@ public final class ExceptionController<C> {
      * @param exceptionHandler the exception handler
      * @return {@code this} exception controller
      */
-    public synchronized <T extends Throwable> @NonNull @This ExceptionController<C> registerHandler(
+    public <T extends Throwable> @NonNull @This ExceptionController<C> registerHandler(
             final @NonNull TypeToken<T> exceptionType,
             final @NonNull ExceptionHandler<C, T> exceptionHandler
     ) {
@@ -187,7 +187,7 @@ public final class ExceptionController<C> {
      * @param exceptionHandler the exception handler
      * @return {@code this} exception controller
      */
-    public synchronized <T extends Throwable> @NonNull @This ExceptionController<C> registerHandler(
+    public <T extends Throwable> @NonNull @This ExceptionController<C> registerHandler(
             final @NonNull Class<T> exceptionType,
             final @NonNull ExceptionHandler<C, T> exceptionHandler
     ) {
