@@ -92,8 +92,14 @@ public final class ExceptionController<C> {
                     if (throwable.equals(exception)) {
                         continue;
                     }
-                    // We try to handle the new exception instead.
-                    this.handleException(commandContext, throwable);
+                    try {
+                        // We try to handle the new exception instead.
+                        this.handleException(commandContext, throwable);
+                    } catch (final Throwable failure) {
+                        // If the handling of the exception fails, we do not want
+                        // to overflow the stack.
+                        return;
+                    }
                 }
                 return;
             }

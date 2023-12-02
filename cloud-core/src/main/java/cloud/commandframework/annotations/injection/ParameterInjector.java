@@ -42,7 +42,21 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public interface ParameterInjector<C, T> {
 
     /**
-     * Attempt to create a a value that should then be injected into the CommandMethod
+     * Returns a parameter injector that always injects {@code value}.
+     *
+     * @param <C>   the command sender type
+     * @param <T>   the type of the value
+     * @param value the value to inject
+     * @return the injector
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    static <C, T> @NonNull ParameterInjector<C, T> constantInjector(@NonNull T value) {
+        return (context, annotationAccessor) -> value;
+    }
+
+    /**
+     * Attempt to create a value that should then be injected into the CommandMethod
      * annotated method. If the injector cannot (or shouldn't) create a value, it is free to return {@code null}.
      *
      * @param context            Command context that is requesting the injection
