@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.exceptions.handling;
 
+import java.util.function.Consumer;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -60,6 +61,24 @@ public interface ExceptionHandler<C, T extends Throwable> {
      */
     static <C, T extends Throwable> @NonNull ExceptionHandler<C, T> passThroughHandler() {
         return ctx -> {
+            throw ctx.exception();
+        };
+    }
+
+    /**
+     * Returns an exception handler that re-throws the {@link ExceptionContext#exception()} after
+     * invoking the given {@code consumer}.
+     *
+     * @param <C>      the command sender type
+     * @param <T>      the exception type
+     * @param consumer the consumer
+     * @return the exception handler
+     */
+    static <C, T extends Throwable> @NonNull ExceptionHandler<C, T> passThroughHandler(
+            final @NonNull Consumer<ExceptionContext<C, T>> consumer
+    ) {
+        return ctx -> {
+            consumer.accept(ctx);
             throw ctx.exception();
         };
     }
