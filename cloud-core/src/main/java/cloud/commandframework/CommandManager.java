@@ -43,6 +43,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.StandardCommandContextFactory;
+import cloud.commandframework.exceptions.handling.ExceptionController;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandResult;
 import cloud.commandframework.execution.CommandSuggestionProcessor;
@@ -106,6 +107,7 @@ public abstract class CommandManager<C> {
     private final CommandTree<C> commandTree;
     private final SuggestionFactory<C, ? extends Suggestion> suggestionFactory;
     private final Set<CloudCapability> capabilities = new HashSet<>();
+    private final ExceptionController<C> exceptionController = new ExceptionController<>();
 
     private CaptionVariableReplacementHandler captionVariableReplacementHandler = new SimpleCaptionVariableReplacementHandler();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
@@ -162,11 +164,8 @@ public abstract class CommandManager<C> {
      * after parsing by a {@link CommandPostprocessor}. In the case that a command was filtered out at any of the
      * execution stages, the future will complete with {@code null}.
      * <p>
-     * The future may also complete exceptionally. The command manager contains some utilities that allow users to
-     * register exception handlers ({@link #registerExceptionHandler(Class, BiConsumer)} and these can be retrieved using
-     * {@link #getExceptionHandler(Class)}, or used with {@link #handleException(Object, Class, Exception, BiConsumer)}. It
-     * is highly recommended that these methods are used in the command manager, as it allows users of the command manager
-     * to override the exception handling as they wish.
+     * The future may also complete exceptionally.
+     * These exceptions may be handled using exception handlers registered in the {@link #exceptionController()}.
      *
      * @param commandSender Sender of the command
      * @param input         Input provided by the sender. Prefixes should be removed before the method is being called, and
@@ -928,6 +927,19 @@ public abstract class CommandManager<C> {
             return null;
         }
         return (BiConsumer<C, E>) consumer;
+    }
+
+    /**
+     * Returns the exception controller.
+     * <p>
+     * The exception controller is responsible for exception handler registration.
+     *
+     * @return the exception controller
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public final @NonNull ExceptionController<C> exceptionController() {
+        return this.exceptionController;
     }
 
     /**
