@@ -57,6 +57,12 @@ import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorPars
 import cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorParser;
 import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorParser;
 import cloud.commandframework.bukkit.parsers.selector.SinglePlayerSelectorParser;
+import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
+import cloud.commandframework.exceptions.InvalidCommandSenderException;
+import cloud.commandframework.exceptions.InvalidSyntaxException;
+import cloud.commandframework.exceptions.NoPermissionException;
+import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.meta.CommandMeta;
@@ -67,6 +73,8 @@ import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import java.util.logging.Level;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -85,6 +93,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 @SuppressWarnings("unchecked")
 public class BukkitCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C> {
+
+    private static final String MESSAGE_INTERNAL_ERROR = ChatColor.RED
+            + "An internal error occurred while attempting to perform this command.";
+    private static final String MESSAGE_NO_PERMS = ChatColor.RED
+            + "I'm sorry, but you do not have permission to perform this command. "
+            + "Please contact the server administrators if you believe that this is in error.";
+    private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
     private final Plugin owningPlugin;
 
@@ -213,6 +228,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
                 this.owningPlugin
         );
 
+        this.registerDefaultExceptionHandlers();
         this.captionRegistry(new BukkitCaptionRegistryFactory<C>().create());
     }
 
@@ -423,6 +439,41 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         } catch (final ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void registerDefaultExceptionHandlers() {
+        this.exceptionController().registerHandler(Throwable.class, context -> {
+            this.backwardsCommandSenderMapper.apply(context.context().getSender()).sendMessage(MESSAGE_INTERNAL_ERROR);
+            this.owningPlugin.getLogger().log(
+                    Level.SEVERE,
+                    "An unhandled exception was thrown during command execution",
+                    context.exception()
+            );
+        }).registerHandler(CommandExecutionException.class, context -> {
+            this.backwardsCommandSenderMapper.apply(context.context().getSender()).sendMessage(MESSAGE_INTERNAL_ERROR);
+            this.owningPlugin.getLogger().log(
+                    Level.SEVERE,
+                    "Exception executing command handler",
+                    context.exception()
+            );
+        }).registerHandler(ArgumentParseException.class, context -> {
+            this.backwardsCommandSenderMapper.apply(context.context().getSender()).sendMessage(
+                    ChatColor.RED + "Invalid Command Argument: " + ChatColor.GRAY + context.exception().getCause().getMessage()
+            );
+        }).registerHandler(NoSuchCommandException.class, context -> {
+            this.backwardsCommandSenderMapper.apply(context.context().getSender()).sendMessage(MESSAGE_UNKNOWN_COMMAND);
+        }).registerHandler(NoPermissionException.class, context -> {
+            this.backwardsCommandSenderMapper.apply(context.context().getSender()).sendMessage(MESSAGE_NO_PERMS);
+        }).registerHandler(InvalidCommandSenderException.class, context -> {
+            this.backwardsCommandSenderMapper.apply(context.context().getSender()).sendMessage(
+                    ChatColor.RED + context.exception().getMessage()
+            );
+        }).registerHandler(InvalidSyntaxException.class, context -> {
+            this.backwardsCommandSenderMapper.apply(context.context().getSender()).sendMessage(
+                    ChatColor.RED + "Invalid Command Syntax. Correct command syntax is: "
+                            + ChatColor.GRAY + context.exception().getCorrectSyntax()
+            );
+        });
     }
 
     final void lockIfBrigadierCapable() {

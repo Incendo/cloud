@@ -27,12 +27,6 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandDescription;
 import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.exceptions.ArgumentParseException;
-import cloud.commandframework.exceptions.CommandExecutionException;
-import cloud.commandframework.exceptions.InvalidCommandSenderException;
-import cloud.commandframework.exceptions.InvalidSyntaxException;
-import cloud.commandframework.exceptions.NoPermissionException;
-import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
@@ -40,11 +34,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletionException;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.plugin.Plugin;
@@ -52,13 +43,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class BukkitCommand<C> extends org.bukkit.command.Command implements PluginIdentifiableCommand {
-
-    private static final String MESSAGE_INTERNAL_ERROR = ChatColor.RED
-            + "An internal error occurred while attempting to perform this command.";
-    private static final String MESSAGE_NO_PERMS = ChatColor.RED
-            + "I'm sorry, but you do not have permission to perform this command. "
-            + "Please contact the server administrators if you believe that this is in error.";
-    private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
     private final CommandComponent<C> command;
     private final BukkitCommandManager<C> manager;
@@ -130,74 +114,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
             builder.append(" ").append(string);
         }
         final C sender = this.manager.getCommandSenderMapper().apply(commandSender);
-        this.manager.executeCommand(sender, builder.toString())
-                .whenComplete((commandResult, throwable) -> {
-                    if (throwable != null) {
-                        if (throwable instanceof CompletionException) {
-                            throwable = throwable.getCause();
-                        }
-                        final Throwable finalThrowable = throwable;
-                        if (throwable instanceof InvalidSyntaxException) {
-                            this.manager.handleException(sender,
-                                    InvalidSyntaxException.class,
-                                    (InvalidSyntaxException) throwable, (c, e) ->
-                                            commandSender.sendMessage(
-                                                    ChatColor.RED + "Invalid Command Syntax. "
-                                                            + "Correct command syntax is: "
-                                                            + ChatColor.GRAY + "/"
-                                                            + ((InvalidSyntaxException) finalThrowable)
-                                                            .getCorrectSyntax())
-                            );
-                        } else if (throwable instanceof InvalidCommandSenderException) {
-                            this.manager.handleException(sender,
-                                    InvalidCommandSenderException.class,
-                                    (InvalidCommandSenderException) throwable, (c, e) ->
-                                            commandSender.sendMessage(
-                                                    ChatColor.RED + finalThrowable.getMessage())
-                            );
-                        } else if (throwable instanceof NoPermissionException) {
-                            this.manager.handleException(sender,
-                                    NoPermissionException.class,
-                                    (NoPermissionException) throwable, (c, e) ->
-                                            commandSender.sendMessage(MESSAGE_NO_PERMS)
-                            );
-                        } else if (throwable instanceof NoSuchCommandException) {
-                            this.manager.handleException(sender,
-                                    NoSuchCommandException.class,
-                                    (NoSuchCommandException) throwable, (c, e) ->
-                                            commandSender.sendMessage(MESSAGE_UNKNOWN_COMMAND)
-                            );
-                        } else if (throwable instanceof ArgumentParseException) {
-                            this.manager.handleException(sender,
-                                    ArgumentParseException.class,
-                                    (ArgumentParseException) throwable, (c, e) ->
-                                            commandSender.sendMessage(
-                                                    ChatColor.RED + "Invalid Command Argument: "
-                                                            + ChatColor.GRAY + finalThrowable.getCause()
-                                                            .getMessage())
-                            );
-                        } else if (throwable instanceof CommandExecutionException) {
-                            this.manager.handleException(sender,
-                                    CommandExecutionException.class,
-                                    (CommandExecutionException) throwable, (c, e) -> {
-                                        commandSender.sendMessage(MESSAGE_INTERNAL_ERROR);
-                                        this.manager.getOwningPlugin().getLogger().log(
-                                                Level.SEVERE,
-                                                "Exception executing command handler",
-                                                finalThrowable.getCause()
-                                        );
-                                    }
-                            );
-                        } else {
-                            commandSender.sendMessage(MESSAGE_INTERNAL_ERROR);
-                            this.manager.getOwningPlugin().getLogger().log(
-                                    Level.SEVERE,
-                                    "An unhandled exception was thrown during command execution",
-                                    throwable
-                            );
-                        }
-                    }
-                });
+        this.manager.executeCommand(sender, builder.toString());
         return true;
     }
 

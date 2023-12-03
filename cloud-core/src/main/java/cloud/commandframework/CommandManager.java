@@ -76,6 +76,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -91,6 +92,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  *
  * @param <C> the command sender type used to execute commands
  */
+@SuppressWarnings({"unchecked", "rawtypes", "unused"})
 @API(status = API.Status.STABLE)
 public abstract class CommandManager<C> {
 
@@ -153,6 +155,15 @@ public abstract class CommandManager<C> {
                 CommandContext.class,
                 (context, annotationAccessor) -> context
         );
+        // TODO(City): Remove!
+        this.exceptionController.registerHandler(Throwable.class, ctx -> {
+            this.handleException(
+                    ctx.context().getSender(),
+                    (Class) ctx.exception().getClass(),
+                    (Exception) ctx.exception(),
+                    (cmdCtx, ex) -> {}
+            );
+        });
     }
 
     /**
@@ -165,7 +176,8 @@ public abstract class CommandManager<C> {
      * execution stages, the future will complete with {@code null}.
      * <p>
      * The future may also complete exceptionally.
-     * These exceptions may be handled using exception handlers registered in the {@link #exceptionController()}.
+     * These exceptions will be handled using exception handlers registered in the {@link #exceptionController()}.
+     * Any uncaught exception will be forwarded to the returned future.
      *
      * @param commandSender Sender of the command
      * @param input         Input provided by the sender. Prefixes should be removed before the method is being called, and
@@ -183,6 +195,24 @@ public abstract class CommandManager<C> {
                 this
         );
         final CommandInput commandInput = CommandInput.of(input);
+        return this.executeCommand(context, commandInput).whenComplete((result, throwable) -> {
+            if (throwable == null) {
+                return;
+            }
+            try {
+                this.exceptionController.handleException(context, ExceptionController.unwrapCompletionException(throwable));
+            } catch (final RuntimeException runtimeException) {
+                throw runtimeException;
+            } catch (final Throwable e) {
+                throw new CompletionException(e);
+            }
+        });
+    }
+
+    private @NonNull CompletableFuture<CommandResult<C>> executeCommand(
+            final @NonNull CommandContext<C> context,
+            final @NonNull CommandInput commandInput
+    ) {
         /* Store a copy of the input queue in the context */
         context.store("__raw_input__", commandInput.copy());
         try {
@@ -526,7 +556,6 @@ public abstract class CommandManager<C> {
      * @return Root command names.
      * @since 1.7.0
      */
-    @SuppressWarnings("unchecked")
     @API(status = API.Status.STABLE, since = "1.7.0")
     public @NonNull Collection<@NonNull String> rootCommands() {
         return this.commandTree.rootNodes()

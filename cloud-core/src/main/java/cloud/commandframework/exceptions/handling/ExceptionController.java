@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletionException;
 import java.util.function.Predicate;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -48,6 +49,19 @@ public final class ExceptionController<C> {
 
     private final ExceptionContextFactory<C> exceptionContextFactory = new ExceptionContextFactory<>(this);
     private final Map<@NonNull Type, @NonNull LinkedList<@NonNull ExceptionHandlerRegistration<C, ?>>> registrations;
+
+    /**
+     * Unwraps a {@link CompletionException} recursively until a cause is encountered that is not a completion exception.
+     *
+     * @param throwable the throwable
+     * @return the original cause
+     */
+    public static @NonNull Throwable unwrapCompletionException(final @NonNull Throwable throwable) {
+        if (throwable instanceof CompletionException) {
+            return unwrapCompletionException(throwable.getCause());
+        }
+        return throwable;
+    }
 
     /**
      * Creates a new exception controller.
