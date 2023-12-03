@@ -24,37 +24,28 @@
 package cloud.commandframework.annotations;
 
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Method that indicates that a method is a command method.
+ * Container for {@link CommandMethod}.
  * <p>
- * This method is repeatable, and each instance will result in a unique command.
+ * This is required in order for {@link CommandMethod} to be repeatable.
+ *
+ * @since 2.0.0
  */
-@Repeatable(Commands.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
-public @interface CommandMethod {
-
-    String ANNOTATION_PATH = "cloud.commandframework.annotations.CommandMethod";
-
-    /**
-     * Returns the command syntax string.
-     *
-     * @return the command syntax string
-     */
-    @NonNull String value();
+@API(status = API.Status.STABLE, since = "2.0.0")
+public @interface Commands {
 
     /**
-     * Returns the required sender type.
-     * <p>
-     * If the type is set to {@link Object} no specific sender type will be enforced.
+     * Returns the {@link CommandMethod comman methods}.
      *
-     * @return the required sender type
+     * @return the command method declarations
      */
-    @NonNull Class<?> requiredSender() default Object.class;
+    @NonNull CommandMethod @NonNull[] value();
 }
