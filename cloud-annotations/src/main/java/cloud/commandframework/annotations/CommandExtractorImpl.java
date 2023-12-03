@@ -52,10 +52,11 @@ final class CommandExtractorImpl implements CommandExtractor {
         final Method[] methods = instance.getClass().getDeclaredMethods();
         final Collection<CommandDescriptor> commandDescriptors = new ArrayList<>();
         for (final Method method : methods) {
-            final CommandMethod commandMethod = method.getAnnotation(CommandMethod.class);
-            if (commandMethod == null) {
+            final CommandMethod[] commands = method.getAnnotationsByType(CommandMethod.class);
+            if (commands.length == 0) {
                 continue;
             }
+
             if (!method.isAccessible()) {
                 method.setAccessible(true);
             }
@@ -65,15 +66,18 @@ final class CommandExtractorImpl implements CommandExtractor {
                         method.getName()
                 ));
             }
-            final String syntax = syntaxPrefix + this.annotationParser.processString(commandMethod.value());
-            commandDescriptors.add(
-                    new CommandDescriptor(
-                            method,
-                            this.annotationParser.syntaxParser().parseSyntax(method, syntax),
-                            syntax.split(" ")[0].split("\\|")[0],
-                            commandMethod.requiredSender()
-                    )
-            );
+
+            for (final CommandMethod commandMethod : commands) {
+                final String syntax = syntaxPrefix + this.annotationParser.processString(commandMethod.value());
+                commandDescriptors.add(
+                        new CommandDescriptor(
+                                method,
+                                this.annotationParser.syntaxParser().parseSyntax(method, syntax),
+                                syntax.split(" ")[0].split("\\|")[0],
+                                commandMethod.requiredSender()
+                        )
+                );
+            }
         }
         return commandDescriptors;
     }
