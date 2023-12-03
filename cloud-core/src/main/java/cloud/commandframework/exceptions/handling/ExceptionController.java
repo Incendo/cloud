@@ -92,14 +92,8 @@ public final class ExceptionController<C> {
                     if (throwable.equals(exception)) {
                         continue;
                     }
-                    try {
-                        // We try to handle the new exception instead.
-                        this.handleException(commandContext, throwable);
-                    } catch (final Throwable failure) {
-                        // If the handling of the exception fails, we do not want
-                        // to overflow the stack.
-                        return;
-                    }
+                    // We try to handle the new exception instead.
+                    this.handleException(commandContext, throwable);
                 }
                 return;
             }
@@ -113,7 +107,7 @@ public final class ExceptionController<C> {
     /**
      * Registers the given {@code registration}.
      * <p>
-     * The ordering mappers when multiple handlers are registered for the same exception type.
+     * The ordering matters when multiple handlers are registered for the same exception type.
      * The last registered handler will get priority.
      *
      * @param <T>          the exception type handled by the exception handler
@@ -131,7 +125,7 @@ public final class ExceptionController<C> {
     /**
      * Decorates a registration builder and registers the result.
      * <p>
-     * The ordering mappers when multiple handlers are registered for the same exception type.
+     * The ordering matters when multiple handlers are registered for the same exception type.
      * The last registered handler will get priority.
      *
      * @param <T>            the exception type handled by the exception handler
@@ -149,7 +143,7 @@ public final class ExceptionController<C> {
     /**
      * Decorates a registration builder and registers the result.
      * <p>
-     * The ordering mappers when multiple handlers are registered for the same exception type.
+     * The ordering matters when multiple handlers are registered for the same exception type.
      * The last registered handler will get priority.
      *
      * @param <T>            the exception type handled by the exception handler
@@ -167,7 +161,7 @@ public final class ExceptionController<C> {
     /**
      * Registers the given {@code exceptionHandler}.
      * <p>
-     * The ordering mappers when multiple handlers are registered for the same exception type.
+     * The ordering matters when multiple handlers are registered for the same exception type.
      * The last registered handler will get priority.
      *
      * @param <T>              the exception type handled by the exception handler
@@ -185,7 +179,7 @@ public final class ExceptionController<C> {
     /**
      * Registers the given {@code exceptionHandler}.
      * <p>
-     * The ordering mappers when multiple handlers are registered for the same exception type.
+     * The ordering matters when multiple handlers are registered for the same exception type.
      * The last registered handler will get priority.
      *
      * @param <T>              the exception type handled by the exception handler

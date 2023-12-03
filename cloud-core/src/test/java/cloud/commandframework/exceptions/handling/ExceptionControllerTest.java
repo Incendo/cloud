@@ -24,8 +24,10 @@
 package cloud.commandframework.exceptions.handling;
 
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -109,28 +111,6 @@ class ExceptionControllerTest {
     }
 
     @Test
-    void HandleException_ExceptionRethrown_ExceptionHandled() throws Throwable {
-        // Arrange
-        final ExceptionHandler<Object, NoSuchCommandException> exceptionHandler = ctx -> {
-            throw ctx.exception();
-        };
-        final ExceptionHandler<Object, NoSuchCommandException> fallbackHandler = mock(ExceptionHandler.class);
-        this.exceptionController.registerHandler(NoSuchCommandException.class, fallbackHandler);
-        this.exceptionController.registerHandler(NoSuchCommandException.class, exceptionHandler);
-        final NoSuchCommandException exception =  new NoSuchCommandException(
-                new Object(),
-                Collections.emptyList(),
-                ""
-        );
-
-        // Act
-        this.exceptionController.handleException(this.commandContext, exception);
-
-        // Assert
-        verify(fallbackHandler).handle(this.exceptionContextFactory.createContext(this.commandContext, exception));
-    }
-
-    @Test
     void HandleException_NewExceptionThrown_ExceptionHandled() throws Throwable {
         // Arrange
         final RuntimeException runtimeException = new RuntimeException("test :)");
@@ -151,5 +131,67 @@ class ExceptionControllerTest {
 
         // Assert
         verify(fallbackHandler).handle(this.exceptionContextFactory.createContext(this.commandContext, runtimeException));
+    }
+
+    @Test
+    void HandleException_PassThroughHandler_ExceptionHandled() throws Throwable {
+        // Arrange
+        final ExceptionHandler<Object, NoSuchCommandException> exceptionHandler = ExceptionHandler.passThroughHandler();
+        final ExceptionHandler<Object, NoSuchCommandException> fallbackHandler = mock(ExceptionHandler.class);
+        this.exceptionController.registerHandler(NoSuchCommandException.class, fallbackHandler);
+        this.exceptionController.registerHandler(NoSuchCommandException.class, exceptionHandler);
+        final NoSuchCommandException exception =  new NoSuchCommandException(
+                new Object(),
+                Collections.emptyList(),
+                ""
+        );
+
+        // Act
+        this.exceptionController.handleException(this.commandContext, exception);
+
+        // Assert
+        verify(fallbackHandler).handle(this.exceptionContextFactory.createContext(this.commandContext, exception));
+    }
+
+    @Test
+    void HandleException_PassThroughHandlerWithConsumer_ExceptionHandled() throws Throwable {
+        // Arrange
+        final AtomicBoolean handled = new AtomicBoolean(false);
+        final ExceptionHandler<Object, NoSuchCommandException> exceptionHandler = ExceptionHandler.passThroughHandler(ctx ->
+                handled.set(true));
+        final ExceptionHandler<Object, NoSuchCommandException> fallbackHandler = mock(ExceptionHandler.class);
+        this.exceptionController.registerHandler(NoSuchCommandException.class, fallbackHandler);
+        this.exceptionController.registerHandler(NoSuchCommandException.class, exceptionHandler);
+        final NoSuchCommandException exception =  new NoSuchCommandException(
+                new Object(),
+                Collections.emptyList(),
+                ""
+        );
+
+        // Act
+        this.exceptionController.handleException(this.commandContext, exception);
+
+        // Assert
+        verify(fallbackHandler).handle(this.exceptionContextFactory.createContext(this.commandContext, exception));
+
+        assertThat(handled.get()).isTrue();
+    }
+
+    @Test
+    void HandleException_UnwrappingHandler_ExceptionHandled() throws Throwable {
+        // Arrange
+        final ExceptionHandler<Object, CommandExecutionException> commandExecutionHandler = ExceptionHandler.unwrappingHandler();
+        final ExceptionHandler<Object, IllegalStateException> illegalStateHandler = mock(ExceptionHandler.class);
+        this.exceptionController.registerHandler(IllegalStateException.class, illegalStateHandler);
+        this.exceptionController.registerHandler(CommandExecutionException.class, commandExecutionHandler);
+
+        final IllegalStateException illegalStateException = new IllegalStateException();
+        final CommandExecutionException commandExecutionException = new CommandExecutionException(illegalStateException);
+
+        // Act
+        this.exceptionController.handleException(this.commandContext, commandExecutionException);
+
+        // Assert
+        verify(illegalStateHandler).handle(this.exceptionContextFactory.createContext(this.commandContext, illegalStateException));
     }
 }

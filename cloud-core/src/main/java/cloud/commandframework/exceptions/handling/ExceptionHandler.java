@@ -23,6 +23,8 @@
 //
 package cloud.commandframework.exceptions.handling;
 
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -65,6 +67,62 @@ public interface ExceptionHandler<C, T extends Throwable> {
     }
 
     /**
+     * Returns an exception handler that re-throws the {@link ExceptionContext#exception()} after
+     * invoking the given {@code consumer}.
+     *
+     * @param <C>      the command sender type
+     * @param <T>      the exception type
+     * @param consumer the consumer
+     * @return the exception handler
+     */
+    static <C, T extends Throwable> @NonNull ExceptionHandler<C, T> passThroughHandler(
+            final @NonNull Consumer<ExceptionContext<C, T>> consumer
+    ) {
+        return ctx -> {
+            consumer.accept(ctx);
+            throw ctx.exception();
+        };
+    }
+
+    /**
+     * Returns an exception handler that throws the cause of the {@link ExceptionContext#exception()} if it's
+     * not {@code null} and the {@code predicate} evaluates to {@code true}.
+     * Otherwise, it will re-throw the {@link ExceptionContext#exception()}.
+     *
+     * @param <C>       the command sender type
+     * @param <T>       the exception type
+     * @param predicate predicate that tests the cause of the exception
+     * @return the exception handler
+     */
+    static <C, T extends Throwable> @NonNull ExceptionHandler<C, T> unwrappingHandler(
+            final @NonNull Predicate<Throwable> predicate
+    ) {
+        return ctx -> {
+            final Throwable cause = ctx.exception().getCause();
+            if (cause != null && predicate.test(cause)) {
+                throw cause;
+            }
+            throw ctx.exception();
+        };
+    }
+
+    /**
+     * Returns an exception handler that throws the cause of the {@link ExceptionContext#exception()} if it's and instance
+     * of {@code causeClass}.
+     * Otherwise, it will re-throw the {@link ExceptionContext#exception()}.
+     *
+     * @param <C>        the command sender type
+     * @param <T>        the exception type
+     * @param causeClass the type of the cause
+     * @return the exception handler
+     */
+    static <C, T extends Throwable> @NonNull ExceptionHandler<C, T> unwrappingHandler(
+            final @NonNull Class<? extends Throwable> causeClass
+    ) {
+        return unwrappingHandler(causeClass::isInstance);
+    }
+
+    /**
      * Returns an exception handler that throws the cause of the {@link ExceptionContext#exception()} if it's
      * not {@code null}.
      * Otherwise, it will re-throw the {@link ExceptionContext#exception()}.
@@ -74,13 +132,7 @@ public interface ExceptionHandler<C, T extends Throwable> {
      * @return the exception handler
      */
     static <C, T extends Throwable> @NonNull ExceptionHandler<C, T> unwrappingHandler() {
-        return ctx -> {
-            final Throwable cause = ctx.exception().getCause();
-            if (cause != null) {
-                throw cause;
-            }
-            throw ctx.exception();
-        };
+        return unwrappingHandler(throwable -> true);
     }
 
     /**
