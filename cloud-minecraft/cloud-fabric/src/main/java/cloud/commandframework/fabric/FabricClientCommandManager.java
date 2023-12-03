@@ -94,6 +94,10 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
         );
 
         this.registerParsers();
+        this.registerDefaultExceptionHandlers(
+                FabricClientCommandSource::sendError,
+                source -> source.getPlayer().getGameProfile().getName()
+        );
     }
 
     private void registerParsers() {

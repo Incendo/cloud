@@ -23,26 +23,22 @@
 //
 package cloud.commandframework.fabric;
 
-import com.mojang.brigadier.Command;
-import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.SharedSuggestionProvider;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class FabricExecutor<C, S extends SharedSuggestionProvider> implements Command<S> {
+@API(status = API.Status.STABLE, since = "2.0.0")
+final class FabricExceptionHandlerFactory<C, S extends SharedSuggestionProvider> {
 
-    private final FabricCommandManager<C, S> manager;
+    private final FabricCommandManager<C, S> fabricCommandManager;
 
-    FabricExecutor(final @NonNull FabricCommandManager<C, S> manager) {
-        this.manager = manager;
+    FabricExceptionHandlerFactory(final @NonNull FabricCommandManager<C, S> fabricCommandManager) {
+        this.fabricCommandManager = fabricCommandManager;
     }
 
-    @Override
-    public int run(final @NonNull CommandContext<S> ctx) {
-        final S source = ctx.getSource();
-        final String input = ctx.getInput().substring(ctx.getLastChild().getNodes().get(0).getRange().getStart());
-        final C sender = this.manager.commandSourceMapper().apply(source);
-
-        this.manager.executeCommand(sender, input);
-        return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+    <T extends Throwable> @NonNull FabricExceptionHandler<C, S, T> createHandler(
+            final FabricExceptionHandler.@NonNull ExceptionConsumer<C, S, T> handler
+    ) {
+        return new FabricExceptionHandler<>(this.fabricCommandManager, handler);
     }
 }
