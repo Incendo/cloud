@@ -4,7 +4,7 @@
   "required": true,
   "mixins": [
     "CloudStringReaderMixin",
-    "CommandsMixin",
+    "CommandDispatcherMixin",
     "EntitySelectorMixin",
     "EntitySelectorParserMixin",
     "MessageArgumentMessageAccess",

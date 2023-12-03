@@ -45,6 +45,12 @@ tasks {
     }
 }
 
+loom {
+    runs.configureEach {
+        property("mixin.debug.countInjections", "true")
+    }
+}
+
 dependencies {
     minecraft(libs.fabricMinecraft)
     mappings(loom.officialMojangMappings())
@@ -53,7 +59,7 @@ dependencies {
     modImplementation(fabricApi.module("fabric-networking-api-v1", libs.versions.fabricApi.get()))
     modImplementation(fabricApi.module("fabric-lifecycle-events-v1", libs.versions.fabricApi.get()))
 
-    modApi(libs.fabricPermissionsApi)
+    modApi(libs.fabricPermissionsApi) { isTransitive = false }
     include(libs.fabricPermissionsApi)
 
     api(include(projects.cloudCore)!!)
