@@ -43,7 +43,9 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.util.ComponentMessageThrowable;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * Exception handler that sends {@link Component} to the sender. All component builders
@@ -129,21 +131,21 @@ public final class MinecraftExceptionHandler<C> {
     private Function<Component, Component> decorator = Function.identity();
 
     /**
-     * Use the default invalid syntax handler
+     * Sets the default invalid syntax handler.
      *
      * @return {@code this}
      */
-    public @NonNull MinecraftExceptionHandler<C> withInvalidSyntaxHandler() {
-        return this.withHandler(ExceptionType.INVALID_SYNTAX, DEFAULT_INVALID_SYNTAX_FUNCTION);
+    public @NonNull @This MinecraftExceptionHandler<C> withInvalidSyntaxHandler() {
+        return this.withDefaultHandler(ExceptionType.INVALID_SYNTAX);
     }
 
     /**
-     * Use the default invalid sender handler
+     * Sets the default invalid sender handler.
      *
      * @return {@code this}
      */
-    public @NonNull MinecraftExceptionHandler<C> withInvalidSenderHandler() {
-        return this.withHandler(ExceptionType.INVALID_SENDER, DEFAULT_INVALID_SENDER_FUNCTION);
+    public @NonNull @This MinecraftExceptionHandler<C> withInvalidSenderHandler() {
+        return this.withDefaultHandler(ExceptionType.INVALID_SENDER);
     }
 
     /**
@@ -151,35 +153,35 @@ public final class MinecraftExceptionHandler<C> {
      *
      * @return {@code this}
      */
-    public @NonNull MinecraftExceptionHandler<C> withNoPermissionHandler() {
-        return this.withHandler(ExceptionType.NO_PERMISSION, DEFAULT_NO_PERMISSION_FUNCTION);
+    public @NonNull @This MinecraftExceptionHandler<C> withNoPermissionHandler() {
+        return this.withDefaultHandler(ExceptionType.NO_PERMISSION);
     }
 
     /**
-     * Use the default argument parsing handler
+     * Sets the default argument parsing handler.
      *
      * @return {@code this}
      */
-    public @NonNull MinecraftExceptionHandler<C> withArgumentParsingHandler() {
-        return this.withHandler(ExceptionType.ARGUMENT_PARSING, DEFAULT_ARGUMENT_PARSING_FUNCTION);
+    public @NonNull @This MinecraftExceptionHandler<C> withArgumentParsingHandler() {
+        return this.withDefaultHandler(ExceptionType.ARGUMENT_PARSING);
     }
 
     /**
-     * Use the default {@link CommandExecutionException} handler
+     * Sets the default {@link CommandExecutionException} handler.
      *
      * @return {@code this}
      * @since 1.2.0
      */
-    public @NonNull MinecraftExceptionHandler<C> withCommandExecutionHandler() {
-        return this.withHandler(ExceptionType.COMMAND_EXECUTION, DEFAULT_COMMAND_EXECUTION_FUNCTION);
+    public @NonNull @This MinecraftExceptionHandler<C> withCommandExecutionHandler() {
+        return this.withDefaultHandler(ExceptionType.COMMAND_EXECUTION);
     }
 
     /**
-     * Use all of the default exception handlers
+     * Sets all the default exception handlers.
      *
      * @return {@code this}
      */
-    public @NonNull MinecraftExceptionHandler<C> withDefaultHandlers() {
+    public @NonNull @This MinecraftExceptionHandler<C> withDefaultHandlers() {
         return this
                 .withArgumentParsingHandler()
                 .withInvalidSenderHandler()
@@ -189,48 +191,62 @@ public final class MinecraftExceptionHandler<C> {
     }
 
     /**
-     * Specify an exception handler
+     * Sets the exception handler for the given {@code type}.
      *
-     * @param type             Exception type
-     * @param componentBuilder Component builder
+     * @param type             the type of exception to handle
+     * @param componentFactory the factory that produces the components
      * @return {@code this}
      */
-    public @NonNull MinecraftExceptionHandler<C> withHandler(
+    public @NonNull @This MinecraftExceptionHandler<C> withHandler(
             final @NonNull ExceptionType type,
-            final @NonNull Function<@NonNull Exception, @NonNull Component> componentBuilder
+            final @NonNull Function<@NonNull Exception, @NonNull Component> componentFactory
     ) {
         return this.withHandler(
                 type,
-                (sender, exception) -> componentBuilder.apply(exception)
+                (sender, exception) -> componentFactory.apply(exception)
         );
     }
 
     /**
-     * Specify an exception handler
+     * Sets the exception handler for the given {@code type} to the {@link ExceptionType#defaultHandler()}.
      *
-     * @param type             Exception type
-     * @param componentBuilder Component builder
+     * @param type the type of exception to handle
+     * @return {@code this}
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull @This MinecraftExceptionHandler<C> withDefaultHandler(
+            final @NonNull ExceptionType type
+    ) {
+        return this.withHandler(type, type.defaultHandler());
+    }
+
+    /**
+     * Sets the exception handler for the given {@code type}.
+     *
+     * @param type             the exception type to handle
+     * @param componentFactory the factory that produces the components
      * @return {@code this}
      * @since 1.2.0
      */
-    public @NonNull MinecraftExceptionHandler<C> withHandler(
+    public @NonNull @This MinecraftExceptionHandler<C> withHandler(
             final @NonNull ExceptionType type,
-            final @NonNull BiFunction<@NonNull C, @NonNull Exception, @NonNull Component> componentBuilder
+            final @NonNull BiFunction<@NonNull C, @NonNull Exception, @NonNull Component> componentFactory
     ) {
         this.componentBuilders.put(
                 type,
-                componentBuilder
+                componentFactory
         );
         return this;
     }
 
     /**
-     * Specify a decorator that acts on a component before it's sent to the sender
+     * Sets the decorator that acts on a component before it's sent to the sender.
      *
-     * @param decorator Component decorator
+     * @param decorator the component decorator
      * @return {@code this}
      */
-    public @NonNull MinecraftExceptionHandler<C> withDecorator(
+    public @NonNull @This MinecraftExceptionHandler<C> withDecorator(
             final @NonNull Function<@NonNull Component, @NonNull Component> decorator
     ) {
         this.decorator = decorator;
@@ -238,60 +254,22 @@ public final class MinecraftExceptionHandler<C> {
     }
 
     /**
-     * Register the exception handlers in the manager
+     * Registers the exceptions to the {@link cloud.commandframework.exceptions.handling.ExceptionController}.
      *
-     * @param manager        Manager instance
-     * @param audienceMapper Mapper that maps command sender to audience instances
+     * @param manager        the manager instance
+     * @param audienceMapper the mapper that maps command sender to audience instances
      */
     public void apply(
             final @NonNull CommandManager<C> manager,
             final @NonNull Function<@NonNull C, @NonNull Audience> audienceMapper
     ) {
-        if (this.componentBuilders.containsKey(ExceptionType.INVALID_SYNTAX)) {
-            manager.registerExceptionHandler(
-                    InvalidSyntaxException.class,
-                    (c, e) -> audienceMapper.apply(c).sendMessage(
-                            Identity.nil(),
-                            this.decorator.apply(this.componentBuilders.get(ExceptionType.INVALID_SYNTAX).apply(c, e))
-                    )
-            );
-        }
-        if (this.componentBuilders.containsKey(ExceptionType.INVALID_SENDER)) {
-            manager.registerExceptionHandler(
-                    InvalidCommandSenderException.class,
-                    (c, e) -> audienceMapper.apply(c).sendMessage(
-                            Identity.nil(),
-                            this.decorator.apply(this.componentBuilders.get(ExceptionType.INVALID_SENDER).apply(c, e))
-                    )
-            );
-        }
-        if (this.componentBuilders.containsKey(ExceptionType.NO_PERMISSION)) {
-            manager.registerExceptionHandler(
-                    NoPermissionException.class,
-                    (c, e) -> audienceMapper.apply(c).sendMessage(
-                            Identity.nil(),
-                            this.decorator.apply(this.componentBuilders.get(ExceptionType.NO_PERMISSION).apply(c, e))
-                    )
-            );
-        }
-        if (this.componentBuilders.containsKey(ExceptionType.ARGUMENT_PARSING)) {
-            manager.registerExceptionHandler(
-                    ArgumentParseException.class,
-                    (c, e) -> audienceMapper.apply(c).sendMessage(
-                            Identity.nil(),
-                            this.decorator.apply(this.componentBuilders.get(ExceptionType.ARGUMENT_PARSING).apply(c, e))
-                    )
-            );
-        }
-        if (this.componentBuilders.containsKey(ExceptionType.COMMAND_EXECUTION)) {
-            manager.registerExceptionHandler(
-                    CommandExecutionException.class,
-                    (c, e) -> audienceMapper.apply(c).sendMessage(
-                            Identity.nil(),
-                            this.decorator.apply(this.componentBuilders.get(ExceptionType.COMMAND_EXECUTION).apply(c, e))
-                    )
-            );
-        }
+        this.componentBuilders.forEach((type, handler) -> manager.exceptionController().registerHandler(
+                type.exceptionClass(),
+                ctx -> audienceMapper.apply(ctx.context().getSender()).sendMessage(
+                        Identity.nil(),
+                        this.decorator.apply(handler.apply(ctx.context().getSender(), ctx.exception()))
+                )
+        ));
     }
 
     private static Component getMessage(final Throwable throwable) {
@@ -300,30 +278,63 @@ public final class MinecraftExceptionHandler<C> {
     }
 
     /**
-     * Exception types
+     * Exception types.
      */
     public enum ExceptionType {
         /**
          * The input does not correspond to any known command ({@link InvalidSyntaxException})
          */
-        INVALID_SYNTAX,
+        INVALID_SYNTAX(InvalidSyntaxException.class, DEFAULT_INVALID_SYNTAX_FUNCTION),
         /**
          * The sender is not of the right type ({@link InvalidCommandSenderException})
          */
-        INVALID_SENDER,
+        INVALID_SENDER(InvalidCommandSenderException.class, DEFAULT_INVALID_SENDER_FUNCTION),
         /**
          * The sender does not have permission to execute the command ({@link NoPermissionException})
          */
-        NO_PERMISSION,
+        NO_PERMISSION(NoPermissionException.class, DEFAULT_NO_PERMISSION_FUNCTION),
         /**
          * An argument failed to parse ({@link ArgumentParseException})
          */
-        ARGUMENT_PARSING,
+        ARGUMENT_PARSING(ArgumentParseException.class, DEFAULT_ARGUMENT_PARSING_FUNCTION),
         /**
          * A command handler had an exception ({@link CommandExecutionException})
          *
          * @since 1.2.0
          */
-        COMMAND_EXECUTION
+        COMMAND_EXECUTION(CommandExecutionException.class, DEFAULT_COMMAND_EXECUTION_FUNCTION);
+
+        private final Class<? extends Exception> exceptionClass;
+        private final Function<Exception, Component> defaultHandler;
+
+        ExceptionType(
+                final @NonNull Class<? extends Exception> exceptionClass,
+                final @NonNull Function<@NonNull Exception, @NonNull Component> defaultHandler
+        ) {
+            this.exceptionClass = exceptionClass;
+            this.defaultHandler = defaultHandler;
+        }
+
+        /**
+         * Returns the associated exception class.
+         *
+         * @return the exception class
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Class<? extends Exception> exceptionClass() {
+            return this.exceptionClass;
+        }
+
+        /**
+         * Returns the default handler for the type.
+         *
+         * @return the default handler
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Function<@NonNull Exception, @NonNull Component> defaultHandler() {
+            return this.defaultHandler;
+        }
     }
 }
