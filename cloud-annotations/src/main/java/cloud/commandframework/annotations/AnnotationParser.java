@@ -26,6 +26,8 @@ package cloud.commandframework.annotations;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.annotations.exception.ExceptionHandler;
+import cloud.commandframework.annotations.exception.ExceptionHandlerFactory;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.injection.RawArgs;
 import cloud.commandframework.annotations.parsers.MethodArgumentParser;
@@ -107,6 +109,7 @@ public final class AnnotationParser<C> {
     private FlagAssembler flagAssembler;
     private CommandExtractor commandExtractor;
     private SuggestionProviderFactory<C> suggestionProviderFactory;
+    private ExceptionHandlerFactory<C> exceptionHandlerFactory;
 
     /**
      * Construct a new annotation parser
@@ -170,6 +173,7 @@ public final class AnnotationParser<C> {
         this.argumentAssembler = new ArgumentAssemblerImpl<>(this);
         this.commandExtractor = new CommandExtractorImpl(this);
         this.suggestionProviderFactory = SuggestionProviderFactory.defaultFactory();
+        this.exceptionHandlerFactory = ExceptionHandlerFactory.defaultFactory();
         // TODO(City): Add mapper so that we can map this to rich descriptions easily.
         this.registerBuilderModifier(
                 CommandDescription.class,
@@ -548,6 +552,28 @@ public final class AnnotationParser<C> {
     }
 
     /**
+     * Returns the exception provider factory.
+     *
+     * @return the exception provider factory
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull ExceptionHandlerFactory<C> exceptionHandlerFactory() {
+        return this.exceptionHandlerFactory;
+    }
+
+    /**
+     * Sets the exception provider factory.
+     *
+     * @param exceptionHandlerFactory new exception provider factory
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void exceptionHandlerFactory(final @NonNull ExceptionHandlerFactory<C> exceptionHandlerFactory) {
+        this.exceptionHandlerFactory = exceptionHandlerFactory;
+    }
+
+    /**
      * Parses all known {@link cloud.commandframework.annotations.processing.CommandContainer command containers}.
      *
      * @return Collection of parsed commands
@@ -610,6 +636,7 @@ public final class AnnotationParser<C> {
     public <T> @NonNull Collection<@NonNull Command<C>> parse(final @NonNull T instance) {
         this.parseSuggestions(instance);
         this.parseParsers(instance);
+        this.parseExceptionHandlers(instance);
 
         final Collection<CommandDescriptor> commandDescriptors = this.commandExtractor.extractCommands(instance);
         final Collection<Command<C>> commands = this.construct(instance, commandDescriptors);
@@ -662,6 +689,28 @@ public final class AnnotationParser<C> {
                 this.manager.parserRegistry().registerSuggestionProvider(
                         this.processString(suggestions.value()),
                         this.suggestionProviderFactory.createSuggestionProvider(instance, method)
+                );
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> void parseExceptionHandlers(final @NonNull T instance) {
+        for (final Method method : instance.getClass().getMethods()) {
+            final ExceptionHandler exceptionHandler = method.getAnnotation(ExceptionHandler.class);
+            if (exceptionHandler == null) {
+                continue;
+            }
+            if (!method.isAccessible()) {
+                method.setAccessible(true);
+            }
+
+            try {
+                this.manager.exceptionController().registerHandler(
+                        (Class<Throwable>) exceptionHandler.value(),
+                        this.exceptionHandlerFactory.createExceptionHandler(instance, method)
                 );
             } catch (final Exception e) {
                 throw new RuntimeException(e);
