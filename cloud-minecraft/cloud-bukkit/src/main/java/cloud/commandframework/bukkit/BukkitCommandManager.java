@@ -454,7 +454,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
             this.owningPlugin.getLogger().log(
                     Level.SEVERE,
                     "Exception executing command handler",
-                    context.exception()
+                    context.exception().getCause()
             );
         }).registerHandler(ArgumentParseException.class, context -> {
             this.backwardsCommandSenderMapper.apply(context.context().getSender()).sendMessage(
