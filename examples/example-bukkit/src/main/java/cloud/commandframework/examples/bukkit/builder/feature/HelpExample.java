@@ -55,7 +55,7 @@ public final class HelpExample implements BuilderFeature {
                                 "query",
                                 greedyStringParser(),
                                 DefaultValue.constant(""),
-                                (ctx, in) -> manager.createCommandHelpHandler()
+                                (ctx, in) -> manager.createHelpHandler()
                                         .queryRootIndex(ctx.getSender())
                                         .entries()
                                         .stream()

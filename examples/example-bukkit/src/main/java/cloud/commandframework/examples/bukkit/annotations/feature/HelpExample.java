@@ -86,7 +86,7 @@ public final class HelpExample implements AnnotationFeature {
             final @NonNull CommandContext<CommandSender> ctx,
             final @NonNull String input
     ) {
-        return this.manager.createCommandHelpHandler()
+        return this.manager.createHelpHandler()
                 .queryRootIndex(ctx.getSender())
                 .entries()
                 .stream()

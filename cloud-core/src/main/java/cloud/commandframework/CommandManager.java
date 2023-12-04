@@ -1003,7 +1003,7 @@ public abstract class CommandManager<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public final @NonNull HelpHandler<C> createCommandHelpHandler() {
+    public final @NonNull HelpHandler<C> createHelpHandler() {
         return this.helpHandlerFactory.createHelpHandler(cmd -> true);
     }
 
@@ -1020,7 +1020,7 @@ public abstract class CommandManager<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public final @NonNull HelpHandler<C> createCommandHelpHandler(
+    public final @NonNull HelpHandler<C> createHelpHandler(
             final @NonNull CommandPredicate<C> filter
     ) {
         return this.helpHandlerFactory.createHelpHandler(filter);

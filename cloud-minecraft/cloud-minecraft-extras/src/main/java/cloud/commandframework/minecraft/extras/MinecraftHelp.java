@@ -326,7 +326,7 @@ public final class MinecraftHelp<C> {
             query = rawQuery;
         }
         final Audience audience = this.getAudience(recipient);
-        this.commandManager.createCommandHelpHandler(this.commandFilter)
+        this.commandManager.createHelpHandler(this.commandFilter)
                 .query(HelpQuery.of(recipient, query))
                 .render(new MinecraftHelpRenderer(page));
     }
