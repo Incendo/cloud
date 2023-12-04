@@ -27,6 +27,7 @@ import cloud.commandframework.CommandDescription
 import cloud.commandframework.CommandManager
 import cloud.commandframework.arguments.standard.StringParser.stringParser
 import cloud.commandframework.execution.CommandExecutionCoordinator
+import cloud.commandframework.help.result.CommandEntry
 import cloud.commandframework.internal.CommandRegistrationHandler
 import cloud.commandframework.kotlin.extension.argumentDescription
 import cloud.commandframework.kotlin.extension.buildAndRegister
@@ -90,7 +91,10 @@ class CommandBuildingDSLTest {
         manager.executeCommand(SpecificCommandSender(), "kotlin dsl time bruh_moment")
 
         Assertions.assertEquals(
-            manager.createCommandHelpHandler().allCommands.map { it.syntaxString() }.sorted(),
+            manager.createCommandHelpHandler()
+                .queryRootIndex(TestCommandSender())
+                .entries()
+                .map(CommandEntry<*>::syntax).sorted(),
             setOf(
                 "kotlin dsl <moment>",
                 "kotlin dsl <moment> bruh_moment",
@@ -98,8 +102,7 @@ class CommandBuildingDSLTest {
                 "is this",
                 "is this going",
                 "is this going too_far"
-            )
-                .sorted()
+            ).sorted()
         )
     }
 

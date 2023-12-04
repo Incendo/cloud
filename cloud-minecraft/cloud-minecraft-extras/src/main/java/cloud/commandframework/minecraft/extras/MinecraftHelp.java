@@ -23,12 +23,18 @@
 //
 package cloud.commandframework.minecraft.extras;
 
-import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandDescription;
-import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
+import cloud.commandframework.help.CommandPredicate;
+import cloud.commandframework.help.HelpQuery;
+import cloud.commandframework.help.HelpRenderer;
+import cloud.commandframework.help.result.CommandEntry;
+import cloud.commandframework.help.result.CommandListResult;
+import cloud.commandframework.help.result.HelpQueryResult;
+import cloud.commandframework.help.result.MultipleCommandResult;
+import cloud.commandframework.help.result.VerboseCommandResult;
 import cloud.commandframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,9 +61,9 @@ import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.event.ClickEvent.runCommand;
 
 /**
- * Opinionated extension of {@link CommandHelpHandler} for Minecraft
+ * Opinionated extension of {@link HelpRenderer} for Minecraft.
  *
- * @param <C> Command sender type
+ * @param <C> the command sender type
  */
 @SuppressWarnings("unused")
 public final class MinecraftHelp<C> {
@@ -97,7 +103,7 @@ public final class MinecraftHelp<C> {
     private final String commandPrefix;
     private final Map<String, String> messageMap = new HashMap<>();
 
-    private Predicate<Command<C>> commandFilter = c -> true;
+    private CommandPredicate<C> commandFilter = CommandPredicate.acceptAll();
     private MessageProvider<C> messageProvider = (sender, key, args) -> {
         final String message = this.messageMap.get(key);
         if (args.isEmpty()) {
@@ -202,7 +208,7 @@ public final class MinecraftHelp<C> {
      * @param commandPredicate Predicate to filter commands by
      * @since 1.4.0
      */
-    public void commandFilter(final @NonNull Predicate<Command<C>> commandPredicate) {
+    public void commandFilter(final @NonNull CommandPredicate<C> commandPredicate) {
         this.commandFilter = commandPredicate;
     }
 
@@ -320,227 +326,9 @@ public final class MinecraftHelp<C> {
             query = rawQuery;
         }
         final Audience audience = this.getAudience(recipient);
-        this.printTopic(
-                recipient,
-                query,
-                page,
-                this.commandManager.createCommandHelpHandler(this.commandFilter).queryHelp(recipient, query)
-        );
-    }
-
-    private void printTopic(
-            final @NonNull C sender,
-            final @NonNull String query,
-            final int page,
-            final CommandHelpHandler.@NonNull HelpTopic<C> helpTopic
-    ) {
-        if (helpTopic instanceof CommandHelpHandler.IndexHelpTopic) {
-            this.printIndexHelpTopic(sender, query, page, (CommandHelpHandler.IndexHelpTopic<C>) helpTopic);
-        } else if (helpTopic instanceof CommandHelpHandler.MultiHelpTopic) {
-            this.printMultiHelpTopic(sender, query, page, (CommandHelpHandler.MultiHelpTopic<C>) helpTopic);
-        } else if (helpTopic instanceof CommandHelpHandler.VerboseHelpTopic) {
-            this.printVerboseHelpTopic(sender, query, (CommandHelpHandler.VerboseHelpTopic<C>) helpTopic);
-        } else {
-            throw new IllegalArgumentException("Unknown help topic type");
-        }
-    }
-
-    private void printNoResults(
-            final @NonNull C sender,
-            final @NonNull String query
-    ) {
-        final Audience audience = this.getAudience(sender);
-        audience.sendMessage(this.basicHeader(sender));
-        audience.sendMessage(LinearComponents.linear(
-                this.messageProvider.provide(sender, MESSAGE_NO_RESULTS_FOR_QUERY).color(this.colors.text),
-                text(": \"", this.colors.text),
-                this.highlight(text("/" + query, this.colors.highlight)),
-                text("\"", this.colors.text)
-        ));
-        audience.sendMessage(this.footer(sender));
-    }
-
-    private void printIndexHelpTopic(
-            final @NonNull C sender,
-            final @NonNull String query,
-            final int page,
-            final CommandHelpHandler.@NonNull IndexHelpTopic<C> helpTopic
-    ) {
-        if (helpTopic.isEmpty()) {
-            this.printNoResults(sender, query);
-            return;
-        }
-
-        final Audience audience = this.getAudience(sender);
-        new Pagination<CommandHelpHandler.VerboseHelpEntry<C>>(
-                (currentPage, maxPages) -> {
-                    final List<Component> header = new ArrayList<>();
-                    header.add(this.paginatedHeader(sender, currentPage, maxPages));
-                    header.add(this.showingResults(sender, query));
-                    header.add(text()
-                            .append(this.lastBranch())
-                            .append(space())
-                            .append(
-                                    this.messageProvider.provide(
-                                            sender,
-                                            MESSAGE_AVAILABLE_COMMANDS
-                                    ).color(this.colors.text)
-                            )
-                            .append(text(":", this.colors.text))
-                            .build()
-                    );
-                    return header;
-                },
-                (helpEntry, isLastOfPage) -> {
-                    final CommandDescription commandDescription = helpEntry.command().commandDescription();
-                    final Component description;
-                    if (commandDescription.description() instanceof RichDescription) {
-                        description = ((RichDescription) commandDescription.description()).contents();
-                    } else if (helpEntry.description().isEmpty()) {
-                        description = this.messageProvider.provide(sender, MESSAGE_CLICK_TO_SHOW_HELP);
-                    } else {
-                        description = this.descriptionDecorator.apply(sender, helpEntry.description().textDescription());
-                    }
-
-                    final boolean lastBranch =
-                            isLastOfPage || helpTopic.getEntries().indexOf(helpEntry) == helpTopic.getEntries().size() - 1;
-
-                    return text()
-                            .append(text("   "))
-                            .append(lastBranch ? this.lastBranch() : this.branch())
-                            .append(this.highlight(text(
-                                                    String.format(" /%s", helpEntry.syntaxString()),
-                                                    this.colors.highlight
-                                            ))
-                                            .hoverEvent(description.color(this.colors.text))
-                                            .clickEvent(runCommand(this.commandPrefix + " " + helpEntry.syntaxString()))
-                            )
-                            .build();
-                },
-                (currentPage, maxPages) -> this.paginatedFooter(sender, currentPage, maxPages, query),
-                (attemptedPage, maxPages) -> this.pageOutOfRange(sender, attemptedPage, maxPages)
-        ).render(helpTopic.getEntries(), page, this.maxResultsPerPage).forEach(audience::sendMessage);
-    }
-
-    private void printMultiHelpTopic(
-            final @NonNull C sender,
-            final @NonNull String query,
-            final int page,
-            final CommandHelpHandler.@NonNull MultiHelpTopic<C> helpTopic
-    ) {
-        if (helpTopic.getChildSuggestions().isEmpty()) {
-            this.printNoResults(sender, query);
-            return;
-        }
-
-        final Audience audience = this.getAudience(sender);
-        final int headerIndentation = helpTopic.getLongestPath().length();
-        new Pagination<String>(
-                (currentPage, maxPages) -> {
-                    final List<Component> header = new ArrayList<>();
-                    header.add(this.paginatedHeader(sender, currentPage, maxPages));
-                    header.add(this.showingResults(sender, query));
-                    header.add(this.lastBranch()
-                            .append(this.highlight(text(" /" + helpTopic.getLongestPath(), this.colors.highlight))));
-                    return header;
-                },
-                (suggestion, isLastOfPage) -> {
-                    final boolean lastBranch = isLastOfPage
-                            || helpTopic.getChildSuggestions().indexOf(suggestion) == helpTopic.getChildSuggestions().size() - 1;
-
-                    return ComponentHelper.repeat(space(), headerIndentation)
-                            .append(lastBranch ? this.lastBranch() : this.branch())
-                            .append(this.highlight(text(" /" + suggestion, this.colors.highlight))
-                                    .hoverEvent(this.messageProvider.provide(sender, MESSAGE_CLICK_TO_SHOW_HELP)
-                                            .color(this.colors.text))
-                                    .clickEvent(runCommand(this.commandPrefix + " " + suggestion)));
-                },
-                (currentPage, maxPages) -> this.paginatedFooter(sender, currentPage, maxPages, query),
-                (attemptedPage, maxPages) -> this.pageOutOfRange(sender, attemptedPage, maxPages)
-        ).render(helpTopic.getChildSuggestions(), page, this.maxResultsPerPage).forEach(audience::sendMessage);
-    }
-
-    private void printVerboseHelpTopic(
-            final @NonNull C sender,
-            final @NonNull String query,
-            final CommandHelpHandler.@NonNull VerboseHelpTopic<C> helpTopic
-    ) {
-        final Audience audience = this.getAudience(sender);
-        audience.sendMessage(this.basicHeader(sender));
-        audience.sendMessage(this.showingResults(sender, query));
-        final String command = this.commandManager.commandSyntaxFormatter()
-                .apply(helpTopic.command().components(), null);
-        audience.sendMessage(text()
-                .append(this.lastBranch())
-                .append(space())
-                .append(this.messageProvider.provide(sender, MESSAGE_COMMAND).color(this.colors.primary))
-                .append(text(": ", this.colors.primary))
-                .append(this.highlight(text("/" + command, this.colors.highlight)))
-        );
-        /* Topics will use the long description if available, but fall back to the short description. */
-        final Description commandDescription = helpTopic.commandDescription();
-
-        final Component topicDescription;
-        if (commandDescription instanceof RichDescription) {
-            topicDescription = ((RichDescription) commandDescription).contents();
-        } else if (helpTopic.commandDescription().isEmpty()) {
-            topicDescription = this.messageProvider.provide(sender, MESSAGE_NO_DESCRIPTION);
-        } else {
-            topicDescription = this.descriptionDecorator.apply(
-                    sender,
-                    helpTopic.commandDescription().textDescription()
-            );
-        }
-
-        final boolean hasArguments = helpTopic.command().components().size() > 1;
-        audience.sendMessage(text()
-                .append(text("   "))
-                .append(hasArguments ? this.branch() : this.lastBranch())
-                .append(space())
-                .append(this.messageProvider.provide(sender, MESSAGE_DESCRIPTION).color(this.colors.primary))
-                .append(text(": ", this.colors.primary))
-                .append(topicDescription.color(this.colors.text))
-        );
-        if (hasArguments) {
-            audience.sendMessage(text()
-                    .append(text("   "))
-                    .append(this.lastBranch())
-                    .append(space())
-                    .append(this.messageProvider.provide(sender, MESSAGE_ARGUMENTS).color(this.colors.primary))
-                    .append(text(":", this.colors.primary))
-            );
-
-            final Iterator<CommandComponent<C>> iterator = helpTopic.command().components().iterator();
-            /* Skip the first one because it's the command literal */
-            iterator.next();
-
-            while (iterator.hasNext()) {
-                final CommandComponent<C> component = iterator.next();
-
-                final String syntax = this.commandManager.commandSyntaxFormatter()
-                        .apply(Collections.singletonList(component), null);
-
-                final TextComponent.Builder textComponent = text()
-                        .append(text("       "))
-                        .append(iterator.hasNext() ? this.branch() : this.lastBranch())
-                        .append(this.highlight(text(" " + syntax, this.colors.highlight)));
-                if (component.optional()) {
-                    textComponent.append(text(" (", this.colors.alternateHighlight));
-                    textComponent.append(
-                            this.messageProvider.provide(sender, MESSAGE_OPTIONAL).color(this.colors.alternateHighlight)
-                    );
-                    textComponent.append(text(")", this.colors.alternateHighlight));
-                }
-                final Description description = component.description();
-                if (!description.isEmpty()) {
-                    textComponent.append(text(" - ", this.colors.accent));
-                    textComponent.append(this.formatDescription(sender, description).colorIfAbsent(this.colors.text));
-                }
-
-                audience.sendMessage(textComponent);
-            }
-        }
-        audience.sendMessage(this.footer(sender));
+        this.commandManager.createCommandHelpHandler(this.commandFilter)
+                .query(HelpQuery.of(recipient, query))
+                .render(new MinecraftHelpRenderer(page));
     }
 
     private Component formatDescription(final C sender, final Description description) {
@@ -694,6 +482,222 @@ public final class MinecraftHelp<C> {
                 this.messageProvider.provide(sender, MESSAGE_PAGE_OUT_OF_RANGE, args).color(this.colors.text)
         );
     }
+
+    private void printListResult(
+            final @NonNull HelpQuery<C> query,
+            final int page,
+            final CommandListResult<C> result
+    ) {
+        if (result.isEmpty()) {
+            this.printNoResults(query);
+            return;
+        }
+
+        final Audience audience = this.getAudience(query.sender());
+        new Pagination<CommandEntry<C>>(
+                (currentPage, maxPages) -> {
+                    final List<Component> header = new ArrayList<>();
+                    header.add(this.paginatedHeader(query.sender(), currentPage, maxPages));
+                    header.add(this.showingResults(query.sender(), query.query()));
+                    header.add(text()
+                            .append(this.lastBranch())
+                            .append(space())
+                            .append(
+                                    this.messageProvider.provide(
+                                            query.sender(),
+                                            MESSAGE_AVAILABLE_COMMANDS
+                                    ).color(this.colors.text)
+                            )
+                            .append(text(":", this.colors.text))
+                            .build()
+                    );
+                    return header;
+                },
+                (helpEntry, isLastOfPage) -> {
+                    final CommandDescription commandDescription = helpEntry.command().commandDescription();
+                    final Component description;
+                    if (commandDescription.description() instanceof RichDescription) {
+                        description = ((RichDescription) commandDescription.description()).contents();
+                    } else if (helpEntry.command().commandDescription().isEmpty()) {
+                        description = this.messageProvider.provide(query.sender(), MESSAGE_CLICK_TO_SHOW_HELP);
+                    } else {
+                        description = this.descriptionDecorator.apply(query.sender(),
+                                helpEntry.command().commandDescription().description().textDescription());
+                    }
+
+                    final boolean lastBranch =
+                            isLastOfPage || result.entries().indexOf(helpEntry) == result.entries().size() - 1;
+
+                    return text()
+                            .append(text("   "))
+                            .append(lastBranch ? this.lastBranch() : this.branch())
+                            .append(this.highlight(text(String.format(" /%s", helpEntry.syntax()), this.colors.highlight))
+                                    .hoverEvent(description.color(this.colors.text))
+                                    .clickEvent(runCommand(this.commandPrefix + " " + helpEntry.syntax()))
+                            )
+                            .build();
+                },
+                (currentPage, maxPages) -> this.paginatedFooter(query.sender(), currentPage, maxPages, query.query()),
+                (attemptedPage, maxPages) -> this.pageOutOfRange(query.sender(), attemptedPage, maxPages)
+        ).render(result.entries(), page, this.maxResultsPerPage).forEach(audience::sendMessage);
+    }
+
+    private void printMultipleCommandResult(
+            final @NonNull HelpQuery<C> query,
+            final int page,
+            final @NonNull MultipleCommandResult<C> result
+    ) {
+        if (result.childSuggestions().isEmpty()) {
+            this.printNoResults(query);
+            return;
+        }
+
+        final Audience audience = this.getAudience(query.sender());
+        final int headerIndentation = result.longestPath().length();
+        new Pagination<String>(
+                (currentPage, maxPages) -> {
+                    final List<Component> header = new ArrayList<>();
+                    header.add(this.paginatedHeader(query.sender(), currentPage, maxPages));
+                    header.add(this.showingResults(query.sender(), query.query()));
+                    header.add(this.lastBranch()
+                            .append(this.highlight(text(" /" + result.longestPath(), this.colors.highlight))));
+                    return header;
+                },
+                (suggestion, isLastOfPage) -> {
+                    final boolean lastBranch = isLastOfPage
+                            || result.childSuggestions().indexOf(suggestion) == result.childSuggestions().size() - 1;
+
+                    return ComponentHelper.repeat(space(), headerIndentation)
+                            .append(lastBranch ? this.lastBranch() : this.branch())
+                            .append(this.highlight(text(" /" + suggestion, this.colors.highlight))
+                                    .hoverEvent(this.messageProvider.provide(query.sender(), MESSAGE_CLICK_TO_SHOW_HELP)
+                                            .color(this.colors.text))
+                                    .clickEvent(runCommand(this.commandPrefix + " " + suggestion)));
+                },
+                (currentPage, maxPages) -> this.paginatedFooter(query.sender(), currentPage, maxPages, query.query()),
+                (attemptedPage, maxPages) -> this.pageOutOfRange(query.sender(), attemptedPage, maxPages)
+        ).render(result.childSuggestions(), page, this.maxResultsPerPage).forEach(audience::sendMessage);
+    }
+
+    private void printVerboseResult(
+            final @NonNull HelpQuery<C> query,
+            final @NonNull VerboseCommandResult<C> result
+    ) {
+        final Audience audience = this.getAudience(query.sender());
+        audience.sendMessage(this.basicHeader(query.sender()));
+        audience.sendMessage(this.showingResults(query.sender(), query.query()));
+        final String command = this.commandManager.commandSyntaxFormatter()
+                .apply(result.command().components(), null);
+        audience.sendMessage(text()
+                .append(this.lastBranch())
+                .append(space())
+                .append(this.messageProvider.provide(query.sender(), MESSAGE_COMMAND).color(this.colors.primary))
+                .append(text(": ", this.colors.primary))
+                .append(this.highlight(text("/" + command, this.colors.highlight)))
+        );
+        /* Topics will use the long description if available, but fall back to the short description. */
+        final Description commandDescription = result.command().commandDescription().verboseDescription();
+
+        final Component topicDescription;
+        if (commandDescription instanceof RichDescription) {
+            topicDescription = ((RichDescription) commandDescription).contents();
+        } else if (commandDescription.isEmpty()) {
+            topicDescription = this.messageProvider.provide(query.sender(), MESSAGE_NO_DESCRIPTION);
+        } else {
+            topicDescription = this.descriptionDecorator.apply(
+                    query.sender(),
+                    commandDescription.textDescription()
+            );
+        }
+
+        final boolean hasArguments = result.command().components().size() > 1;
+        audience.sendMessage(text()
+                .append(text("   "))
+                .append(hasArguments ? this.branch() : this.lastBranch())
+                .append(space())
+                .append(this.messageProvider.provide(query.sender(), MESSAGE_DESCRIPTION).color(this.colors.primary))
+                .append(text(": ", this.colors.primary))
+                .append(topicDescription.color(this.colors.text))
+        );
+        if (hasArguments) {
+            audience.sendMessage(text()
+                    .append(text("   "))
+                    .append(this.lastBranch())
+                    .append(space())
+                    .append(this.messageProvider.provide(query.sender(), MESSAGE_ARGUMENTS).color(this.colors.primary))
+                    .append(text(":", this.colors.primary))
+            );
+
+            final Iterator<CommandComponent<C>> iterator = result.command().components().iterator();
+            /* Skip the first one because it's the command literal */
+            iterator.next();
+
+            while (iterator.hasNext()) {
+                final CommandComponent<C> component = iterator.next();
+
+                final String syntax = this.commandManager.commandSyntaxFormatter()
+                        .apply(Collections.singletonList(component), null);
+
+                final TextComponent.Builder textComponent = text()
+                        .append(text("       "))
+                        .append(iterator.hasNext() ? this.branch() : this.lastBranch())
+                        .append(this.highlight(text(" " + syntax, this.colors.highlight)));
+                if (component.optional()) {
+                    textComponent.append(text(" (", this.colors.alternateHighlight));
+                    textComponent.append(
+                            this.messageProvider.provide(query.sender(), MESSAGE_OPTIONAL).color(this.colors.alternateHighlight)
+                    );
+                    textComponent.append(text(")", this.colors.alternateHighlight));
+                }
+                final Description description = component.description();
+                if (!description.isEmpty()) {
+                    textComponent.append(text(" - ", this.colors.accent));
+                    textComponent.append(this.formatDescription(query.sender(), description).colorIfAbsent(this.colors.text));
+                }
+
+                audience.sendMessage(textComponent);
+            }
+        }
+        audience.sendMessage(this.footer(query.sender()));
+    }
+
+    private void printNoResults(
+            final @NonNull HelpQuery<C> query
+    ) {
+        final Audience audience = this.getAudience(query.sender());
+        audience.sendMessage(this.basicHeader(query.sender()));
+        audience.sendMessage(LinearComponents.linear(
+                this.messageProvider.provide(query.sender(), MESSAGE_NO_RESULTS_FOR_QUERY).color(this.colors.text),
+                text(": \"", this.colors.text),
+                this.highlight(text("/" + query, this.colors.highlight)),
+                text("\"", this.colors.text)
+        ));
+        audience.sendMessage(this.footer(query.sender()));
+    }
+
+
+    public final class MinecraftHelpRenderer implements HelpRenderer<C> {
+
+        private final int page;
+
+        private MinecraftHelpRenderer(final int page) {
+            this.page = page;
+        }
+
+        @Override
+        public void render(@NonNull final C sender, final @NonNull HelpQueryResult<C> result) {
+            if (result instanceof CommandListResult) {
+                MinecraftHelp.this.printListResult(result.query(), this.page, (CommandListResult<C>) result);
+            } else if (result instanceof MultipleCommandResult) {
+                MinecraftHelp.this.printMultipleCommandResult(result.query(), this.page, (MultipleCommandResult<C>) result);
+            } else if (result instanceof VerboseCommandResult) {
+                MinecraftHelp.this.printVerboseResult(result.query(), (VerboseCommandResult<C>) result);
+            } else {
+                throw new IllegalArgumentException("Unknown help topic type");
+            }
+        }
+    }
+
 
     @API(status = API.Status.STABLE, since = "1.4.0")
     @FunctionalInterface

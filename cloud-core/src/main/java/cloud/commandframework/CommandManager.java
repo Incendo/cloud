@@ -54,6 +54,9 @@ import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
 import cloud.commandframework.execution.preprocessor.AcceptingCommandPreprocessor;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
+import cloud.commandframework.help.CommandPredicate;
+import cloud.commandframework.help.HelpHandler;
+import cloud.commandframework.help.HelpHandlerFactory;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.CommandMeta;
@@ -79,7 +82,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -116,6 +118,7 @@ public abstract class CommandManager<C> {
     private CommandRegistrationHandler<C> commandRegistrationHandler;
     private CaptionRegistry<C> captionRegistry;
     private SuggestionMapper<? extends Suggestion> suggestionMapper = SuggestionMapper.identity();
+    private HelpHandlerFactory<C> helpHandlerFactory = HelpHandlerFactory.standard(this);
     private final AtomicReference<RegistrationState> state = new AtomicReference<>(RegistrationState.BEFORE_REGISTRATION);
 
     /**
@@ -992,16 +995,16 @@ public abstract class CommandManager<C> {
     /**
      * Creates a new command help handler instance.
      * <p>
-     * The command helper handler can be used to assist in the production of commad help menus, etc.
+     * The command helper handler can be used to assist in the production of command help menus, etc.
      * <p>
      * This command help handler instance will display all commands registered in this command manager.
      *
      * @return a new command helper handler instance
-     * @since 1.7.0
+     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
-    public final @NonNull CommandHelpHandler<C> createCommandHelpHandler() {
-        return new CommandHelpHandler<>(this, cmd -> true);
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public final @NonNull HelpHandler<C> createCommandHelpHandler() {
+        return this.helpHandlerFactory.createHelpHandler(cmd -> true);
     }
 
     /**
@@ -1009,19 +1012,42 @@ public abstract class CommandManager<C> {
      * <p>
      * The command helper handler can be used to assist in the production of commad help menus, etc.
      * <p>
-     * A predicate can be specified to filter what commands
+     * A filter can be specified to filter what commands
      * registered in this command manager are visible in the help menu.
      *
-     * @param commandPredicate predicate that filters what commands are displayed in
-     *                         the help menu.
+     * @param filter predicate that filters what commands are displayed in the help menu.
      * @return a new command helper handler instance
-     * @since 1.7.0
+     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
-    public final @NonNull CommandHelpHandler<C> createCommandHelpHandler(
-            final @NonNull Predicate<Command<C>> commandPredicate
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public final @NonNull HelpHandler<C> createCommandHelpHandler(
+            final @NonNull CommandPredicate<C> filter
     ) {
-        return new CommandHelpHandler<>(this, commandPredicate);
+        return this.helpHandlerFactory.createHelpHandler(filter);
+    }
+
+    /**
+     * Returns the help handler factory.
+     *
+     * @return the help handler factory
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public final @NonNull HelpHandlerFactory<C> helpHandlerFactory() {
+        return this.helpHandlerFactory;
+    }
+
+    /**
+     * Sets the new help handler factory.
+     * <p>
+     * The help handler factory is used to create {@link cloud.commandframework.help.HelpHandler} instances.
+     *
+     * @param helpHandlerFactory the new factory instance
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public final void helpHandlerFactory(final @NonNull HelpHandlerFactory<C> helpHandlerFactory) {
+        this.helpHandlerFactory = helpHandlerFactory;
     }
 
     /**
