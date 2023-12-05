@@ -46,12 +46,23 @@ public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolde
      * Create a new predicate permission
      *
      * @param key       Key that identifies the permission node
-     * @param predicate Predicate that determines whether or not the sender has the permission
+     * @param predicate Predicate that determines whether the sender has the permission
      * @param <C>       Command sender type
      * @return Created permission node
      */
     static <C> PredicatePermission<C> of(final @NonNull CloudKey<Void> key, final @NonNull Predicate<C> predicate) {
         return new WrappingPredicatePermission<>(key, predicate);
+    }
+
+    /**
+     * Create a new predicate permission
+     *
+     * @param predicate Predicate that determines whether the sender has the permission
+     * @param <C>       Command sender type
+     * @return Created permission node
+     */
+    static <C> PredicatePermission<C> of(final @NonNull Predicate<C> predicate) {
+        return sender -> PermissionResult.of(predicate.test(sender));
     }
 
     @Override
@@ -60,13 +71,8 @@ public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolde
         return SimpleCloudKey.of(this.getClass().getSimpleName());
     }
 
-    /**
-     * Check whether or not the given sender has this permission
-     *
-     * @param sender Sender to check for
-     * @return {@code true} if the sender has the given permission, else {@code false}
-     */
-    boolean hasPermission(C sender);
+    @NonNull
+    PermissionResult testPermission(@NonNull C sender);
 
     @Override
     default @NonNull Collection<@NonNull CommandPermission> getPermissions() {

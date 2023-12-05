@@ -108,7 +108,7 @@ class CommandPermissionTest {
         ));
         final CommandPermission andTwo = AndPermission.of(Arrays.asList(
                 Permission.of("perm.three"),
-                (PredicatePermission<?>) (s) -> false
+                PredicatePermission.of((s) -> false)
         ));
         final CommandPermission orPermission = OrPermission.of(Arrays.asList(andOne, andTwo));
         assertFalse(manager.hasPermission(new TestCommandSender("does.have", "also.does.have"), orPermission));
@@ -120,7 +120,7 @@ class CommandPermissionTest {
     void testComplexAndPermissions() {
         final CommandPermission orOne = OrPermission.of(Arrays.asList(
                 Permission.of("perm.one"),
-                (PredicatePermission<?>) (s) -> false
+                PredicatePermission.of((s) -> false)
         ));
         final CommandPermission orTwo = OrPermission.of(Arrays.asList(
                 Permission.of("perm.two"),

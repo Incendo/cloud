@@ -361,12 +361,13 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
      * Get a permission predicate which passes when the sender has the specified permission level.
      *
      * @param permissionLevel permission level to require
-     * @return a permission predicate
+     * @return a permission predicate that will provide {@link PermissionLevelResult}s
      * @since 1.5.0
      */
     public @NonNull PredicatePermission<C> permissionLevel(final int permissionLevel) {
-        return sender -> this.backwardsCommandSourceMapper()
-                .apply(sender)
-                .hasPermission(permissionLevel);
+        return sender -> new PermissionLevelResult(
+                this.backwardsCommandSourceMapper().apply(sender).hasPermission(permissionLevel),
+                permissionLevel
+        );
     }
 }

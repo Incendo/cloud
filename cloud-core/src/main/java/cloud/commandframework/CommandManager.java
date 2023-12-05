@@ -61,6 +61,7 @@ import cloud.commandframework.permission.AndPermission;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.permission.Permission;
+import cloud.commandframework.permission.PermissionResult;
 import cloud.commandframework.permission.PredicatePermission;
 import cloud.commandframework.services.ServicePipeline;
 import cloud.commandframework.services.State;
@@ -403,32 +404,47 @@ public abstract class CommandManager<C> {
      * @param permission Permission node
      * @return {@code true} if the sender has the permission, else {@code false}
      */
-    @SuppressWarnings("unchecked")
     public boolean hasPermission(
+            final @NonNull C sender,
+            final @NonNull CommandPermission permission
+    ) {
+        return testPermission(sender, permission).toBoolean();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public @NonNull PermissionResult testPermission(
             final @NonNull C sender,
             final @NonNull CommandPermission permission
     ) {
         if (permission instanceof Permission) {
             if (permission.toString().isEmpty()) {
-                return true;
+                return PermissionResult.TRUE;
             }
-            return this.hasPermission(sender, permission.toString());
+            return PermissionResult.of(this.hasPermission(sender, permission.toString()));
         } else if (permission instanceof PredicatePermission) {
-            return ((PredicatePermission<C>) permission).hasPermission(sender);
-        } else if (permission instanceof OrPermission) {
+            return ((PredicatePermission<C>) permission).testPermission(sender);
+        }
+
+        PermissionResult result = PermissionResult.FALSE;
+        if (permission instanceof OrPermission) {
             for (final CommandPermission innerPermission : permission.getPermissions()) {
-                if (this.hasPermission(sender, innerPermission)) {
-                    return true;
+                if ((result = this.testPermission(sender, innerPermission)).toBoolean()) {
+                    return result; // return the first true result
                 }
             }
-            return false;
+            return result; // didn't change, or some type of false - return the last false result
         } else if (permission instanceof AndPermission) {
+            if (permission.getPermissions().isEmpty()) {
+                return PermissionResult.FALSE;
+            }
+
             for (final CommandPermission innerPermission : permission.getPermissions()) {
-                if (!this.hasPermission(sender, innerPermission)) {
-                    return false;
+                if (!(result = this.testPermission(sender, innerPermission)).toBoolean()) {
+                    return result; // return the first false result
                 }
             }
-            return true;
+            return result; // some type of true - return the last true result
         }
 
         throw new IllegalArgumentException("Unknown permission type " + permission.getClass());
