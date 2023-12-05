@@ -150,7 +150,7 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
                                 CommandEntry.of(
                                         head.component().owningCommand(),
                                         this.commandManager.commandSyntaxFormatter()
-                                                .apply(head.component().owningCommand().components(), node)
+                                                .apply(head.component().owningCommand().components(), null)
                                 )
                         );
                     }
