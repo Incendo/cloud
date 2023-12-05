@@ -39,6 +39,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 class ArgumentExtractorImpl implements ArgumentExtractor {
 
+    private static @Nullable String nullIfEmpty(final @NonNull String string) {
+        if (string.isEmpty()) {
+            return null;
+        }
+        return string;
+    }
+
     private final Function<@NonNull Argument, @Nullable Description> descriptionMapper;
 
     ArgumentExtractorImpl() {
@@ -55,14 +62,23 @@ class ArgumentExtractorImpl implements ArgumentExtractor {
             if (!parameter.isAnnotationPresent(Argument.class)) {
                 continue;
             }
+
             final Argument argument = parameter.getAnnotation(Argument.class);
+
+            final String name;
+            if (argument.value().equals(AnnotationParser.INFERRED_ARGUMENT_NAME)) {
+                name = parameter.getName();
+            } else {
+                name = argument.value();
+            }
+
             final ArgumentDescriptor argumentDescriptor = ArgumentDescriptor.builder()
                     .parameter(parameter)
-                    .name(argument.value())
-                    .parserName(argument.parserName())
-                    .defaultValue(argument.defaultValue())
+                    .name(name)
+                    .parserName(nullIfEmpty(argument.parserName()))
+                    .defaultValue(nullIfEmpty(argument.defaultValue()))
                     .description(this.descriptionMapper.apply(argument))
-                    .suggestions(argument.suggestions())
+                    .suggestions(nullIfEmpty(argument.suggestions()))
                     .build();
             arguments.add(argumentDescriptor);
         }

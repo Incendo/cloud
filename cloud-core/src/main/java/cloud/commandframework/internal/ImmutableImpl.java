@@ -21,27 +21,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.brigadier.node;
+package cloud.commandframework.internal;
 
-import cloud.commandframework.brigadier.suggestion.SuggestionsType;
-import cloud.commandframework.internal.ImmutableBuilder;
-import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import org.apiguardian.api.API;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.immutables.value.Value;
 
-@ImmutableBuilder
-@Value.Immutable
+/**
+ * Annotation that generates immutable classes suffixed with "Impl".
+ */
+@Value.Style(
+        typeImmutable = "*Impl",
+        typeImmutableEnclosing = "*",
+        typeAbstract = "*",
+        deferCollectionAllocation = true,
+        optionalAcceptNullable = true,
+        jdkOnly = true, // We do not want any runtime dependencies!
+        allParameters = true,
+        headerComments = true,
+        jacksonIntegration = false,
+        visibility = Value.Style.ImplementationVisibility.PACKAGE,
+        builderVisibility = Value.Style.BuilderVisibility.PACKAGE
+)
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.PACKAGE})
+@Retention(RetentionPolicy.SOURCE)
 @API(status = API.Status.INTERNAL, since = "2.0.0")
-interface ArgumentMapping<S> {
+public @interface ImmutableImpl {
 
-    @NonNull ArgumentType<?> argumentType();
-
-    default @NonNull SuggestionsType suggestionsType() {
-        return SuggestionsType.BRIGADIER_SUGGESTIONS;
-    }
-
-    @Nullable SuggestionProvider<S> suggestionProvider();
 }

@@ -34,6 +34,7 @@ tasks {
                 "CatchAndPrintStackTrace",
                 "InlineMeSuggester"
             )
+            disableWarningsInGeneratedCode.set(true)
         }
         options.compilerArgs.addAll(listOf("-Xlint:-processing", "-Werror"))
     }
@@ -67,6 +68,8 @@ spotless {
 dependencies {
     compileOnlyApi(libs.checkerQual)
     compileOnlyApi(libs.apiguardian)
+    compileOnlyApi(libs.immutables)
+    annotationProcessor(libs.immutables)
 
     testImplementation(libs.jupiterEngine)
     testImplementation(libs.jupiterParams)

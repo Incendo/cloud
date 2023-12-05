@@ -70,12 +70,12 @@ final class CommandExtractorImpl implements CommandExtractor {
             for (final CommandMethod commandMethod : commands) {
                 final String syntax = syntaxPrefix + this.annotationParser.processString(commandMethod.value());
                 commandDescriptors.add(
-                        new CommandDescriptor(
-                                method,
-                                this.annotationParser.syntaxParser().parseSyntax(method, syntax),
-                                syntax.split(" ")[0].split("\\|")[0],
-                                commandMethod.requiredSender()
-                        )
+                        ImmutableCommandDescriptor.builder()
+                                .method(method)
+                                .syntax(this.annotationParser.syntaxParser().parseSyntax(method, syntax))
+                                .commandToken(syntax.split(" ")[0].split("\\|")[0])
+                                .requiredSender(commandMethod.requiredSender())
+                                .build()
                 );
             }
         }
