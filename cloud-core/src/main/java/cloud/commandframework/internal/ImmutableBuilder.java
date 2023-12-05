@@ -21,47 +21,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework;
+package cloud.commandframework.internal;
 
-import java.util.Objects;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import org.apiguardian.api.API;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
+/**
+ * Annotation that generates immutables classes with builders.
+ */
+@Value.Style(
+        typeImmutableEnclosing = "*",
+        typeAbstract = "*",
+        deferCollectionAllocation = true,
+        optionalAcceptNullable = true,
+        jdkOnly = true, // We do not want any runtime dependencies!
+        allParameters = true,
+        headerComments = true,
+        jacksonIntegration = false,
+        builderVisibility = Value.Style.BuilderVisibility.SAME,
+        defaultAsDefault = true
+)
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.PACKAGE})
+@Retention(RetentionPolicy.SOURCE)
 @API(status = API.Status.INTERNAL, since = "2.0.0")
-final class DescriptionImpl implements Description {
+public @interface ImmutableBuilder {
 
-    static final DescriptionImpl EMPTY = new DescriptionImpl("");
-
-    private final String description;
-
-    DescriptionImpl(final @NonNull String description) {
-        this.description = description;
-    }
-
-    @Override
-    public @NonNull String textDescription() {
-        return this.description;
-    }
-
-    @Override
-    public @NonNull String toString() {
-        return this.description;
-    }
-
-    @Override
-    public boolean equals(final Object object) {
-        if (this == object) {
-            return true;
-        }
-        if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
-        final DescriptionImpl that = (DescriptionImpl) object;
-        return Objects.equals(this.description, that.description);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.description);
-    }
 }

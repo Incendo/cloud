@@ -23,52 +23,28 @@
 //
 package cloud.commandframework.annotations;
 
+import cloud.commandframework.internal.ImmutableBuilder;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
+@ImmutableBuilder
+@Value.Immutable
 @API(status = API.Status.STABLE, since = "2.0.0")
-public final class CommandDescriptor implements Descriptor {
-
-    private final Method method;
-    private final List<@NonNull SyntaxFragment> syntax;
-    private final String commandToken;
-    private final Class<?> requiredSender;
-
-    /**
-     * Creates a new command descriptor.
-     *
-     * @param method         the command method
-     * @param syntax         the command syntax
-     * @param commandToken   the root command name
-     * @param requiredSender the required sender type
-     */
-    public CommandDescriptor(
-            final @NonNull Method method,
-            final @NonNull List<@NonNull SyntaxFragment> syntax,
-            final @NonNull String commandToken,
-            final @NonNull Class<?> requiredSender
-    ) {
-        this.method = method;
-        this.syntax = syntax;
-        this.commandToken = commandToken;
-        this.requiredSender = requiredSender;
-    }
+public interface CommandDescriptor extends Descriptor {
 
     /**
      * Returns the command method.
      *
      * @return the command method
      */
-    public @NonNull Method method() {
-        return this.method;
-    }
+    @NonNull Method method();
 
     @Override
-    public @NonNull String name() {
-        return this.commandToken;
+    default @NonNull String name() {
+        return this.commandToken();
     }
 
     /**
@@ -76,25 +52,19 @@ public final class CommandDescriptor implements Descriptor {
      *
      * @return the syntax fragments
      */
-    public @NonNull List<@NonNull SyntaxFragment> syntax() {
-        return Collections.unmodifiableList(this.syntax);
-    }
+    @NonNull List<@NonNull SyntaxFragment> syntax();
 
     /**
      * Returns the root command name.
      *
      * @return the name of the root command
      */
-    public @NonNull String commandToken() {
-        return this.commandToken;
-    }
+    @NonNull String commandToken();
 
     /**
      * Returns the required sender type.
      *
      * @return the required sender type
      */
-    public @NonNull Class<?> requiredSender() {
-        return this.requiredSender;
-    }
+    @NonNull Class<?> requiredSender();
 }

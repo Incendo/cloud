@@ -23,10 +23,13 @@
 //
 package cloud.commandframework;
 
-import java.util.Objects;
+import cloud.commandframework.internal.ImmutableImpl;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
+@ImmutableImpl
+@Value.Immutable
 @SuppressWarnings("unused")
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface CommandDescription extends Describable {
@@ -39,7 +42,7 @@ public interface CommandDescription extends Describable {
      * @return the description instance
      */
     static @NonNull CommandDescription empty() {
-        return new CommandDescriptionImpl(Description.empty());
+        return CommandDescriptionImpl.of(Description.empty(), Description.empty());
     }
 
     /**
@@ -53,7 +56,7 @@ public interface CommandDescription extends Describable {
             final @NonNull Description description,
             final @NonNull Description verboseDescription
     ) {
-        return new CommandDescriptionImpl(description, verboseDescription);
+        return CommandDescriptionImpl.of(description, verboseDescription);
     }
 
     /**
@@ -65,7 +68,7 @@ public interface CommandDescription extends Describable {
      * @return the description instance
      */
     static @NonNull CommandDescription commandDescription(final @NonNull Description description) {
-        return new CommandDescriptionImpl(description);
+        return CommandDescriptionImpl.of(description, description);
     }
 
     /**
@@ -79,7 +82,7 @@ public interface CommandDescription extends Describable {
             final @NonNull String description,
             final @NonNull String verboseDescription
     ) {
-        return new CommandDescriptionImpl(Description.of(description), Description.of(verboseDescription));
+        return CommandDescriptionImpl.of(Description.of(description), Description.of(verboseDescription));
     }
 
     /**
@@ -91,7 +94,7 @@ public interface CommandDescription extends Describable {
      * @return the description instance
      */
     static @NonNull CommandDescription commandDescription(final @NonNull String description) {
-        return new CommandDescriptionImpl(Description.of(description));
+        return CommandDescriptionImpl.of(Description.of(description), Description.of(description));
     }
 
     /**
@@ -116,60 +119,5 @@ public interface CommandDescription extends Describable {
      */
     default boolean isEmpty() {
         return this.description().equals(Description.empty());
-    }
-
-
-    final class CommandDescriptionImpl implements CommandDescription {
-
-        private final Description description;
-        private final Description verboseDescription;
-
-        private CommandDescriptionImpl(
-                final @NonNull Description description,
-                final @NonNull Description verboseDescription
-        ) {
-            this.description = description;
-            this.verboseDescription = verboseDescription;
-        }
-
-        private CommandDescriptionImpl(
-                final @NonNull Description description
-        ) {
-            this(description, description);
-        }
-
-        @Override
-        public @NonNull Description description() {
-            return this.description;
-        }
-
-        @Override
-        public @NonNull Description verboseDescription() {
-            return this.verboseDescription;
-        }
-
-        @Override
-        public boolean equals(final Object object) {
-            if (this == object) {
-                return true;
-            }
-            if (object == null || getClass() != object.getClass()) {
-                return false;
-            }
-            final CommandDescriptionImpl that = (CommandDescriptionImpl) object;
-            return Objects.equals(this.description, that.description)
-                    && Objects.equals(this.verboseDescription, that.verboseDescription);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.description, this.verboseDescription);
-        }
-
-        @Override
-        public String toString() {
-            return "CommandDescriptionImpl{description=" + this.description
-                    + ", verboseDescription=" + this.verboseDescription + '}';
-        }
     }
 }
