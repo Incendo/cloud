@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.help;
 
-import cloud.commandframework.help.result.CommandListResult;
 import cloud.commandframework.help.result.HelpQueryResult;
+import cloud.commandframework.help.result.IndexCommandResult;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -34,7 +34,7 @@ public interface HelpHandler<C> {
     /**
      * Handles the given {@code query} and returns the result.
      * <p>
-     * If nothing matched the query, an empty {@link cloud.commandframework.help.result.CommandListResult}
+     * If nothing matched the query, an empty {@link IndexCommandResult}
      * will be returned.
      *
      * @param query the query
@@ -48,7 +48,7 @@ public interface HelpHandler<C> {
      * @param sender the sender
      * @return the result
      */
-    default @NonNull CommandListResult<C> queryRootIndex(final @NonNull C sender) {
-        return (CommandListResult<C>) this.query(HelpQuery.of(sender, ""));
+    default @NonNull IndexCommandResult<C> queryRootIndex(final @NonNull C sender) {
+        return (IndexCommandResult<C>) this.query(HelpQuery.of(sender, ""));
     }
 }

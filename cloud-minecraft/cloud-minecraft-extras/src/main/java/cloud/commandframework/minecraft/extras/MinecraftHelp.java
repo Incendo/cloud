@@ -31,8 +31,8 @@ import cloud.commandframework.help.CommandPredicate;
 import cloud.commandframework.help.HelpQuery;
 import cloud.commandframework.help.HelpRenderer;
 import cloud.commandframework.help.result.CommandEntry;
-import cloud.commandframework.help.result.CommandListResult;
 import cloud.commandframework.help.result.HelpQueryResult;
+import cloud.commandframework.help.result.IndexCommandResult;
 import cloud.commandframework.help.result.MultipleCommandResult;
 import cloud.commandframework.help.result.VerboseCommandResult;
 import cloud.commandframework.util.StringUtils;
@@ -486,7 +486,7 @@ public final class MinecraftHelp<C> {
     private void printListResult(
             final @NonNull HelpQuery<C> query,
             final int page,
-            final CommandListResult<C> result
+            final IndexCommandResult<C> result
     ) {
         if (result.isEmpty()) {
             this.printNoResults(query);
@@ -587,7 +587,7 @@ public final class MinecraftHelp<C> {
         audience.sendMessage(this.basicHeader(query.sender()));
         audience.sendMessage(this.showingResults(query.sender(), query.query()));
         final String command = this.commandManager.commandSyntaxFormatter()
-                .apply(result.command().components(), null);
+                .apply(result.entry().command().components(), null);
         audience.sendMessage(text()
                 .append(this.lastBranch())
                 .append(space())
@@ -596,7 +596,7 @@ public final class MinecraftHelp<C> {
                 .append(this.highlight(text("/" + command, this.colors.highlight)))
         );
         /* Topics will use the long description if available, but fall back to the short description. */
-        final Description commandDescription = result.command().commandDescription().verboseDescription();
+        final Description commandDescription = result.entry().command().commandDescription().verboseDescription();
 
         final Component topicDescription;
         if (commandDescription instanceof RichDescription) {
@@ -610,7 +610,7 @@ public final class MinecraftHelp<C> {
             );
         }
 
-        final boolean hasArguments = result.command().components().size() > 1;
+        final boolean hasArguments = result.entry().command().components().size() > 1;
         audience.sendMessage(text()
                 .append(text("   "))
                 .append(hasArguments ? this.branch() : this.lastBranch())
@@ -628,7 +628,7 @@ public final class MinecraftHelp<C> {
                     .append(text(":", this.colors.primary))
             );
 
-            final Iterator<CommandComponent<C>> iterator = result.command().components().iterator();
+            final Iterator<CommandComponent<C>> iterator = result.entry().command().components().iterator();
             /* Skip the first one because it's the command literal */
             iterator.next();
 
@@ -685,9 +685,9 @@ public final class MinecraftHelp<C> {
         }
 
         @Override
-        public void render(@NonNull final C sender, final @NonNull HelpQueryResult<C> result) {
-            if (result instanceof CommandListResult) {
-                MinecraftHelp.this.printListResult(result.query(), this.page, (CommandListResult<C>) result);
+        public void render(final @NonNull HelpQueryResult<C> result) {
+            if (result instanceof IndexCommandResult) {
+                MinecraftHelp.this.printListResult(result.query(), this.page, (IndexCommandResult<C>) result);
             } else if (result instanceof MultipleCommandResult) {
                 MinecraftHelp.this.printMultipleCommandResult(result.query(), this.page, (MultipleCommandResult<C>) result);
             } else if (result instanceof VerboseCommandResult) {

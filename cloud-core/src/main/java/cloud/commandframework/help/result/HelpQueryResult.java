@@ -35,29 +35,21 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public abstract class HelpQueryResult<C> {
-
-    private final HelpQuery<C> query;
-
-    protected HelpQueryResult(final @NonNull HelpQuery<C> query) {
-        this.query = query;
-    }
+public interface HelpQueryResult<C> {
 
     /**
      * Returns the query.
      *
      * @return the query
      */
-    public final @NonNull HelpQuery<C> query() {
-        return this.query;
-    }
+    @NonNull HelpQuery<C> query();
 
     /**
      * Renders the result using the given {@code renderer}.
      *
      * @param renderer the renderer
      */
-    public final void render(final @NonNull HelpRenderer<C> renderer) {
-        renderer.render(this.query().sender(), this);
+    default void render(final @NonNull HelpRenderer<C> renderer) {
+        renderer.render(this);
     }
 }

@@ -81,7 +81,7 @@ class Issue262 {
 
         final VerboseCommandResult<TestCommandSender> topic =
                 (VerboseCommandResult<TestCommandSender>) result;
-        assertThat(topic.command().toString()).isEqualTo("cloudcommand sub2 argument");
+        assertThat(topic.entry().command().toString()).isEqualTo("cloudcommand sub2 argument");
     }
 
     @Test
@@ -99,7 +99,7 @@ class Issue262 {
 
         final VerboseCommandResult<TestCommandSender> topic =
                 (VerboseCommandResult<TestCommandSender>) result;
-        assertThat(topic.command().toString()).isEqualTo("cloudcommand sub2 argument");
+        assertThat(topic.entry().command().toString()).isEqualTo("cloudcommand sub2 argument");
     }
 
     @Test
@@ -117,7 +117,7 @@ class Issue262 {
 
         final VerboseCommandResult<TestCommandSender> topic =
                 (VerboseCommandResult<TestCommandSender>) result;
-        assertThat(topic.command().toString()).isEqualTo("cloudcommand sub2 argument");
+        assertThat(topic.entry().command().toString()).isEqualTo("cloudcommand sub2 argument");
     }
 
     @Test
@@ -135,7 +135,7 @@ class Issue262 {
 
         final VerboseCommandResult<TestCommandSender> topic =
                 (VerboseCommandResult<TestCommandSender>) result;
-        assertThat(topic.command().toString()).isEqualTo("cloudcommand sub1 argument");
+        assertThat(topic.entry().command().toString()).isEqualTo("cloudcommand sub1 argument");
     }
 
     @Test

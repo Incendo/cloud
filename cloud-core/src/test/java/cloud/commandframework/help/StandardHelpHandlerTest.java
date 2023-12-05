@@ -26,8 +26,8 @@ package cloud.commandframework.help;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.help.result.CommandEntry;
-import cloud.commandframework.help.result.CommandListResult;
 import cloud.commandframework.help.result.HelpQueryResult;
+import cloud.commandframework.help.result.IndexCommandResult;
 import cloud.commandframework.help.result.MultipleCommandResult;
 import cloud.commandframework.help.result.VerboseCommandResult;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -76,7 +76,7 @@ class StandardHelpHandlerTest {
     @Test
     void testRootIndex() {
         // Act
-        final CommandListResult<?> result = this.helpHandler.queryRootIndex(new TestCommandSender());
+        final IndexCommandResult<?> result = this.helpHandler.queryRootIndex(new TestCommandSender());
 
         // Assert
         assertThat(result.entries()).hasSize(4);
@@ -108,7 +108,7 @@ class StandardHelpHandlerTest {
         assertThat(result.query()).isEqualTo(query);
 
         final VerboseCommandResult<?> verboseCommandResult = (VerboseCommandResult<?>) result;
-        assertThat(verboseCommandResult.syntax()).isEqualTo(syntax);
+        assertThat(verboseCommandResult.entry().syntax()).isEqualTo(syntax);
     }
 
     @Test
@@ -140,7 +140,7 @@ class StandardHelpHandlerTest {
         );
 
         // Act
-        final CommandListResult<?> result = helpHandler.queryRootIndex(new TestCommandSender());
+        final IndexCommandResult<?> result = helpHandler.queryRootIndex(new TestCommandSender());
 
         // Assert
         assertThat(result.entries().stream().map(CommandEntry::syntax)).containsExactly(

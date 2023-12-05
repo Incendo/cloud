@@ -24,11 +24,11 @@
 package cloud.commandframework.help.result;
 
 import cloud.commandframework.help.HelpQuery;
-import java.util.Collections;
+import cloud.commandframework.internal.ImmutableImpl;
 import java.util.List;
-import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
 /**
  * A list of commands.
@@ -36,62 +36,45 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> the command sender type
  * @since 2.0.0
  */
+@ImmutableImpl
+@Value.Immutable
 @API(status = API.Status.STABLE, since = "2.0.0")
-public class MultipleCommandResult<C> extends HelpQueryResult<C> {
-
-    private final String longestPath;
-    private final List<@NonNull String> childSuggestions;
+public interface MultipleCommandResult<C> extends HelpQueryResult<C> {
 
     /**
      * Creates a new result.
      *
+     * @param <C>              the command sender type
      * @param query            the query that prompted the result
      * @param longestPath      the longest shared result
      * @param childSuggestions the syntax hints for the children
+     * @return the result
      */
-    public MultipleCommandResult(
+    static <C> @NonNull MultipleCommandResult<C> of(
             final @NonNull HelpQuery<C> query,
             final @NonNull String longestPath,
             final @NonNull List<@NonNull String> childSuggestions
     ) {
-        super(query);
-        this.longestPath = longestPath;
-        this.childSuggestions = Collections.unmodifiableList(childSuggestions);
+        return MultipleCommandResultImpl.of(query, longestPath, childSuggestions);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @NonNull HelpQuery<C> query();
 
     /**
      * Returns the longest path shared between the children.
      *
      * @return the longest shared path
      */
-    public @NonNull String longestPath() {
-        return this.longestPath;
-    }
+    @NonNull String longestPath();
 
     /**
      * Returns syntax hints for the children.
      *
      * @return child suggestions
      */
-    public @NonNull List<@NonNull String> childSuggestions() {
-        return this.childSuggestions;
-    }
-
-    @Override
-    public final boolean equals(final Object object) {
-        if (this == object) {
-            return true;
-        }
-        if (object == null || this.getClass() != object.getClass()) {
-            return false;
-        }
-        final MultipleCommandResult<?> that = (MultipleCommandResult<?>) object;
-        return Objects.equals(this.longestPath, that.longestPath)
-                && Objects.equals(this.childSuggestions, that.childSuggestions);
-    }
-
-    @Override
-    public final int hashCode() {
-        return Objects.hash(this.longestPath, this.childSuggestions);
-    }
+    @NonNull List<@NonNull String> childSuggestions();
 }

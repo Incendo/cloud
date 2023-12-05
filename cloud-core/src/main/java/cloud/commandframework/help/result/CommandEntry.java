@@ -24,10 +24,13 @@
 package cloud.commandframework.help.result;
 
 import cloud.commandframework.Command;
-import java.util.Objects;
+import cloud.commandframework.internal.ImmutableImpl;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
+@ImmutableImpl
+@Value.Immutable
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface CommandEntry<C> extends Comparable<CommandEntry<C>> {
 
@@ -43,7 +46,7 @@ public interface CommandEntry<C> extends Comparable<CommandEntry<C>> {
             final @NonNull Command<C> command,
             final @NonNull String syntax
     ) {
-        return new CommandEntryImpl<>(command, syntax);
+        return CommandEntryImpl.of(command, syntax);
     }
 
     /**
@@ -60,51 +63,8 @@ public interface CommandEntry<C> extends Comparable<CommandEntry<C>> {
      */
     @NonNull String syntax();
 
-
-    final class CommandEntryImpl<C> implements CommandEntry<C> {
-
-        private final Command<C> command;
-        private final String syntax;
-
-        private CommandEntryImpl(
-                final @NonNull Command<C> command,
-                final @NonNull String syntax
-        ) {
-            this.command = command;
-            this.syntax = syntax;
-        }
-
-        @Override
-        public @NonNull Command<C> command() {
-            return this.command;
-        }
-
-        @Override
-        public @NonNull String syntax() {
-            return this.syntax;
-        }
-
-        @Override
-        public int compareTo(final CommandEntry<C> other) {
-            return this.syntax().compareTo(other.syntax());
-        }
-
-        @Override
-        public boolean equals(final Object object) {
-            if (this == object) {
-                return true;
-            }
-            if (object == null || this.getClass() != object.getClass()) {
-                return false;
-            }
-            final CommandEntryImpl<?> that = (CommandEntryImpl<?>) object;
-            return Objects.equals(this.command, that.command)
-                    && Objects.equals(this.syntax, that.syntax);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.command, this.syntax);
-        }
+    @Override
+    default int compareTo(final @NonNull CommandEntry<C> other) {
+        return this.syntax().compareTo(other.syntax());
     }
 }

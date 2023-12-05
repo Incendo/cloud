@@ -23,11 +23,11 @@
 //
 package cloud.commandframework.help.result;
 
-import cloud.commandframework.Command;
 import cloud.commandframework.help.HelpQuery;
-import java.util.Objects;
+import cloud.commandframework.internal.ImmutableImpl;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
 /**
  * Verbose information about a single command.
@@ -35,63 +35,36 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> the command sender type
  * @since 2.0.0
  */
+@ImmutableImpl
+@Value.Immutable
 @API(status = API.Status.STABLE, since = "2.0.0")
-public class VerboseCommandResult<C> extends HelpQueryResult<C> implements CommandEntry<C> {
-
-    private final CommandEntry<C> entry;
+public interface VerboseCommandResult<C> extends HelpQueryResult<C> {
 
     /**
      * Creates a new result.
      *
+     * @param <C>   the command sender type
      * @param query the query that prompted the result
      * @param entry the entry
+     * @return the result
      */
-    public VerboseCommandResult(
+    static <C> @NonNull VerboseCommandResult<C> of(
             final @NonNull HelpQuery<C> query,
             final @NonNull CommandEntry<C> entry
     ) {
-        super(query);
-        this.entry = entry;
+        return VerboseCommandResultImpl.of(query, entry);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @NonNull HelpQuery<C> query();
 
     /**
      * Returns the command entry.
      *
      * @return the entry
      */
-    public @NonNull CommandEntry<C> entry() {
-        return this.entry;
-    }
-
-    @Override
-    public final @NonNull Command<C> command() {
-        return this.entry.command();
-    }
-
-    @Override
-    public final @NonNull String syntax() {
-        return this.entry.syntax();
-    }
-
-    @Override
-    public final int compareTo(final @NonNull CommandEntry<C> other) {
-        return this.entry.compareTo(other);
-    }
-
-    @Override
-    public final boolean equals(final Object object) {
-        if (this == object) {
-            return true;
-        }
-        if (object == null || this.getClass() != object.getClass()) {
-            return false;
-        }
-        final VerboseCommandResult<?> that = (VerboseCommandResult<?>) object;
-        return Objects.equals(this.entry, that.entry);
-    }
-
-    @Override
-    public final int hashCode() {
-        return Objects.hash(this.entry);
-    }
+    @NonNull CommandEntry<C> entry();
 }

@@ -27,8 +27,8 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.help.result.CommandEntry;
-import cloud.commandframework.help.result.CommandListResult;
 import cloud.commandframework.help.result.HelpQueryResult;
+import cloud.commandframework.help.result.IndexCommandResult;
 import cloud.commandframework.help.result.MultipleCommandResult;
 import cloud.commandframework.help.result.VerboseCommandResult;
 import cloud.commandframework.internal.CommandInputTokenizer;
@@ -72,7 +72,7 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
 
         // If the query is empty, then we return all commands that they have permission to see.
         if (query.query().replace(" ", "").isEmpty()) {
-            return new CommandListResult<>(query, commands);
+            return IndexCommandResult.of(query, commands);
         }
 
         final List<String> queryFragments = new CommandInputTokenizer(query.query()).tokenize();
@@ -114,9 +114,9 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
 
         /* No command found, return all possible commands */
         if (availableCommands.isEmpty()) {
-            return new CommandListResult<>(query, Collections.emptyList());
+            return IndexCommandResult.of(query, Collections.emptyList());
         } else if (!exactMatch || availableCommandLabels.size() > 1) {
-            return new CommandListResult<>(
+            return IndexCommandResult.of(
                     query,
                     availableCommands.stream()
                             .map(command -> CommandEntry.of(command, this.commandManager.commandSyntaxFormatter()
@@ -145,7 +145,7 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
                     if (this.commandManager.hasPermission(query.sender(), head.component()
                             .owningCommand()
                             .commandPermission())) {
-                        return new VerboseCommandResult<>(
+                        return VerboseCommandResult.of(
                                 query,
                                 CommandEntry.of(
                                         head.component().owningCommand(),
@@ -200,12 +200,12 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
                         childSuggestions.add(this.commandManager.commandSyntaxFormatter().apply(traversedNodesSub, child));
                     }
                 }
-                return new MultipleCommandResult<>(query, currentDescription, childSuggestions);
+                return MultipleCommandResult.of(query, currentDescription, childSuggestions);
             }
         }
 
         // No result :(
-        return new CommandListResult<>(query, Collections.emptyList());
+        return IndexCommandResult.of(query, Collections.emptyList());
     }
 
     /**

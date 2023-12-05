@@ -31,10 +31,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface HelpRenderer<C> {
 
     /**
-     * Renders the {@code result} to the given {@code sender}.
+     * Renders the {@code result} to the sender that created the query.
      *
-     * @param sender the command sender
      * @param result the result
      */
-    void render(@NonNull C sender, @NonNull HelpQueryResult<C> result);
+    void render(@NonNull HelpQueryResult<C> result);
 }
