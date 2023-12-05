@@ -31,8 +31,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class FlagExtractorImpl implements FlagExtractor {
+
+    private static @Nullable String nullIfEmpty(final @NonNull String string) {
+        if (string.isEmpty()) {
+            return null;
+        }
+        return string;
+    }
 
     private final AnnotationParser<?> annotationParser;
 
@@ -50,15 +58,22 @@ final class FlagExtractorImpl implements FlagExtractor {
             final Flag flag = parameter.getAnnotation(Flag.class);
             final String flagName = this.annotationParser.processString(flag.value());
 
+            final String name;
+            if (flagName.equals(AnnotationParser.INFERRED_ARGUMENT_NAME)) {
+                name = parameter.getName();
+            } else {
+                name = flagName;
+            }
+
             final FlagDescriptor flagDescriptor = FlagDescriptor.builder()
                     .parameter(parameter)
-                    .name(flagName)
+                    .name(name)
                     .description(Description.of(this.annotationParser.processString(flag.description())))
                     .aliases(this.annotationParser.processStrings(Arrays.asList(flag.aliases())))
                     .permission(Permission.of(this.annotationParser.processString(flag.permission())))
                     .repeatable(flag.repeatable())
-                    .parserName(this.annotationParser.processString(flag.parserName()))
-                    .suggestions(this.annotationParser.processString(flag.suggestions()))
+                    .parserName(nullIfEmpty(this.annotationParser.processString(flag.parserName())))
+                    .suggestions(nullIfEmpty(this.annotationParser.processString(flag.suggestions())))
                     .build();
             flags.add(flagDescriptor);
         }
