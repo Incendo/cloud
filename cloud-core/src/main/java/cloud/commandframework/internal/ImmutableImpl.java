@@ -44,7 +44,8 @@ import org.immutables.value.Value;
         headerComments = true,
         jacksonIntegration = false,
         visibility = Value.Style.ImplementationVisibility.PACKAGE,
-        builderVisibility = Value.Style.BuilderVisibility.PACKAGE
+        builderVisibility = Value.Style.BuilderVisibility.PACKAGE,
+        defaults = @Value.Immutable(builder = false)
 )
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.PACKAGE})
 @Retention(RetentionPolicy.SOURCE)

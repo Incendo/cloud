@@ -36,7 +36,7 @@ tasks {
             )
             disableWarningsInGeneratedCode.set(true)
         }
-        options.compilerArgs.addAll(listOf("-Xlint:-processing", "-Werror"))
+        options.compilerArgs.addAll(listOf("-Xlint:-processing,-classfile", "-Werror"))
     }
 }
 
@@ -68,7 +68,8 @@ spotless {
 dependencies {
     compileOnlyApi(libs.checkerQual)
     compileOnlyApi(libs.apiguardian)
-    compileOnlyApi(libs.immutables)
+
+    compileOnly(libs.immutables)
     annotationProcessor(libs.immutables)
 
     testImplementation(libs.jupiterEngine)
