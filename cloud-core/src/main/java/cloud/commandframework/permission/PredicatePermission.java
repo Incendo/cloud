@@ -87,6 +87,18 @@ public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolde
     @API(status = API.Status.STABLE, since = "2.0.0")
     @NonNull PermissionResult testPermission(@NonNull C sender);
 
+    /**
+     * Checks whether the given sender has this permission
+     *
+     * @param sender Sender to check for
+     * @return true if the permission check succeeded
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    default boolean hasPermission(@NonNull C sender) {
+        return this.testPermission(sender).succeeded();
+    }
+
     @Override
     default @NonNull Collection<@NonNull CommandPermission> getPermissions() {
         return Collections.singleton(this);

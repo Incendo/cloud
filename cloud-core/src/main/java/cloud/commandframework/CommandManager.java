@@ -404,11 +404,36 @@ public abstract class CommandManager<C> {
      * @param permission Permission node
      * @return {@code true} if the sender has the permission, else {@code false}
      */
+    @SuppressWarnings("unchecked")
     public boolean hasPermission(
             final @NonNull C sender,
             final @NonNull CommandPermission permission
     ) {
-        return this.testPermission(sender, permission).succeeded();
+        if (permission.isEmpty()) {
+            return true;
+        } else if (permission instanceof Permission) {
+            return this.hasPermission(sender, permission.toString());
+        } else if (permission instanceof PredicatePermission) {
+            return ((PredicatePermission<C>) permission).hasPermission(sender);
+        }
+
+        if (permission instanceof OrPermission) {
+            for (final CommandPermission innerPermission : permission.getPermissions()) {
+                if (this.hasPermission(sender, innerPermission)) {
+                    return true; // short circuit the first true result
+                }
+            }
+            return false; // none returned true
+        } else if (permission instanceof AndPermission) {
+            for (final CommandPermission innerPermission : permission.getPermissions()) {
+                if (!this.hasPermission(sender, innerPermission)) {
+                    return false; // short circuit the first false result
+                }
+            }
+            return true; // all returned true
+        }
+
+        throw new IllegalArgumentException("Unknown permission type " + permission.getClass());
     }
 
     /**

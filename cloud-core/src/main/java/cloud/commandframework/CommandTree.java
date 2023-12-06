@@ -641,7 +641,7 @@ public final class CommandTree<C> {
             final @NonNull CommandNode<C> root
     ) {
         // If the sender isn't allowed to access the root node, no suggestions are needed
-        if (this.determinePermissionResult(context.commandContext().getSender(), root).failed()) {
+        if (!this.hasPermission(context.commandContext().getSender(), root)) {
             return CompletableFuture.completedFuture(context);
         }
 
@@ -722,7 +722,7 @@ public final class CommandTree<C> {
             final @NonNull CommandNode<C> node,
             final @NonNull String input
     ) {
-        if (this.determinePermissionResult(context.commandContext().getSender(), node).failed()) {
+        if (!this.hasPermission(context.commandContext().getSender(), node)) {
             return CompletableFuture.completedFuture(context);
         }
         final CommandComponent<C> component = Objects.requireNonNull(node.component());
@@ -1045,12 +1045,46 @@ public final class CommandTree<C> {
     }
 
     /**
-     * Returns the permission that is missing from the given {@code sender} for them to execute the command attached
-     * to the given {@code node}. If the {@code sender} is allowed to execute the command, the method returns {@code null}
+     * Determines the permission result describing whether the given {@code sender} can execute the command attached to the
+     * given {@code node}.
      *
      * @param sender the command sender
      * @param node   the command node
-     * @return the missing permission, or {@code null}
+     * @return true if the {@code sender} is allowed to execute the command, otherwise false
+     */
+    private boolean hasPermission(
+            final @NonNull C sender,
+            final @NonNull CommandNode<C> node
+    ) {
+        final CommandPermission permission = (CommandPermission) node.nodeMeta().get("permission");
+        if (permission != null) {
+            return this.commandManager.hasPermission(sender, permission);
+        }
+        if (node.isLeaf()) {
+            final CommandComponent<C> component = Objects.requireNonNull(node.component(), "component");
+            final Command<C> command = Objects.requireNonNull(component.owningCommand(), "command");
+            return this.commandManager.hasPermission(sender, command.commandPermission());
+        }
+        /*
+          if any of the children would permit the execution, then the sender has a valid
+           chain to execute, and so we allow them to execute the root
+         */
+        for (final CommandNode<C> child : node.children()) {
+            if (this.hasPermission(sender, child)) {
+                return true;
+            }
+        }
+        // none of the children were permissible
+        return false;
+    }
+
+    /**
+     * Determines the permission result describing whether the given {@code sender} can execute the command attached to the
+     * given {@code node}.
+     *
+     * @param sender the command sender
+     * @param node   the command node
+     * @return a permission result for the given sender and node
      */
     private @NonNull PermissionResult determinePermissionResult(
             final @NonNull C sender,

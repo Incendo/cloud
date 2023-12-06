@@ -31,6 +31,7 @@ import cloud.commandframework.permission.AndPermission;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.permission.Permission;
+import cloud.commandframework.permission.PermissionResult;
 import cloud.commandframework.permission.PredicatePermission;
 import java.util.Arrays;
 import java.util.Collections;
@@ -57,6 +58,15 @@ class CommandPermissionTest {
         manager.command(manager.commandBuilder("test").literal("bar").permission("test.permission.two").build());
         manager.command(manager.commandBuilder("test").literal("fizz").permission("test.permission.three").build());
         manager.command(manager.commandBuilder("test").literal("buzz").permission("test.permission.four").build());
+    }
+
+    private static boolean hasPermission(TestCommandSender sender, CommandPermission permission) {
+        boolean primitiveResult = manager.hasPermission(sender, permission);
+        PermissionResult result = manager.testPermission(sender, permission);
+        if (primitiveResult != result.succeeded()) {
+            throw new IllegalStateException("Permission results " + primitiveResult + " and " + result + " don't match");
+        }
+        return primitiveResult;
     }
 
     @Test
@@ -99,20 +109,20 @@ class CommandPermissionTest {
         final CommandPermission test = Permission.of("one").and(Permission.of("two"));
         final TestCommandSender sender = new TestCommandSender("one");
 
-        assertThat(manager.hasPermission(sender, test)).isFalse();
-        assertThat(manager.hasPermission(new TestCommandSender("two"), test)).isFalse();
+        assertThat(hasPermission(sender, test)).isFalse();
+        assertThat(hasPermission(new TestCommandSender("two"), test)).isFalse();
 
         sender.addPermission("two");
-        assertThat(manager.hasPermission(sender, test)).isTrue();
+        assertThat(hasPermission(sender, test)).isTrue();
     }
 
     @Test
     void testOrPermissions() {
         final CommandPermission test = Permission.of("one").or(Permission.of("two"));
-        assertFalse(manager.hasPermission(new TestCommandSender(), test));
-        assertTrue(manager.hasPermission(new TestCommandSender("one"), test));
-        assertTrue(manager.hasPermission(new TestCommandSender("two"), test));
-        assertTrue(manager.hasPermission(new TestCommandSender("one", "two"), test));
+        assertFalse(hasPermission(new TestCommandSender(), test));
+        assertTrue(hasPermission(new TestCommandSender("one"), test));
+        assertTrue(hasPermission(new TestCommandSender("two"), test));
+        assertTrue(hasPermission(new TestCommandSender("one", "two"), test));
     }
 
     @Test
@@ -126,9 +136,9 @@ class CommandPermissionTest {
                 PredicatePermission.of((s) -> false)
         ));
         final CommandPermission orPermission = OrPermission.of(Arrays.asList(andOne, andTwo));
-        assertFalse(manager.hasPermission(new TestCommandSender("does.have", "also.does.have"), orPermission));
-        assertFalse(manager.hasPermission(new TestCommandSender("perm.one", "perm.three"), orPermission));
-        assertTrue(manager.hasPermission(new TestCommandSender("perm.one", "perm.two"), orPermission));
+        assertFalse(hasPermission(new TestCommandSender("does.have", "also.does.have"), orPermission));
+        assertFalse(hasPermission(new TestCommandSender("perm.one", "perm.three"), orPermission));
+        assertTrue(hasPermission(new TestCommandSender("perm.one", "perm.two"), orPermission));
     }
 
     @Test
@@ -142,9 +152,9 @@ class CommandPermissionTest {
                 Permission.of("perm.three")
         ));
         final CommandPermission andPermission = AndPermission.of(Arrays.asList(orOne, orTwo));
-        assertFalse(manager.hasPermission(new TestCommandSender("perm.one"), andPermission));
-        assertTrue(manager.hasPermission(new TestCommandSender("perm.one", "perm.two"), andPermission));
-        assertTrue(manager.hasPermission(new TestCommandSender("perm.one", "perm.three"), andPermission));
+        assertFalse(hasPermission(new TestCommandSender("perm.one"), andPermission));
+        assertTrue(hasPermission(new TestCommandSender("perm.one", "perm.two"), andPermission));
+        assertTrue(hasPermission(new TestCommandSender("perm.one", "perm.three"), andPermission));
     }
 
     @Test
