@@ -28,6 +28,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.apiguardian.api.API;
+import org.immutables.annotate.InjectAnnotation;
 import org.immutables.value.Value;
 
 /**
@@ -44,6 +45,11 @@ import org.immutables.value.Value;
         jacksonIntegration = false,
         builderVisibility = Value.Style.BuilderVisibility.SAME,
         defaultAsDefault = true
+)
+@InjectAnnotation(
+        type = API.class,
+        target = InjectAnnotation.Where.IMMUTABLE_TYPE,
+        code = "(status = org.apiguardian.api.API.Status.STABLE, consumers = \"cloud.commandframework.*\")"
 )
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.PACKAGE})
 @Retention(RetentionPolicy.SOURCE)
