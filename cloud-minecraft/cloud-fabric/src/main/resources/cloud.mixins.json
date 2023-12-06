@@ -3,8 +3,6 @@
   "compatibilityLevel": "JAVA_8",
   "required": true,
   "mixins": [
-    "CloudStringReaderMixin",
-    "CommandsMixin",
     "EntitySelectorMixin",
     "EntitySelectorParserMixin",
     "MessageArgumentMessageAccess",
