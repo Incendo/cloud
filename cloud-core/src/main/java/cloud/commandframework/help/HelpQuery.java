@@ -23,9 +23,13 @@
 //
 package cloud.commandframework.help;
 
+import cloud.commandframework.internal.ImmutableImpl;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
+@ImmutableImpl
+@Value.Immutable
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface HelpQuery<C> {
 
@@ -41,7 +45,7 @@ public interface HelpQuery<C> {
             final @NonNull C sender,
             final @NonNull String query
     ) {
-        return new HelpQueryImpl<>(sender, query);
+        return HelpQueryImpl.of(sender, query);
     }
 
     /**
@@ -57,26 +61,4 @@ public interface HelpQuery<C> {
      * @return the query string
      */
     @NonNull String query();
-
-
-    final class HelpQueryImpl<C> implements HelpQuery<C> {
-
-        private final C sender;
-        private final String query;
-
-        private HelpQueryImpl(final @NonNull C sender, final @NonNull String query) {
-            this.sender = sender;
-            this.query = query;
-        }
-
-        @Override
-        public @NonNull C sender() {
-            return this.sender;
-        }
-
-        @Override
-        public @NonNull String query() {
-            return this.query;
-        }
-    }
 }
