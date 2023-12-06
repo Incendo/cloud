@@ -33,7 +33,6 @@ tasks {
                 "EqualsGetClass",
                 "CatchAndPrintStackTrace",
                 "InlineMeSuggester",
-                "NonApiType",
                 "InlineTrivialConstant"
             )
             disableWarningsInGeneratedCode.set(true)

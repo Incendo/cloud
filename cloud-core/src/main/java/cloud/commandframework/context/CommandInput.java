@@ -605,6 +605,7 @@ public interface CommandInput extends Cloneable {
      *
      * @return the wrapping queue
      */
+    @SuppressWarnings("NonApiType")
     default @NonNull LinkedList<@NonNull String> tokenize() {
         if (this.isEmpty()) {
             return new LinkedList<>();

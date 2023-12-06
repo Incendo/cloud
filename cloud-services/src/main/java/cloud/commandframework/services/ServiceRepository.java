@@ -80,6 +80,7 @@ public final class ServiceRepository<Context, Response> {
      * @return Queue containing all implementations
      */
     @NonNull
+    @SuppressWarnings("NonApiType")
     LinkedList<ServiceWrapper<? extends Service<Context, Response>>> getQueue() {
         synchronized (this.lock) {
             return new LinkedList<>(this.implementations);
