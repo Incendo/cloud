@@ -32,6 +32,12 @@ import org.immutables.value.Value;
 
 /**
  * A list of commands.
+ * <p>
+ * This is the result of a query that is not specific enough to point to a single command,
+ * but unlike {@link IndexCommandResult} this is guaranteed to not be empty.
+ * <p>
+ * The {@link #longestPath()} is the longest command path shared between all the results, and the
+ * {@link #childSuggestions()}} are the commands that share that common path.
  *
  * @param <C> the command sender type
  * @since 2.0.0

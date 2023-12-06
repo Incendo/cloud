@@ -31,6 +31,8 @@ import org.immutables.value.Value;
 
 /**
  * Verbose information about a single command.
+ * <p>
+ * This is displayed when the help query is precise enough to point to a single command.
  *
  * @param <C> the command sender type
  * @since 2.0.0

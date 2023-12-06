@@ -33,6 +33,10 @@ import org.immutables.value.Value;
 
 /**
  * A list of commands.
+ * <p>
+ * This is the result of a query that doesn't point to a specific command or chain of commands.
+ * The resulting {@link #entries()} are likely to consist of all commands available to the sender,
+ * but may also be empty in the case that no results were found.
  *
  * @param <C> the command sender type
  * @since 2.0.0
@@ -81,7 +85,9 @@ public interface IndexCommandResult<C> extends HelpQueryResult<C>, Iterable<Comm
     }
 
     /**
-     * {@inheritDoc}
+     * Returns an iterator that iterates over the {@link #entries()}.
+     *
+     * @return the iterator
      */
     @Value.Parameter(false)
     @Override
