@@ -773,12 +773,15 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Construct a default command meta instance
+     * Constructs a default {@link CommandMeta} instance.
+     * <p>
+     * Returns {@link CommandMeta#empty()} by default.
      *
-     * @return Default command meta
-     * @throws UnsupportedOperationException If the command manager does not support this operation
+     * @return default command meta
      */
-    public abstract @NonNull CommandMeta createDefaultCommandMeta();
+    public @NonNull CommandMeta createDefaultCommandMeta() {
+        return CommandMeta.empty();
+    }
 
     /**
      * Register a new command preprocessor. The order they are registered in is respected, and they

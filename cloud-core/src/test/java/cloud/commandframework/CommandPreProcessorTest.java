@@ -25,7 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
-import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.services.types.ConsumerService;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Assertions;
@@ -42,7 +42,7 @@ public class CommandPreProcessorTest {
     @BeforeAll
     static void newTree() {
         manager = createManager();
-        manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
+        manager.command(manager.commandBuilder("test", CommandMeta.empty())
                 .required("enum", enumParser(SampleEnum.class))
                 .handler(
                         commandContext -> System.out.printf(

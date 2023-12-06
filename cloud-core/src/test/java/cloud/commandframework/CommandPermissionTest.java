@@ -23,11 +23,8 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.keys.SimpleCloudKey;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.permission.AndPermission;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
@@ -167,11 +164,6 @@ class CommandPermissionTest {
                 return false;
             }
             return sender.hasPermisison(permission);
-        }
-
-        @Override
-        public @NonNull CommandMeta createDefaultCommandMeta() {
-            return SimpleCommandMeta.empty();
         }
     }
 }

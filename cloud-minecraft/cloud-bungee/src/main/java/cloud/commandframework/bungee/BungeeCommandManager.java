@@ -30,7 +30,6 @@ import cloud.commandframework.bungee.arguments.ServerArgument;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.Function;
 import net.md_5.bungee.api.CommandSender;
@@ -114,11 +113,6 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
             return true;
         }
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
-    }
-
-    @Override
-    public final @NonNull SimpleCommandMeta createDefaultCommandMeta() {
-        return SimpleCommandMeta.empty();
     }
 
     final @NonNull Function<@NonNull CommandSender, @NonNull C> getCommandSenderMapper() {

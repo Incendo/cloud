@@ -25,6 +25,8 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.internal.CommandNode;
+import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.meta.CommandMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +37,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 class CommandBeanTest {
 
-    private static final CommandMeta.Key<String> META_KEY = CommandMeta.Key.of(String.class, "key");
+    private static final CloudKey<String> META_KEY = SimpleCloudKey.of("key", String.class);
 
     private CommandManager<TestCommandSender> commandManager;
 
@@ -75,7 +77,7 @@ class CommandBeanTest {
 
         @Override
         protected @NonNull CommandMeta meta() {
-            return CommandMeta.simple().with(META_KEY, "value").build();
+            return CommandMeta.builder().with(META_KEY, "value").build();
         }
 
         @Override

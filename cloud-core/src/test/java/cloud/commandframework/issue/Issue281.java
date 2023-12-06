@@ -28,8 +28,6 @@ import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import java.util.concurrent.CompletionException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Test;
@@ -56,11 +54,6 @@ class Issue281 {
                     final @NonNull String permission
             ) {
                 return true;
-            }
-
-            @Override
-            public @NonNull CommandMeta createDefaultCommandMeta() {
-                return SimpleCommandMeta.empty();
             }
         };
 

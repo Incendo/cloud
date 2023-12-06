@@ -31,8 +31,6 @@ import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.jda.parsers.ChannelArgument;
 import cloud.commandframework.jda.parsers.RoleArgument;
 import cloud.commandframework.jda.parsers.UserArgument;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -187,10 +185,5 @@ public class JDACommandManager<C> extends CommandManager<C> {
         final JDAGuildSender guildSender = (JDAGuildSender) jdaSender;
 
         return guildSender.getMember().hasPermission(Permission.valueOf(permission));
-    }
-
-    @Override
-    public final @NonNull CommandMeta createDefaultCommandMeta() {
-        return SimpleCommandMeta.empty();
     }
 }

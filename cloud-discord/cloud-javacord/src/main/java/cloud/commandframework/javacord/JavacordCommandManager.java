@@ -29,7 +29,6 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.javacord.sender.JavacordCommandSender;
 import cloud.commandframework.javacord.sender.JavacordServerSender;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -106,11 +105,6 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
 
         final JavacordServerSender serverSender = (JavacordServerSender) commandSender;
         return serverSender.getServer().hasPermission(authorOptional.get(), PermissionType.valueOf(permission));
-    }
-
-    @Override
-    public final @NonNull SimpleCommandMeta createDefaultCommandMeta() {
-        return SimpleCommandMeta.empty();
     }
 
     final @NonNull Function<@NonNull JavacordCommandSender, @NonNull C> getCommandSenderMapper() {

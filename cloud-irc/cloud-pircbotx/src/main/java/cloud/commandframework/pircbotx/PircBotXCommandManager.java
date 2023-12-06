@@ -31,7 +31,6 @@ import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.pircbotx.arguments.UserArgument;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.BiFunction;
@@ -126,11 +125,6 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
             final @NonNull String permission
     ) {
         return this.permissionFunction.apply(sender, permission);
-    }
-
-    @Override
-    public final @NonNull CommandMeta createDefaultCommandMeta() {
-        return CommandMeta.simple().build();
     }
 
     /**
