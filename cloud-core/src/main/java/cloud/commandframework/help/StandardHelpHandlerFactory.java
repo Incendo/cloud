@@ -27,27 +27,17 @@ import cloud.commandframework.CommandManager;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.STABLE, since = "2.0.0")
-public interface HelpHandlerFactory<C> {
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
+final class StandardHelpHandlerFactory<C> implements HelpHandlerFactory<C> {
 
-    /**
-     * Returns a factory that produces instances of {@link StandardHelpHandler}.
-     *
-     * @param <C>            the command sender type
-     * @param commandManager the command manager
-     * @return the factory instance
-     */
-    static <C> @NonNull HelpHandlerFactory<C> standard(
-            final @NonNull CommandManager<C> commandManager
-    ) {
-        return new StandardHelpHandlerFactory<>(commandManager);
+    private final CommandManager<C> commandManager;
+
+    StandardHelpHandlerFactory(final @NonNull CommandManager<C> commandManager) {
+        this.commandManager = commandManager;
     }
 
-    /**
-     * Creates a new help handler.
-     *
-     * @param filter filter that determines which commands are applicable to the help handler
-     * @return the help handler
-     */
-    @NonNull HelpHandler<C> createHelpHandler(@NonNull CommandPredicate<C> filter);
+    @Override
+    public @NonNull HelpHandler<C> createHelpHandler(@NonNull final CommandPredicate<C> filter) {
+        return new StandardHelpHandler<>(this.commandManager, filter);
+    }
 }
