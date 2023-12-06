@@ -24,7 +24,6 @@
 package cloud.commandframework.velocity;
 
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import com.velocitypowered.api.proxy.ProxyServer;
 import io.leangen.geantyref.TypeToken;
 
@@ -39,7 +38,7 @@ public final class VelocityContextKeys {
      * The {@link ProxyServer} instance is stored in the {@link cloud.commandframework.context.CommandContext}
      * in {@link VelocityCommandPreprocessor}
      */
-    public static final CloudKey<ProxyServer> PROXY_SERVER_KEY = SimpleCloudKey.of(
+    public static final CloudKey<ProxyServer> PROXY_SERVER_KEY = CloudKey.of(
             "ProxyServer",
             TypeToken.get(ProxyServer.class)
     );

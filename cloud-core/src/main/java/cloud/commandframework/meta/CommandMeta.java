@@ -25,7 +25,6 @@ package cloud.commandframework.meta;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import java.util.Map;
 import java.util.Optional;
 import org.apiguardian.api.API;
@@ -40,7 +39,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE)
 public abstract class CommandMeta {
 
-    public static final CloudKey<Boolean> HIDDEN = SimpleCloudKey.of(
+    public static final CloudKey<Boolean> HIDDEN = CloudKey.of(
             "cloud:hidden",
             Boolean.class
     );

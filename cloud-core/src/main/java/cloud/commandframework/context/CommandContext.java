@@ -33,7 +33,6 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.CaptionVariableReplacementHandler;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
-import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.permission.CommandPermission;
 import java.util.Collections;
 import java.util.HashMap;
@@ -168,7 +167,7 @@ public class CommandContext<C> {
      * @param <T>   Value type
      */
     public <T extends @NonNull Object> void store(final @NonNull String key, final T value) {
-        this.internalStorage.put(SimpleCloudKey.of(key), value);
+        this.internalStorage.put(CloudKey.of(key), value);
     }
 
     /**
@@ -246,7 +245,7 @@ public class CommandContext<C> {
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
     public boolean contains(final @NonNull String key) {
-        return this.contains(SimpleCloudKey.of(key));
+        return this.contains(CloudKey.of(key));
     }
 
     /**
@@ -270,7 +269,7 @@ public class CommandContext<C> {
     @API(status = API.Status.STABLE, since = "1.3.0")
     public @NonNull Map<@NonNull String, @Nullable ?> asMap() {
         final Map<String, Object> values = new HashMap<>();
-        this.internalStorage.forEach((key, value) -> values.put(key.getName(), value));
+        this.internalStorage.forEach((key, value) -> values.put(key.name(), value));
         return Collections.unmodifiableMap(values);
     }
 
@@ -283,7 +282,7 @@ public class CommandContext<C> {
      * @return Value
      */
     public <T extends @NonNull Object> @NonNull Optional<T> getOptional(final @NonNull String key) {
-        final Object value = this.internalStorage.get(SimpleCloudKey.of(key));
+        final Object value = this.internalStorage.get(CloudKey.of(key));
         if (value != null) {
             @SuppressWarnings("unchecked") final T castedValue = (T) value;
             return Optional.of(castedValue);
@@ -339,7 +338,7 @@ public class CommandContext<C> {
      * @param key Key to remove
      */
     public void remove(final @NonNull String key) {
-        this.remove(SimpleCloudKey.of(key));
+        this.remove(CloudKey.of(key));
     }
 
     /**
@@ -364,7 +363,7 @@ public class CommandContext<C> {
      */
     @SuppressWarnings({"unchecked", "TypeParameterUnusedInFormals"})
     public <T extends @NonNull Object> T get(final @NonNull String key) {
-        final Object value = this.internalStorage.get(SimpleCloudKey.of(key));
+        final Object value = this.internalStorage.get(CloudKey.of(key));
         if (value == null) {
             throw new NullPointerException("No such object stored in the context: " + key);
         }

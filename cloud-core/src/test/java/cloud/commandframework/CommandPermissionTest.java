@@ -24,7 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.keys.SimpleCloudKey;
+import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.permission.AndPermission;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
@@ -133,7 +133,7 @@ class CommandPermissionTest {
     void testPredicatePermissions() {
         final AtomicBoolean condition = new AtomicBoolean(true);
         manager.command(manager.commandBuilder("predicate").permission(PredicatePermission.of(
-                SimpleCloudKey.of("boolean"), $ -> condition.get()
+                CloudKey.of("boolean"), $ -> condition.get()
         )));
         // First time should succeed
         manager.executeCommand(new TestCommandSender(), "predicate").join();

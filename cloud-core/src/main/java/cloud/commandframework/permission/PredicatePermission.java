@@ -25,7 +25,6 @@ package cloud.commandframework.permission;
 
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
-import cloud.commandframework.keys.SimpleCloudKey;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Predicate;
@@ -57,7 +56,7 @@ public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolde
     @Override
     @SuppressWarnings("FunctionalInterfaceMethodChanged")
     default @NonNull CloudKey<Void> getKey() {
-        return SimpleCloudKey.of(this.getClass().getSimpleName());
+        return CloudKey.of(this.getClass().getSimpleName());
     }
 
     /**

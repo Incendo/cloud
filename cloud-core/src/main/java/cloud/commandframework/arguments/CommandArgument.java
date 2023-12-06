@@ -35,7 +35,6 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
-import cloud.commandframework.keys.SimpleCloudKey;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.Collections;
@@ -127,7 +126,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         this.argumentPreprocessors = argumentPreprocessors.stream()
                 .map(ComponentPreprocessor::wrap)
                 .collect(Collectors.toCollection(LinkedList::new));
-        this.key = SimpleCloudKey.of(this.name, this.valueType);
+        this.key = CloudKey.of(this.name, this.valueType);
     }
 
     /**
@@ -555,7 +554,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
 
         @Override
         public @NonNull CloudKey<T> getKey() {
-            return SimpleCloudKey.of(this.name, this.valueType);
+            return CloudKey.of(this.name, this.valueType);
         }
 
         @Override

@@ -32,7 +32,7 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.AmbiguousNodeException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.execution.CommandExecutionHandler;
-import cloud.commandframework.keys.SimpleCloudKey;
+import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.meta.CommandMeta;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collections;
@@ -185,7 +185,7 @@ class CommandTreeTest {
         verify(executionHandler).executeFuture(contextArgumentCaptor.capture());
 
         final CommandContext<TestCommandSender> context = contextArgumentCaptor.getValue();
-        assertThat(context.get(SimpleCloudKey.of("int", TypeToken.get(Integer.class)))).isEqualTo(5);
+        assertThat(context.get(CloudKey.of("int", TypeToken.get(Integer.class)))).isEqualTo(5);
     }
 
     @Test
@@ -569,8 +569,8 @@ class CommandTreeTest {
         verify(executionHandler).executeFuture(contextArgumentCaptor.capture());
 
         final CommandContext<TestCommandSender> context = contextArgumentCaptor.getValue();
-        assertThat(context.getOrDefault(SimpleCloudKey.of("opt1", TypeToken.get(String.class)), null)).isNull();
-        assertThat(context.getOrDefault(SimpleCloudKey.of("opt2", TypeToken.get(String.class)), null)).isNull();
+        assertThat(context.getOrDefault(CloudKey.of("opt1", TypeToken.get(String.class)), null)).isNull();
+        assertThat(context.getOrDefault(CloudKey.of("opt2", TypeToken.get(String.class)), null)).isNull();
     }
 
     enum FlagEnum {

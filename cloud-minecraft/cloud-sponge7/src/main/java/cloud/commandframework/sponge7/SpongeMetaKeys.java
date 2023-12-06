@@ -24,7 +24,6 @@
 package cloud.commandframework.sponge7;
 
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import org.spongepowered.api.text.Text;
 
 /**
@@ -40,12 +39,12 @@ public final class SpongeMetaKeys {
     /**
      * A rich short description for commands.
      */
-    public static final CloudKey<Text> RICH_DESCRIPTION = SimpleCloudKey.of("cloud:sponge7/rich_description", Text.class);
+    public static final CloudKey<Text> RICH_DESCRIPTION = CloudKey.of("cloud:sponge7/rich_description", Text.class);
 
     /**
      * A rich long description for commands.
      */
-    public static final CloudKey<Text> RICH_LONG_DESCRIPTION = SimpleCloudKey.of(
+    public static final CloudKey<Text> RICH_LONG_DESCRIPTION = CloudKey.of(
             "cloud:sponge7/rich_long_description",
             Text.class
     );

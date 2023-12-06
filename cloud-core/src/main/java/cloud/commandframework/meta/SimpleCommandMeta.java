@@ -49,13 +49,13 @@ public class SimpleCommandMeta extends CommandMeta {
     @Override
     @SuppressWarnings("unchecked")
     public final @NonNull <V> Optional<V> get(final @NonNull CloudKey<V> key) {
-        final Object value = this.metaMap.get(key.getName());
+        final Object value = this.metaMap.get(key.name());
         if (value == null) {
             return Optional.empty();
         }
-        if (!GenericTypeReflector.isSuperType(key.getType().getType(), value.getClass())) {
+        if (!GenericTypeReflector.isSuperType(key.type().getType(), value.getClass())) {
             throw new IllegalArgumentException("Conflicting argument types between key type of "
-                    + key.getType().getType().getTypeName() + " and value type of " + value.getClass());
+                    + key.type().getType().getTypeName() + " and value type of " + value.getClass());
         }
 
         return Optional.of((V) value);

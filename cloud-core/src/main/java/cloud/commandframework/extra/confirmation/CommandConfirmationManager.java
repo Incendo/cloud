@@ -28,7 +28,6 @@ import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessingContext;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.meta.CommandMetaBuilder;
 import cloud.commandframework.services.types.ConsumerService;
 import cloud.commandframework.types.tuples.Pair;
@@ -62,7 +61,7 @@ public class CommandConfirmationManager<C> {
      * @since 1.3.0
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
-    public static final CloudKey<Boolean> META_CONFIRMATION_REQUIRED = SimpleCloudKey.of(
+    public static final CloudKey<Boolean> META_CONFIRMATION_REQUIRED = CloudKey.of(
             "cloud:require_confirmation",
             Boolean.class
     );

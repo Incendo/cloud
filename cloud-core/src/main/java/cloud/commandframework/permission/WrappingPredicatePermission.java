@@ -54,6 +54,6 @@ final class WrappingPredicatePermission<C> implements PredicatePermission<C> {
 
     @Override
     public String toString() {
-        return this.key.getName();
+        return this.key.name();
     }
 }

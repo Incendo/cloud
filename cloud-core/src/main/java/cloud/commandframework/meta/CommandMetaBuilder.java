@@ -61,7 +61,7 @@ public class CommandMetaBuilder {
             final @NonNull CloudKey<V> key,
             final @NonNull V value
     ) {
-        this.map.put(key.getName(), value);
+        this.map.put(key.name(), value);
         return this;
     }
 
