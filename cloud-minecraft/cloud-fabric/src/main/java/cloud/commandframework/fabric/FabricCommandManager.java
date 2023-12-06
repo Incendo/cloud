@@ -41,6 +41,7 @@ import cloud.commandframework.fabric.argument.TeamArgument;
 import cloud.commandframework.fabric.data.MinecraftTime;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.permission.PermissionResult;
 import cloud.commandframework.permission.PredicatePermission;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.Codec;
@@ -365,9 +366,16 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
      * @since 1.5.0
      */
     public @NonNull PredicatePermission<C> permissionLevel(final int permissionLevel) {
-        return sender -> new PermissionLevelResult(
-                this.backwardsCommandSourceMapper().apply(sender).hasPermission(permissionLevel),
-                permissionLevel
-        );
+        // unfortunate monstrosity because the predicate instance itself must be passed to the result
+        return new PredicatePermission<C>() {
+            @Override
+            public @NonNull PermissionResult testPermission(@NonNull final C sender) {
+                return new PermissionLevelResult(
+                        FabricCommandManager.this.backwardsCommandSourceMapper().apply(sender).hasPermission(permissionLevel),
+                        this,
+                        permissionLevel
+                );
+            };
+        };
     }
 }

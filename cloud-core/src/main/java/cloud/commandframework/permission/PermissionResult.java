@@ -24,11 +24,12 @@
 package cloud.commandframework.permission;
 
 import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * The cached result of a permission check, representing whether a command may be executed.
  * <p>
- * Implementations must be immutable. Most importantly, {@link #toBoolean()} must always return the same value as previous
+ * Implementations must be immutable. Most importantly, {@link #succeeded()} must always return the same value as previous
  * invocations.
  * <p>
  * Custom implementations may be used in order to provide more information.
@@ -40,29 +41,57 @@ import org.apiguardian.api.API;
 public interface PermissionResult {
 
     /**
-     * Result that returns true
-     */
-    PermissionResult TRUE = () -> true;
-
-    /**
-     * Result that returns false
-     */
-    PermissionResult FALSE = () -> false;
-
-    /**
-     * Returns the result of a permission check
+     * Returns true if the command may be executed
      *
-     * @return true if the command may be executed, false otherwise
+     * @return true if the command may be executed
      */
-    boolean toBoolean();
+    boolean succeeded();
+
+    /**
+     * Returns true if the command may not be executed
+     *
+     * @return true if the command may not be executed
+     */
+    default boolean failed() {
+        return !this.succeeded();
+    }
+
+    /**
+     * Returns the permission that this result came from
+     *
+     * @return the permission that this result came from
+     */
+    @NonNull CommandPermission permission();
 
     /**
      * Creates a result that wraps the given boolean result
      *
      * @param result true if the command may be executed, false otherwise
+     * @param permission the permission that this result came from
      * @return a PermissionResult of the boolean result
      */
-    static PermissionResult of(boolean result) {
-        return result ? TRUE : FALSE;
+    static @NonNull PermissionResult of(boolean result, @NonNull CommandPermission permission) {
+        return new SimplePermissionResult(result, permission);
     }
+
+    /**
+     * Creates a successful result for the given permission
+     *
+     * @param permission the permission that this result came from
+     * @return a successful PermissionResult
+     */
+    static @NonNull PermissionResult succeeded(@NonNull CommandPermission permission) {
+        return new SimplePermissionResult(true, permission);
+    }
+
+    /**
+     * Creates a failed result for the given permission
+     *
+     * @param permission the permission that this result came from
+     * @return a failed PermissionResult
+     */
+    static @NonNull PermissionResult failed(@NonNull CommandPermission permission) {
+        return new SimplePermissionResult(false, permission);
+    }
+
 }

@@ -44,6 +44,7 @@ import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.SuggestionContext;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
+import cloud.commandframework.permission.PermissionResult;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -214,11 +215,11 @@ public final class CommandTree<C> {
             final @NonNull CommandInput commandInput,
             final @NonNull CommandNode<C> root
     ) {
-        final CommandPermission permission = this.findMissingPermission(commandContext.getSender(), root);
-        if (permission != null) {
+        final PermissionResult permissionResult = this.determinePermissionResult(commandContext.getSender(), root);
+        if (permissionResult.failed()) {
             return this.failedCompletable(
                     new NoPermissionException(
-                            permission,
+                            permissionResult,
                             commandContext.getSender(),
                             this.getChain(root)
                                     .stream()
@@ -322,13 +323,14 @@ public final class CommandTree<C> {
                     final CommandComponent<C> rootComponent = root.component();
                     if (rootComponent != null && rootComponent.owningCommand() != null && commandInput.isEmpty()) {
                         final Command<C> command = rootComponent.owningCommand();
-                        if (!this.commandManager().hasPermission(
+                        final PermissionResult check = this.commandManager.testPermission(
                                 commandContext.getSender(),
                                 command.commandPermission()
-                        )) {
+                        );
+                        if (check.failed()) {
                             return this.failedCompletable(
                                     new NoPermissionException(
-                                            command.commandPermission(),
+                                            check,
                                             commandContext.getSender(),
                                             this.getChain(root)
                                                     .stream()
@@ -362,6 +364,7 @@ public final class CommandTree<C> {
             final @NonNull CommandNode<C> root,
             final @NonNull CommandInput commandInput
     ) {
+        C sender = commandContext.getSender();
         final List<CommandNode<C>> children = root.children();
 
         // Check whether it matches any of the static arguments If so, do not attempt parsing as a dynamic argument
@@ -382,12 +385,12 @@ public final class CommandTree<C> {
         final CommandNode<C> child = argumentNodes.get(0);
 
         // Check if we're allowed to execute the child command. If not, exit
-        final CommandPermission permission = this.findMissingPermission(commandContext.getSender(), child);
-        if (!commandInput.isEmpty() && permission != null) {
+        final PermissionResult childCheck = this.determinePermissionResult(sender, child);
+        if (!commandInput.isEmpty() && childCheck.failed()) {
             return this.failedCompletable(
                     new NoPermissionException(
-                            permission,
-                            commandContext.getSender(),
+                            childCheck,
+                            sender,
                             this.getChain(child)
                                     .stream()
                                     .filter(node -> node.component() != null)
@@ -444,7 +447,7 @@ public final class CommandTree<C> {
                     return this.failedCompletable(
                             new InvalidSyntaxException(
                                     this.commandManager.commandSyntaxFormatter().apply(components, child),
-                                    commandContext.getSender(),
+                                    sender,
                                     this.getChain(root)
                                             .stream()
                                             .filter(node -> node.component() != null)
@@ -455,13 +458,14 @@ public final class CommandTree<C> {
                 }
 
                 final Command<C> command = rootComponent.owningCommand();
-                if (this.commandManager().hasPermission(commandContext.getSender(), command.commandPermission())) {
+                final PermissionResult check = this.commandManager().testPermission(sender, command.commandPermission());
+                if (check.succeeded()) {
                     return CompletableFuture.completedFuture(command);
                 }
                 return this.failedCompletable(
                         new NoPermissionException(
-                                command.commandPermission(),
-                                commandContext.getSender(),
+                                check,
+                                sender,
                                 this.getChain(root)
                                         .stream()
                                         .filter(node -> node.component() != null)
@@ -478,7 +482,7 @@ public final class CommandTree<C> {
                             new InvalidSyntaxException(
                                     this.commandManager.commandSyntaxFormatter()
                                             .apply(parsedArguments, root),
-                                    commandContext.getSender(),
+                                    sender,
                                     this.getChain(root)
                                             .stream()
                                             .filter(node -> node.component() != null)
@@ -490,14 +494,15 @@ public final class CommandTree<C> {
 
                 // If the sender has permission to use the command, then we're completely done
                 final Command<C> command = Objects.requireNonNull(rootComponent.owningCommand());
-                if (this.commandManager().hasPermission(commandContext.getSender(), command.commandPermission())) {
+                final PermissionResult check = this.commandManager().testPermission(sender, command.commandPermission());
+                if (check.succeeded()) {
                     return CompletableFuture.completedFuture(command);
                 }
 
                 return this.failedCompletable(
                         new NoPermissionException(
-                                command.commandPermission(),
-                                commandContext.getSender(),
+                                check,
+                                sender,
                                 this.getChain(root)
                                         .stream()
                                         .filter(node -> node.component() != null)
@@ -533,7 +538,7 @@ public final class CommandTree<C> {
                return this.failedCompletable(
                        new InvalidSyntaxException(
                                this.commandManager.commandSyntaxFormatter().apply(parsedArguments, child),
-                               commandContext.getSender(),
+                               sender,
                                this.getChain(root)
                                        .stream()
                                        .filter(node -> node.component() != null)
@@ -636,7 +641,7 @@ public final class CommandTree<C> {
             final @NonNull CommandNode<C> root
     ) {
         // If the sender isn't allowed to access the root node, no suggestions are needed
-        if (this.findMissingPermission(context.commandContext().getSender(), root) != null) {
+        if (this.determinePermissionResult(context.commandContext().getSender(), root).failed()) {
             return CompletableFuture.completedFuture(context);
         }
 
@@ -717,7 +722,7 @@ public final class CommandTree<C> {
             final @NonNull CommandNode<C> node,
             final @NonNull String input
     ) {
-        if (this.findMissingPermission(context.commandContext().getSender(), node) != null) {
+        if (this.determinePermissionResult(context.commandContext().getSender(), node).failed()) {
             return CompletableFuture.completedFuture(context);
         }
         final CommandComponent<C> component = Objects.requireNonNull(node.component());
@@ -1047,21 +1052,18 @@ public final class CommandTree<C> {
      * @param node   the command node
      * @return the missing permission, or {@code null}
      */
-    private @Nullable CommandPermission findMissingPermission(
+    private @NonNull PermissionResult determinePermissionResult(
             final @NonNull C sender,
             final @NonNull CommandNode<C> node
     ) {
         final CommandPermission permission = (CommandPermission) node.nodeMeta().get("permission");
         if (permission != null) {
-            return this.commandManager.hasPermission(sender, permission) ? null : permission;
+            return this.commandManager.testPermission(sender, permission);
         }
         if (node.isLeaf()) {
             final CommandComponent<C> component = Objects.requireNonNull(node.component(), "component");
             final Command<C> command = Objects.requireNonNull(component.owningCommand(), "command");
-            return this.commandManager.hasPermission(
-                    sender,
-                    command.commandPermission()
-            ) ? null : command.commandPermission();
+            return this.commandManager.testPermission(sender, command.commandPermission());
         }
         /*
           if any of the children would permit the execution, then the sender has a valid
@@ -1069,15 +1071,15 @@ public final class CommandTree<C> {
          */
         final List<CommandPermission> missingPermissions = new LinkedList<>();
         for (final CommandNode<C> child : node.children()) {
-            final CommandPermission check = this.findMissingPermission(sender, child);
-            if (check == null) {
-                return null;
+            final PermissionResult result = this.determinePermissionResult(sender, child);
+            if (result.succeeded()) {
+                return result;
             } else {
-                missingPermissions.add(check);
+                missingPermissions.add(result.permission());
             }
         }
-
-        return OrPermission.of(missingPermissions);
+        // none of the children were permissible
+        return PermissionResult.failed(OrPermission.of(missingPermissions));
     }
 
     /**

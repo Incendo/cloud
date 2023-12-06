@@ -23,36 +23,31 @@
 //
 package cloud.commandframework.fabric;
 
+import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.PermissionResult;
+import cloud.commandframework.permission.SimplePermissionResult;
 import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A {@link PermissionResult} that also contains the permission level that was required for the permission check to pass.
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public class PermissionLevelResult implements PermissionResult {
+public class PermissionLevelResult extends SimplePermissionResult {
 
-    private final boolean result;
     private final int requiredPermissionLevel;
 
     /**
      * Creates a new PermissionLevelResult
      *
-     * @param result true if the permission check passed, otherwise false
+     * @param result true if the command may be executed, false otherwise
+     * @param permission the permission that this result came from
      * @param requiredPermissionLevel the minecraft permission level that was required for the permission check to pass
      */
-    public PermissionLevelResult(final boolean result, final int requiredPermissionLevel) {
-        this.result = result;
+    public PermissionLevelResult(final boolean result, @NonNull final CommandPermission permission, final int requiredPermissionLevel) {
+        super(result, permission);
         this.requiredPermissionLevel = requiredPermissionLevel;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean toBoolean() {
-        return this.result;
     }
 
     /**

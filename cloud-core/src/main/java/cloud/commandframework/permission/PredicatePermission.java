@@ -62,7 +62,13 @@ public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolde
      * @return Created permission node
      */
     static <C> PredicatePermission<C> of(final @NonNull Predicate<C> predicate) {
-        return sender -> PermissionResult.of(predicate.test(sender));
+        // anonymous class because we need to access the class instance in the implemented method D:
+        return new PredicatePermission<C>() {
+            @Override
+            public @NonNull PermissionResult testPermission(@NonNull final C sender) {
+                return PermissionResult.of(predicate.test(sender), this);
+            }
+        };
     }
 
     @Override

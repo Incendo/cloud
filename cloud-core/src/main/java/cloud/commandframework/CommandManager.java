@@ -408,7 +408,7 @@ public abstract class CommandManager<C> {
             final @NonNull C sender,
             final @NonNull CommandPermission permission
     ) {
-        return this.testPermission(sender, permission).toBoolean();
+        return this.testPermission(sender, permission).succeeded();
     }
 
     /**
@@ -427,9 +427,9 @@ public abstract class CommandManager<C> {
             final @NonNull CommandPermission permission
     ) {
         if (permission.isEmpty()) {
-            return PermissionResult.TRUE;
+            return PermissionResult.succeeded(permission);
         } else if (permission instanceof Permission) {
-            return PermissionResult.of(this.hasPermission(sender, permission.toString()));
+            return PermissionResult.of(this.hasPermission(sender, permission.toString()), permission);
         } else if (permission instanceof PredicatePermission) {
             return ((PredicatePermission<C>) permission).testPermission(sender);
         }
@@ -437,19 +437,19 @@ public abstract class CommandManager<C> {
         if (permission instanceof OrPermission) {
             for (final CommandPermission innerPermission : permission.getPermissions()) {
                 final PermissionResult result = this.testPermission(sender, innerPermission);
-                if (result.toBoolean()) {
+                if (result.succeeded()) {
                     return result; // short circuit the first true result
                 }
             }
-            return PermissionResult.FALSE; // none returned true
+            return PermissionResult.failed(permission); // none returned true
         } else if (permission instanceof AndPermission) {
             for (final CommandPermission innerPermission : permission.getPermissions()) {
                 final PermissionResult result = this.testPermission(sender, innerPermission);
-                if (!result.toBoolean()) {
+                if (!result.succeeded()) {
                     return result; // short circuit the first false result
                 }
             }
-            return PermissionResult.TRUE; // all returned true
+            return PermissionResult.succeeded(permission); // all returned true
         }
 
         throw new IllegalArgumentException("Unknown permission type " + permission.getClass());

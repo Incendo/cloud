@@ -26,6 +26,7 @@ package cloud.commandframework.exceptions;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.permission.CommandPermission;
+import cloud.commandframework.permission.PermissionResult;
 import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -39,28 +40,31 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public class NoPermissionException extends CommandParseException {
 
     private static final long serialVersionUID = 7103413337750692843L;
-    private final CommandPermission missingPermission;
+    private final PermissionResult result;
 
     /**
      * Construct a new no permission exception
      *
-     * @param missingPermission Missing permission node
+     * @param permissionResult  Result of the permission check
      * @param commandSender     Command sender
      * @param currentChain      Chain leading up to the exception
      */
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public NoPermissionException(
-            final @NonNull CommandPermission missingPermission,
+            final @NonNull PermissionResult permissionResult,
             final @NonNull Object commandSender,
             final @NonNull List<@NonNull CommandComponent<?>> currentChain
     ) {
         super(commandSender, currentChain);
-        this.missingPermission = missingPermission;
+        if (permissionResult.succeeded()) {
+            throw new IllegalArgumentException("Provided permission result was one that succeeded instead of failed");
+        }
+        this.result = permissionResult;
     }
 
     @Override
     public final String getMessage() {
-        return String.format("Missing permission '%s'", this.missingPermission);
+        return String.format("Missing permission '%s'", this.missingPermission());
     }
 
     /**
@@ -71,7 +75,17 @@ public class NoPermissionException extends CommandParseException {
      */
     @API(status = API.Status.STABLE, since = "1.9.0")
     public @NonNull CommandPermission missingPermission() {
-        return this.missingPermission;
+        return this.result.permission();
+    }
+
+    /**
+     * Returns the falsy {@link PermissionResult} that caused this exception.
+     *
+     * @return the falsy result that caused this exception
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull PermissionResult permissionResult() {
+        return this.result;
     }
 
     @Override
