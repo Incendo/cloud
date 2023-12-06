@@ -126,7 +126,8 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
         return PredicatePermission.of(
                 SimpleCloudKey.of("integrated-server-running"),
                 sender -> Minecraft.getInstance().hasSingleplayerServer()
-        );    }
+        );
+    }
 
     /**
      * Get a permission predicate which passes when the integrated server is not running.
