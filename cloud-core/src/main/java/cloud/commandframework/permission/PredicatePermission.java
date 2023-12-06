@@ -62,13 +62,7 @@ public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolde
      * @return Created permission node
      */
     static <C> PredicatePermission<C> of(final @NonNull Predicate<C> predicate) {
-        // anonymous class because we need to access the class instance in the implemented method D:
-        return new PredicatePermission<C>() {
-            @Override
-            public @NonNull PermissionResult testPermission(@NonNull final C sender) {
-                return PermissionResult.of(predicate.test(sender), this);
-            }
-        };
+        return predicate::test;
     }
 
     @Override
@@ -85,7 +79,9 @@ public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolde
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    @NonNull PermissionResult testPermission(@NonNull C sender);
+    default @NonNull PermissionResult testPermission(@NonNull C sender) {
+        return PermissionResult.of(this.hasPermission(sender), this);
+    }
 
     /**
      * Checks whether the given sender has this permission
@@ -95,9 +91,7 @@ public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolde
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    default boolean hasPermission(@NonNull C sender) {
-        return this.testPermission(sender).succeeded();
-    }
+    boolean hasPermission(@NonNull C sender);
 
     @Override
     default @NonNull Collection<@NonNull CommandPermission> getPermissions() {

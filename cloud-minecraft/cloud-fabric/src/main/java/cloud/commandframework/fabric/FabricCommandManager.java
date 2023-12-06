@@ -366,16 +366,20 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
      * @since 1.5.0
      */
     public @NonNull PredicatePermission<C> permissionLevel(final int permissionLevel) {
-        // unfortunate monstrosity because the predicate instance itself must be passed to the result
         return new PredicatePermission<C>() {
             @Override
             public @NonNull PermissionResult testPermission(@NonNull final C sender) {
                 return new PermissionLevelResult(
-                        FabricCommandManager.this.backwardsCommandSourceMapper().apply(sender).hasPermission(permissionLevel),
+                        this.hasPermission(sender),
                         this,
                         permissionLevel
                 );
-            };
+            }
+
+            @Override
+            public boolean hasPermission(@NonNull final C sender) {
+                return FabricCommandManager.this.backwardsCommandSourceMapper().apply(sender).hasPermission(permissionLevel);
+            }
         };
     }
 }

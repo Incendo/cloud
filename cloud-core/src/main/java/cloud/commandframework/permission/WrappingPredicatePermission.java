@@ -43,8 +43,8 @@ final class WrappingPredicatePermission<C> implements PredicatePermission<C> {
     }
 
     @Override
-    public @NonNull PermissionResult testPermission(final @NonNull C sender) {
-        return PermissionResult.of(this.predicate.test(sender), this);
+    public boolean hasPermission(@NonNull final C sender) {
+        return this.predicate.test(sender);
     }
 
     @Override
