@@ -397,8 +397,8 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Check if the command sender has the required permission. If the permission node is
-     * empty, this should return {@code true}
+     * Checks if the command sender has the required permission. If the permission node is
+     * empty, this should return {@code true}.
      *
      * @param sender     Command sender
      * @param permission Permission node
@@ -408,10 +408,19 @@ public abstract class CommandManager<C> {
             final @NonNull C sender,
             final @NonNull CommandPermission permission
     ) {
-        return testPermission(sender, permission).toBoolean();
+        return this.testPermission(sender, permission).toBoolean();
     }
 
-
+    /**
+     * Checks if the command sender has the required permission. If the permission node is
+     * empty, this should return {@code true}.
+     *
+     * @param sender     Command sender
+     * @param permission Permission node
+     * @return a {@link PermissionResult} representing whether the sender has the permission
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @SuppressWarnings("unchecked")
     public @NonNull PermissionResult testPermission(
             final @NonNull C sender,
@@ -429,7 +438,8 @@ public abstract class CommandManager<C> {
         PermissionResult result = PermissionResult.FALSE;
         if (permission instanceof OrPermission) {
             for (final CommandPermission innerPermission : permission.getPermissions()) {
-                if ((result = this.testPermission(sender, innerPermission)).toBoolean()) {
+                result = this.testPermission(sender, innerPermission);
+                if (result.toBoolean()) {
                     return result; // return the first true result
                 }
             }
@@ -440,7 +450,8 @@ public abstract class CommandManager<C> {
             }
 
             for (final CommandPermission innerPermission : permission.getPermissions()) {
-                if (!(result = this.testPermission(sender, innerPermission)).toBoolean()) {
+                result = this.testPermission(sender, innerPermission);
+                if (!result.toBoolean()) {
                     return result; // return the first false result
                 }
             }
