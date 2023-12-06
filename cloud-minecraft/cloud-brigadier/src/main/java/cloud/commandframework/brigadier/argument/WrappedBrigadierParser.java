@@ -144,13 +144,7 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
             final @NonNull CommandInput commandInput
     ) {
         // Convert to a brig reader
-        final StringReader reader;
-
-        if (commandInput instanceof StringReader) {
-            reader = (StringReader) commandInput;
-        } else {
-            reader = CloudStringReader.of(commandInput);
-        }
+        final StringReader reader = CloudStringReader.of(commandInput);
 
         // Then try to parse
         try {
