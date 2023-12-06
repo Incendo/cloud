@@ -43,7 +43,7 @@ public class SimplePermissionResult implements PermissionResult {
      * @param result true if the command may be executed, false otherwise
      * @param permission the permission that this result came from
      */
-    protected SimplePermissionResult(final boolean result, @NonNull final CommandPermission permission) {
+    protected SimplePermissionResult(final boolean result, final @NonNull CommandPermission permission) {
         this.result = result;
         this.permission = Objects.requireNonNull(permission, "permission");
     }

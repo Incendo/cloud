@@ -79,7 +79,7 @@ public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolde
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    default @NonNull PermissionResult testPermission(@NonNull C sender) {
+    default @NonNull PermissionResult testPermission(final @NonNull C sender) {
         return PermissionResult.of(this.hasPermission(sender), this);
     }
 

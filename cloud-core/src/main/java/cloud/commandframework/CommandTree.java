@@ -364,7 +364,7 @@ public final class CommandTree<C> {
             final @NonNull CommandNode<C> root,
             final @NonNull CommandInput commandInput
     ) {
-        C sender = commandContext.getSender();
+        final C sender = commandContext.getSender();
         final List<CommandNode<C>> children = root.children();
 
         // Check whether it matches any of the static arguments If so, do not attempt parsing as a dynamic argument
