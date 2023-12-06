@@ -40,17 +40,22 @@ public final class AndPermission implements CommandPermission {
 
     private final Set<CommandPermission> permissions;
 
-    AndPermission(final @NonNull Set<CommandPermission> permissions) {
+    private AndPermission(final @NonNull Set<CommandPermission> permissions) {
         this.permissions = Collections.unmodifiableSet(permissions);
     }
 
     /**
-     * Create a new OR permission
+     * Creates a new AND permission
      *
      * @param permissions Permissions to join
      * @return Constructed permission
+     * @throws IllegalArgumentException if permissions is empty
      */
     public static @NonNull CommandPermission of(final @NonNull Collection<CommandPermission> permissions) {
+        if (permissions.isEmpty()) {
+            throw new IllegalArgumentException("AndPermission may not have an empty set of permissions");
+        }
+
         final Set<CommandPermission> objects = new HashSet<>();
         for (final CommandPermission permission : permissions) {
             if (permission instanceof AndPermission) {
@@ -65,6 +70,11 @@ public final class AndPermission implements CommandPermission {
     @Override
     public @NonNull Collection<@NonNull CommandPermission> getPermissions() {
         return this.permissions;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false; // we require the set to be non-empty
     }
 
     @Override

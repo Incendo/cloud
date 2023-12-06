@@ -85,4 +85,9 @@ public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolde
     default @NonNull Collection<@NonNull CommandPermission> getPermissions() {
         return Collections.singleton(this);
     }
+
+    @Override
+    default boolean isEmpty() {
+        return false;
+    }
 }

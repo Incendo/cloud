@@ -23,7 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.meta.CommandMeta;
@@ -34,6 +33,7 @@ import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PredicatePermission;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -42,6 +42,7 @@ import org.junit.jupiter.api.Test;
 
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -77,6 +78,20 @@ class CommandPermissionTest {
                 CompletionException.class,
                 () -> manager.executeCommand(new TestCommandSender(), "first 10").join()
         );
+    }
+
+    @Test
+    void testEmptyStringPermission() {
+        final CommandPermission permission = Permission.of("");
+
+        assertTrue(permission.isEmpty());
+        assertEquals(Permission.empty(), permission);
+    }
+
+    @Test
+    void testEmptyPermissions() {
+        assertThrows(IllegalArgumentException.class, () -> AndPermission.of(Collections.emptyList()));
+        assertThrows(IllegalArgumentException.class, () -> OrPermission.of(Collections.emptyList()));
     }
 
     @Test

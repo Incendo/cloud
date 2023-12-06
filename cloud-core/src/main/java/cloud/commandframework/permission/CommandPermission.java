@@ -46,6 +46,15 @@ public interface CommandPermission {
     @NonNull Collection<@NonNull CommandPermission> getPermissions();
 
     /**
+     * Returns true if a check for this permission should and will always return true.
+     *
+     * @return true if this permission is empty, otherwise false
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    boolean isEmpty();
+
+    /**
      * Get a string representation of the permission
      *
      * @return String representation of the permission node

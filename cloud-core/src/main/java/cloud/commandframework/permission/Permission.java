@@ -79,6 +79,11 @@ public final class Permission implements CommandPermission {
         return Collections.singleton(this);
     }
 
+    @Override
+    public boolean isEmpty() {
+        return this.permission.isEmpty();
+    }
+
     /**
      * Get the command permission
      *
