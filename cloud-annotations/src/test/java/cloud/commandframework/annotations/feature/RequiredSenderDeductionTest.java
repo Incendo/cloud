@@ -28,8 +28,6 @@ import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
 import java.util.concurrent.CompletionException;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -55,17 +53,11 @@ class RequiredSenderDeductionTest {
             ) {
                 return true;
             }
-
-            @Override
-            public @NonNull CommandMeta createDefaultCommandMeta() {
-                return SimpleCommandMeta.empty();
-            }
         };
         AnnotationParser<SuperSender<?>> annotationParser = new AnnotationParser<>(
                 this.commandManager,
                 new TypeToken<SuperSender<?>>() {
-                },
-                parameters -> SimpleCommandMeta.empty()
+                }
         );
         annotationParser.parse(new TestClassA());
     }

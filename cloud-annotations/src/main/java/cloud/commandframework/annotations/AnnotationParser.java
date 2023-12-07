@@ -47,7 +47,7 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.meta.CommandMetaBuilder;
 import cloud.commandframework.types.tuples.Pair;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
@@ -139,7 +139,20 @@ public final class AnnotationParser<C> {
             final @NonNull CommandManager<C> manager,
             final @NonNull Class<C> commandSenderClass
     ) {
-        this(manager, TypeToken.get(commandSenderClass), parameters -> SimpleCommandMeta.empty());
+        this(manager, TypeToken.get(commandSenderClass), parameters -> CommandMeta.empty());
+    }
+
+    /**
+     * Construct a new annotation parser
+     *
+     * @param manager            Command manager instance
+     * @param commandSenderClass Command sender class
+     */
+    public AnnotationParser(
+            final @NonNull CommandManager<C> manager,
+            final @NonNull TypeToken<C> commandSenderClass
+    ) {
+        this(manager, commandSenderClass, parameters -> CommandMeta.empty());
     }
 
     /**
@@ -797,8 +810,7 @@ public final class AnnotationParser<C> {
 
         final Method method = commandDescriptor.method();
         final CommandManager<C> manager = this.manager;
-        final SimpleCommandMeta.Builder metaBuilder = SimpleCommandMeta.builder()
-                .with(this.metaFactory.apply(method));
+        final CommandMetaBuilder metaBuilder = CommandMeta.builder().with(this.metaFactory.apply(method));
         if (methodOrClassHasAnnotation(method, Confirmation.class)) {
             metaBuilder.with(CommandConfirmationManager.META_CONFIRMATION_REQUIRED, true);
         }

@@ -25,16 +25,11 @@ package cloud.commandframework.meta;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.keys.CloudKey;
-import io.leangen.geantyref.GenericTypeReflector;
-import io.leangen.geantyref.TypeToken;
+import cloud.commandframework.keys.SimpleCloudKey;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Object that is associated with a {@link Command}.
@@ -45,18 +40,29 @@ import static java.util.Objects.requireNonNull;
 @API(status = API.Status.STABLE)
 public abstract class CommandMeta {
 
-    public static final Key<Boolean> HIDDEN = Key.of(
-            Boolean.class,
-            "cloud:hidden"
+    public static final CloudKey<Boolean> HIDDEN = SimpleCloudKey.of(
+            "cloud:hidden",
+            Boolean.class
     );
 
     /**
-     * Create a new simple command meta builder
+     * Create a new simple command meta-builder
      *
      * @return Builder instance
      */
-    public static SimpleCommandMeta.@NonNull Builder simple() {
-        return SimpleCommandMeta.builder();
+    public static @NonNull CommandMetaBuilder builder() {
+        return new CommandMetaBuilder();
+    }
+
+    /**
+     * Creates an empty simple command meta-instance
+     *
+     * @return the empty instance
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static @NonNull CommandMeta empty() {
+        return builder().build();
     }
 
     @Override
@@ -73,7 +79,7 @@ public abstract class CommandMeta {
      * @since 1.3.0
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
-    public abstract <V> @NonNull Optional<V> get(@NonNull Key<V> key);
+    public abstract <V> @NonNull Optional<V> get(@NonNull CloudKey<V> key);
 
     /**
      * Get the value if it exists, else return the default value.
@@ -85,7 +91,7 @@ public abstract class CommandMeta {
      * @since 1.3.0
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
-    public abstract <V> @NonNull V getOrDefault(@NonNull Key<V> key, @NonNull V defaultValue);
+    public abstract <V> @NonNull V getOrDefault(@NonNull CloudKey<V> key, @NonNull V defaultValue);
 
     /**
      * Get a copy of the meta map, without type information.
@@ -95,123 +101,4 @@ public abstract class CommandMeta {
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
     public abstract @NonNull Map<@NonNull String, @NonNull ?> getAllValues();
-
-
-    /**
-     * A key into the metadata map.
-     *
-     * @param <V> value type
-     * @since 1.3.0
-     */
-    @API(status = API.Status.STABLE, since = "1.3.0")
-    public interface Key<V> extends CloudKey<V> {
-
-        /**
-         * Create a new metadata key.
-         *
-         * @param type the value type
-         * @param key  the name for the key
-         * @param <T>  the value type
-         * @return a new key
-         */
-        static <T> @NonNull Key<T> of(final @NonNull Class<T> type, final @NonNull String key) {
-            if (GenericTypeReflector.isMissingTypeParameters(type)) {
-                throw new IllegalArgumentException("Raw type " + type + " is prohibited");
-            }
-
-            return new SimpleKey<>(
-                    TypeToken.get(requireNonNull(type, "type")),
-                    requireNonNull(key, "key"),
-                    null
-            );
-        }
-
-        /**
-         * Create a new metadata key.
-         *
-         * @param type the value type
-         * @param key  the name for the key
-         * @param <T>  the value type
-         * @return a new key
-         */
-        static <T> @NonNull Key<T> of(final @NonNull TypeToken<T> type, final @NonNull String key) {
-            return new SimpleKey<>(
-                    requireNonNull(type, "type"),
-                    requireNonNull(key, "key"),
-                    null
-            );
-        }
-
-        /**
-         * Create a new metadata key.
-         *
-         * @param type               the value type
-         * @param key                the name for the key
-         * @param fallbackDerivation A function that will be called if no value is present for the key
-         * @param <T>                the value type
-         * @return a new key
-         */
-        static <T> @NonNull Key<T> of(
-                final @NonNull Class<T> type,
-                final @NonNull String key,
-                final @NonNull Function<@NonNull CommandMeta, @Nullable T> fallbackDerivation
-        ) {
-            return new SimpleKey<>(
-                    TypeToken.get(requireNonNull(type, "type")),
-                    requireNonNull(key, "key"),
-                    fallbackDerivation
-            );
-        }
-
-        /**
-         * Create a new metadata key.
-         *
-         * @param type               the value type
-         * @param key                the name for the key
-         * @param fallbackDerivation A function that will be called if no value is present for the key
-         * @param <T>                the value type
-         * @return a new key
-         */
-        static <T> @NonNull Key<T> of(
-                final @NonNull TypeToken<T> type,
-                final @NonNull String key,
-                final @NonNull Function<@NonNull CommandMeta, @Nullable T> fallbackDerivation
-        ) {
-            return new SimpleKey<>(
-                    requireNonNull(type, "type"),
-                    requireNonNull(key, "key"),
-                    fallbackDerivation
-            );
-        }
-
-        @Override
-        @NonNull
-        default TypeToken<@NonNull V> getType() {
-            return this.getValueType();
-        }
-
-        /**
-         * Get a representation of the type of value this key holds.
-         *
-         * @return the value type
-         */
-        @NonNull TypeToken<V> getValueType();
-
-        /**
-         * Get the name of this key
-         *
-         * @return the key type
-         */
-        @Override
-        @NonNull String getName();
-
-        /**
-         * Get a function that can be used to compute a fallback based on existing meta.
-         *
-         * <p>This function will only be used if no value is directly for the key.</p>
-         *
-         * @return the fallback derivation
-         */
-        @Nullable Function<@NonNull CommandMeta, @Nullable V> getFallbackDerivation();
-    }
 }

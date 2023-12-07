@@ -35,7 +35,6 @@ import cloud.commandframework.annotations.SyntaxFragment;
 import cloud.commandframework.annotations.SyntaxParser;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -63,8 +62,7 @@ class ArgumentDrivenCommandsTest {
         this.commandManager = new TestCommandManager();
         this.annotationParser = new AnnotationParser<>(
                 this.commandManager,
-                TestCommandSender.class,
-                p -> SimpleCommandMeta.empty()
+                TestCommandSender.class
         );
     }
 

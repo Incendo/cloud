@@ -30,7 +30,6 @@ import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandResult;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,8 +49,7 @@ class RepeatableCommandMethodTest {
         this.commandManager = new TestCommandManager();
         this.annotationParser = new AnnotationParser<>(
                 this.commandManager,
-                TestCommandSender.class,
-                p -> SimpleCommandMeta.empty()
+                TestCommandSender.class
         );
     }
 

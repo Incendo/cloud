@@ -36,7 +36,6 @@ import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
 import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PredicatePermission;
@@ -504,8 +503,8 @@ public class Command<C> {
          * @since 1.3.0
          */
         @API(status = API.Status.STABLE, since = "1.3.0")
-        public <V> @NonNull Builder<C> meta(final CommandMeta.@NonNull Key<V> key, final @NonNull V value) {
-            final CommandMeta commandMeta = SimpleCommandMeta.builder().with(this.commandMeta).with(key, value).build();
+        public <V> @NonNull Builder<C> meta(final @NonNull CloudKey<V> key, final @NonNull V value) {
+            final CommandMeta commandMeta = CommandMeta.builder().with(this.commandMeta).with(key, value).build();
             return new Builder<>(
                     this.commandManager,
                     commandMeta,

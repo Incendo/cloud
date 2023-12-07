@@ -32,7 +32,6 @@ import cloud.commandframework.kotlin.extension.argumentDescription
 import cloud.commandframework.kotlin.extension.buildAndRegister
 import cloud.commandframework.kotlin.extension.command
 import cloud.commandframework.kotlin.extension.commandBuilder
-import cloud.commandframework.meta.SimpleCommandMeta
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -107,9 +106,6 @@ class CommandBuildingDSLTest {
         CommandExecutionCoordinator.simpleCoordinator(),
         CommandRegistrationHandler.nullCommandRegistrationHandler()
     ) {
-        override fun createDefaultCommandMeta(): SimpleCommandMeta {
-            return SimpleCommandMeta.empty()
-        }
 
         override fun hasPermission(sender: TestCommandSender, permission: String): Boolean {
             return !permission.equals("no", ignoreCase = true)

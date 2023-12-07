@@ -59,7 +59,6 @@ import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorParser
 import cloud.commandframework.bukkit.parsers.selector.SinglePlayerSelectorParser;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
-import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.tasks.TaskFactory;
 import cloud.commandframework.tasks.TaskRecipe;
 import io.leangen.geantyref.TypeToken;
@@ -255,16 +254,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      */
     public @NonNull Plugin getOwningPlugin() {
         return this.owningPlugin;
-    }
-
-    /**
-     * Create default command meta data
-     *
-     * @return Meta data
-     */
-    @Override
-    public @NonNull CommandMeta createDefaultCommandMeta() {
-        return CommandMeta.simple().build();
     }
 
     /**

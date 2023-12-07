@@ -30,7 +30,6 @@ import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,8 +56,7 @@ class Issue262 {
         this.commandHelpHandler = this.manager.createCommandHelpHandler();
         this.annotationParser = new AnnotationParser<>(
                 this.manager,
-                TestCommandSender.class,
-                (parameters) -> SimpleCommandMeta.empty()
+                TestCommandSender.class
         );
     }
 
