@@ -36,23 +36,23 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_ENCHANTMENT}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_ENCHANTMENT = "'{input}' is not a valid enchantment";
+    public static final String ARGUMENT_PARSE_FAILURE_ENCHANTMENT = "'<input>' is not a valid enchantment";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_MATERIAL}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_MATERIAL = "'{input}' is not a valid material name";
+    public static final String ARGUMENT_PARSE_FAILURE_MATERIAL = "'<input>' is not a valid material name";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_OFFLINEPLAYER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_OFFLINEPLAYER = "No player found for input '{input}'";
+    public static final String ARGUMENT_PARSE_FAILURE_OFFLINEPLAYER = "No player found for input '<input>'";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "No player found for input '{input}'";
+    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "No player found for input '<input>'";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_WORLD}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_WORLD = "'{input}' is not a valid Minecraft world";
+    public static final String ARGUMENT_PARSE_FAILURE_WORLD = "'<input>' is not a valid Minecraft world";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED}
      *
@@ -60,7 +60,7 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
      */
     @API(status = API.Status.DEPRECATED, since = "1.8.0")
     @Deprecated
-    public static final String ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED = "Selector '{input}' is malformed.";
+    public static final String ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED = "Selector '<input>' is malformed.";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_SELECTOR_UNSUPPORTED}
      */
@@ -94,7 +94,7 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT}
      */
     public static final String ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT =
-            "'{input}' is not a valid location. Required format is '<x> <y> <z>'";
+            "'<input>' is not a valid location. Required format is '<x> <y> <z>'";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE}
      */
@@ -106,21 +106,21 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
      * @since 1.7.0
      */
     public static final String ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NAMESPACE =
-            "Invalid namespace '{input}'. Must be [a-z0-9._-]";
+            "Invalid namespace '<input>'. Must be [a-z0-9._-]";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY}
      *
      * @since 1.7.0
      */
     public static final String ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY =
-            "Invalid key '{input}'. Must be [a-z0-9/._-]";
+            "Invalid key '<input>'. Must be [a-z0-9/._-]";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY}
      *
      * @since 1.7.0
      */
     public static final String ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NEED_NAMESPACE =
-            "Invalid input '{input}', requires an explicit namespace.";
+            "Invalid input '<input>', requires an explicit namespace.";
 
 
     @SuppressWarnings("deprecation")

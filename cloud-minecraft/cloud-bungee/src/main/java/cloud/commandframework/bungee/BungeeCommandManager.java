@@ -43,12 +43,12 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
     /**
      * Default caption for {@link BungeeCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'{input}' is not a valid player";
+    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'<input>' is not a valid player";
 
     /**
      * Default caption for {@link BungeeCaptionKeys#ARGUMENT_PARSE_FAILURE_SERVER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'{input}' is not a valid server";
+    public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'<input>' is not a valid server";
 
     private final Plugin owningPlugin;
     private final Function<CommandSender, C> commandSenderMapper;

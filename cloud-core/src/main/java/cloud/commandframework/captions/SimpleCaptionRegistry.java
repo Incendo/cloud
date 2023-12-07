@@ -44,59 +44,59 @@ public class SimpleCaptionRegistry<C> implements FactoryDelegatingCaptionRegistr
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_BOOLEAN}.
      */
-    public static final String ARGUMENT_PARSE_FAILURE_BOOLEAN = "Could not parse boolean from '{input}'";
+    public static final String ARGUMENT_PARSE_FAILURE_BOOLEAN = "Could not parse boolean from '<input>'";
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_NUMBER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_NUMBER = "'{input}' is not a valid number in the range {min} to {max}";
+    public static final String ARGUMENT_PARSE_FAILURE_NUMBER = "'<input>' is not a valid number in the range <min> to <max>";
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_CHAR}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_CHAR = "'{input}' is not a valid character";
+    public static final String ARGUMENT_PARSE_FAILURE_CHAR = "'<input>' is not a valid character";
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_ENUM}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_ENUM = "'{input}' is not one of the following: {acceptableValues}";
+    public static final String ARGUMENT_PARSE_FAILURE_ENUM = "'<input>' is not one of the following: <acceptableValues>";
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_STRING}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_STRING = "'{input}' is not a valid string of type {stringMode}";
+    public static final String ARGUMENT_PARSE_FAILURE_STRING = "'<input>' is not a valid string of type <stringMode>";
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_UUID}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_UUID = "'{input}' is not a valid UUID";
+    public static final String ARGUMENT_PARSE_FAILURE_UUID = "'<input>' is not a valid UUID";
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_REGEX}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_REGEX = "'{input}' does not match '{pattern}'";
+    public static final String ARGUMENT_PARSE_FAILURE_REGEX = "'<input>' does not match '<pattern>'";
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG = "Unknown flag '{flag}'";
+    public static final String ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG = "Unknown flag '<flag>'";
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG = "Duplicate flag '{flag}'";
+    public static final String ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG = "Duplicate flag '<flag>'";
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED = "No flag started. Don't know what to do with '{input}'";
+    public static final String ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED = "No flag started. Don't know what to do with '<input>'";
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT = "Missing argument for '{flag}'";
+    public static final String ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT = "Missing argument for '<flag>'";
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_FLAG_NO_PERMISSION}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_FLAG_NO_PERMISSION = "You don't have permission to use '{flag}'";
+    public static final String ARGUMENT_PARSE_FAILURE_FLAG_NO_PERMISSION = "You don't have permission to use '<flag>'";
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_COLOR}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_COLOR = "'{input}' is not a valid color";
+    public static final String ARGUMENT_PARSE_FAILURE_COLOR = "'<input>' is not a valid color";
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_DURATION}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_DURATION = "'{input}' is not a duration format";
+    public static final String ARGUMENT_PARSE_FAILURE_DURATION = "'<input>' is not a duration format";
 
     private final Map<Caption, BiFunction<Caption, C, String>> messageFactories = new HashMap<>();
 

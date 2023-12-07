@@ -51,7 +51,7 @@ public final class RegexExample implements BuilderFeature {
         if (manager.captionRegistry() instanceof SimpleCaptionRegistry) {
             ((SimpleCaptionRegistry<CommandSender>) manager.captionRegistry()).registerMessageFactory(
                     moneyCaption,
-                    (sender, key) -> "'{input}' is not very cash money of you"
+                    (sender, key) -> "'<input>' is not very cash money of you"
             );
         }
 

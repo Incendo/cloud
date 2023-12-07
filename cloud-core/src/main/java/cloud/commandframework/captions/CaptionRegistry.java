@@ -35,11 +35,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface CaptionRegistry<C> {
 
     /**
-     * Get a caption for a specific sender
+     * Returns the value of the given {@code caption} for the given {@code sender}.
      *
-     * @param caption Caption key
-     * @param sender  Sender
-     * @return Caption
+     * @param caption the caption key
+     * @param sender  the sender to get the caption for
+     * @return the caption value
      */
     @NonNull String getCaption(@NonNull Caption caption, @NonNull C sender);
 }

@@ -23,63 +23,33 @@
 //
 package cloud.commandframework.captions;
 
-import java.util.Objects;
+import cloud.commandframework.internal.ImmutableImpl;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
 /**
- * This is a reference to a caption and does not contain any message itself
+ * This is a reference to a caption and does not contain any message itself.
  */
+@ImmutableImpl
+@Value.Immutable
 @API(status = API.Status.STABLE)
-public final class Caption {
+public interface Caption {
 
-    private final String key;
-
-    private Caption(final @NonNull String key) {
-        this.key = key;
+    /**
+     * Creates a new caption with a given key
+     *
+     * @param key the caption key
+     * @return the created caption
+     */
+    static @NonNull Caption of(final @NonNull String key) {
+        return CaptionImpl.of(key);
     }
 
     /**
-     * Create a new caption with a given key
+     * Returns the caption key.
      *
-     * @param key Caption key
-     * @return Created caption
+     * @return the caption key
      */
-    public static @NonNull Caption of(final @NonNull String key) {
-        return new Caption(key);
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final Caption caption = (Caption) o;
-        return Objects.equals(this.key, caption.key);
-    }
-
-    /**
-     * Get the caption key
-     *
-     * @return Caption key
-     */
-    public @NonNull String getKey() {
-        return this.key;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.key);
-    }
-
-    @Override
-    public String toString() {
-        return String.format(
-                "Caption{key='%s'}",
-                this.key
-        );
-    }
+    @NonNull String key();
 }

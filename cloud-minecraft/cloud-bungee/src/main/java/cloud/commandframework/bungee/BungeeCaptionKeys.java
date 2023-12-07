@@ -39,12 +39,12 @@ public final class BungeeCaptionKeys {
     private static final Collection<Caption> RECOGNIZED_CAPTIONS = new LinkedList<>();
 
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_PLAYER = of("argument.parse.failure.player");
 
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_SERVER = of("argument.parse.failure.server");
 

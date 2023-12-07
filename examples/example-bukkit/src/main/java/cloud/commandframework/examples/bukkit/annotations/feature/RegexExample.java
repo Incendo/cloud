@@ -58,7 +58,7 @@ public final class RegexExample implements AnnotationFeature {
         if (annotationParser.manager().captionRegistry() instanceof SimpleCaptionRegistry) {
             ((SimpleCaptionRegistry<CommandSender>) annotationParser.manager().captionRegistry()).registerMessageFactory(
                     moneyCaption,
-                    (sender, key) -> "'{input}' is not very cash money of you"
+                    (sender, key) -> "'<input>' is not very cash money of you"
             );
         }
     }

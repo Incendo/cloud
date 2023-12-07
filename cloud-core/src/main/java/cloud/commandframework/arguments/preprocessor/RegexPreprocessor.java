@@ -138,7 +138,7 @@ public final class RegexPreprocessor<C> implements ComponentPreprocessor<C> {
 
         @Override
         public String getMessage() {
-            return this.commandContext.formatMessage(
+            return this.commandContext.formatCaption(
                     this.failureCaption,
                     CaptionVariable.of(
                             "input",

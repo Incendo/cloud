@@ -42,59 +42,59 @@ public final class StandardCaptionKeys {
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED = of("argument.parse.failure.no_input_was_provided");
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_BOOLEAN = of("argument.parse.failure.boolean");
     /**
-     * Variables: {input}, {min}, {max}
+     * Variables: {@code <input>}, {@code <min>}, {@code <max>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_NUMBER = of("argument.parse.failure.number");
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_CHAR = of("argument.parse.failure.char");
     /**
-     * Variables: {input}, {stringMode}
+     * Variables: {@code <input>}, {@code <stringMode>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_STRING = of("argument.parse.failure.string");
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_UUID = of("argument.parse.failure.uuid");
     /**
-     * Variables: {input}, {acceptableValues}
+     * Variables: {@code <input>}, {@code <acceptableValues>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_ENUM = of("argument.parse.failure.enum");
     /**
-     * Variables: {input}, {pattern}
+     * Variables: {@code <input>}, {@code <pattern>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_REGEX = of("argument.parse.failure.regex");
     /**
-     * Variables: {flag}
+     * Variables: {@code <flag>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG = of("argument.parse.failure.flag.unknown");
     /**
-     * Variables: {flag}
+     * Variables: {@code <flag>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG = of("argument.parse.failure.flag.duplicate_flag");
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED = of("argument.parse.failure.flag.no_flag_started");
     /**
-     * Variables: {flag}
+     * Variables: {@code <flag>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT = of("argument.parse.failure.flag.missing_argument");
     /**
-     * Variables: {flag}
+     * Variables: {@code <flag>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_FLAG_NO_PERMISSION = of("argument.parse.failure.flag.no_permission");
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_COLOR = of("argument.parse.failure.color");
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_DURATION = of("argument.parse.failure.duration");
 
@@ -112,7 +112,7 @@ public final class StandardCaptionKeys {
      *
      * @return Immutable collection of keys
      */
-    public static @NonNull Collection<@NonNull Caption> getStandardCaptionKeys() {
+    public static @NonNull Collection<@NonNull Caption> standardCaptionKeys() {
         return Collections.unmodifiableCollection(RECOGNIZED_CAPTIONS);
     }
 }

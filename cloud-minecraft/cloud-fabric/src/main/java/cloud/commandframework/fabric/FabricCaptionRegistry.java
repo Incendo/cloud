@@ -39,14 +39,14 @@ public class FabricCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
      * @since 1.5.0
      */
     public static final String ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY =
-            "Could not find value with key '{id}' in registry '{registry}'.";
+            "Could not find value with key '<id>' in registry '<registry>'.";
 
     /**
      * Default caption for {@link FabricCaptionKeys#ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN}
      *
      * @since 1.5.0
      */
-    public static final String ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN = "Could not find any team named '{input}'!";
+    public static final String ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN = "Could not find any team named '<input>'!";
 
     protected FabricCaptionRegistry() {
         super();

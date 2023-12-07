@@ -66,12 +66,12 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
     /**
      * Default caption for {@link VelocityCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'{input}' is not a valid player";
+    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'<input>' is not a valid player";
 
     /**
      * Default caption for {@link VelocityCaptionKeys#ARGUMENT_PARSE_FAILURE_SERVER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'{input}' is not a valid server";
+    public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'<input>' is not a valid server";
 
     private final ProxyServer proxyServer;
     private final Function<CommandSource, C> commandSenderMapper;

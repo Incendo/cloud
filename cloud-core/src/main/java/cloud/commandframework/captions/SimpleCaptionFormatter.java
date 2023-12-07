@@ -26,18 +26,20 @@ package cloud.commandframework.captions;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Utility that replaces variables in captions
- */
 @API(status = API.Status.STABLE)
-public interface CaptionVariableReplacementHandler {
+public final class SimpleCaptionFormatter<C> implements CaptionFormatter<C, String> {
 
-    /**
-     * Replace the variables in a message and return the result
-     *
-     * @param string    Message to replace variables in
-     * @param variables Variables
-     * @return Transformed message
-     */
-    @NonNull String replaceVariables(@NonNull String string, @NonNull CaptionVariable... variables);
+    @Override
+    public @NonNull String formatCaption(
+            final @NonNull Caption captionKey,
+            final @NonNull C recipient,
+            final @NonNull String caption,
+            final @NonNull CaptionVariable... variables
+    ) {
+        String replacedString = caption;
+        for (final CaptionVariable variable : variables) {
+            replacedString = replacedString.replace(String.format("<%s>", variable.key()), variable.value());
+        }
+        return replacedString;
+    }
 }
