@@ -32,8 +32,6 @@ import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.velocity.arguments.PlayerArgument;
 import cloud.commandframework.velocity.arguments.ServerArgument;
 import com.google.inject.Inject;
@@ -140,11 +138,6 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
     @Override
     public final boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
-    }
-
-    @Override
-    public final @NonNull CommandMeta createDefaultCommandMeta() {
-        return SimpleCommandMeta.empty();
     }
 
     /**

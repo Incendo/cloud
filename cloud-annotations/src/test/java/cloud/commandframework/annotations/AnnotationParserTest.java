@@ -38,7 +38,6 @@ import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -72,7 +71,7 @@ class AnnotationParserTest {
     @BeforeAll
     void setup() {
         manager = new TestCommandManager();
-        annotationParser = new AnnotationParser<>(manager, TestCommandSender.class, p -> SimpleCommandMeta.empty());
+        annotationParser = new AnnotationParser<>(manager, TestCommandSender.class);
         manager.parserRegistry().registerNamedParserSupplier("potato", p -> new StringParser<>(StringParser.StringMode.SINGLE));
         /* Register a suggestion provider */
         manager.parserRegistry().registerSuggestionProvider(

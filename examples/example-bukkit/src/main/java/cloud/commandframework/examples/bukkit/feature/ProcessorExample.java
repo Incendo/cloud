@@ -29,7 +29,7 @@ import cloud.commandframework.execution.postprocessor.CommandPostprocessingConte
 import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
-import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.services.types.ConsumerService;
 import java.util.logging.Logger;
 import org.bukkit.command.CommandSender;
@@ -73,7 +73,7 @@ public final class ProcessorExample {
      */
     public static final class ExamplePostProcessor implements CommandPostprocessor<CommandSender> {
 
-        private static final CommandMeta.Key<Boolean> REQUIRES_BOOTS = CommandMeta.Key.of(Boolean.class, "requires_boots");
+        private static final CloudKey<Boolean> REQUIRES_BOOTS = CloudKey.of("requires_boots", Boolean.class);
 
         @Override
         public void accept(final @NonNull CommandPostprocessingContext<CommandSender> context) {

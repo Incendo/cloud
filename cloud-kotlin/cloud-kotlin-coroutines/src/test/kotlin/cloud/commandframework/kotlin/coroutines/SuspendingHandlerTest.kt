@@ -28,8 +28,6 @@ import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
 import cloud.commandframework.kotlin.coroutines.extension.suspendingHandler
 import cloud.commandframework.kotlin.extension.buildAndRegister
-import cloud.commandframework.meta.CommandMeta
-import cloud.commandframework.meta.SimpleCommandMeta
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
@@ -69,7 +67,5 @@ class SuspendingHandlerTest {
     ) {
 
         override fun hasPermission(sender: TestCommandSender, permission: String): Boolean = true
-
-        override fun createDefaultCommandMeta(): CommandMeta = SimpleCommandMeta.empty()
     }
 }

@@ -21,25 +21,56 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.bukkit;
+package cloud.commandframework.meta;
 
 import cloud.commandframework.keys.CloudKey;
+import java.util.HashMap;
+import java.util.Map;
 import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 @API(status = API.Status.STABLE, since = "2.0.0")
-public final class BukkitCommandMeta {
+public class CommandMetaBuilder {
+
+    private final Map<CloudKey<?>, Object> map = new HashMap<>();
+
+    CommandMetaBuilder() {
+    }
 
     /**
-     * The description to show for the Bukkit command.
-     * <p>
-     * If this is not set then Bukkit will attempt to retrieve the {@link cloud.commandframework.CommandDescription}
-     * for the command.
-     * <p>
-     * If the command description is empty, then Bukkit will attempt to fall back on the argument description of
-     * the root literal.
+     * Copies all values from another {@link CommandMeta} instance
+     *
+     * @param commandMeta the instance to copy from
+     * @return {@code this}
      */
-    public static final CloudKey<String> BUKKIT_DESCRIPTION = CloudKey.of("bukkit_description", String.class);
+    public @NonNull @This CommandMetaBuilder with(final @NonNull CommandMeta commandMeta) {
+        this.map.putAll(commandMeta.all());
+        return this;
+    }
 
-    private BukkitCommandMeta() {
+    /**
+     * Stores the given {@code key}-{@code value} pair.
+     *
+     * @param <V>   the value type
+     * @param key   the key
+     * @param value the value
+     * @return {@code this}
+     */
+    public <V> @NonNull @This CommandMetaBuilder with(
+            final @NonNull CloudKey<V> key,
+            final @NonNull V value
+    ) {
+        this.map.put(key, value);
+        return this;
+    }
+
+    /**
+     * Builds a new {@link CommandMeta} instance using the stored {@code key}-{@code value} pairs.
+     *
+     * @return the instance
+     */
+    public @NonNull CommandMeta build() {
+        return new SimpleCommandMeta(this.map);
     }
 }

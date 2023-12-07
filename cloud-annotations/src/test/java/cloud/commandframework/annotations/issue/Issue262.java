@@ -34,7 +34,6 @@ import cloud.commandframework.help.HelpQuery;
 import cloud.commandframework.help.result.HelpQueryResult;
 import cloud.commandframework.help.result.MultipleCommandResult;
 import cloud.commandframework.help.result.VerboseCommandResult;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,8 +60,7 @@ class Issue262 {
         this.commandHelpHandler = this.manager.createHelpHandler();
         this.annotationParser = new AnnotationParser<>(
                 this.manager,
-                TestCommandSender.class,
-                (parameters) -> SimpleCommandMeta.empty()
+                TestCommandSender.class
         );
     }
 

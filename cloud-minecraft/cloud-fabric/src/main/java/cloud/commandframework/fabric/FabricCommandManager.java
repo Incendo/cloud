@@ -39,8 +39,6 @@ import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.fabric.argument.RegistryEntryArgument;
 import cloud.commandframework.fabric.argument.TeamArgument;
 import cloud.commandframework.fabric.data.MinecraftTime;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.permission.PredicatePermission;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.Codec;
@@ -315,11 +313,6 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
             final @NonNull ArgumentType<T> argument
     ) {
         this.parserRegistry().registerParserSupplier(type, params -> new WrappedBrigadierParser<>(argument));
-    }
-
-    @Override
-    public final @NonNull CommandMeta createDefaultCommandMeta() {
-        return SimpleCommandMeta.empty();
     }
 
     /**

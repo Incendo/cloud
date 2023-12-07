@@ -67,7 +67,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     private boolean disabled;
 
     private static @NonNull String description(final @NonNull Command<?> command) {
-        final Optional<String> bukkitDescription = command.commandMeta().get(BukkitCommandMeta.BUKKIT_DESCRIPTION);
+        final Optional<String> bukkitDescription = command.commandMeta().optional(BukkitCommandMeta.BUKKIT_DESCRIPTION);
         if (bukkitDescription.isPresent()) {
             return bukkitDescription.get();
         }

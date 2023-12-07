@@ -28,8 +28,6 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import java.util.concurrent.CompletionException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,11 +59,6 @@ class CommandDeletionTest {
                     final @NonNull String permission
             ) {
                 return true;
-            }
-
-            @Override
-            public @NonNull CommandMeta createDefaultCommandMeta() {
-                return SimpleCommandMeta.empty();
             }
         };
     }

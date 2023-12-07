@@ -254,7 +254,7 @@ public class MutableCommandBuilder<C : Any>(
      * @return this mutable builder
      * @since 1.3.0
      */
-    public fun <T : Any> meta(key: CommandMeta.Key<T>, value: T): MutableCommandBuilder<C> =
+    public fun <T : Any> meta(key: CloudKey<T>, value: T): MutableCommandBuilder<C> =
         mutate {
             it.meta(key, value)
         }
@@ -267,7 +267,7 @@ public class MutableCommandBuilder<C : Any>(
      * @return this mutable builder
      * @since 1.3.0
      */
-    public infix fun <T : Any> CommandMeta.Key<T>.to(value: T): MutableCommandBuilder<C> =
+    public infix fun <T : Any> CloudKey<T>.to(value: T): MutableCommandBuilder<C> =
         meta(this, value)
 
     /**

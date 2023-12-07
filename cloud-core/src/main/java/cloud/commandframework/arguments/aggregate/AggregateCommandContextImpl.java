@@ -25,7 +25,6 @@ package cloud.commandframework.arguments.aggregate;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +54,7 @@ final class AggregateCommandContextImpl<C> implements AggregateCommandContext<C>
 
     @Override
     public <T> @NonNull T get(@NonNull final CloudKey<T> key) {
-        if (!this.validKeys.contains(key.getName())) {
+        if (!this.validKeys.contains(key.name())) {
             throw new NullPointerException("No value with the given key has been stored in the context");
         }
         final Object value = Objects.requireNonNull(this.storage.get(key));
@@ -68,7 +67,7 @@ final class AggregateCommandContextImpl<C> implements AggregateCommandContext<C>
         if (!this.validKeys.contains(key)) {
             throw new NullPointerException("No value with the given key has been stored in the context");
         }
-        final Object value = Objects.requireNonNull(this.storage.get(SimpleCloudKey.of(key)));
+        final Object value = Objects.requireNonNull(this.storage.get(CloudKey.of(key)));
         return (T) value;
     }
 
@@ -79,6 +78,6 @@ final class AggregateCommandContextImpl<C> implements AggregateCommandContext<C>
 
     @Override
     public boolean contains(@NonNull final String key) {
-        return this.storage.containsKey(SimpleCloudKey.of(key));
+        return this.storage.containsKey(CloudKey.of(key));
     }
 }

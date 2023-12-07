@@ -60,7 +60,7 @@ class StringProcessingTest {
         this.annotationParser = new AnnotationParser<>(
                 this.commandManager,
                 TestCommandSender.class,
-                p -> CommandMeta.simple().build()
+                p -> CommandMeta.builder().build()
         );
     }
 

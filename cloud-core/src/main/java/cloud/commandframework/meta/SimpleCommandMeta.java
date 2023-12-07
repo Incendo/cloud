@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.meta;
 
+import cloud.commandframework.keys.CloudKey;
 import io.leangen.geantyref.GenericTypeReflector;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,7 +32,6 @@ import java.util.Objects;
 import java.util.Optional;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * A simple immutable string-string map containing command meta
@@ -40,62 +40,51 @@ import org.checkerframework.common.returnsreceiver.qual.This;
 @API(status = API.Status.STABLE)
 public class SimpleCommandMeta extends CommandMeta {
 
-    private final Map<String, Object> metaMap;
+    private final Map<CloudKey<?>, Object> metaMap;
 
-    protected SimpleCommandMeta(final SimpleCommandMeta source) {
-        this.metaMap = source.metaMap;
-    }
-
-    // Constructor needs an extra flag to distinguish it from the old one (for reified generics)
-    SimpleCommandMeta(final @NonNull Map<@NonNull String, @NonNull Object> metaMap, final boolean unusedMarkerForNew) {
-        this.metaMap = Collections.unmodifiableMap(metaMap);
-    }
-
-    /**
-     * Create a new meta builder
-     *
-     * @return Builder instance
-     */
-    public static SimpleCommandMeta.@NonNull Builder builder() {
-        return new Builder();
-    }
-
-    /**
-     * Create an empty simple command meta instance
-     *
-     * @return Empty instance
-     */
-    public static @NonNull SimpleCommandMeta empty() {
-        return SimpleCommandMeta.builder().build();
+    protected SimpleCommandMeta(final @NonNull Map<@NonNull CloudKey<?>, @NonNull Object> metaMap) {
+        this.metaMap = Collections.unmodifiableMap(new HashMap<>(metaMap));
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public final @NonNull <V> Optional<V> get(final @NonNull Key<V> key) {
-        final Object value = this.metaMap.get(key.getName());
+    public final @NonNull <V> Optional<V> optional(final @NonNull CloudKey<V> key) {
+        final Object value = this.metaMap.get(key);
         if (value == null) {
-            // Attempt to use a fallback legacy type
-            if (key.getFallbackDerivation() != null) {
-                return Optional.ofNullable(key.getFallbackDerivation().apply(this));
-            }
-
             return Optional.empty();
         }
-        if (!GenericTypeReflector.isSuperType(key.getValueType().getType(), value.getClass())) {
+        if (!GenericTypeReflector.isSuperType(key.type().getType(), value.getClass())) {
             throw new IllegalArgumentException("Conflicting argument types between key type of "
-                    + key.getValueType().getType().getTypeName() + " and value type of " + value.getClass());
+                    + key.type().getType().getTypeName() + " and value type of " + value.getClass());
         }
 
         return Optional.of((V) value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public final <V> @NonNull V getOrDefault(final @NonNull Key<V> key, final @NonNull V defaultValue) {
-        return this.get(key).orElse(defaultValue);
+    @SuppressWarnings("unchecked")
+    public @NonNull <V> Optional<V> optional(@NonNull final String key) {
+        final Object value = this.metaMap.get(CloudKey.of(key));
+        if (value == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of((V) value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean contains(@NonNull final CloudKey<?> key) {
+        return this.metaMap.containsKey(key);
     }
 
     @Override
-    public final @NonNull Map<@NonNull String, @NonNull ?> getAllValues() {
+    public final @NonNull Map<@NonNull CloudKey<?>, @NonNull ?> all() {
         return new HashMap<>(this.metaMap);
     }
 
@@ -114,60 +103,5 @@ public class SimpleCommandMeta extends CommandMeta {
     @Override
     public final int hashCode() {
         return Objects.hashCode(this.metaMap);
-    }
-
-
-    /**
-     * Builder for {@link SimpleCommandMeta}
-     */
-    @API(status = API.Status.STABLE)
-    public static final class Builder {
-
-        private final Map<String, Object> map = new HashMap<>();
-
-        private Builder() {
-        }
-
-        /**
-         * Copy all values from another command meta instance
-         *
-         * @param commandMeta Existing instance
-         * @return Builder instance
-         */
-        public @NonNull @This Builder with(final @NonNull CommandMeta commandMeta) {
-            if (commandMeta instanceof SimpleCommandMeta) {
-                this.map.putAll(((SimpleCommandMeta) commandMeta).metaMap);
-            } else {
-                this.map.putAll(commandMeta.getAllValues());
-            }
-            return this;
-        }
-
-        /**
-         * Store a new key-value pair in the meta map
-         *
-         * @param <V>   Value type
-         * @param key   Key
-         * @param value Value
-         * @return Builder instance
-         * @since 1.3.0
-         */
-        @API(status = API.Status.STABLE, since = "1.3.0")
-        public <V> @NonNull @This Builder with(
-                final @NonNull Key<V> key,
-                final @NonNull V value
-        ) {
-            this.map.put(key.getName(), value);
-            return this;
-        }
-
-        /**
-         * Construct a new meta instance
-         *
-         * @return Meta instance
-         */
-        public @NonNull SimpleCommandMeta build() {
-            return new SimpleCommandMeta(this.map, false);
-        }
     }
 }

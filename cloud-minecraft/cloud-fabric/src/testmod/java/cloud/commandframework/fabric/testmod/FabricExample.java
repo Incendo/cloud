@@ -44,7 +44,6 @@ import cloud.commandframework.fabric.data.MultipleEntitySelector;
 import cloud.commandframework.fabric.data.MultiplePlayerSelector;
 import cloud.commandframework.fabric.testmod.mixin.GiveCommandAccess;
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Collection;
 import java.util.Comparator;
@@ -83,8 +82,8 @@ public final class FabricExample implements ModInitializer {
 
         final Command.Builder<CommandSourceStack> base = manager.commandBuilder("cloudtest");
 
-        final CloudKey<String> name = SimpleCloudKey.of("name", String.class);
-        final CloudKey<Integer> hugs = SimpleCloudKey.of("hugs", Integer.class);
+        final CloudKey<String> name = CloudKey.of("name", String.class);
+        final CloudKey<Integer> hugs = CloudKey.of("hugs", Integer.class);
 
         manager.command(base
                 .literal("hugs")
