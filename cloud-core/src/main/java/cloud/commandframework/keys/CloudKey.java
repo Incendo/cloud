@@ -88,6 +88,52 @@ public abstract class CloudKey<T> {
     }
 
     /**
+     * Creates a new key.
+     *
+     * @param <T>  the generic type of the value represented by the key
+     * @param name the name of the key
+     * @param type the type of the value represented by the key
+     * @return the created key
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <@NonNull T> CloudKey<T> cloudKey(
+            final @NonNull String name,
+            final @NonNull TypeToken<T> type
+    ) {
+        return CloudKeyImpl.of(name, type);
+    }
+
+    /**
+     * Creates a new key.
+     *
+     * @param <T>  the generic type of the value represented by the key
+     * @param name the name of the key
+     * @param type the type of the value represented by the key
+     * @return the created key
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <@NonNull T> CloudKey<T> cloudKey(
+            final @NonNull String name,
+            final @NonNull Class<T> type
+    ) {
+        return CloudKeyImpl.of(name, TypeToken.get(type));
+    }
+
+    /**
+     * Creates a new type-less key.
+     *
+     * @param name the name of the key
+     * @return the created key
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static @NonNull CloudKey<Void> cloudKey(final @NonNull String name) {
+        return CloudKeyImpl.of(name, TypeToken.get(Void.TYPE));
+    }
+
+    /**
      * Returns the name of the key.
      * <p>
      * The name of the key should be used to
