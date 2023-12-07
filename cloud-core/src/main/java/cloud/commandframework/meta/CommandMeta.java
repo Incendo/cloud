@@ -25,7 +25,7 @@ package cloud.commandframework.meta;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.CloudKeyRegistry;
+import cloud.commandframework.keys.CloudKeyContainer;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -36,7 +36,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Appropriate use for command meta would be fixed state, such as command descriptions.
  */
 @API(status = API.Status.STABLE)
-public abstract class CommandMeta implements CloudKeyRegistry {
+public abstract class CommandMeta implements CloudKeyContainer {
 
     public static final CloudKey<Boolean> HIDDEN = CloudKey.of(
             "cloud:hidden",

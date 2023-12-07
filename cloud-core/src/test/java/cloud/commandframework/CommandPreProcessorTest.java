@@ -47,10 +47,10 @@ public class CommandPreProcessorTest {
                 .handler(
                         commandContext -> System.out.printf(
                                 "enum = %s | integer = %d\n",
-                                commandContext.<SampleEnum>getOptional(
+                                commandContext.<SampleEnum>optional(
                                         "enum").orElse(
                                         SampleEnum.VALUE1),
-                                commandContext.<Integer>getOptional(
+                                commandContext.<Integer>optional(
                                         "int").orElseThrow(
                                         () -> new NullPointerException(
                                                 "int"))
@@ -62,7 +62,7 @@ public class CommandPreProcessorTest {
     @Test
     void testPreprocessing() {
         Assertions.assertEquals(10, manager.executeCommand(new TestCommandSender(), "10 test value1")
-                .join().getCommandContext().<Integer>getOptional("int").orElse(0));
+                .join().getCommandContext().<Integer>optional("int").orElse(0));
         manager.executeCommand(new TestCommandSender(), "aa test value1").join();
     }
 

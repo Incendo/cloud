@@ -32,8 +32,8 @@ import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.CaptionVariableReplacementHandler;
 import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.keys.CloudKeyContainer;
 import cloud.commandframework.keys.CloudKeyHolder;
-import cloud.commandframework.keys.CloudKeyRegistry;
 import cloud.commandframework.permission.CommandPermission;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,7 +53,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  */
 @API(status = API.Status.STABLE)
-public class CommandContext<C> implements CloudKeyRegistry {
+public class CommandContext<C> implements CloudKeyContainer {
 
     private final CaptionVariableReplacementHandler captionVariableReplacementHandler;
     private final List<ParsingContext<C>> parsingContexts = new LinkedList<>();
@@ -248,7 +248,7 @@ public class CommandContext<C> implements CloudKeyRegistry {
      * {@inheritDoc}
      */
     @Override
-    public <T extends @NonNull Object> @NonNull Optional<T> getOptional(final @NonNull CloudKey<T> key) {
+    public <T extends @NonNull Object> @NonNull Optional<T> optional(final @NonNull CloudKey<T> key) {
         final Object value = this.internalStorage.get(key);
         if (value != null) {
             @SuppressWarnings("unchecked") final T castedValue = (T) value;
@@ -262,7 +262,7 @@ public class CommandContext<C> implements CloudKeyRegistry {
      * {@inheritDoc}
      */
     @Override
-    public <T extends @NonNull Object> @NonNull Optional<T> getOptional(final @NonNull String key) {
+    public <T extends @NonNull Object> @NonNull Optional<T> optional(final @NonNull String key) {
         final Object value = this.internalStorage.get(CloudKey.of(key));
         if (value != null) {
             @SuppressWarnings("unchecked") final T castedValue = (T) value;

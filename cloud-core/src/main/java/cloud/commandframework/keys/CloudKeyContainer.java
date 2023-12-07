@@ -31,7 +31,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 @SuppressWarnings({"unchecked", "TypeParameterUnusedInFormals", "unused"})
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface CloudKeyRegistry {
+public interface CloudKeyContainer {
 
     /**
      * Returns the value associated with the given {@code key}.
@@ -40,7 +40,7 @@ public interface CloudKeyRegistry {
      * @param key the key
      * @return the value
      */
-    <V extends @NonNull Object> @NonNull Optional<V> getOptional(@NonNull CloudKey<V> key);
+    <V extends @NonNull Object> @NonNull Optional<V> optional(@NonNull CloudKey<V> key);
 
     /**
      * Returns the value associated with the given {@code key}.
@@ -49,7 +49,7 @@ public interface CloudKeyRegistry {
      * @param key the key
      * @return the value
      */
-    <V extends @NonNull Object> @NonNull Optional<V> getOptional(@NonNull String key);
+    <V extends @NonNull Object> @NonNull Optional<V> optional(@NonNull String key);
 
     /**
      * Returns the value associated with the given {@code keyHolder}.
@@ -58,8 +58,8 @@ public interface CloudKeyRegistry {
      * @param keyHolder the holder of the key
      * @return the value
      */
-    default <V extends @NonNull Object> @NonNull Optional<V> getOptional(@NonNull CloudKeyHolder<V> keyHolder) {
-        return this.getOptional(keyHolder.key());
+    default <V extends @NonNull Object> @NonNull Optional<V> optional(@NonNull CloudKeyHolder<V> keyHolder) {
+        return this.optional(keyHolder.key());
     }
 
     /**
@@ -72,7 +72,7 @@ public interface CloudKeyRegistry {
      * @return the value
      */
     default <V> V getOrDefault(@NonNull CloudKey<@NonNull V> key, V defaultValue) {
-        return this.getOptional(key).orElse(defaultValue);
+        return this.optional(key).orElse(defaultValue);
     }
 
     /**
@@ -85,7 +85,7 @@ public interface CloudKeyRegistry {
      * @return the value
      */
     default <V> V getOrDefault(@NonNull String key, V defaultValue) {
-        return this.<V>getOptional(key).orElse(defaultValue);
+        return this.<V>optional(key).orElse(defaultValue);
     }
 
     /**
@@ -111,7 +111,7 @@ public interface CloudKeyRegistry {
      * @return the value
      */
     default <V> V getOrSupplyDefault(@NonNull CloudKey<@NonNull V> key, @NonNull Supplier<V> supplier) {
-        return this.getOptional(key).orElseGet(supplier);
+        return this.optional(key).orElseGet(supplier);
     }
 
     /**
@@ -124,7 +124,7 @@ public interface CloudKeyRegistry {
      * @return the value
      */
     default <V> V getOrSupplyDefault(@NonNull String key, @NonNull Supplier<V> supplier) {
-        return this.<V>getOptional(key).orElseGet(supplier);
+        return this.<V>optional(key).orElseGet(supplier);
     }
 
     /**
@@ -137,7 +137,7 @@ public interface CloudKeyRegistry {
      * @return the value
      */
     default <V> V getOrSupplyDefault(@NonNull CloudKeyHolder<@NonNull V> keyHolder, @NonNull Supplier<V> supplier) {
-        return this.getOptional(keyHolder).orElseGet(supplier);
+        return this.optional(keyHolder).orElseGet(supplier);
     }
 
     /**
@@ -149,7 +149,7 @@ public interface CloudKeyRegistry {
      * @throws NullPointerException if the value is missing
      */
     default <V extends @NonNull Object> V get(@NonNull CloudKey<V> key) {
-        return this.getOptional(key).orElseThrow(() -> new NullPointerException(
+        return this.optional(key).orElseThrow(() -> new NullPointerException(
                 String.format("There is no object in the registry identified by the key '%s'", key.name())
         ));
     }
@@ -163,7 +163,7 @@ public interface CloudKeyRegistry {
      * @throws NullPointerException if the value is missing
      */
     default <V extends @NonNull Object> V get(@NonNull String key) {
-        return this.getOptional(key).map(value -> (V) value).orElseThrow(() -> new NullPointerException(
+        return this.optional(key).map(value -> (V) value).orElseThrow(() -> new NullPointerException(
                 String.format("There is no object in the registry identified by the key '%s'", key)
         ));
     }
