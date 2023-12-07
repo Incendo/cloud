@@ -40,34 +40,51 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE)
 public class SimpleCommandMeta extends CommandMeta {
 
-    private final Map<String, Object> metaMap;
+    private final Map<CloudKey<?>, Object> metaMap;
 
-    protected SimpleCommandMeta(final @NonNull Map<@NonNull String, @NonNull Object> metaMap) {
-        this.metaMap = Collections.unmodifiableMap(metaMap);
+    protected SimpleCommandMeta(final @NonNull Map<@NonNull CloudKey<?>, @NonNull Object> metaMap) {
+        this.metaMap = Collections.unmodifiableMap(new HashMap<>(metaMap));
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public final @NonNull <V> Optional<V> get(final @NonNull CloudKey<V> key) {
-        final Object value = this.metaMap.get(key.getName());
+    public final @NonNull <V> Optional<V> optional(final @NonNull CloudKey<V> key) {
+        final Object value = this.metaMap.get(key);
         if (value == null) {
             return Optional.empty();
         }
-        if (!GenericTypeReflector.isSuperType(key.getType().getType(), value.getClass())) {
+        if (!GenericTypeReflector.isSuperType(key.type().getType(), value.getClass())) {
             throw new IllegalArgumentException("Conflicting argument types between key type of "
-                    + key.getType().getType().getTypeName() + " and value type of " + value.getClass());
+                    + key.type().getType().getTypeName() + " and value type of " + value.getClass());
         }
 
         return Optional.of((V) value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public final <V> @NonNull V getOrDefault(final @NonNull CloudKey<V> key, final @NonNull V defaultValue) {
-        return this.get(key).orElse(defaultValue);
+    @SuppressWarnings("unchecked")
+    public @NonNull <V> Optional<V> optional(@NonNull final String key) {
+        final Object value = this.metaMap.get(CloudKey.of(key));
+        if (value == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of((V) value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean contains(@NonNull final CloudKey<?> key) {
+        return this.metaMap.containsKey(key);
     }
 
     @Override
-    public final @NonNull Map<@NonNull String, @NonNull ?> getAllValues() {
+    public final @NonNull Map<@NonNull CloudKey<?>, @NonNull ?> all() {
         return new HashMap<>(this.metaMap);
     }
 

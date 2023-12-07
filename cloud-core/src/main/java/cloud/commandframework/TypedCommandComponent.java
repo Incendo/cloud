@@ -30,7 +30,6 @@ import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
-import cloud.commandframework.keys.SimpleCloudKey;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import org.apiguardian.api.API;
@@ -70,8 +69,8 @@ public final class TypedCommandComponent<C, T> extends CommandComponent<C> imple
     }
 
     @Override
-    public @NonNull CloudKey<T> getKey() {
-        return SimpleCloudKey.of(this.name(), this.valueType());
+    public @NonNull CloudKey<T> key() {
+        return CloudKey.of(this.name(), this.valueType());
     }
 
     @Override

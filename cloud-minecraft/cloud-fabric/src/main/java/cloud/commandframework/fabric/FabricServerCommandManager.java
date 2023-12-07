@@ -37,7 +37,6 @@ import cloud.commandframework.fabric.data.SingleEntitySelector;
 import cloud.commandframework.fabric.data.SinglePlayerSelector;
 import cloud.commandframework.fabric.internal.LateRegistrationCatcher;
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.Function;
 import me.lucko.fabric.api.permissions.v0.Permissions;
@@ -69,7 +68,7 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      *
      * @since 1.5.0
      */
-    public static final CloudKey<Commands.CommandSelection> META_REGISTRATION_ENVIRONMENT = SimpleCloudKey.of(
+    public static final CloudKey<Commands.CommandSelection> META_REGISTRATION_ENVIRONMENT = CloudKey.of(
             "cloud:registration-environment",
             Commands.CommandSelection.class
     );

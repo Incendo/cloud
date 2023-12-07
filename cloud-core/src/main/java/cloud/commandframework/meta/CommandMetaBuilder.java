@@ -33,7 +33,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
 @API(status = API.Status.STABLE, since = "2.0.0")
 public class CommandMetaBuilder {
 
-    private final Map<String, Object> map = new HashMap<>();
+    private final Map<CloudKey<?>, Object> map = new HashMap<>();
 
     CommandMetaBuilder() {
     }
@@ -45,7 +45,7 @@ public class CommandMetaBuilder {
      * @return {@code this}
      */
     public @NonNull @This CommandMetaBuilder with(final @NonNull CommandMeta commandMeta) {
-        this.map.putAll(commandMeta.getAllValues());
+        this.map.putAll(commandMeta.all());
         return this;
     }
 
@@ -61,7 +61,7 @@ public class CommandMetaBuilder {
             final @NonNull CloudKey<V> key,
             final @NonNull V value
     ) {
-        this.map.put(key.getName(), value);
+        this.map.put(key, value);
         return this;
     }
 

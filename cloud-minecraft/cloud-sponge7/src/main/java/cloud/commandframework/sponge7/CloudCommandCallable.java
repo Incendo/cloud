@@ -197,7 +197,7 @@ final class CloudCommandCallable<C> implements CommandCallable {
 
     @Override
     public @NonNull Optional<Text> getShortDescription(final @NonNull CommandSource source) {
-        final Optional<Text> richDesc = this.cloudCommand.commandMeta().get(SpongeMetaKeys.RICH_DESCRIPTION);
+        final Optional<Text> richDesc = this.cloudCommand.commandMeta().optional(SpongeMetaKeys.RICH_DESCRIPTION);
         if (richDesc.isPresent()) {
             return richDesc;
         }
@@ -207,7 +207,7 @@ final class CloudCommandCallable<C> implements CommandCallable {
 
     @Override
     public @NonNull Optional<Text> getHelp(final @NonNull CommandSource source) {
-        final Optional<Text> richLongDesc = this.cloudCommand.commandMeta().get(SpongeMetaKeys.RICH_LONG_DESCRIPTION);
+        final Optional<Text> richLongDesc = this.cloudCommand.commandMeta().optional(SpongeMetaKeys.RICH_LONG_DESCRIPTION);
         if (richLongDesc.isPresent()) {
             return richLongDesc;
         }

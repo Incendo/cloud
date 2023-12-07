@@ -24,7 +24,6 @@
 package cloud.commandframework.bukkit;
 
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import org.apiguardian.api.API;
 
 @API(status = API.Status.STABLE, since = "2.0.0")
@@ -39,7 +38,7 @@ public final class BukkitCommandMeta {
      * If the command description is empty, then Bukkit will attempt to fall back on the argument description of
      * the root literal.
      */
-    public static final CloudKey<String> BUKKIT_DESCRIPTION = SimpleCloudKey.of("bukkit_description", String.class);
+    public static final CloudKey<String> BUKKIT_DESCRIPTION = CloudKey.of("bukkit_description", String.class);
 
     private BukkitCommandMeta() {
     }

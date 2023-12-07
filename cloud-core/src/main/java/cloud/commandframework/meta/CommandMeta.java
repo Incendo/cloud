@@ -25,9 +25,7 @@ package cloud.commandframework.meta;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
-import java.util.Map;
-import java.util.Optional;
+import cloud.commandframework.keys.CloudKeyContainer;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -38,9 +36,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Appropriate use for command meta would be fixed state, such as command descriptions.
  */
 @API(status = API.Status.STABLE)
-public abstract class CommandMeta {
+public abstract class CommandMeta implements CloudKeyContainer {
 
-    public static final CloudKey<Boolean> HIDDEN = SimpleCloudKey.of(
+    public static final CloudKey<Boolean> HIDDEN = CloudKey.of(
             "cloud:hidden",
             Boolean.class
     );
@@ -69,36 +67,4 @@ public abstract class CommandMeta {
     public final @NonNull String toString() {
         return "";
     }
-
-    /**
-     * Get the value associated with a key.
-     *
-     * @param <V> Value type
-     * @param key Key
-     * @return Optional that may contain the associated value
-     * @since 1.3.0
-     */
-    @API(status = API.Status.STABLE, since = "1.3.0")
-    public abstract <V> @NonNull Optional<V> get(@NonNull CloudKey<V> key);
-
-    /**
-     * Get the value if it exists, else return the default value.
-     *
-     * @param <V>          Value type
-     * @param key          Key
-     * @param defaultValue Default value
-     * @return Value, or default value
-     * @since 1.3.0
-     */
-    @API(status = API.Status.STABLE, since = "1.3.0")
-    public abstract <V> @NonNull V getOrDefault(@NonNull CloudKey<V> key, @NonNull V defaultValue);
-
-    /**
-     * Get a copy of the meta map, without type information.
-     *
-     * @return Copy of meta map
-     * @since 1.3.0
-     */
-    @API(status = API.Status.STABLE, since = "1.3.0")
-    public abstract @NonNull Map<@NonNull String, @NonNull ?> getAllValues();
 }
