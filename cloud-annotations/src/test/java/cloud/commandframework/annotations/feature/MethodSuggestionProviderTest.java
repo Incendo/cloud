@@ -51,8 +51,8 @@ class MethodSuggestionProviderTest {
 
     @BeforeEach
     void setup() {
-        this.commandContextFactory = new StandardCommandContextFactory<>();
         this.commandManager = new TestCommandManager();
+        this.commandContextFactory = new StandardCommandContextFactory<>(this.commandManager);
         this.annotationParser = new AnnotationParser<>(
                 this.commandManager,
                 TestCommandSender.class
@@ -66,8 +66,7 @@ class MethodSuggestionProviderTest {
         this.annotationParser.parse(instance);
         final CommandContext<TestCommandSender> context = this.commandContextFactory.create(
                 true,
-                new TestCommandSender(),
-                this.commandManager
+                new TestCommandSender()
         );
 
         // Act

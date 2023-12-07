@@ -98,7 +98,7 @@ public abstract class CommandManager<C> {
     private final EnumSet<ManagerSettings> managerSettings = EnumSet.of(
             ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS);
 
-    private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>();
+    private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>(this);
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private final ParserRegistry<C> parserRegistry = new StandardParserRegistry<>();
     private final Collection<Command<C>> commands = new LinkedList<>();
@@ -179,8 +179,7 @@ public abstract class CommandManager<C> {
     ) {
         final CommandContext<C> context = this.commandContextFactory.create(
                 false,
-                commandSender,
-                this
+                commandSender
         );
         final CommandInput commandInput = CommandInput.of(input);
         /* Store a copy of the input queue in the context */
