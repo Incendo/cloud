@@ -611,7 +611,7 @@ public class Command<C> {
                 final @NonNull Description description
         ) {
             final CommandComponent.Builder builder = CommandComponent.builder()
-                    .key(argument.getKey())
+                    .key(argument.key())
                     .parser(argument)
                     .description(description);
             if (argument instanceof SuggestionProvider) {
@@ -699,7 +699,7 @@ public class Command<C> {
                 final @NonNull Description description
         ) {
             final CommandComponent.Builder builder = CommandComponent.builder()
-                    .key(argument.getKey())
+                    .key(argument.key())
                     .parser(argument)
                     .optional()
                     .description(description);
@@ -726,7 +726,7 @@ public class Command<C> {
                 final @NonNull U argument
         ) {
             final CommandComponent.Builder builder = CommandComponent.builder()
-                    .key(argument.getKey())
+                    .key(argument.key())
                     .parser(argument);
             if (argument instanceof SuggestionProvider) {
                 builder.suggestionProvider((SuggestionProvider<C>) argument);
@@ -751,7 +751,7 @@ public class Command<C> {
                 final @NonNull U argument
         ) {
             final CommandComponent.Builder builder = CommandComponent.builder()
-                    .key(argument.getKey())
+                    .key(argument.key())
                     .parser(argument)
                     .optional();
             if (argument instanceof SuggestionProvider) {

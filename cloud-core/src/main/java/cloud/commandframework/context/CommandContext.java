@@ -193,7 +193,7 @@ public class CommandContext<C> {
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     public <T extends @NonNull Object> void store(final @NonNull CloudKeyHolder<T> keyHolder, final T value) {
-        this.internalStorage.put(keyHolder.getKey(), value);
+        this.internalStorage.put(keyHolder.key(), value);
     }
 
     /**
@@ -323,7 +323,7 @@ public class CommandContext<C> {
     @SuppressWarnings("unused")
     @API(status = API.Status.STABLE, since = "1.4.0")
     public <T extends @NonNull Object> @NonNull Optional<T> getOptional(final @NonNull CloudKeyHolder<T> keyHolder) {
-        final Object value = this.internalStorage.get(keyHolder.getKey());
+        final Object value = this.internalStorage.get(keyHolder.key());
         if (value != null) {
             @SuppressWarnings("unchecked") final T castedValue = (T) value;
             return Optional.of(castedValue);
@@ -402,7 +402,7 @@ public class CommandContext<C> {
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     public <T extends @NonNull Object> T get(final @NonNull CloudKeyHolder<T> keyHolder) {
-        return this.get(keyHolder.getKey());
+        return this.get(keyHolder.key());
     }
 
     /**

@@ -55,7 +55,7 @@ public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolde
 
     @Override
     @SuppressWarnings("FunctionalInterfaceMethodChanged")
-    default @NonNull CloudKey<Void> getKey() {
+    default @NonNull CloudKey<Void> key() {
         return CloudKey.of(this.getClass().getSimpleName());
     }
 

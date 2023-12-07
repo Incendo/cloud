@@ -69,7 +69,7 @@ public final class TypedCommandComponent<C, T> extends CommandComponent<C> imple
     }
 
     @Override
-    public @NonNull CloudKey<T> getKey() {
+    public @NonNull CloudKey<T> key() {
         return CloudKey.of(this.name(), this.valueType());
     }
 

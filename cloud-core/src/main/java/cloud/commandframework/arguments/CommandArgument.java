@@ -263,7 +263,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
     }
 
     @Override
-    public final @NonNull CloudKey<T> getKey() {
+    public final @NonNull CloudKey<T> key() {
         return this.key;
     }
 
@@ -553,7 +553,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         }
 
         @Override
-        public @NonNull CloudKey<T> getKey() {
+        public @NonNull CloudKey<T> key() {
             return CloudKey.of(this.name, this.valueType);
         }
 

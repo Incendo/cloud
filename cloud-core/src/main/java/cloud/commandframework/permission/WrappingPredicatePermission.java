@@ -48,7 +48,7 @@ final class WrappingPredicatePermission<C> implements PredicatePermission<C> {
     }
 
     @Override
-    public @NonNull CloudKey<Void> getKey() {
+    public @NonNull CloudKey<Void> key() {
         return this.key;
     }
 
