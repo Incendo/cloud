@@ -53,7 +53,7 @@ public class ParameterInjectorRegistryTest {
     void setup() {
         this.commandSender = new TestCommandSender();
         this.commandManager = createManager();
-        this.commandContextFactory = new StandardCommandContextFactory<>();
+        this.commandContextFactory = new StandardCommandContextFactory<>(this.commandManager);
         this.parameterInjectorRegistry = new ParameterInjectorRegistry<>();
         this.parameterInjectorRegistry.registerInjector(Integer.class, (context, annotationAccessor) -> INJECTED_INTEGER);
         this.commandSender = new TestCommandSender();
@@ -61,7 +61,7 @@ public class ParameterInjectorRegistryTest {
     }
 
     private @NonNull CommandContext<TestCommandSender> createContext() {
-        return this.commandContextFactory.create(false, this.commandSender, this.commandManager);
+        return this.commandContextFactory.create(false, this.commandSender);
     }
 
     @Test

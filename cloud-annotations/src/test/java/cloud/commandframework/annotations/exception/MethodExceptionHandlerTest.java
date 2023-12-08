@@ -51,7 +51,7 @@ class MethodExceptionHandlerTest {
         final CommandManager<TestCommandSender> commandManager = new TestCommandManager();
         this.exceptionController = commandManager.exceptionController();
         this.annotationParser = new AnnotationParser<>(commandManager, TestCommandSender.class);
-        this.context = commandManager.commandContextFactory().create(false, new TestCommandSender(), commandManager);
+        this.context = commandManager.commandContextFactory().create(false, new TestCommandSender());
         commandManager.parameterInjectorRegistry().registerInjector(Integer.class, ParameterInjector.constantInjector(5));
     }
 

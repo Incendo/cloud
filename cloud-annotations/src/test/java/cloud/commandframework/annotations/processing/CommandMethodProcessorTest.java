@@ -123,4 +123,18 @@ public class CommandMethodProcessorTest {
         assertThat(compilation).failed();
         assertThat(compilation).hadErrorContaining("Argument 'optional' is missing from the @CommandMethod syntax (commandMethod)");
     }
+
+    @Test
+    void testCommandMethodWithoutArgumentAnnotations() {
+        // Arrange
+        final Compiler compiler = javac().withProcessors(new CommandMethodProcessor());
+
+        // Act
+        final Compilation compilation = compiler.compile(
+                JavaFileObjects.forResource("TestCommandMethodWithoutArgumentAnnotations.java")
+        );
+
+        // Assert
+        assertThat(compilation).succeededWithoutWarnings();
+    }
 }

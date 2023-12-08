@@ -21,39 +21,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.internal;
+package cloud.commandframework.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import cloud.commandframework.Description;
 import org.apiguardian.api.API;
-import org.immutables.annotate.InjectAnnotation;
-import org.immutables.value.Value;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Annotation that generates immutables classes with builders.
- */
-@Value.Style(
-        typeImmutableEnclosing = "*",
-        typeAbstract = "*",
-        deferCollectionAllocation = true,
-        optionalAcceptNullable = true,
-        jdkOnly = true, // We do not want any runtime dependencies!
-        allParameters = true,
-        headerComments = true,
-        jacksonIntegration = false,
-        builderVisibility = Value.Style.BuilderVisibility.SAME,
-        defaultAsDefault = true
-)
-@InjectAnnotation(
-        type = API.class,
-        target = InjectAnnotation.Where.IMMUTABLE_TYPE,
-        code = "(status = org.apiguardian.api.API.Status.STABLE, consumers = \"cloud.commandframework.*\")"
-)
-@Target({ElementType.TYPE, ElementType.METHOD, ElementType.PACKAGE})
-@Retention(RetentionPolicy.SOURCE)
-@API(status = API.Status.INTERNAL, since = "2.0.0")
-public @interface ImmutableBuilder {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface DescriptionMapper {
 
+    /**
+     * Returns a description mapper that maps the string to {@link Description#of(String)}.
+     *
+     * @return the mapper
+     */
+    static @NonNull DescriptionMapper simple() {
+        return Description::of;
+    }
+
+    /**
+     * Maps the given {@code string} to a {@link Description}.
+     *
+     * @param string the string to map
+     * @return the description
+     */
+    @NonNull Description map(@NonNull String string);
 }

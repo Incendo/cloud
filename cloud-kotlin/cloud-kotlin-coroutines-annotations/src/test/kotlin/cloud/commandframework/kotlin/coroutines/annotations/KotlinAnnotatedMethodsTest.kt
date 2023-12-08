@@ -100,10 +100,9 @@ class KotlinAnnotatedMethodsTest {
             .installCoroutineSupport()
             .parse(SuggestionMethods())
 
-        val commandContext = StandardCommandContextFactory<TestCommandSender>().create(
+        val commandContext = StandardCommandContextFactory<TestCommandSender>(commandManager).create(
             true,
-            TestCommandSender(),
-            commandManager
+            TestCommandSender()
         )
         val suggestions = commandManager.parserRegistry().getSuggestionProvider("suspending-suggestions").get()
             .suggestionsFuture(commandContext, "")
@@ -119,10 +118,9 @@ class KotlinAnnotatedMethodsTest {
             .installCoroutineSupport()
             .parse(SuggestionMethods())
 
-        val commandContext = StandardCommandContextFactory<TestCommandSender>().create(
+        val commandContext = StandardCommandContextFactory<TestCommandSender>(commandManager).create(
             true,
-            TestCommandSender(),
-            commandManager
+            TestCommandSender()
         )
         val suggestions = commandManager.parserRegistry().getSuggestionProvider("non-suspending-suggestions").get()
             .suggestionsFuture(commandContext, "")
