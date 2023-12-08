@@ -72,11 +72,16 @@ class ArgumentExtractorImpl implements ArgumentExtractor {
                 name = argument.value();
             }
 
+            String defaultValue = null;
+            if (parameter.isAnnotationPresent(Default.class)) {
+                defaultValue = parameter.getAnnotation(Default.class).value();
+            }
+
             final ArgumentDescriptor argumentDescriptor = ArgumentDescriptor.builder()
                     .parameter(parameter)
                     .name(name)
                     .parserName(nullIfEmpty(argument.parserName()))
-                    .defaultValue(nullIfEmpty(argument.defaultValue()))
+                    .defaultValue(defaultValue)
                     .description(this.descriptionMapper.apply(argument))
                     .suggestions(nullIfEmpty(argument.suggestions()))
                     .build();
