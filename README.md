@@ -50,8 +50,8 @@ or using annotated methods, in Java:
 @CommandMethod("command literal <number> [string]")
 public void yourCommand(
         CommandSender sender,
-        @Argument("number") int number, 
-        @Argument(value = "string", defaultValue = "") String string
+        int number, // @Argument is optional!
+        @Argument(value = "string") @Default("string!") String str
 ) {
     // ...
 }
@@ -61,8 +61,8 @@ or in Kotlin:
 @CommandMethod("command literal <number> [string]")
 public suspend fun yourCommand(
     sender: CommandSender,
-    @Argument("number") number: Int,
-    @Argument("string") string: String = ""
+    number: Int, // @Argument is optional!
+    @Argument("string") str: String = "string!"
 ) {
     // ...
 }

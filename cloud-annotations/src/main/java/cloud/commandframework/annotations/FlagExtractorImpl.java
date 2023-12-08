@@ -23,7 +23,6 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.Description;
 import cloud.commandframework.permission.Permission;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -43,9 +42,11 @@ final class FlagExtractorImpl implements FlagExtractor {
     }
 
     private final AnnotationParser<?> annotationParser;
+    private final DescriptionMapper descriptionMapper;
 
     FlagExtractorImpl(final @NonNull AnnotationParser<?> annotationParser) {
         this.annotationParser = annotationParser;
+        this.descriptionMapper = this.annotationParser::mapDescription;
     }
 
     @Override
@@ -68,7 +69,7 @@ final class FlagExtractorImpl implements FlagExtractor {
             final FlagDescriptor flagDescriptor = FlagDescriptor.builder()
                     .parameter(parameter)
                     .name(name)
-                    .description(Description.of(this.annotationParser.processString(flag.description())))
+                    .description(this.descriptionMapper.map(flag.description()))
                     .aliases(this.annotationParser.processStrings(Arrays.asList(flag.aliases())))
                     .permission(Permission.of(this.annotationParser.processString(flag.permission())))
                     .repeatable(flag.repeatable())
