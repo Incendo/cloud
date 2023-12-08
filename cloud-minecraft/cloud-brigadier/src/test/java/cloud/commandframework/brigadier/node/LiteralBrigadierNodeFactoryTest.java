@@ -70,7 +70,7 @@ class LiteralBrigadierNodeFactoryTest {
         this.commandManager = new TestCommandManager();
         final CloudBrigadierManager<Object, Object> cloudBrigadierManager = new CloudBrigadierManager<>(
                 this.commandManager,
-                () -> this.commandManager.commandContextFactory().create(false, new Object(), this.commandManager),
+                () -> this.commandManager.commandContextFactory().create(false, new Object()),
                 this.commandManager.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion)
         );
         this.literalBrigadierNodeFactory = cloudBrigadierManager.literalBrigadierNodeFactory();

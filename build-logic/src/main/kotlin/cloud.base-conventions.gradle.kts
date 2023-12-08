@@ -71,6 +71,8 @@ dependencies {
 
     compileOnly(libs.immutables)
     annotationProcessor(libs.immutables)
+    compileOnly(libs.immutablesAnnotate)
+    annotationProcessor(libs.immutablesAnnotate)
 
     testImplementation(libs.jupiterEngine)
     testImplementation(libs.jupiterParams)

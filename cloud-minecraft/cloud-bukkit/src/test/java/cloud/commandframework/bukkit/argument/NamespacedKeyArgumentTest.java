@@ -50,10 +50,9 @@ class NamespacedKeyArgumentTest {
 
     @BeforeEach
     void setup() {
-        this.commandContext = new StandardCommandContextFactory<>().create(
+        this.commandContext = new StandardCommandContextFactory<>(this.commandManager).create(
                 false /* suggestions */,
-                new Object(),
-                this.commandManager
+                new Object()
         );
     }
 
