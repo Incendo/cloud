@@ -39,7 +39,7 @@ public interface BuilderModifier<A extends Annotation, C> {
      * @param builder    the existing builder
      * @return the updated builder
      */
-    Command.@NonNull Builder<C> modifyBuilder(
+    Command.@NonNull Builder<? extends C> modifyBuilder(
             @NonNull A annotation,
             Command.@NonNull Builder<C> builder
     );
