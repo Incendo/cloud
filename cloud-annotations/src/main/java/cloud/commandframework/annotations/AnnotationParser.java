@@ -26,6 +26,7 @@ package cloud.commandframework.annotations;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.Description;
 import cloud.commandframework.annotations.exception.ExceptionHandler;
 import cloud.commandframework.annotations.exception.ExceptionHandlerFactory;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
@@ -110,6 +111,7 @@ public final class AnnotationParser<C> {
     private CommandExtractor commandExtractor;
     private SuggestionProviderFactory<C> suggestionProviderFactory;
     private ExceptionHandlerFactory<C> exceptionHandlerFactory;
+    private DescriptionMapper descriptionMapper;
 
     /**
      * Construct a new annotation parser
@@ -182,15 +184,15 @@ public final class AnnotationParser<C> {
         this.flagExtractor = new FlagExtractorImpl(this);
         this.flagAssembler = new FlagAssemblerImpl(manager);
         this.syntaxParser = new SyntaxParserImpl();
-        this.argumentExtractor = new ArgumentExtractorImpl();
+        this.descriptionMapper = DescriptionMapper.simple();
+        this.argumentExtractor = StandardArgumentExtractor.create(this);
         this.argumentAssembler = new ArgumentAssemblerImpl<>(this);
         this.commandExtractor = new CommandExtractorImpl(this);
         this.suggestionProviderFactory = SuggestionProviderFactory.defaultFactory();
         this.exceptionHandlerFactory = ExceptionHandlerFactory.defaultFactory();
-        // TODO(City): Add mapper so that we can map this to rich descriptions easily.
         this.registerBuilderModifier(
                 CommandDescription.class,
-                (description, builder) -> builder.commandDescription(commandDescription(this.processString(description.value())))
+                (description, builder) -> builder.commandDescription(commandDescription(this.mapDescription(description.value())))
         );
         this.registerPreprocessorMapper(Regex.class, annotation -> RegexPreprocessor.of(
                 this.processString(annotation.value()),
@@ -587,6 +589,28 @@ public final class AnnotationParser<C> {
     }
 
     /**
+     * Returns the description mapper.
+     *
+     * @return the description mapper
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull DescriptionMapper descriptionMapper() {
+        return this.descriptionMapper;
+    }
+
+    /**
+     * Sets the description mapper.
+     *
+     * @param descriptionMapper new description mapper
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void descriptionMapper(final @NonNull DescriptionMapper descriptionMapper) {
+        this.descriptionMapper = descriptionMapper;
+    }
+
+    /**
      * Parses all known {@link cloud.commandframework.annotations.processing.CommandContainer command containers}.
      *
      * @return Collection of parsed commands
@@ -966,6 +990,10 @@ public final class AnnotationParser<C> {
                 .filter(fragment -> fragment.getMajor().equals(argumentName))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Argument is not declared in syntax: " + argumentName));
+    }
+
+    @NonNull Description mapDescription(final @NonNull String string) {
+        return this.descriptionMapper.map(this.processString(string));
     }
 
     @NonNull Map<@NonNull Class<@NonNull ? extends Annotation>, AnnotationMapper<?>> annotationMappers() {

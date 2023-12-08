@@ -31,20 +31,22 @@ import java.lang.annotation.Target;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Annotation used to indicate that a method parameter is a command argument
+ * Annotation used to indicate that a method parameter is a command argument.
+ * <p>
+ * This annotation is optional if the parameter names are preserved during compilation, and the parameter
+ * name matches the corresponding syntax fragment.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface Argument {
 
     /**
-     * The name of the argument that this parameter is bound to.
-     * This value must be overridden unless you have explicitly enabled
+     * The name of the argument that this parameter is bound to. This value must be overridden unless you have explicitly enabled
      * the preservation of parameter names in your compiler options.
      * <p>
-     * If the parameter names are preserved and the name of the bound
-     * argument is the same as the parameter name, the default value
-     * may be used.
+     * If the parameter names are preserved and the name of the bound argument is the same as the parameter name, the default
+     * value may be used. The mapping between parameter names and argument names can be overridden by supplying a custom
+     * {@link ParameterNameExtractor} to a {@link StandardArgumentExtractor}.
      *
      * @return Argument name
      */
