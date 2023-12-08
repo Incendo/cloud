@@ -26,6 +26,7 @@ package cloud.commandframework.examples.bukkit.annotations.feature;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Default;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
 import org.apache.commons.lang.StringUtils;
@@ -49,7 +50,7 @@ public final class StringArrayExample implements AnnotationFeature {
     @CommandMethod("annotations arraycommand [args]")
     public void arrayCommand(
             final @NonNull CommandSender sender,
-            @Argument(value = "args", defaultValue = "") final @NonNull String[] args
+            @Argument(value = "args") @Default("") final @NonNull String[] args
     ) {
         sender.sendMessage("You wrote: " + StringUtils.join(args, " "));
     }

@@ -227,7 +227,7 @@ class AnnotationParserTest {
     public void testCommand(
             final TestCommandSender sender,
             @Argument("int") @Range(max = "100") final int argument,
-            @Argument(value = "string", defaultValue = "potato", parserName = "potato") final String string
+            @Argument(value = "string", parserName = "potato") @Default("potato") final String string
     ) {
         System.out.printf("Received int: %d and string '%s'\n", argument, string);
     }

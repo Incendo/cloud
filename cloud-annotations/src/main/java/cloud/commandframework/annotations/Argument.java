@@ -74,13 +74,6 @@ public @interface Argument {
     @NonNull String suggestions() default "";
 
     /**
-     * Get the default value
-     *
-     * @return Default value
-     */
-    @NonNull String defaultValue() default "";
-
-    /**
      * The argument description
      *
      * @return Argument description
