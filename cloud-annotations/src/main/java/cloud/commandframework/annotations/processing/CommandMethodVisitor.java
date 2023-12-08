@@ -117,14 +117,21 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
 
         final CommandMethod[] commandMethods = e.getAnnotationsByType(CommandMethod.class);
         for (final CommandMethod commandMethod : commandMethods) {
-            final List<String> parameterArgumentNames = e.getParameters()
+            final List<String> annotatedArgumentNames = e.getParameters()
                     .stream()
                     .map(parameter -> parameter.getAnnotation(Argument.class))
                     .filter(Objects::nonNull)
                     .map(Argument::value)
                     .collect(Collectors.toList());
-            final List<String> parsedArgumentNames = new ArrayList<>(parameterArgumentNames.size());
+            final List<String> parameterArgumentNames = new ArrayList<>(annotatedArgumentNames);
 
+            e.getParameters()
+                    .stream()
+                    .filter(parameter -> parameter.getAnnotation(Argument.class) == null)
+                    .map(parameter -> parameter.getSimpleName().toString())
+                    .forEach(parameterArgumentNames::add);
+
+            final List<String> parsedArgumentNames = new ArrayList<>(parameterArgumentNames.size());
             final List<SyntaxFragment> syntaxFragments = this.syntaxParser.parseSyntax(null, commandMethod.value());
 
             boolean foundOptional = false;
@@ -164,7 +171,7 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
                 parsedArgumentNames.add(fragment.getMajor());
             }
 
-            for (final String argument : parameterArgumentNames) {
+            for (final String argument : annotatedArgumentNames) {
                 if (!parsedArgumentNames.contains(argument)) {
                     this.processingEnvironment.getMessager().printMessage(
                             Diagnostic.Kind.ERROR,
@@ -177,6 +184,8 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
                     );
                 }
             }
+
+
         }
         return null;
     }
