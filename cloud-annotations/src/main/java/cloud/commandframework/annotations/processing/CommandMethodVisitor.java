@@ -184,8 +184,6 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
                     );
                 }
             }
-
-
         }
         return null;
     }
