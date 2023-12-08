@@ -142,11 +142,16 @@ public abstract class StandardArgumentExtractor implements ArgumentExtractor {
                 name = this.annotationParser().processString(argument.value());
             }
 
+            String defaultValue = null;
+            if (parameter.isAnnotationPresent(Default.class)) {
+                defaultValue = this.annotationParser().processString(parameter.getAnnotation(Default.class).value());
+            }
+
             final ArgumentDescriptor argumentDescriptor = ArgumentDescriptor.builder()
                     .parameter(parameter)
                     .name(name)
                     .parserName(nullIfEmpty(this.annotationParser().processString(argument.parserName())))
-                    .defaultValue(nullIfEmpty(this.annotationParser().processString(argument.defaultValue())))
+                    .defaultValue(defaultValue)
                     .description(this.descriptionMapper().map(argument.description()))
                     .suggestions(nullIfEmpty(this.annotationParser().processString(argument.suggestions())))
                     .build();
