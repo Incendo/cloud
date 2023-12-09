@@ -89,6 +89,17 @@ public interface ComponentCaptionFormatter<C> extends CaptionFormatter<C, Compon
         return new MappingComponentCaptionFormatter<>(mapper);
     }
 
+    /**
+     * Returns a caption formatter that maps to a {@link net.kyori.adventure.text.TranslatableComponent} using the caption key
+     * as the translation key.
+     *
+     * @param <C> the command sender type
+     * @return the formatter
+     */
+    static <C> @NonNull ComponentCaptionFormatter<C> translatable() {
+        return mapping(ComponentMapper.translatable());
+    }
+
 
     /**
      * Maps from {@link Caption captions} to {@link Component components}.
@@ -98,7 +109,8 @@ public interface ComponentCaptionFormatter<C> extends CaptionFormatter<C, Compon
     interface ComponentMapper<C> {
 
         /**
-         * Returns a mapper that maps to a {@link net.kyori.adventure.text.TranslatableComponent} using the caption key.
+         * Returns a mapper that maps to a {@link net.kyori.adventure.text.TranslatableComponent} using the caption key
+         * as the translation key.
          *
          * @param <C> the command sender type
          * @return the mapper
