@@ -23,35 +23,27 @@
 //
 package cloud.commandframework.captions;
 
+import cloud.commandframework.internal.ImmutableBuilder;
+import java.util.Map;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.immutables.value.Value;
 
-/**
- * Registry that allows for messages to be configurable per-sender
- *
- * @param <C> Command sender type
- */
-@API(status = API.Status.STABLE)
-public interface CaptionRegistry<C> {
+@ImmutableBuilder
+@Value.Immutable
+@API(status = API.Status.STABLE, since = "2.0.0")
+public abstract class ConstantCaptionProvider<C> implements CaptionProvider<C> {
 
     /**
-     * Returns the value of the given {@code caption} for the given {@code sender}.
+     * Returns all recognized captions and their corresponding constant values.
      *
-     * @param caption the caption key
-     * @param sender  the sender to get the caption for
-     * @return the caption value
+     * @return the captions
      */
-    @NonNull String caption(@NonNull Caption caption, @NonNull C sender);
+    public abstract @NonNull Map<@NonNull Caption, @NonNull String> captions();
 
-    /**
-     * Registers the given {@code provider}.
-     * <p>
-     * When {@link #caption(Caption, Object)} is invoked, all providers will be iterated over (with the
-     * last registered provider getting priority) until a provider returns a non-{@code null} value for the caption.
-     *
-     * @param provider the provider
-     * @return {@code this}
-     */
-    @NonNull @This CaptionRegistry<C> registerProvider(@NonNull CaptionProvider<C> provider);
+    @Override
+    public final @Nullable String provide(final @NonNull Caption caption, final @NonNull C recipient) {
+        return this.captions().get(caption);
+    }
 }

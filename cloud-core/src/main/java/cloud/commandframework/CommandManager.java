@@ -38,7 +38,7 @@ import cloud.commandframework.arguments.suggestion.SuggestionMapper;
 import cloud.commandframework.captions.CaptionFormatter;
 import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.captions.SimpleCaptionFormatter;
-import cloud.commandframework.captions.SimpleCaptionRegistryFactory;
+import cloud.commandframework.captions.StandardCaptionRegistryFactory;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.CommandInput;
@@ -147,7 +147,7 @@ public abstract class CommandManager<C> {
         this.servicePipeline.registerServiceType(new TypeToken<CommandPostprocessor<C>>() {
         }, new AcceptingCommandPostprocessor<>());
         /* Create the caption registry */
-        this.captionRegistry = new SimpleCaptionRegistryFactory<C>().create();
+        this.captionRegistry = new StandardCaptionRegistryFactory<C>().create();
         /* Register default injectors */
         this.parameterInjectorRegistry().registerInjector(
                 CommandContext.class,

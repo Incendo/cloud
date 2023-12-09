@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.fabric;
 
-import cloud.commandframework.captions.SimpleCaptionRegistry;
+import cloud.commandframework.captions.CaptionProvider;
+import cloud.commandframework.captions.StandardCaptionRegistry;
 
 /**
  * Caption registry that uses bi-functions to produce messages.
@@ -31,7 +32,7 @@ import cloud.commandframework.captions.SimpleCaptionRegistry;
  * @param <C> Command sender type
  * @since 1.5.0
  */
-public class FabricCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
+public class FabricCaptionRegistry<C> extends StandardCaptionRegistry<C> {
 
     /**
      * Default caption for {@link FabricCaptionKeys#ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY}
@@ -51,13 +52,16 @@ public class FabricCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
     protected FabricCaptionRegistry() {
         super();
 
-        this.registerMessageFactory(
-                FabricCaptionKeys.ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY
-        );
-        this.registerMessageFactory(
-                FabricCaptionKeys.ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN
+        this.registerProvider(
+                CaptionProvider.<C>constantProvider()
+                        .putCaptions(
+                                FabricCaptionKeys.ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY,
+                                ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY
+                        ).putCaptions(
+                                FabricCaptionKeys.ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN,
+                                ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN
+                        )
+                        .build()
         );
     }
 }

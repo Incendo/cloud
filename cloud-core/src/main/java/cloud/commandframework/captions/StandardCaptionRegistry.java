@@ -23,19 +23,18 @@
 //
 package cloud.commandframework.captions;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.LinkedList;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
- * Caption registry that uses bi-functions to produce messages
+ * Caption registry that registers constant values for all {@link StandardCaptionKeys}.
  *
- * @param <C> Command sender type
+ * @param <C> the command sender type
  */
 @API(status = API.Status.STABLE)
-public class SimpleCaptionRegistry<C> implements FactoryDelegatingCaptionRegistry<C> {
+public class StandardCaptionRegistry<C> implements CaptionRegistry<C> {
 
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED}.
@@ -98,93 +97,79 @@ public class SimpleCaptionRegistry<C> implements FactoryDelegatingCaptionRegistr
      */
     public static final String ARGUMENT_PARSE_FAILURE_DURATION = "'<input>' is not a duration format";
 
-    private final Map<Caption, BiFunction<Caption, C, String>> messageFactories = new HashMap<>();
+    private final LinkedList<@NonNull CaptionProvider<C>> providers = new LinkedList<>();
 
-    protected SimpleCaptionRegistry() {
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED
-        );
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_BOOLEAN,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_BOOLEAN
-        );
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_NUMBER,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_NUMBER
-        );
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_CHAR,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_CHAR
-        );
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_ENUM,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_ENUM
-        );
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_STRING,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_STRING
-        );
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_UUID,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_UUID
-        );
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_REGEX,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_REGEX
-        );
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG
-        );
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG
-        );
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED
-        );
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT
-        );
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_NO_PERMISSION,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_FLAG_NO_PERMISSION
-        );
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_COLOR,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_COLOR
-        );
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_DURATION,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_DURATION
+    protected StandardCaptionRegistry() {
+        this.registerProvider(
+                CaptionProvider.<C>constantProvider()
+                        .putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED,
+                                ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_BOOLEAN,
+                                ARGUMENT_PARSE_FAILURE_BOOLEAN
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_NUMBER,
+                                ARGUMENT_PARSE_FAILURE_NUMBER
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_CHAR,
+                                ARGUMENT_PARSE_FAILURE_CHAR
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_ENUM,
+                                ARGUMENT_PARSE_FAILURE_ENUM
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_STRING,
+                                ARGUMENT_PARSE_FAILURE_STRING
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_UUID,
+                                ARGUMENT_PARSE_FAILURE_UUID
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_REGEX,
+                                ARGUMENT_PARSE_FAILURE_REGEX
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_COLOR,
+                                ARGUMENT_PARSE_FAILURE_COLOR
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_DURATION,
+                                ARGUMENT_PARSE_FAILURE_DURATION
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG,
+                                ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG,
+                                ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED,
+                                ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT,
+                                ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_NO_PERMISSION,
+                                ARGUMENT_PARSE_FAILURE_FLAG_NO_PERMISSION
+                        ).build()
         );
     }
 
     @Override
-    public final @NonNull String getCaption(
+    public final @NonNull String caption(
             final @NonNull Caption caption,
             final @NonNull C sender
     ) {
-        final BiFunction<Caption, C, String> messageFactory = this.messageFactories.get(caption);
-        if (messageFactory == null) {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "There is no caption stored with key '%s'",
-                            caption
-                    )
-            );
+        for (final CaptionProvider<C> provider : this.providers) {
+            final String result = provider.provide(caption, sender);
+            if (result != null) {
+                return result;
+            }
         }
-        return messageFactory.apply(caption, sender);
+        throw new IllegalArgumentException(String.format("There is no caption stored with key '%s'", caption));
     }
 
     @Override
-    public final void registerMessageFactory(
-            final @NonNull Caption caption,
-            final @NonNull BiFunction<Caption, C, String> messageFactory
+    public final @NonNull @This StandardCaptionRegistry<C> registerProvider(
+            final @NonNull CaptionProvider<C> provider
     ) {
-        this.messageFactories.put(caption, messageFactory);
+        this.providers.addFirst(provider);
+        return this;
     }
 }

@@ -128,7 +128,7 @@ public class CommandContext<C> implements CloudKeyContainer {
         return formatter.formatCaption(
                 caption,
                 this.commandSender,
-                this.captionRegistry.getCaption(caption, this.commandSender),
+                this.captionRegistry.caption(caption, this.commandSender),
                 variables
         );
     }

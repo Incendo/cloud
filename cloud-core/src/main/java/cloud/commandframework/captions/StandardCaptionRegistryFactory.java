@@ -27,19 +27,19 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Factory creating {@link SimpleCaptionRegistry} instances
+ * Factory creating {@link StandardCaptionRegistry} instances
  *
  * @param <C> Command sender type
  */
 @API(status = API.Status.STABLE)
-public final class SimpleCaptionRegistryFactory<C> {
+public final class StandardCaptionRegistryFactory<C> {
 
     /**
      * Create a new simple caption registry instance
      *
      * @return Created instance
      */
-    public @NonNull SimpleCaptionRegistry<C> create() {
-        return new SimpleCaptionRegistry<>();
+    public @NonNull StandardCaptionRegistry<C> create() {
+        return new StandardCaptionRegistry<>();
     }
 }
