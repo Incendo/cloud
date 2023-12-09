@@ -399,8 +399,8 @@ public abstract class CommandManager<C> {
      * Checks if the command sender has the required permission. If the permission node is
      * empty, this should return {@code true}.
      *
-     * @param sender     Command sender
-     * @param permission Permission node
+     * @param sender     the command sender
+     * @param permission the permission
      * @return {@code true} if the sender has the permission, else {@code false}
      */
     @SuppressWarnings("unchecked")
@@ -439,8 +439,8 @@ public abstract class CommandManager<C> {
      * Checks if the command sender has the required permission. If the permission node is
      * empty, this should return {@code true}.
      *
-     * @param sender     Command sender
-     * @param permission Permission node
+     * @param sender     the command sender
+     * @param permission the permission
      * @return a {@link PermissionResult} representing whether the sender has the permission
      * @since 2.0.0
      */
