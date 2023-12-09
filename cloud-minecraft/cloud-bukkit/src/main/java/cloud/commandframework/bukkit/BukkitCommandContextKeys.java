@@ -24,7 +24,6 @@
 package cloud.commandframework.bukkit;
 
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import io.leangen.geantyref.TypeToken;
 import java.util.Set;
 import org.bukkit.command.CommandSender;
@@ -41,7 +40,7 @@ public final class BukkitCommandContextKeys {
      *
      * @since 1.5.0
      */
-    public static final CloudKey<CommandSender> BUKKIT_COMMAND_SENDER = SimpleCloudKey.of(
+    public static final CloudKey<CommandSender> BUKKIT_COMMAND_SENDER = CloudKey.of(
             "BukkitCommandSender",
             TypeToken.get(CommandSender.class)
     );
@@ -51,7 +50,7 @@ public final class BukkitCommandContextKeys {
      *
      * @since 1.5.0
      */
-    public static final CloudKey<Set<CloudBukkitCapabilities>> CLOUD_BUKKIT_CAPABILITIES = SimpleCloudKey.of(
+    public static final CloudKey<Set<CloudBukkitCapabilities>> CLOUD_BUKKIT_CAPABILITIES = CloudKey.of(
             "CloudBukkitCapabilities",
             new TypeToken<Set<CloudBukkitCapabilities>>() {
             }

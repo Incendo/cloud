@@ -76,7 +76,7 @@ public abstract class CommandBean<C> implements CommandExecutionHandler<C>, Comm
      * @return the command meta
      */
     protected @NonNull CommandMeta meta() {
-        return CommandMeta.simple().build();
+        return CommandMeta.builder().build();
     }
 
     /**

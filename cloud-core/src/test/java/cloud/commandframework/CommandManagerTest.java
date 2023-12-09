@@ -27,8 +27,6 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -65,11 +63,6 @@ class CommandManagerTest {
                     final @NonNull String permission
             ) {
                 return true;
-            }
-
-            @Override
-            public @NonNull CommandMeta createDefaultCommandMeta() {
-                return SimpleCommandMeta.empty();
             }
         };
     }

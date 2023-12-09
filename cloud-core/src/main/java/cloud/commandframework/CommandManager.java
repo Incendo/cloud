@@ -99,7 +99,7 @@ public abstract class CommandManager<C> {
     private final EnumSet<ManagerSettings> managerSettings = EnumSet.of(
             ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS);
 
-    private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>();
+    private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>(this);
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private final ParserRegistry<C> parserRegistry = new StandardParserRegistry<>();
     private final Collection<Command<C>> commands = new LinkedList<>();
@@ -180,8 +180,7 @@ public abstract class CommandManager<C> {
     ) {
         final CommandContext<C> context = this.commandContextFactory.create(
                 false,
-                commandSender,
-                this
+                commandSender
         );
         final CommandInput commandInput = CommandInput.of(input);
         /* Store a copy of the input queue in the context */
@@ -819,12 +818,15 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Construct a default command meta instance
+     * Constructs a default {@link CommandMeta} instance.
+     * <p>
+     * Returns {@link CommandMeta#empty()} by default.
      *
-     * @return Default command meta
-     * @throws UnsupportedOperationException If the command manager does not support this operation
+     * @return default command meta
      */
-    public abstract @NonNull CommandMeta createDefaultCommandMeta();
+    public @NonNull CommandMeta createDefaultCommandMeta() {
+        return CommandMeta.empty();
+    }
 
     /**
      * Register a new command preprocessor. The order they are registered in is respected, and they
@@ -874,7 +876,7 @@ public abstract class CommandManager<C> {
                 .through(new TypeToken<CommandPreprocessor<C>>() {
                 })
                 .getResult();
-        return context.<String>getOptional(AcceptingCommandPreprocessor.PROCESSED_INDICATOR_KEY).orElse("").isEmpty()
+        return context.<String>optional(AcceptingCommandPreprocessor.PROCESSED_INDICATOR_KEY).orElse("").isEmpty()
                 ? State.REJECTED
                 : State.ACCEPTED;
     }
@@ -895,7 +897,7 @@ public abstract class CommandManager<C> {
                 .through(new TypeToken<CommandPostprocessor<C>>() {
                 })
                 .getResult();
-        return context.<String>getOptional(AcceptingCommandPostprocessor.PROCESSED_INDICATOR_KEY).orElse("").isEmpty()
+        return context.<String>optional(AcceptingCommandPostprocessor.PROCESSED_INDICATOR_KEY).orElse("").isEmpty()
                 ? State.REJECTED
                 : State.ACCEPTED;
     }

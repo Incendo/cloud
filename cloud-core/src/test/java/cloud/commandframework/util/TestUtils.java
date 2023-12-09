@@ -28,7 +28,7 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.meta.CommandMeta;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.mockito.Mockito;
@@ -76,7 +76,7 @@ public final class TestUtils {
         );
 
         // We don't care about the actual command meta.
-        when(manager.createDefaultCommandMeta()).thenReturn(SimpleCommandMeta.empty());
+        when(manager.createDefaultCommandMeta()).thenReturn(CommandMeta.empty());
 
         // The permission check should always return true, unless "no" is the parameter.
         when(manager.hasPermission(any(), anyString())).thenReturn(true);

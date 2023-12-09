@@ -28,7 +28,6 @@ import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.Location;
@@ -47,8 +46,8 @@ public final class CompoundArgumentExample implements BuilderFeature {
             final @NonNull ExamplePlugin examplePlugin,
             final @NonNull BukkitCommandManager<CommandSender> manager
     ) {
-        final CloudKey<World> worldKey = SimpleCloudKey.of("world", World.class);
-        final CloudKey<Vector> coordsKey = SimpleCloudKey.of("coords", Vector.class);
+        final CloudKey<World> worldKey = CloudKey.of("world", World.class);
+        final CloudKey<Vector> coordsKey = CloudKey.of("coords", Vector.class);
 
         manager.command(manager.commandBuilder("builder")
                 .literal("teleport")

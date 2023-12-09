@@ -435,7 +435,7 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
          * @return {@code this}
          */
         public @NonNull @This Builder<C, T> key(final @NonNull CloudKey<T> cloudKey) {
-            return this.name(cloudKey.getName()).valueType(cloudKey.getType());
+            return this.name(cloudKey.name()).valueType(cloudKey.type());
         }
 
         /**

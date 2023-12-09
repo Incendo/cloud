@@ -31,8 +31,6 @@ import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Stream;
@@ -57,11 +55,6 @@ class CommandExecutionCoordinatorTest {
             @Override
             public boolean hasPermission(@NonNull final TestCommandSender sender, @NonNull final String permission) {
                 return true;
-            }
-
-            @Override
-            public @NonNull CommandMeta createDefaultCommandMeta() {
-                return SimpleCommandMeta.empty();
             }
         };
         commandManager.command(
@@ -100,11 +93,6 @@ class CommandExecutionCoordinatorTest {
             @Override
             public boolean hasPermission(@NonNull final TestCommandSender sender, @NonNull final String permission) {
                 return true;
-            }
-
-            @Override
-            public @NonNull CommandMeta createDefaultCommandMeta() {
-                return SimpleCommandMeta.empty();
             }
         };
         final CompletableFuture<Integer> result = new CompletableFuture<>();
@@ -147,11 +135,6 @@ class CommandExecutionCoordinatorTest {
             public boolean hasPermission(@NonNull final TestCommandSender sender, @NonNull final String permission) {
                 return true;
             }
-
-            @Override
-            public @NonNull CommandMeta createDefaultCommandMeta() {
-                return SimpleCommandMeta.empty();
-            }
         };
         commandManager.command(
                 commandManager.commandBuilder("test")
@@ -189,11 +172,6 @@ class CommandExecutionCoordinatorTest {
             @Override
             public boolean hasPermission(@NonNull final TestCommandSender sender, @NonNull final String permission) {
                 return true;
-            }
-
-            @Override
-            public @NonNull CommandMeta createDefaultCommandMeta() {
-                return SimpleCommandMeta.empty();
             }
         };
         final CompletableFuture<Integer> result = new CompletableFuture<>();

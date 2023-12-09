@@ -27,8 +27,6 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.cloudburstmc.server.command.CommandSender;
@@ -90,11 +88,6 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
             final @NonNull String permission
     ) {
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
-    }
-
-    @Override
-    public final @NonNull CommandMeta createDefaultCommandMeta() {
-        return SimpleCommandMeta.builder().build();
     }
 
     @Override

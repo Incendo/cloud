@@ -31,7 +31,6 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +42,7 @@ import static cloud.commandframework.arguments.standard.IntegerParser.integerPar
  */
 public final class CommandBeanExample extends CommandBean<CommandSender> implements BuilderFeature {
 
-    private static final CloudKey<Integer> NUMBER_KEY = SimpleCloudKey.of("number", Integer.class);
+    private static final CloudKey<Integer> NUMBER_KEY = CloudKey.of("number", Integer.class);
 
     @Override
     public void registerFeature(
