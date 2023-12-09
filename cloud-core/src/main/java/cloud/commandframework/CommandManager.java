@@ -37,7 +37,6 @@ import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.arguments.suggestion.SuggestionMapper;
 import cloud.commandframework.captions.CaptionFormatter;
 import cloud.commandframework.captions.CaptionRegistry;
-import cloud.commandframework.captions.SimpleCaptionFormatter;
 import cloud.commandframework.captions.StandardCaptionRegistryFactory;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
@@ -109,7 +108,7 @@ public abstract class CommandManager<C> {
     private final Set<CloudCapability> capabilities = new HashSet<>();
     private final ExceptionController<C> exceptionController = new ExceptionController<>();
 
-    private CaptionFormatter<C, String> captionVariableReplacementHandler = new SimpleCaptionFormatter<C>();
+    private CaptionFormatter<C, String> captionVariableReplacementHandler = CaptionFormatter.placeholderReplacing();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
     private CommandSuggestionProcessor<C> commandSuggestionProcessor =
             new FilteringCommandSuggestionProcessor<>(FilteringCommandSuggestionProcessor.Filter.startsWith(true));

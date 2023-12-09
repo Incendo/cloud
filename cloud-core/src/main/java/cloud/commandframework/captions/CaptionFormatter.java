@@ -23,11 +23,41 @@
 //
 package cloud.commandframework.captions;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface CaptionFormatter<C, T> {
+
+    /**
+     * Returns a caption formatter that replaces the results from the given {@code pattern} with
+     * the values from the caption variables.
+     * <p>
+     * The 1st capturing group will be used to determine the name of the variable to use for
+     * the replacement.
+     *
+     * @param <C>     the command sender type
+     * @param pattern the pattern
+     * @return the formatter
+     */
+    static <C> @NonNull CaptionFormatter<C, String> patternReplacing(final @NonNull Pattern pattern) {
+        return new PatternReplacingCaptionFormatter<>(pattern);
+    }
+
+    /**
+     * Returns a caption formatter that replaces placeholders in the form of {@code <placeholder>}
+     * with the caption variables.
+     *
+     * @param <C> the command sender type
+     * @return the formatter
+     */
+    static <C> @NonNull CaptionFormatter<C, String> placeholderReplacing() {
+        return new PatternReplacingCaptionFormatter<>(Pattern.compile("<(\\S+)>"));
+    }
 
     /**
      * Formats the {@code caption}.
@@ -44,4 +74,37 @@ public interface CaptionFormatter<C, T> {
             @NonNull String caption,
             @NonNull CaptionVariable @NonNull... variables
     );
+
+
+    final class PatternReplacingCaptionFormatter<C> implements CaptionFormatter<C, String> {
+
+        private final Pattern pattern;
+
+        private PatternReplacingCaptionFormatter(final @NonNull Pattern pattern) {
+            this.pattern = pattern;
+        }
+
+        @Override
+        public @NonNull String formatCaption(
+                final @NonNull Caption captionKey,
+                final @NonNull C recipient,
+                final @NonNull String caption, 
+                final @NonNull CaptionVariable @NonNull ... variables
+        ) {
+            final Map<String, String> replacements = new HashMap<>();
+            for (final CaptionVariable variable : variables) {
+                replacements.put(variable.key(), variable.value());
+            }
+
+            final Matcher matcher = this.pattern.matcher(caption);
+            final StringBuffer stringBuffer = new StringBuffer();
+            while (matcher.find()) {
+                final String replacement = replacements.get(matcher.group(1));
+                matcher.appendReplacement(stringBuffer, replacement == null ? "$0" : replacement);
+            }
+            matcher.appendTail(stringBuffer);
+
+            return stringBuffer.toString();
+        }
+    }
 }

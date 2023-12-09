@@ -25,20 +25,20 @@ package cloud.commandframework.caption;
 
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.captions.Caption;
+import cloud.commandframework.captions.CaptionFormatter;
 import cloud.commandframework.captions.CaptionVariable;
-import cloud.commandframework.captions.SimpleCaptionFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 
-class SimpleCaptionFormatterTest {
+class PlaceholderReplacingCaptionFormatterTest {
 
-    private SimpleCaptionFormatter<TestCommandSender> captionFormatter;
+    private CaptionFormatter<TestCommandSender, String> captionFormatter;
 
     @BeforeEach
     void setup() {
-        this.captionFormatter = new SimpleCaptionFormatter<>();
+        this.captionFormatter = CaptionFormatter.placeholderReplacing();
     }
 
     @Test
