@@ -78,6 +78,17 @@ public interface ComponentCaptionFormatter<C> extends CaptionFormatter<C, Compon
         return new PatternReplacingComponentCaptionFormatter<>(Pattern.compile("<(\\S+)>"), mapper);
     }
 
+    /**
+     * Returns a caption formatter that forwards the result from the given {@code mapper}.
+     *
+     * @param <C>    the command sender type
+     * @param mapper the mapper
+     * @return the formatter
+     */
+    static <C> @NonNull ComponentCaptionFormatter<C> mapping(final @NonNull ComponentMapper<C> mapper) {
+        return new MappingComponentCaptionFormatter<>(mapper);
+    }
+
 
     /**
      * Maps from {@link Caption captions} to {@link Component components}.
@@ -97,6 +108,16 @@ public interface ComponentCaptionFormatter<C> extends CaptionFormatter<C, Compon
         }
 
         /**
+         * Returns a mapper that maps to a {@link net.kyori.adventure.text.TextComponent} using the caption value.
+         *
+         * @param <C> the command sender type
+         * @return the mapper
+         */
+        static <C> @NonNull ComponentMapper<C> text() {
+            return (key, caption, recipient) -> Component.text(caption);
+        }
+
+        /**
          * Maps the caption to a component.
          *
          * @param captionKey the caption key
@@ -106,7 +127,6 @@ public interface ComponentCaptionFormatter<C> extends CaptionFormatter<C, Compon
          */
         @NonNull Component mapComponent(@NonNull Caption captionKey, @NonNull String caption, @NonNull C recipient);
     }
-
 
     final class PatternReplacingComponentCaptionFormatter<C> implements ComponentCaptionFormatter<C> {
 
@@ -139,6 +159,25 @@ public interface ComponentCaptionFormatter<C> extends CaptionFormatter<C, Compon
                             builder.content(replacements.getOrDefault(matcher.group(1), matcher.group())))
                     .build();
             return this.mapper.mapComponent(captionKey, caption, recipient).replaceText(replacementConfig);
+        }
+    }
+
+    final class MappingComponentCaptionFormatter<C> implements ComponentCaptionFormatter<C> {
+
+        private final ComponentMapper<C> mapper;
+
+        private MappingComponentCaptionFormatter(final @NonNull ComponentMapper<C> mapper) {
+            this.mapper = mapper;
+        }
+
+        @Override
+        public @NonNull Component formatCaption(
+                final @NonNull Caption captionKey,
+                final @NonNull C recipient,
+                final @NonNull String caption,
+                final @NonNull CaptionVariable @NonNull... variables
+        ) {
+            return this.mapper.mapComponent(captionKey, caption, recipient);
         }
     }
 }
