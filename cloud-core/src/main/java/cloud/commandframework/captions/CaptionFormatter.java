@@ -88,8 +88,8 @@ public interface CaptionFormatter<C, T> {
         public @NonNull String formatCaption(
                 final @NonNull Caption captionKey,
                 final @NonNull C recipient,
-                final @NonNull String caption, 
-                final @NonNull CaptionVariable @NonNull ... variables
+                final @NonNull String caption,
+                final @NonNull CaptionVariable @NonNull... variables
         ) {
             final Map<String, String> replacements = new HashMap<>();
             for (final CaptionVariable variable : variables) {
