@@ -26,7 +26,7 @@ package cloud.commandframework.fabric;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.keys.SimpleCloudKey;
+import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.permission.PredicatePermission;
 import java.util.function.Function;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
@@ -124,7 +124,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      */
     public static <C> @NonNull PredicatePermission<C> integratedServerRunning() {
         return PredicatePermission.of(
-                SimpleCloudKey.of("integrated-server-running"),
+                CloudKey.of("integrated-server-running"),
                 sender -> Minecraft.getInstance().hasSingleplayerServer()
         );
     }
@@ -138,7 +138,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      */
     public static <C> @NonNull PredicatePermission<C> integratedServerNotRunning() {
         return PredicatePermission.of(
-                SimpleCloudKey.of("integrated-server-not-running"),
+                CloudKey.of("integrated-server-not-running"),
                 sender -> !Minecraft.getInstance().hasSingleplayerServer()
         );
     }
@@ -168,7 +168,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      * @since 1.5.0
      */
     public static <C> @NonNull PredicatePermission<C> cheatsAllowed(final boolean allowOnMultiplayer) {
-        return PredicatePermission.of(SimpleCloudKey.of("cheats-allowed"), sender -> {
+        return PredicatePermission.of(CloudKey.of("cheats-allowed"), sender -> {
             if (!Minecraft.getInstance().hasSingleplayerServer()) {
                 return allowOnMultiplayer;
             }
@@ -202,7 +202,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      * @since 1.5.0
      */
     public static <C> @NonNull PredicatePermission<C> cheatsDisallowed(final boolean allowOnMultiplayer) {
-        return PredicatePermission.of(SimpleCloudKey.of("cheats-disallowed"), sender -> {
+        return PredicatePermission.of(CloudKey.of("cheats-disallowed"), sender -> {
             if (!Minecraft.getInstance().hasSingleplayerServer()) {
                 return allowOnMultiplayer;
             }
