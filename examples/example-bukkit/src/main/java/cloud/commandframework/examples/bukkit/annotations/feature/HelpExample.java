@@ -71,13 +71,13 @@ public final class HelpExample implements AnnotationFeature {
     }
 
     private void setupHelp() {
-        this.minecraftHelp = new MinecraftHelp<>(
+        this.minecraftHelp = MinecraftHelp.create(
                 // The help command. This gets prefixed onto all the clickable queries.
                 "/annotations help",
-                // Tells the help manager how to map command senders to adventure audiences.
-                this.bukkitAudiences::sender,
                 // The command manager instance that is used to look up the commands.
-                this.manager
+                this.manager,
+                // Tells the help manager how to map command senders to adventure audiences.
+                this.bukkitAudiences::sender
         );
     }
 
