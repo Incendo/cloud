@@ -26,7 +26,7 @@ package cloud.commandframework.examples.bukkit.builder.feature;
 import cloud.commandframework.arguments.preprocessor.RegexPreprocessor;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.captions.Caption;
-import cloud.commandframework.captions.SimpleCaptionRegistry;
+import cloud.commandframework.captions.CaptionProvider;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -48,12 +48,10 @@ public final class RegexExample implements BuilderFeature {
             final @NonNull BukkitCommandManager<CommandSender> manager
     ) {
         final Caption moneyCaption = Caption.of("annotations.regex.money");
-        if (manager.captionRegistry() instanceof SimpleCaptionRegistry) {
-            ((SimpleCaptionRegistry<CommandSender>) manager.captionRegistry()).registerMessageFactory(
-                    moneyCaption,
-                    (sender, key) -> "'{input}' is not very cash money of you"
-            );
-        }
+        manager.captionRegistry().registerProvider(CaptionProvider.constantProvider(
+                moneyCaption,
+                "'<input>' is not very cash money of you"
+        ));
 
         manager.command(
                 manager.commandBuilder("builder")

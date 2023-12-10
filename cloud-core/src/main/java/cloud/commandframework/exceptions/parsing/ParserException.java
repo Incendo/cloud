@@ -24,6 +24,7 @@
 package cloud.commandframework.exceptions.parsing;
 
 import cloud.commandframework.captions.Caption;
+import cloud.commandframework.captions.CaptionFormatter;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import java.util.Arrays;
@@ -54,10 +55,21 @@ public class ParserException extends IllegalArgumentException {
 
     @Override
     public final String getMessage() {
-        return this.context.formatMessage(
-                this.errorCaption,
-                this.captionVariables
-        );
+        return this.context.formatCaption(this.errorCaption, this.captionVariables);
+    }
+
+    /**
+     * Formats the error caption using the given {@code formatter}.
+     *
+     * @param <T>        the type produced by the formatter
+     * @param formatter the formatter
+     * @return the formatted caption
+     * @since 2.0.0
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public final <T> @NonNull T formatCaption(final @NonNull CaptionFormatter<?, T> formatter) {
+        return (T) this.context.formatCaption((CaptionFormatter) formatter, this.errorCaption, this.captionVariables());
     }
 
     /**

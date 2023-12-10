@@ -35,10 +35,9 @@ import cloud.commandframework.arguments.parser.StandardParserRegistry;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.arguments.suggestion.SuggestionMapper;
+import cloud.commandframework.captions.CaptionFormatter;
 import cloud.commandframework.captions.CaptionRegistry;
-import cloud.commandframework.captions.CaptionVariableReplacementHandler;
-import cloud.commandframework.captions.SimpleCaptionRegistryFactory;
-import cloud.commandframework.captions.SimpleCaptionVariableReplacementHandler;
+import cloud.commandframework.captions.StandardCaptionRegistryFactory;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.CommandInput;
@@ -111,7 +110,7 @@ public abstract class CommandManager<C> {
     private final Set<CloudCapability> capabilities = new HashSet<>();
     private final ExceptionController<C> exceptionController = new ExceptionController<>();
 
-    private CaptionVariableReplacementHandler captionVariableReplacementHandler = new SimpleCaptionVariableReplacementHandler();
+    private CaptionFormatter<C, String> captionVariableReplacementHandler = CaptionFormatter.placeholderReplacing();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
     private CommandSuggestionProcessor<C> commandSuggestionProcessor =
             new FilteringCommandSuggestionProcessor<>(FilteringCommandSuggestionProcessor.Filter.startsWith(true));
@@ -150,7 +149,7 @@ public abstract class CommandManager<C> {
         this.servicePipeline.registerServiceType(new TypeToken<CommandPostprocessor<C>>() {
         }, new AcceptingCommandPostprocessor<>());
         /* Create the caption registry */
-        this.captionRegistry = new SimpleCaptionRegistryFactory<C>().create();
+        this.captionRegistry = new StandardCaptionRegistryFactory<C>().create();
         /* Register default injectors */
         this.parameterInjectorRegistry().registerInjector(
                 CommandContext.class,
@@ -286,29 +285,27 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get the caption variable replacement handler.
+     * Returns the string-producing caption formatter.
      *
-     * @return the caption variable replacement handler
-     * @since 1.7.0
-     * @see #captionVariableReplacementHandler(CaptionVariableReplacementHandler)
+     * @return the formatter
+     * @since 2.0.0
+     * @see #captionFormatter(CaptionFormatter)
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
-    public @NonNull CaptionVariableReplacementHandler captionVariableReplacementHandler() {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CaptionFormatter<C, String> captionFormatter() {
         return this.captionVariableReplacementHandler;
     }
 
     /**
-     * Sets the caption variable replacement handler.
+     * Sets the string-producing caption formatter.
      *
-     * @param captionVariableReplacementHandler new replacement handler
-     * @since 1.7.0
-     * @see #captionVariableReplacementHandler()
+     * @param captionFormatter the new formatter
+     * @since 2.0.0
+     * @see #captionFormatter()
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
-    public void captionVariableReplacementHandler(
-            final @NonNull CaptionVariableReplacementHandler captionVariableReplacementHandler
-    ) {
-        this.captionVariableReplacementHandler = captionVariableReplacementHandler;
+    public void captionFormatter(final @NonNull CaptionFormatter<C, String> captionFormatter) {
+        this.captionVariableReplacementHandler = captionFormatter;
     }
 
     /**

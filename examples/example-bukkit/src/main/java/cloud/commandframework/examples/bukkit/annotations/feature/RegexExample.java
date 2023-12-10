@@ -29,7 +29,7 @@ import cloud.commandframework.annotations.CommandDescription;
 import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.Regex;
 import cloud.commandframework.captions.Caption;
-import cloud.commandframework.captions.SimpleCaptionRegistry;
+import cloud.commandframework.captions.CaptionProvider;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -55,12 +55,10 @@ public final class RegexExample implements AnnotationFeature {
         annotationParser.parse(this);
 
         final Caption moneyCaption = Caption.of("annotations.regex.money");
-        if (annotationParser.manager().captionRegistry() instanceof SimpleCaptionRegistry) {
-            ((SimpleCaptionRegistry<CommandSender>) annotationParser.manager().captionRegistry()).registerMessageFactory(
-                    moneyCaption,
-                    (sender, key) -> "'{input}' is not very cash money of you"
-            );
-        }
+        annotationParser.manager().captionRegistry().registerProvider(CaptionProvider.constantProvider(
+                moneyCaption,
+                "'<input>' is not very cash money of you"
+        ));
     }
 
     @CommandMethod("annotations pay <money>")

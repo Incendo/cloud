@@ -28,9 +28,9 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationAccessor;
 import cloud.commandframework.arguments.flags.FlagContext;
 import cloud.commandframework.captions.Caption;
+import cloud.commandframework.captions.CaptionFormatter;
 import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.captions.CaptionVariable;
-import cloud.commandframework.captions.CaptionVariableReplacementHandler;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyContainer;
 import cloud.commandframework.keys.CloudKeyHolder;
@@ -55,7 +55,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @API(status = API.Status.STABLE)
 public class CommandContext<C> implements CloudKeyContainer {
 
-    private final CaptionVariableReplacementHandler captionVariableReplacementHandler;
     private final List<ParsingContext<C>> parsingContexts = new LinkedList<>();
     private final FlagContext flagContext = FlagContext.create();
     private final Map<CloudKey<?>, Object> internalStorage = new HashMap<>();
@@ -96,22 +95,40 @@ public class CommandContext<C> implements CloudKeyContainer {
         this.suggestions = suggestions;
         this.commandManager = commandManager;
         this.captionRegistry = commandManager.captionRegistry();
-        this.captionVariableReplacementHandler = commandManager.captionVariableReplacementHandler();
     }
 
     /**
-     * Format a caption
+     * Formats a {@code caption} using the {@link CommandManager#captionFormatter()}.
      *
-     * @param caption   Caption key
-     * @param variables Replacements
-     * @return Formatted message
+     * @param caption   the caption key
+     * @param variables the variables to use during formatting
+     * @return the formatted caption
      */
-    public @NonNull String formatMessage(
+    public @NonNull String formatCaption(
             final @NonNull Caption caption,
-            final @NonNull CaptionVariable... variables
+            final @NonNull CaptionVariable @NonNull... variables
     ) {
-        return this.captionVariableReplacementHandler.replaceVariables(
-                this.captionRegistry.getCaption(caption, this.commandSender),
+        return this.formatCaption(this.commandManager.captionFormatter(), caption, variables);
+    }
+
+    /**
+     * Formats a {@code caption} using the given {@code formatter}.
+     *
+     * @param <T>       the message type produced by the formatter
+     * @param formatter the formatter
+     * @param caption   the caption key
+     * @param variables the variables to use during formatting
+     * @return the formatted caption
+     */
+    public <T> @NonNull T formatCaption(
+            final @NonNull CaptionFormatter<C, T> formatter,
+            final @NonNull Caption caption,
+            final @NonNull CaptionVariable @NonNull... variables
+    ) {
+        return formatter.formatCaption(
+                caption,
+                this.commandSender,
+                this.captionRegistry.caption(caption, this.commandSender),
                 variables
         );
     }

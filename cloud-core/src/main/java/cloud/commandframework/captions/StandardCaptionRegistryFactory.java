@@ -27,17 +27,19 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Utility that replaces variables in captions
+ * Factory creating {@link StandardCaptionRegistry} instances
+ *
+ * @param <C> Command sender type
  */
 @API(status = API.Status.STABLE)
-public interface CaptionVariableReplacementHandler {
+public final class StandardCaptionRegistryFactory<C> {
 
     /**
-     * Replace the variables in a message and return the result
+     * Create a new simple caption registry instance
      *
-     * @param string    Message to replace variables in
-     * @param variables Variables
-     * @return Transformed message
+     * @return Created instance
      */
-    @NonNull String replaceVariables(@NonNull String string, @NonNull CaptionVariable... variables);
+    public @NonNull StandardCaptionRegistry<C> create() {
+        return new StandardCaptionRegistry<>();
+    }
 }

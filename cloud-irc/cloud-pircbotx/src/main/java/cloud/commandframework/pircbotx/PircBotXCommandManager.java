@@ -53,13 +53,13 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
      */
     public static final String PIRCBOTX_META_KEY = "__internal_pircbotx__";
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_USER_KEY = Caption.of("argument.parse.failure.use");
     /**
      * Default caption for {@link #ARGUMENT_PARSE_FAILURE_USER_KEY}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_USER = "'{input}' is not a valid user";
+    public static final String ARGUMENT_PARSE_FAILURE_USER = "'<input>' is not a valid user";
 
     private final String commandPrefix;
     private final BiFunction<C, String, Boolean> permissionFunction;

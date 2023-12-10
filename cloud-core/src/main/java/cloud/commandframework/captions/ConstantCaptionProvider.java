@@ -23,24 +23,27 @@
 //
 package cloud.commandframework.captions;
 
+import cloud.commandframework.internal.ImmutableBuilder;
+import java.util.Map;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.immutables.value.Value;
 
-/**
- * Simple implementation of {@link CaptionVariableReplacementHandler}
- */
-@API(status = API.Status.STABLE)
-public final class SimpleCaptionVariableReplacementHandler implements CaptionVariableReplacementHandler {
+@ImmutableBuilder
+@Value.Immutable
+@API(status = API.Status.STABLE, since = "2.0.0")
+public abstract class ConstantCaptionProvider<C> implements CaptionProvider<C> {
+
+    /**
+     * Returns all recognized captions and their corresponding constant values.
+     *
+     * @return the captions
+     */
+    public abstract @NonNull Map<@NonNull Caption, @NonNull String> captions();
 
     @Override
-    public @NonNull String replaceVariables(
-            final @NonNull String string,
-            final @NonNull CaptionVariable... variables
-    ) {
-        String replacedString = string;
-        for (final CaptionVariable variable : variables) {
-            replacedString = replacedString.replace(String.format("{%s}", variable.getKey()), variable.getValue());
-        }
-        return replacedString;
+    public final @Nullable String provide(final @NonNull Caption caption, final @NonNull C recipient) {
+        return this.captions().get(caption);
     }
 }
