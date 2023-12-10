@@ -66,7 +66,7 @@ public final class CommandBeanExample extends CommandBean<CommandSender> impleme
 
     @Override
     public void execute(final @NonNull CommandContext<CommandSender> commandContext) {
-        final CommandSender sender = commandContext.getSender();
+        final CommandSender sender = commandContext.sender();
         final int number = commandContext.get(NUMBER_KEY);
         sender.sendMessage("The square root of your number is: " + Math.sqrt(number));
     }

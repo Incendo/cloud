@@ -73,7 +73,7 @@ public final class FabricClientExample implements ClientModInitializer {
                     final Path target = FabricLoader.getInstance().getGameDir().resolve(
                             "cloud-dump-" + Instant.now().toString().replace(':', '-') + ".json"
                     );
-                    ctx.getSender().sendFeedback(
+                    ctx.sender().sendFeedback(
                             Component.literal("Dumping command output to ")
                                     .append(Component.literal(target.toString())
                                             .withStyle(s -> s.withClickEvent(new ClickEvent(
@@ -90,7 +90,7 @@ public final class FabricClientExample implements ClientModInitializer {
                         json.setIndent("  ");
                         Streams.write(object, json);
                     } catch (final IOException ex) {
-                        ctx.getSender().sendError(Component.literal(
+                        ctx.sender().sendError(Component.literal(
                                 "Unable to write file, see console for details: " + ex.getMessage()
                         ));
                     }
@@ -98,7 +98,7 @@ public final class FabricClientExample implements ClientModInitializer {
 
         commandManager.command(base.literal("say")
                 .required("required", greedyStringParser())
-                .handler(ctx -> ctx.getSender().sendFeedback(
+                .handler(ctx -> ctx.sender().sendFeedback(
                         Component.literal("Cloud client commands says: " + ctx.get("message"))
                 )));
 
@@ -114,25 +114,25 @@ public final class FabricClientExample implements ClientModInitializer {
 
         commandManager.command(base.literal("requires_cheats")
                 .permission(FabricClientCommandManager.cheatsAllowed(false))
-                .handler(ctx -> ctx.getSender().sendFeedback(Component.literal("Cheats are enabled!"))));
+                .handler(ctx -> ctx.sender().sendFeedback(Component.literal("Cheats are enabled!"))));
 
         // Test argument which requires CommandBuildContext/RegistryAccess
         commandManager.command(base.literal("show_item")
                 .required(ItemInputArgument.of("item"))
                 .handler(ctx -> {
                     try {
-                        ctx.getSender().sendFeedback(
+                        ctx.sender().sendFeedback(
                                 ctx.<ItemInput>get("item").createItemStack(1, false).getDisplayName()
                         );
                     } catch (final CommandSyntaxException ex) {
-                        ctx.getSender().sendError(ComponentUtils.fromMessage(ex.getRawMessage()));
+                        ctx.sender().sendError(ComponentUtils.fromMessage(ex.getRawMessage()));
                     }
                 }));
 
         commandManager.command(base.literal("flag_test")
                 .optional("parameter", stringParser())
                 .flag(CommandFlag.builder("flag").withAliases("f"))
-                .handler(ctx -> ctx.getSender().sendFeedback(Component.literal("Had flag: " + ctx.flags().isPresent("flag")))));
+                .handler(ctx -> ctx.sender().sendFeedback(Component.literal("Had flag: " + ctx.flags().isPresent("flag")))));
     }
 
     private static void disconnectClient(final @NonNull Minecraft client) {

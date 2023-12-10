@@ -52,7 +52,7 @@ public final class SelectorExample implements BuilderFeature {
                 .literal("here")
                 .senderType(Player.class)
                 .handler(commandContext -> {
-                    final Player player = commandContext.getSender();
+                    final Player player = commandContext.sender();
                     final SingleEntitySelector singleEntitySelector = commandContext.get("entity");
                     if (singleEntitySelector.hasAny()) {
                         singleEntitySelector.getEntity().teleport(player);

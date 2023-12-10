@@ -51,7 +51,7 @@ public final class EnumExample implements BuilderFeature {
                         .required("type", enumParser(EntityType.class))
                         .senderType(Player.class)
                         .handler(context -> {
-                            final Location location = context.getSender().getLocation();
+                            final Location location = context.sender().getLocation();
                             location.getWorld().spawnEntity(location, context.get("type"));
                         })
         );

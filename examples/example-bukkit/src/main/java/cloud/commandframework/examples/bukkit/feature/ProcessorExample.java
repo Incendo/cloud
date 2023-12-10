@@ -81,7 +81,7 @@ public final class ProcessorExample {
             if (!command.commandMeta().getOrDefault(REQUIRES_BOOTS, false)) {
                 return;
             }
-            final CommandSender sender = context.getCommandContext().getSender();
+            final CommandSender sender = context.getCommandContext().sender();
             if (!(sender instanceof Player)) {
                 return;
             }

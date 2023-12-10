@@ -265,9 +265,9 @@ public final class MinecraftExceptionHandler<C> {
     ) {
         this.componentBuilders.forEach((type, handler) -> manager.exceptionController().registerHandler(
                 type.exceptionClass(),
-                ctx -> audienceMapper.apply(ctx.context().getSender()).sendMessage(
+                ctx -> audienceMapper.apply(ctx.context().sender()).sendMessage(
                         Identity.nil(),
-                        this.decorator.apply(handler.apply(ctx.context().getSender(), ctx.exception()))
+                        this.decorator.apply(handler.apply(ctx.context().sender(), ctx.exception()))
                 )
         ));
     }

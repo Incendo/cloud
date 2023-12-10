@@ -66,7 +66,7 @@ public final class BlockPredicateExample implements BuilderFeature {
         final BlockPredicate predicate = ctx.get("predicate");
         final int radius = ctx.get("radius");
 
-        final Player player = ctx.getSender();
+        final Player player = ctx.sender();
         final Location loc = player.getLocation();
 
         for (double x = loc.getX() - radius; x < loc.getX() + radius; x++) {

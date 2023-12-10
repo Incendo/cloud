@@ -58,7 +58,7 @@ public final class ItemStackPredicateExample implements BuilderFeature {
     private void executeTestItem(final @NonNull CommandContext<CommandSender> ctx) {
         final ProtoItemStack protoItemStack = ctx.get("item");
         final ItemStackPredicate predicate = ctx.get("predicate");
-        ctx.getSender().sendMessage("result: " + predicate.test(
+        ctx.sender().sendMessage("result: " + predicate.test(
                 protoItemStack.createItemStack(1, true)));
     }
 }

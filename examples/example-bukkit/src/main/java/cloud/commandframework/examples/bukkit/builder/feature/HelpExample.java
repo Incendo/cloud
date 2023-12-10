@@ -56,7 +56,7 @@ public final class HelpExample implements BuilderFeature {
                                 greedyStringParser(),
                                 DefaultValue.constant(""),
                                 (ctx, in) -> manager.createHelpHandler()
-                                        .queryRootIndex(ctx.getSender())
+                                        .queryRootIndex(ctx.sender())
                                         .entries()
                                         .stream()
                                         .map(CommandEntry::syntax)
@@ -64,7 +64,7 @@ public final class HelpExample implements BuilderFeature {
                                         .collect(Collectors.toList())
                         )
                         .handler(context -> {
-                            examplePlugin.minecraftHelp().queryCommands(context.get("query"), context.getSender());
+                            examplePlugin.minecraftHelp().queryCommands(context.get("query"), context.sender());
                         })
         );
     }

@@ -90,12 +90,12 @@ public final class FabricExample implements ModInitializer {
                 .required(name, stringParser())
                 .optional(hugs, integerParser(), DefaultValue.constant(1))
                 .handler(ctx -> {
-                    ctx.getSender().sendSuccess(Component.literal("Hello, ")
+                    ctx.sender().sendSuccess(Component.literal("Hello, ")
                             .append(ctx.get(name))
                             .append(", hope you're doing well!")
                             .withStyle(style -> style.withColor(TextColor.fromRgb(0xAA22BB))), false);
 
-                    ctx.getSender().sendSuccess(Component.literal("Cloud would like to give you ")
+                    ctx.sender().sendSuccess(Component.literal("Cloud would like to give you ")
                             .append(Component.literal(String.valueOf(ctx.get(hugs)))
                                     .withStyle(style -> style.withColor(TextColor.fromRgb(0xFAB3DA))))
                             .append(" hug(s) <3")
@@ -112,9 +112,9 @@ public final class FabricExample implements ModInitializer {
                 .literal("land")
                 .required(biomeArgument)
                 .handler(ctx -> {
-                    ctx.getSender().sendSuccess(Component.literal("Yes, the biome ")
+                    ctx.sender().sendSuccess(Component.literal("Yes, the biome ")
                             .append(Component.literal(
-                                            ctx.getSender().registryAccess()
+                                            ctx.sender().registryAccess()
                                                     .registryOrThrow(Registries.BIOME)
                                                     .getKey(ctx.get(biomeArgument)).toString())
                                     .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD))
@@ -137,9 +137,9 @@ public final class FabricExample implements ModInitializer {
                             selectedPlayer.sendSystemMessage(
                                     Component.literal("Wave from ")
                                             .withStyle(style -> style.withColor(ctx.get(textColor)))
-                                            .append(ctx.getSender().getDisplayName())
+                                            .append(ctx.sender().getDisplayName())
                             ));
-                    ctx.getSender().sendSuccess(
+                    ctx.sender().sendSuccess(
                             Component.literal(String.format("Waved at %d players (%s)", selected.size(),
                                     selector.inputString()
                             )),
@@ -157,7 +157,7 @@ public final class FabricExample implements ModInitializer {
                     final MultiplePlayerSelector targets = ctx.get("targets");
                     final int amount = ctx.get("amount");
                     GiveCommandAccess.giveItem(
-                            ctx.getSender(),
+                            ctx.sender(),
                             item,
                             targets.get(),
                             amount
@@ -201,7 +201,7 @@ public final class FabricExample implements ModInitializer {
                     text.append(Component.literal(", ").withStyle(style -> style.withColor(ChatFormatting.GRAY)));
                 }
             }
-            ctx.getSender().sendSuccess(text, false);
+            ctx.sender().sendSuccess(text, false);
         }));
 
         final TypedCommandComponent<CommandSourceStack, ModMetadata> modMetadata = manager.componentBuilder(ModMetadata.class, "mod")
@@ -245,7 +245,7 @@ public final class FabricExample implements ModInitializer {
                     if (!meta.getLicense().isEmpty()) {
                         text.append(Component.literal("\n license: " + String.join(", ", meta.getLicense())));
                     }
-                    ctx.getSender().sendSuccess(
+                    ctx.sender().sendSuccess(
                             text,
                             false
                     );
@@ -268,9 +268,9 @@ public final class FabricExample implements ModInitializer {
                 .handler(ctx -> {
                     final ServerPlayer player;
                     try {
-                        player = ctx.getSender().getPlayerOrException();
+                        player = ctx.sender().getPlayerOrException();
                     } catch (final CommandSyntaxException e) {
-                        ctx.getSender().sendSuccess(ComponentUtils.fromMessage(e.getRawMessage()), false);
+                        ctx.sender().sendSuccess(ComponentUtils.fromMessage(e.getRawMessage()), false);
                         return;
                     }
                     final Vec3 vec = ctx.<ColumnCoordinates>get("chunk_position").position();

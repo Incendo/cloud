@@ -73,8 +73,8 @@ public final class MethodExceptionHandler<C> implements ExceptionHandler<C, Thro
                 arguments.add(context.exception());
             } else if (argument.isInstance(context.context())) {
                 arguments.add(context.context());
-            } else if (argument.isInstance(context.context().getSender())) {
-                arguments.add(context.context().getSender());
+            } else if (argument.isInstance(context.context().sender())) {
+                arguments.add(context.context().sender());
             } else {
                 arguments.add(context.context().inject(argument).orElseThrow(() ->
                         new IllegalArgumentException("Can't map argument of type " + argument.getName())));

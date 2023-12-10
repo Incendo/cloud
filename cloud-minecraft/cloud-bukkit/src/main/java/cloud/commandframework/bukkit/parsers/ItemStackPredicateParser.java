@@ -163,7 +163,7 @@ public final class ItemStackPredicateParser<C> implements ArgumentParser<C, Item
     ) {
         return new com.mojang.brigadier.context.CommandContext<>(
                 commandSourceStack,
-                ctx.getRawInputJoined(),
+                ctx.rawInput().input(),
                 Collections.emptyMap(),
                 null,
                 null,

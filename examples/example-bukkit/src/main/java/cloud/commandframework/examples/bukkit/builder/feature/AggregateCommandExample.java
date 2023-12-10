@@ -82,7 +82,7 @@ public final class AggregateCommandExample implements BuilderFeature {
                         .literal("teleport")
                         .required("location", locationParser)
                         .senderType(Player.class)
-                        .handler(commandContext -> commandContext.getSender().teleport(commandContext.<Location>get("location")))
+                        .handler(commandContext -> commandContext.sender().teleport(commandContext.<Location>get("location")))
         );
     }
 
@@ -105,7 +105,7 @@ public final class AggregateCommandExample implements BuilderFeature {
                         .senderType(Player.class)
                         .handler(commandContext -> {
                             final Pair<Integer, String> name = commandContext.get("name");
-                            final ItemStack stack = commandContext.getSender().getInventory().getItem(name.getFirst());
+                            final ItemStack stack = commandContext.sender().getInventory().getItem(name.getFirst());
                             if (stack == null) {
                                 return;
                             }
@@ -124,7 +124,7 @@ public final class AggregateCommandExample implements BuilderFeature {
     }
 
     private @NonNull SuggestionProvider<CommandSender> nameSuggestions() {
-        return (context, input) -> Stream.of(context.<Integer>get("slot"), context.getSender().getName())
+        return (context, input) -> Stream.of(context.<Integer>get("slot"), context.sender().getName())
                 .map(Object::toString)
                 .map(Suggestion::simple)
                 .collect(Collectors.toList());

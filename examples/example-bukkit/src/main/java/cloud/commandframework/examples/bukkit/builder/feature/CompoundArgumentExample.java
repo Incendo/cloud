@@ -66,7 +66,7 @@ public final class CompoundArgumentExample implements BuilderFeature {
                         Description.of("Coordinates")
                 )
                 .handler(context -> {
-                    final Player player = context.getSender();
+                    final Player player = context.sender();
                     final World world = context.get(worldKey);
                     final Vector coords = context.get(coordsKey);
                     final Location location = coords.toLocation(world);
