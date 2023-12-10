@@ -28,7 +28,6 @@ import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.execution.CommandResult;
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,7 +48,7 @@ class DefaultValueTest {
     @Test
     void Constant_HappyFlow_Success() throws Exception {
         // Arrange
-        final CloudKey<Integer> key = SimpleCloudKey.of("int", Integer.class);
+        final CloudKey<Integer> key = CloudKey.of("int", Integer.class);
         this.commandManager.command(
                 this.commandManager.commandBuilder("test").optional(key, integerParser(), DefaultValue.constant(5))
         );
@@ -64,7 +63,7 @@ class DefaultValueTest {
     @Test
     void Dynamic_HappyFlow_Success() throws Exception {
         // Arrange
-        final CloudKey<Integer> key = SimpleCloudKey.of("int", Integer.class);
+        final CloudKey<Integer> key = CloudKey.of("int", Integer.class);
         final DefaultValue<TestCommandSender, Integer> defaultValue = ctx -> ThreadLocalRandom.current().nextInt();
         this.commandManager.command(
                 this.commandManager.commandBuilder("test").optional(key, integerParser(), defaultValue)
@@ -80,7 +79,7 @@ class DefaultValueTest {
     @Test
     void Parsed_HappyFlow_Success() throws Exception {
         // Arrange
-        final CloudKey<Integer> key = SimpleCloudKey.of("int", Integer.class);
+        final CloudKey<Integer> key = CloudKey.of("int", Integer.class);
         this.commandManager.command(
                 this.commandManager.commandBuilder("test").optional(key, integerParser(), DefaultValue.parsed("5"))
         );

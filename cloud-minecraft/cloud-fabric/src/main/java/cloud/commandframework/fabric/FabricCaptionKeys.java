@@ -39,7 +39,7 @@ public final class FabricCaptionKeys {
     private static final Collection<Caption> RECOGNIZED_CAPTIONS = new HashSet<>();
 
     /**
-     * Variables: {id}, {registry}
+     * Variables: {@code <id>}, {@code <registry>}
      *
      * @since 1.5.0
      */
@@ -47,7 +47,7 @@ public final class FabricCaptionKeys {
             "argument.parse.failure.registry_entry.unknown_entry"
     );
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      *
      * @since 1.5.0
      */

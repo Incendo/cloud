@@ -27,12 +27,14 @@ import cloud.commandframework.CommandDescription
 import cloud.commandframework.CommandManager
 import cloud.commandframework.arguments.standard.StringParser.stringParser
 import cloud.commandframework.execution.CommandExecutionCoordinator
+import cloud.commandframework.help.result.CommandEntry
 import cloud.commandframework.internal.CommandRegistrationHandler
+import cloud.commandframework.keys.CloudKey
 import cloud.commandframework.kotlin.extension.argumentDescription
 import cloud.commandframework.kotlin.extension.buildAndRegister
+import cloud.commandframework.kotlin.extension.cloudKey
 import cloud.commandframework.kotlin.extension.command
 import cloud.commandframework.kotlin.extension.commandBuilder
-import cloud.commandframework.meta.SimpleCommandMeta
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -41,6 +43,7 @@ class CommandBuildingDSLTest {
     @Test
     fun testCommandDSL() {
         val manager = TestCommandManager()
+        val moment: CloudKey<String> = cloudKey("moment")
 
         manager.command(
             manager.commandBuilder("kotlin", aliases = arrayOf("alias")) {
@@ -49,12 +52,13 @@ class CommandBuildingDSLTest {
 
                 literal("dsl")
 
-                required("moment", stringParser()) {
+                required(moment, stringParser()) {
                     description(argumentDescription("An amazing command argument"))
                 }
 
                 handler {
                     // ...
+                    val argumentValue: String = it[moment]
                 }
 
                 manager.command(
@@ -90,7 +94,10 @@ class CommandBuildingDSLTest {
         manager.executeCommand(SpecificCommandSender(), "kotlin dsl time bruh_moment")
 
         Assertions.assertEquals(
-            manager.createCommandHelpHandler().allCommands.map { it.syntaxString() }.sorted(),
+            manager.createHelpHandler()
+                .queryRootIndex(TestCommandSender())
+                .entries()
+                .map(CommandEntry<*>::syntax).sorted(),
             setOf(
                 "kotlin dsl <moment>",
                 "kotlin dsl <moment> bruh_moment",
@@ -98,8 +105,7 @@ class CommandBuildingDSLTest {
                 "is this",
                 "is this going",
                 "is this going too_far"
-            )
-                .sorted()
+            ).sorted()
         )
     }
 
@@ -107,9 +113,6 @@ class CommandBuildingDSLTest {
         CommandExecutionCoordinator.simpleCoordinator(),
         CommandRegistrationHandler.nullCommandRegistrationHandler()
     ) {
-        override fun createDefaultCommandMeta(): SimpleCommandMeta {
-            return SimpleCommandMeta.empty()
-        }
 
         override fun hasPermission(sender: TestCommandSender, permission: String): Boolean {
             return !permission.equals("no", ignoreCase = true)

@@ -30,16 +30,23 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class StandardCommandContextFactory<C> implements CommandContextFactory<C> {
 
+    private final CommandManager<C> commandManager;
+
+    /**
+     * Creates a new context factory.
+     *
+     * @param commandManager the command manager
+     */
+    public StandardCommandContextFactory(final @NonNull CommandManager<C> commandManager) {
+        this.commandManager = commandManager;
+    }
+
     @Override
-    public @NonNull CommandContext<C> create(
-            final boolean suggestions,
-            final @NonNull C sender,
-            final @NonNull CommandManager<C> commandManager
-    ) {
+    public @NonNull CommandContext<C> create(final boolean suggestions, final @NonNull C sender) {
         return new CommandContext<C>(
                 suggestions,
                 sender,
-                commandManager
+                this.commandManager
         );
     }
 }

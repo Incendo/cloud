@@ -23,8 +23,7 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.standard.IntegerParser;
-import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.meta.CommandMeta;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +36,7 @@ class CommandTest {
     void noArguments() {
         assertThat(
                 Command
-                        .newBuilder("test", SimpleCommandMeta.empty())
+                        .newBuilder("test", CommandMeta.empty())
                         .build()
                         .components()
                         .size()
@@ -47,7 +46,7 @@ class CommandTest {
     @Test
     void ensureOrdering() {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
-                Command.newBuilder("test", SimpleCommandMeta.empty())
+                Command.newBuilder("test", CommandMeta.empty())
                         .optional("something", integerParser())
                         .required("somethingelse", integerParser())
                         .build()

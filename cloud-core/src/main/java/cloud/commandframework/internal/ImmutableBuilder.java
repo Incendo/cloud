@@ -21,23 +21,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.captions;
+package cloud.commandframework.internal;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import org.apiguardian.api.API;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.annotate.InjectAnnotation;
+import org.immutables.value.Value;
 
 /**
- * Utility that replaces variables in captions
+ * Annotation that generates immutables classes with builders.
  */
-@API(status = API.Status.STABLE)
-public interface CaptionVariableReplacementHandler {
+@Value.Style(
+        typeImmutableEnclosing = "*",
+        typeAbstract = "*",
+        deferCollectionAllocation = true,
+        optionalAcceptNullable = true,
+        jdkOnly = true, // We do not want any runtime dependencies!
+        allParameters = true,
+        headerComments = true,
+        jacksonIntegration = false,
+        builderVisibility = Value.Style.BuilderVisibility.SAME,
+        defaultAsDefault = true
+)
+@InjectAnnotation(
+        type = API.class,
+        target = InjectAnnotation.Where.IMMUTABLE_TYPE,
+        code = "(status = org.apiguardian.api.API.Status.STABLE, consumers = \"cloud.commandframework.*\")"
+)
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.PACKAGE})
+@Retention(RetentionPolicy.SOURCE)
+@API(status = API.Status.INTERNAL, since = "2.0.0")
+public @interface ImmutableBuilder {
 
-    /**
-     * Replace the variables in a message and return the result
-     *
-     * @param string    Message to replace variables in
-     * @param variables Variables
-     * @return Transformed message
-     */
-    @NonNull String replaceVariables(@NonNull String string, @NonNull CaptionVariable... variables);
 }

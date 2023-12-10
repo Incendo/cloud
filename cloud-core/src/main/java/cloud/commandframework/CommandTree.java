@@ -931,7 +931,7 @@ public final class CommandTree<C> {
             final boolean isParsingFlag = component.type() == CommandComponent.ComponentType.FLAG
                     && !node.children().isEmpty() // Has children
                     && !text.startsWith("-") // Not a flag
-                    && !context.commandContext().getOptional(CommandFlagParser.FLAG_META_KEY).isPresent();
+                    && !context.commandContext().optional(CommandFlagParser.FLAG_META_KEY).isPresent();
 
             if (!isParsingFlag) {
                 return CompletableFuture.completedFuture(ctx);

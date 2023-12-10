@@ -21,25 +21,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.captions;
+package cloud.commandframework.annotations;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Factory creating {@link SimpleCaptionRegistry} instances
+ * Used to give an optional command component a
+ * {@link cloud.commandframework.arguments.DefaultValue#parsed(String) parsed default value}.
  *
- * @param <C> Command sender type
+ * @since 2.0.0
  */
-@API(status = API.Status.STABLE)
-public final class SimpleCaptionRegistryFactory<C> {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.PARAMETER)
+@API(status = API.Status.STABLE, since = "2.0.0")
+public @interface Default {
 
     /**
-     * Create a new simple caption registry instance
+     * Returns the default value.
+     * <p>
+     * This value will be parsed when the command is being parsed in the case that the optional parameter has been omitted.
      *
-     * @return Created instance
+     * @return the default value
      */
-    public @NonNull SimpleCaptionRegistry<C> create() {
-        return new SimpleCaptionRegistry<>();
-    }
+    @NonNull String value();
 }

@@ -76,7 +76,7 @@ final class DelegatingSuggestionFactory<C, S extends Suggestion> implements Sugg
     @Override
     public @NonNull CompletableFuture<List<@NonNull S>> suggest(@NonNull final C sender, @NonNull final String input) {
         return this.suggest(
-                this.commandManager.commandContextFactory().create(true /* suggestions */, sender, this.commandManager),
+                this.commandManager.commandContextFactory().create(true /* suggestions */, sender),
                 input
         );
     }

@@ -37,9 +37,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface CloudKeyHolder<T> {
 
     /**
-     * Get the key that identifies this object.
+     * Returns the key that identifies this object.
      *
-     * @return Identifying key.
+     * @return the identifying key.
      */
-    @NonNull CloudKey<T> getKey();
+    @NonNull CloudKey<T> key();
 }

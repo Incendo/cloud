@@ -21,47 +21,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework;
+package cloud.commandframework.captions;
 
-import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.INTERNAL, since = "2.0.0")
-final class DescriptionImpl implements Description {
+/**
+ * Factory creating {@link StandardCaptionRegistry} instances
+ *
+ * @param <C> Command sender type
+ */
+@API(status = API.Status.STABLE)
+public final class StandardCaptionRegistryFactory<C> {
 
-    static final DescriptionImpl EMPTY = new DescriptionImpl("");
-
-    private final String description;
-
-    DescriptionImpl(final @NonNull String description) {
-        this.description = description;
-    }
-
-    @Override
-    public @NonNull String textDescription() {
-        return this.description;
-    }
-
-    @Override
-    public @NonNull String toString() {
-        return this.description;
-    }
-
-    @Override
-    public boolean equals(final Object object) {
-        if (this == object) {
-            return true;
-        }
-        if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
-        final DescriptionImpl that = (DescriptionImpl) object;
-        return Objects.equals(this.description, that.description);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.description);
+    /**
+     * Create a new simple caption registry instance
+     *
+     * @return Created instance
+     */
+    public @NonNull StandardCaptionRegistry<C> create() {
+        return new StandardCaptionRegistry<>();
     }
 }

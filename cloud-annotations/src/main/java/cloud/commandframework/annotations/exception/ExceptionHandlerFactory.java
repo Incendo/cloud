@@ -21,26 +21,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.captions;
+package cloud.commandframework.annotations.exception;
 
+import cloud.commandframework.exceptions.handling.ExceptionHandler;
+import java.lang.reflect.Method;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Simple implementation of {@link CaptionVariableReplacementHandler}
- */
-@API(status = API.Status.STABLE)
-public final class SimpleCaptionVariableReplacementHandler implements CaptionVariableReplacementHandler {
+@FunctionalInterface
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface ExceptionHandlerFactory<C> {
 
-    @Override
-    public @NonNull String replaceVariables(
-            final @NonNull String string,
-            final @NonNull CaptionVariable... variables
-    ) {
-        String replacedString = string;
-        for (final CaptionVariable variable : variables) {
-            replacedString = replacedString.replace(String.format("{%s}", variable.getKey()), variable.getValue());
-        }
-        return replacedString;
+    /**
+     * Returns a factory that produces {@link MethodExceptionHandler} instances.
+     *
+     * @param <C> the command sender type
+     * @return the created factory
+     */
+    static <C> @NonNull ExceptionHandlerFactory<C> defaultFactory() {
+        return MethodExceptionHandler::new;
     }
+
+    /**
+     * Creates an exception handler using the given {@code method}.
+     *
+     * @param instance the parsed instance
+     * @param method   the exception handler method
+     * @return the method handler
+     */
+    @NonNull ExceptionHandler<C, Throwable> createExceptionHandler(@NonNull Object instance, @NonNull Method method);
 }

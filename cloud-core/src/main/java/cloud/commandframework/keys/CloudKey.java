@@ -23,32 +23,148 @@
 //
 package cloud.commandframework.keys;
 
+import cloud.commandframework.internal.ImmutableImpl;
 import io.leangen.geantyref.TypeToken;
+import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
 /**
- * A typed, named key
+ * A typed, named key.
  *
  * @param <T> The type of the key
  * @since 1.4.0
  */
+@ImmutableImpl
+@Value.Immutable
 @API(status = API.Status.STABLE, since = "1.4.0")
-public interface CloudKey<T> {
+public abstract class CloudKey<T> {
 
     /**
-     * Get the name of the key. The name of the key should be used to
+     * Creates a new key.
+     *
+     * @param <T>  the generic type of the value represented by the key
+     * @param name the name of the key
+     * @param type the type of the value represented by the key
+     * @return the created key
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <@NonNull T> CloudKey<T> of(
+            final @NonNull String name,
+            final @NonNull TypeToken<T> type
+    ) {
+        return CloudKeyImpl.of(name, type);
+    }
+
+    /**
+     * Creates a new key.
+     *
+     * @param <T>  the generic type of the value represented by the key
+     * @param name the name of the key
+     * @param type the type of the value represented by the key
+     * @return the created key
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <@NonNull T> CloudKey<T> of(
+            final @NonNull String name,
+            final @NonNull Class<T> type
+    ) {
+        return CloudKeyImpl.of(name, TypeToken.get(type));
+    }
+
+    /**
+     * Creates a new type-less key.
+     *
+     * @param name the name of the key
+     * @return the created key
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static @NonNull CloudKey<Void> of(final @NonNull String name) {
+        return CloudKeyImpl.of(name, TypeToken.get(Void.TYPE));
+    }
+
+    /**
+     * Creates a new key.
+     *
+     * @param <T>  the generic type of the value represented by the key
+     * @param name the name of the key
+     * @param type the type of the value represented by the key
+     * @return the created key
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <@NonNull T> CloudKey<T> cloudKey(
+            final @NonNull String name,
+            final @NonNull TypeToken<T> type
+    ) {
+        return CloudKeyImpl.of(name, type);
+    }
+
+    /**
+     * Creates a new key.
+     *
+     * @param <T>  the generic type of the value represented by the key
+     * @param name the name of the key
+     * @param type the type of the value represented by the key
+     * @return the created key
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <@NonNull T> CloudKey<T> cloudKey(
+            final @NonNull String name,
+            final @NonNull Class<T> type
+    ) {
+        return CloudKeyImpl.of(name, TypeToken.get(type));
+    }
+
+    /**
+     * Creates a new type-less key.
+     *
+     * @param name the name of the key
+     * @return the created key
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static @NonNull CloudKey<Void> cloudKey(final @NonNull String name) {
+        return CloudKeyImpl.of(name, TypeToken.get(Void.TYPE));
+    }
+
+    /**
+     * Returns the name of the key.
+     * <p>
+     * The name of the key should be used to
      * determine key equality. That means that two keys sharing the same
-     * name are equal.
+     * name are considered equal.
      *
-     * @return The key name
+     * @return the name of the key
      */
-    @NonNull String getName();
+    public abstract @NonNull String name();
 
     /**
-     * Get the type of the value that this key holds.
+     * Returns the type of the value that this key holds.
      *
-     * @return The type of the key value.
+     * @return the type of the key value.
      */
-    @NonNull TypeToken<@NonNull T> getType();
+    public abstract @NonNull TypeToken<@NonNull T> type();
+
+    @Override
+    public final boolean equals(final Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || this.getClass() != other.getClass()) {
+            return false;
+        }
+        final CloudKey<?> that = (CloudKey<?>) other;
+        return Objects.equals(this.name(), that.name());
+    }
+
+    @Override
+    public final int hashCode() {
+        return Objects.hashCode(this.name());
+    }
 }

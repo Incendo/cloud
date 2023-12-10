@@ -26,6 +26,9 @@ package cloud.commandframework.annotations;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.Description;
+import cloud.commandframework.annotations.exception.ExceptionHandler;
+import cloud.commandframework.annotations.exception.ExceptionHandlerFactory;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.injection.RawArgs;
 import cloud.commandframework.annotations.parsers.MethodArgumentParser;
@@ -45,7 +48,7 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.meta.CommandMetaBuilder;
 import cloud.commandframework.types.tuples.Pair;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
@@ -107,6 +110,8 @@ public final class AnnotationParser<C> {
     private FlagAssembler flagAssembler;
     private CommandExtractor commandExtractor;
     private SuggestionProviderFactory<C> suggestionProviderFactory;
+    private ExceptionHandlerFactory<C> exceptionHandlerFactory;
+    private DescriptionMapper descriptionMapper;
 
     /**
      * Construct a new annotation parser
@@ -136,7 +141,20 @@ public final class AnnotationParser<C> {
             final @NonNull CommandManager<C> manager,
             final @NonNull Class<C> commandSenderClass
     ) {
-        this(manager, TypeToken.get(commandSenderClass), parameters -> SimpleCommandMeta.empty());
+        this(manager, TypeToken.get(commandSenderClass), parameters -> CommandMeta.empty());
+    }
+
+    /**
+     * Construct a new annotation parser
+     *
+     * @param manager            Command manager instance
+     * @param commandSenderClass Command sender class
+     */
+    public AnnotationParser(
+            final @NonNull CommandManager<C> manager,
+            final @NonNull TypeToken<C> commandSenderClass
+    ) {
+        this(manager, commandSenderClass, parameters -> CommandMeta.empty());
     }
 
     /**
@@ -166,14 +184,15 @@ public final class AnnotationParser<C> {
         this.flagExtractor = new FlagExtractorImpl(this);
         this.flagAssembler = new FlagAssemblerImpl(manager);
         this.syntaxParser = new SyntaxParserImpl();
-        this.argumentExtractor = new ArgumentExtractorImpl();
+        this.descriptionMapper = DescriptionMapper.simple();
+        this.argumentExtractor = StandardArgumentExtractor.create(this);
         this.argumentAssembler = new ArgumentAssemblerImpl<>(this);
         this.commandExtractor = new CommandExtractorImpl(this);
         this.suggestionProviderFactory = SuggestionProviderFactory.defaultFactory();
-        // TODO(City): Add mapper so that we can map this to rich descriptions easily.
+        this.exceptionHandlerFactory = ExceptionHandlerFactory.defaultFactory();
         this.registerBuilderModifier(
                 CommandDescription.class,
-                (description, builder) -> builder.commandDescription(commandDescription(this.processString(description.value())))
+                (description, builder) -> builder.commandDescription(commandDescription(this.mapDescription(description.value())))
         );
         this.registerPreprocessorMapper(Regex.class, annotation -> RegexPreprocessor.of(
                 this.processString(annotation.value()),
@@ -548,6 +567,50 @@ public final class AnnotationParser<C> {
     }
 
     /**
+     * Returns the exception provider factory.
+     *
+     * @return the exception provider factory
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull ExceptionHandlerFactory<C> exceptionHandlerFactory() {
+        return this.exceptionHandlerFactory;
+    }
+
+    /**
+     * Sets the exception provider factory.
+     *
+     * @param exceptionHandlerFactory new exception provider factory
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void exceptionHandlerFactory(final @NonNull ExceptionHandlerFactory<C> exceptionHandlerFactory) {
+        this.exceptionHandlerFactory = exceptionHandlerFactory;
+    }
+
+    /**
+     * Returns the description mapper.
+     *
+     * @return the description mapper
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull DescriptionMapper descriptionMapper() {
+        return this.descriptionMapper;
+    }
+
+    /**
+     * Sets the description mapper.
+     *
+     * @param descriptionMapper new description mapper
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void descriptionMapper(final @NonNull DescriptionMapper descriptionMapper) {
+        this.descriptionMapper = descriptionMapper;
+    }
+
+    /**
      * Parses all known {@link cloud.commandframework.annotations.processing.CommandContainer command containers}.
      *
      * @return Collection of parsed commands
@@ -610,6 +673,7 @@ public final class AnnotationParser<C> {
     public <T> @NonNull Collection<@NonNull Command<C>> parse(final @NonNull T instance) {
         this.parseSuggestions(instance);
         this.parseParsers(instance);
+        this.parseExceptionHandlers(instance);
 
         final Collection<CommandDescriptor> commandDescriptors = this.commandExtractor.extractCommands(instance);
         final Collection<Command<C>> commands = this.construct(instance, commandDescriptors);
@@ -662,6 +726,28 @@ public final class AnnotationParser<C> {
                 this.manager.parserRegistry().registerSuggestionProvider(
                         this.processString(suggestions.value()),
                         this.suggestionProviderFactory.createSuggestionProvider(instance, method)
+                );
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> void parseExceptionHandlers(final @NonNull T instance) {
+        for (final Method method : instance.getClass().getMethods()) {
+            final ExceptionHandler exceptionHandler = method.getAnnotation(ExceptionHandler.class);
+            if (exceptionHandler == null) {
+                continue;
+            }
+            if (!method.isAccessible()) {
+                method.setAccessible(true);
+            }
+
+            try {
+                this.manager.exceptionController().registerHandler(
+                        (Class<Throwable>) exceptionHandler.value(),
+                        this.exceptionHandlerFactory.createExceptionHandler(instance, method)
                 );
             } catch (final Exception e) {
                 throw new RuntimeException(e);
@@ -748,8 +834,7 @@ public final class AnnotationParser<C> {
 
         final Method method = commandDescriptor.method();
         final CommandManager<C> manager = this.manager;
-        final SimpleCommandMeta.Builder metaBuilder = SimpleCommandMeta.builder()
-                .with(this.metaFactory.apply(method));
+        final CommandMetaBuilder metaBuilder = CommandMeta.builder().with(this.metaFactory.apply(method));
         if (methodOrClassHasAnnotation(method, Confirmation.class)) {
             metaBuilder.with(CommandConfirmationManager.META_CONFIRMATION_REQUIRED, true);
         }
@@ -905,6 +990,10 @@ public final class AnnotationParser<C> {
                 .filter(fragment -> fragment.getMajor().equals(argumentName))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Argument is not declared in syntax: " + argumentName));
+    }
+
+    @NonNull Description mapDescription(final @NonNull String string) {
+        return this.descriptionMapper.map(this.processString(string));
     }
 
     @NonNull Map<@NonNull Class<@NonNull ? extends Annotation>, AnnotationMapper<?>> annotationMappers() {

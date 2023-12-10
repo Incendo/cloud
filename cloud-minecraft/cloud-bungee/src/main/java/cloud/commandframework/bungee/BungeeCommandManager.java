@@ -30,7 +30,6 @@ import cloud.commandframework.bungee.arguments.ServerParser;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.Function;
 import net.md_5.bungee.api.CommandSender;
@@ -44,12 +43,12 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
     /**
      * Default caption for {@link BungeeCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'{input}' is not a valid player";
+    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'<input>' is not a valid player";
 
     /**
      * Default caption for {@link BungeeCaptionKeys#ARGUMENT_PARSE_FAILURE_SERVER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'{input}' is not a valid server";
+    public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'<input>' is not a valid server";
 
     private final Plugin owningPlugin;
     private final Function<CommandSender, C> commandSenderMapper;
@@ -114,11 +113,6 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
             return true;
         }
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
-    }
-
-    @Override
-    public final @NonNull SimpleCommandMeta createDefaultCommandMeta() {
-        return SimpleCommandMeta.empty();
     }
 
     final @NonNull Function<@NonNull CommandSender, @NonNull C> getCommandSenderMapper() {

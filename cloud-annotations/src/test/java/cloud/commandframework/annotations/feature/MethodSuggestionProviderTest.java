@@ -32,7 +32,6 @@ import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.StandardCommandContextFactory;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -52,12 +51,11 @@ class MethodSuggestionProviderTest {
 
     @BeforeEach
     void setup() {
-        this.commandContextFactory = new StandardCommandContextFactory<>();
         this.commandManager = new TestCommandManager();
+        this.commandContextFactory = new StandardCommandContextFactory<>(this.commandManager);
         this.annotationParser = new AnnotationParser<>(
                 this.commandManager,
-                TestCommandSender.class,
-                p -> SimpleCommandMeta.empty()
+                TestCommandSender.class
         );
     }
 
@@ -68,8 +66,7 @@ class MethodSuggestionProviderTest {
         this.annotationParser.parse(instance);
         final CommandContext<TestCommandSender> context = this.commandContextFactory.create(
                 true,
-                new TestCommandSender(),
-                this.commandManager
+                new TestCommandSender()
         );
 
         // Act

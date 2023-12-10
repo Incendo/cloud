@@ -26,18 +26,12 @@ package cloud.commandframework.annotations;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class TestCommandManager extends CommandManager<TestCommandSender> {
 
     public TestCommandManager() {
         super(CommandExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
-    }
-
-    @Override
-    public final SimpleCommandMeta createDefaultCommandMeta() {
-        return SimpleCommandMeta.empty();
     }
 
     @Override

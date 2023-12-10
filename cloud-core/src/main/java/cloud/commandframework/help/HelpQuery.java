@@ -21,24 +21,44 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.fabric.internal;
+package cloud.commandframework.help;
 
-import com.mojang.brigadier.StringReader;
+import cloud.commandframework.internal.ImmutableImpl;
+import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
-/**
- * An extension to the Brigadier StringReader that also implements Queue (via mixin).
- *
- * <p>See {@link cloud.commandframework.fabric.mixin.CloudStringReaderMixin} for the
- * {@link java.util.Queue} implementation.</p>
- */
-public final class CloudStringReader extends StringReader {
+@ImmutableImpl
+@Value.Immutable
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface HelpQuery<C> {
 
     /**
-     * Create a new reader from text.
+     * Creates a new help query.
      *
-     * @param input the input
+     * @param <C>    the command sender type
+     * @param sender the creator of the query
+     * @param query  the query string
+     * @return the created help query instance
      */
-    public CloudStringReader(final String input) {
-        super(input);
+    static <C> @NonNull HelpQuery<C> of(
+            final @NonNull C sender,
+            final @NonNull String query
+    ) {
+        return HelpQueryImpl.of(sender, query);
     }
+
+    /**
+     * Returns the command sender.
+     *
+     * @return the command sender
+     */
+    @NonNull C sender();
+
+    /**
+     * Returns the query string.
+     *
+     * @return the query string
+     */
+    @NonNull String query();
 }

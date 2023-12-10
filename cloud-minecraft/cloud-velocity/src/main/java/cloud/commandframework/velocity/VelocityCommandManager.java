@@ -32,8 +32,6 @@ import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.velocity.arguments.PlayerParser;
 import cloud.commandframework.velocity.arguments.ServerParser;
 import com.google.inject.Inject;
@@ -68,12 +66,12 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
     /**
      * Default caption for {@link VelocityCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'{input}' is not a valid player";
+    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'<input>' is not a valid player";
 
     /**
      * Default caption for {@link VelocityCaptionKeys#ARGUMENT_PARSE_FAILURE_SERVER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'{input}' is not a valid server";
+    public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'<input>' is not a valid server";
 
     private final ProxyServer proxyServer;
     private final Function<CommandSource, C> commandSenderMapper;
@@ -140,11 +138,6 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
     @Override
     public final boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
-    }
-
-    @Override
-    public final @NonNull CommandMeta createDefaultCommandMeta() {
-        return SimpleCommandMeta.empty();
     }
 
     /**

@@ -21,21 +21,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.fabric.mixin;
+package cloud.commandframework.help.result;
 
-import cloud.commandframework.fabric.internal.CloudStringReader;
-import com.mojang.brigadier.StringReader;
-import net.minecraft.commands.Commands;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import cloud.commandframework.help.HelpQuery;
+import cloud.commandframework.help.HelpRenderer;
+import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-@Mixin(Commands.class)
-public class CommandsMixin {
+/**
+ * The result of a help query.
+ *
+ * @param <C> command sender type
+ * @since 2.0.0
+ */
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface HelpQueryResult<C> {
 
-    /* Use our StringReader. This is technically optional, but it's nicer to avoid re-wrapping the object every time */
-    @Redirect(method = "performCommand", at = @At(value = "NEW", target = "com/mojang/brigadier/StringReader", remap = false), require = 0)
-    private StringReader cloud$newStringReader(final String arguments) {
-        return new CloudStringReader(arguments);
+    /**
+     * Returns the query.
+     *
+     * @return the query
+     */
+    @NonNull HelpQuery<C> query();
+
+    /**
+     * Renders the result using the given {@code renderer}.
+     *
+     * @param renderer the renderer
+     */
+    default void render(final @NonNull HelpRenderer<C> renderer) {
+        renderer.render(this);
     }
 }

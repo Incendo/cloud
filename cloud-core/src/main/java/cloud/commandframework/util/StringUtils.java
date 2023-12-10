@@ -23,6 +23,10 @@
 //
 package cloud.commandframework.util;
 
+import java.util.function.Function;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -50,5 +54,34 @@ public final class StringUtils {
             }
         }
         return occurrences;
+    }
+
+    /**
+     * Replace all matches in a string.
+     *
+     * @param string   string to process
+     * @param pattern  replacement pattern
+     * @param replacer replacement function
+     * @return processed string
+     */
+    public static @NonNull String replaceAll(
+            final @NonNull String string,
+            final @NonNull Pattern pattern,
+            final @NonNull Function<@NonNull MatchResult, @NonNull String> replacer
+    ) {
+        final Matcher matcher = pattern.matcher(string);
+        matcher.reset();
+        boolean result = matcher.find();
+        if (result) {
+            final StringBuffer sb = new StringBuffer();
+            do {
+                final String replacement = replacer.apply(matcher);
+                matcher.appendReplacement(sb, replacement);
+                result = matcher.find();
+            } while (result);
+            matcher.appendTail(sb);
+            return sb.toString();
+        }
+        return string;
     }
 }
