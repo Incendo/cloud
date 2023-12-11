@@ -65,6 +65,10 @@ import static net.kyori.adventure.text.event.ClickEvent.runCommand;
 
 /**
  * Opinionated extension of {@link HelpRenderer} for Minecraft.
+ * <p>
+ * This class should <b>not</b> be extended, and the only implementation of it is {@link ImmutableMinecraftHelp}.
+ * <p>
+ * You may customize certain aspects of the help menu by using the {@link #builder() builder}.
  *
  * @param <C> command sender type
  */
