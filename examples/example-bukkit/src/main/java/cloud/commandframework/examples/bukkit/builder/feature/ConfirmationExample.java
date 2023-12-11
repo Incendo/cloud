@@ -55,9 +55,9 @@ public final class ConfirmationExample implements BuilderFeature {
                         .senderType(Player.class)
                         .meta(CommandConfirmationManager.META_CONFIRMATION_REQUIRED, true)
                         .handler(context -> {
-                            context.getSender().getInventory().clear();
+                            context.sender().getInventory().clear();
                             examplePlugin.bukkitAudiences()
-                                    .player(context.getSender())
+                                    .player(context.sender())
                                     .sendMessage(text("Your inventory has been cleared", NamedTextColor.GOLD));
                         })
         );
@@ -69,7 +69,7 @@ public final class ConfirmationExample implements BuilderFeature {
         final CommandConfirmationManager<CommandSender> confirmationManager = new CommandConfirmationManager<>(
                 /* Timeout */ 30L,
                 /* Timeout unit */ TimeUnit.SECONDS,
-                /* Action when confirmation is required */ context -> context.getCommandContext().getSender().sendMessage(
+                /* Action when confirmation is required */ context -> context.getCommandContext().sender().sendMessage(
                 ChatColor.RED + "Confirmation required. Confirm using /builder confirm."),
                 /* Action when no confirmation is pending */ sender -> sender.sendMessage(
                 ChatColor.RED + "You don't have any pending commands.")

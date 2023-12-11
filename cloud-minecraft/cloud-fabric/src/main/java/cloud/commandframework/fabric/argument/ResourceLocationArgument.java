@@ -23,86 +23,47 @@
 //
 package cloud.commandframework.fabric.argument;
 
-import cloud.commandframework.Description;
-import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.CommandComponent;
+import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import net.minecraft.resources.ResourceLocation;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * An argument parsing a {@link ResourceLocation}.
  *
  * @param <C> the sender type
- * @since 1.5.0
+ * @since 2.0.0
  */
-public final class ResourceLocationArgument<C> extends CommandArgument<C, ResourceLocation> {
+public final class ResourceLocationArgument<C> extends WrappedBrigadierParser<C, ResourceLocation> {
 
-    ResourceLocationArgument(
-            final @NonNull String name,
-            final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull Description defaultDescription
-    ) {
-        super(
-                name,
-                new WrappedBrigadierParser<>(net.minecraft.commands.arguments.ResourceLocationArgument.id()),
-                ResourceLocation.class,
-                suggestionProvider,
-                defaultDescription
-        );
+    /**
+     * Creates a new resource location parser.
+     *
+     * @param <C> command sender type
+     * @return the created parser
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> @NonNull ParserDescriptor<C, ResourceLocation> resourceLocationParser() {
+        return ParserDescriptor.of(new ResourceLocationArgument<>(), ResourceLocation.class);
     }
 
     /**
-     * Create a new {@link Builder}.
+     * Returns a {@link CommandComponent.Builder} using {@link #resourceLocationParser()} as the parser.
      *
-     * @param name Name of the argument
-     * @param <C>  Command sender type
-     * @return Created builder
-     * @since 1.5.0
+     * @param <C> the command sender type
+     * @return the component builder
+     * @since 2.0.0
      */
-    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
-        return new Builder<>(name);
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> CommandComponent.@NonNull Builder<C, ResourceLocation> resourceLocationComponent() {
+        return CommandComponent.<C, ResourceLocation>builder().parser(resourceLocationParser());
     }
 
-    /**
-     * Create a new required {@link ResourceLocationArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull ResourceLocationArgument<C> of(final @NonNull String name) {
-        return ResourceLocationArgument.<C>builder(name).build();
+    ResourceLocationArgument() {
+        super(net.minecraft.commands.arguments.ResourceLocationArgument.id());
     }
 
-
-    /**
-     * Builder for {@link ResourceLocationArgument}.
-     *
-     * @param <C> sender type
-     * @since 1.5.0
-     */
-    public static final class Builder<C> extends TypedBuilder<C, ResourceLocation, Builder<C>> {
-
-        Builder(final @NonNull String name) {
-            super(ResourceLocation.class, name);
-        }
-
-        /**
-         * Build a new {@link ResourceLocationArgument}.
-         *
-         * @return Constructed argument
-         * @since 1.5.0
-         */
-        @Override
-        public @NonNull ResourceLocationArgument<C> build() {
-            return new ResourceLocationArgument<>(
-                    this.getName(),
-                    this.suggestionProvider(),
-                    this.getDefaultDescription()
-            );
-        }
-    }
 }

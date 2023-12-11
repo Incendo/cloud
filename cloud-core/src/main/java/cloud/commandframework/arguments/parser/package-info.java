@@ -1,4 +1,4 @@
 /**
- * Parser classes used to parse {@link cloud.commandframework.arguments.CommandArgument}
+ * Parser classes used to parse command components.
  */
 package cloud.commandframework.arguments.parser;

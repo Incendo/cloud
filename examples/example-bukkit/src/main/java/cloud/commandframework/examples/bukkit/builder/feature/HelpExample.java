@@ -23,12 +23,12 @@
 //
 package cloud.commandframework.examples.bukkit.builder.feature;
 
-import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
+import cloud.commandframework.help.result.CommandEntry;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import java.util.stream.Collectors;
 import org.bukkit.command.CommandSender;
@@ -55,16 +55,16 @@ public final class HelpExample implements BuilderFeature {
                                 "query",
                                 greedyStringParser(),
                                 DefaultValue.constant(""),
-                                (ctx, in) -> manager.createCommandHelpHandler()
-                                        .queryRootIndex(ctx.getSender())
-                                        .getEntries()
+                                (ctx, in) -> manager.createHelpHandler()
+                                        .queryRootIndex(ctx.sender())
+                                        .entries()
                                         .stream()
-                                        .map(CommandHelpHandler.VerboseHelpEntry::syntaxString)
+                                        .map(CommandEntry::syntax)
                                         .map(Suggestion::simple)
                                         .collect(Collectors.toList())
                         )
                         .handler(context -> {
-                            examplePlugin.minecraftHelp().queryCommands(context.get("query"), context.getSender());
+                            examplePlugin.minecraftHelp().queryCommands(context.get("query"), context.sender());
                         })
         );
     }

@@ -24,7 +24,6 @@
 package cloud.commandframework;
 
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.CommandSyntaxFormatter;
 import cloud.commandframework.arguments.StandardCommandSyntaxFormatter;
 import cloud.commandframework.arguments.flags.CommandFlag;
@@ -35,10 +34,9 @@ import cloud.commandframework.arguments.parser.StandardParserRegistry;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.arguments.suggestion.SuggestionMapper;
+import cloud.commandframework.captions.CaptionFormatter;
 import cloud.commandframework.captions.CaptionRegistry;
-import cloud.commandframework.captions.CaptionVariableReplacementHandler;
-import cloud.commandframework.captions.SimpleCaptionRegistryFactory;
-import cloud.commandframework.captions.SimpleCaptionVariableReplacementHandler;
+import cloud.commandframework.captions.StandardCaptionRegistryFactory;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.CommandInput;
@@ -54,6 +52,9 @@ import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
 import cloud.commandframework.execution.preprocessor.AcceptingCommandPreprocessor;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
+import cloud.commandframework.help.CommandPredicate;
+import cloud.commandframework.help.HelpHandler;
+import cloud.commandframework.help.HelpHandlerFactory;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.CommandMeta;
@@ -80,7 +81,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -110,13 +110,14 @@ public abstract class CommandManager<C> {
     private final Set<CloudCapability> capabilities = new HashSet<>();
     private final ExceptionController<C> exceptionController = new ExceptionController<>();
 
-    private CaptionVariableReplacementHandler captionVariableReplacementHandler = new SimpleCaptionVariableReplacementHandler();
+    private CaptionFormatter<C, String> captionVariableReplacementHandler = CaptionFormatter.placeholderReplacing();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
     private CommandSuggestionProcessor<C> commandSuggestionProcessor =
             new FilteringCommandSuggestionProcessor<>(FilteringCommandSuggestionProcessor.Filter.startsWith(true));
     private CommandRegistrationHandler<C> commandRegistrationHandler;
     private CaptionRegistry<C> captionRegistry;
     private SuggestionMapper<? extends Suggestion> suggestionMapper = SuggestionMapper.identity();
+    private HelpHandlerFactory<C> helpHandlerFactory = HelpHandlerFactory.standard(this);
     private final AtomicReference<RegistrationState> state = new AtomicReference<>(RegistrationState.BEFORE_REGISTRATION);
 
     /**
@@ -148,7 +149,7 @@ public abstract class CommandManager<C> {
         this.servicePipeline.registerServiceType(new TypeToken<CommandPostprocessor<C>>() {
         }, new AcceptingCommandPostprocessor<>());
         /* Create the caption registry */
-        this.captionRegistry = new SimpleCaptionRegistryFactory<C>().create();
+        this.captionRegistry = new StandardCaptionRegistryFactory<C>().create();
         /* Register default injectors */
         this.parameterInjectorRegistry().registerInjector(
                 CommandContext.class,
@@ -161,7 +162,7 @@ public abstract class CommandManager<C> {
      * or at some point in the future, depending on the {@link CommandExecutionCoordinator} used in the command manager.
      * <p>
      * The command may also be filtered out by preprocessors (see {@link CommandPreprocessor}) before they are parsed,
-     * or by the {@link CommandArgument} command arguments during parsing. The execution may also be filtered out
+     * or by the {@link CommandComponent} command components during parsing. The execution may also be filtered out
      * after parsing by a {@link CommandPostprocessor}. In the case that a command was filtered out at any of the
      * execution stages, the future will complete with {@code null}.
      * <p>
@@ -284,29 +285,27 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get the caption variable replacement handler.
+     * Returns the string-producing caption formatter.
      *
-     * @return the caption variable replacement handler
-     * @since 1.7.0
-     * @see #captionVariableReplacementHandler(CaptionVariableReplacementHandler)
+     * @return the formatter
+     * @since 2.0.0
+     * @see #captionFormatter(CaptionFormatter)
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
-    public @NonNull CaptionVariableReplacementHandler captionVariableReplacementHandler() {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CaptionFormatter<C, String> captionFormatter() {
         return this.captionVariableReplacementHandler;
     }
 
     /**
-     * Sets the caption variable replacement handler.
+     * Sets the string-producing caption formatter.
      *
-     * @param captionVariableReplacementHandler new replacement handler
-     * @since 1.7.0
-     * @see #captionVariableReplacementHandler()
+     * @param captionFormatter the new formatter
+     * @since 2.0.0
+     * @see #captionFormatter()
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
-    public void captionVariableReplacementHandler(
-            final @NonNull CaptionVariableReplacementHandler captionVariableReplacementHandler
-    ) {
-        this.captionVariableReplacementHandler = captionVariableReplacementHandler;
+    public void captionFormatter(final @NonNull CaptionFormatter<C, String> captionFormatter) {
+        this.captionVariableReplacementHandler = captionFormatter;
     }
 
     /**
@@ -775,7 +774,7 @@ public abstract class CommandManager<C> {
     /**
      * Create a new command component builder.
      * <p>
-     * This will also invoke {@link CommandArgument.Builder#manager(CommandManager)}
+     * This will also invoke {@link CommandComponent.Builder#commandManager(CommandManager)}
      * so that the argument is associated with the calling command manager. This allows for parser inference based on
      * the type, with the help of the {@link ParserRegistry parser registry}.
      *
@@ -1040,16 +1039,16 @@ public abstract class CommandManager<C> {
     /**
      * Creates a new command help handler instance.
      * <p>
-     * The command helper handler can be used to assist in the production of commad help menus, etc.
+     * The command helper handler can be used to assist in the production of command help menus, etc.
      * <p>
      * This command help handler instance will display all commands registered in this command manager.
      *
      * @return a new command helper handler instance
-     * @since 1.7.0
+     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
-    public final @NonNull CommandHelpHandler<C> createCommandHelpHandler() {
-        return new CommandHelpHandler<>(this, cmd -> true);
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public final @NonNull HelpHandler<C> createHelpHandler() {
+        return this.helpHandlerFactory.createHelpHandler(cmd -> true);
     }
 
     /**
@@ -1057,19 +1056,42 @@ public abstract class CommandManager<C> {
      * <p>
      * The command helper handler can be used to assist in the production of commad help menus, etc.
      * <p>
-     * A predicate can be specified to filter what commands
+     * A filter can be specified to filter what commands
      * registered in this command manager are visible in the help menu.
      *
-     * @param commandPredicate predicate that filters what commands are displayed in
-     *                         the help menu.
+     * @param filter predicate that filters what commands are displayed in the help menu.
      * @return a new command helper handler instance
-     * @since 1.7.0
+     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
-    public final @NonNull CommandHelpHandler<C> createCommandHelpHandler(
-            final @NonNull Predicate<Command<C>> commandPredicate
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public final @NonNull HelpHandler<C> createHelpHandler(
+            final @NonNull CommandPredicate<C> filter
     ) {
-        return new CommandHelpHandler<>(this, commandPredicate);
+        return this.helpHandlerFactory.createHelpHandler(filter);
+    }
+
+    /**
+     * Returns the help handler factory.
+     *
+     * @return the help handler factory
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public final @NonNull HelpHandlerFactory<C> helpHandlerFactory() {
+        return this.helpHandlerFactory;
+    }
+
+    /**
+     * Sets the new help handler factory.
+     * <p>
+     * The help handler factory is used to create {@link cloud.commandframework.help.HelpHandler} instances.
+     *
+     * @param helpHandlerFactory the new factory instance
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public final void helpHandlerFactory(final @NonNull HelpHandlerFactory<C> helpHandlerFactory) {
+        this.helpHandlerFactory = helpHandlerFactory;
     }
 
     /**

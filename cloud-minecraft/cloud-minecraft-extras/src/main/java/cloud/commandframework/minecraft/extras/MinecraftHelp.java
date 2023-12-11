@@ -23,12 +23,18 @@
 //
 package cloud.commandframework.minecraft.extras;
 
-import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandDescription;
-import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
+import cloud.commandframework.help.CommandPredicate;
+import cloud.commandframework.help.HelpQuery;
+import cloud.commandframework.help.HelpRenderer;
+import cloud.commandframework.help.result.CommandEntry;
+import cloud.commandframework.help.result.HelpQueryResult;
+import cloud.commandframework.help.result.IndexCommandResult;
+import cloud.commandframework.help.result.MultipleCommandResult;
+import cloud.commandframework.help.result.VerboseCommandResult;
 import cloud.commandframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,9 +61,9 @@ import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.event.ClickEvent.runCommand;
 
 /**
- * Opinionated extension of {@link CommandHelpHandler} for Minecraft
+ * Opinionated extension of {@link HelpRenderer} for Minecraft.
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @SuppressWarnings("unused")
 public final class MinecraftHelp<C> {
@@ -97,7 +103,7 @@ public final class MinecraftHelp<C> {
     private final String commandPrefix;
     private final Map<String, String> messageMap = new HashMap<>();
 
-    private Predicate<Command<C>> commandFilter = c -> true;
+    private CommandPredicate<C> commandFilter = c -> true;
     private MessageProvider<C> messageProvider = (sender, key, args) -> {
         final String message = this.messageMap.get(key);
         if (args.isEmpty()) {
@@ -202,7 +208,7 @@ public final class MinecraftHelp<C> {
      * @param commandPredicate Predicate to filter commands by
      * @since 1.4.0
      */
-    public void commandFilter(final @NonNull Predicate<Command<C>> commandPredicate) {
+    public void commandFilter(final @NonNull CommandPredicate<C> commandPredicate) {
         this.commandFilter = commandPredicate;
     }
 
@@ -324,7 +330,7 @@ public final class MinecraftHelp<C> {
                 recipient,
                 query,
                 page,
-                this.commandManager.createCommandHelpHandler(this.commandFilter).queryHelp(recipient, query)
+                this.commandManager.createHelpHandler(this.commandFilter).query(HelpQuery.of(recipient, query))
         );
     }
 
@@ -332,14 +338,14 @@ public final class MinecraftHelp<C> {
             final @NonNull C sender,
             final @NonNull String query,
             final int page,
-            final CommandHelpHandler.@NonNull HelpTopic<C> helpTopic
+            final @NonNull HelpQueryResult<C> helpTopic
     ) {
-        if (helpTopic instanceof CommandHelpHandler.IndexHelpTopic) {
-            this.printIndexHelpTopic(sender, query, page, (CommandHelpHandler.IndexHelpTopic<C>) helpTopic);
-        } else if (helpTopic instanceof CommandHelpHandler.MultiHelpTopic) {
-            this.printMultiHelpTopic(sender, query, page, (CommandHelpHandler.MultiHelpTopic<C>) helpTopic);
-        } else if (helpTopic instanceof CommandHelpHandler.VerboseHelpTopic) {
-            this.printVerboseHelpTopic(sender, query, (CommandHelpHandler.VerboseHelpTopic<C>) helpTopic);
+        if (helpTopic instanceof IndexCommandResult) {
+            this.printIndexHelpTopic(sender, query, page, (IndexCommandResult<C>) helpTopic);
+        } else if (helpTopic instanceof MultipleCommandResult) {
+            this.printMultiHelpTopic(sender, query, page, (MultipleCommandResult<C>) helpTopic);
+        } else if (helpTopic instanceof VerboseCommandResult) {
+            this.printVerboseHelpTopic(sender, query, (VerboseCommandResult<C>) helpTopic);
         } else {
             throw new IllegalArgumentException("Unknown help topic type");
         }
@@ -364,7 +370,7 @@ public final class MinecraftHelp<C> {
             final @NonNull C sender,
             final @NonNull String query,
             final int page,
-            final CommandHelpHandler.@NonNull IndexHelpTopic<C> helpTopic
+            final @NonNull IndexCommandResult<C> helpTopic
     ) {
         if (helpTopic.isEmpty()) {
             this.printNoResults(sender, query);
@@ -372,7 +378,7 @@ public final class MinecraftHelp<C> {
         }
 
         final Audience audience = this.getAudience(sender);
-        new Pagination<CommandHelpHandler.VerboseHelpEntry<C>>(
+        new Pagination<CommandEntry<C>>(
                 (currentPage, maxPages) -> {
                     final List<Component> header = new ArrayList<>();
                     header.add(this.paginatedHeader(sender, currentPage, maxPages));
@@ -396,57 +402,57 @@ public final class MinecraftHelp<C> {
                     final Component description;
                     if (commandDescription.description() instanceof RichDescription) {
                         description = ((RichDescription) commandDescription.description()).contents();
-                    } else if (helpEntry.description().isEmpty()) {
+                    } else if (commandDescription.isEmpty()) {
                         description = this.messageProvider.provide(sender, MESSAGE_CLICK_TO_SHOW_HELP);
                     } else {
-                        description = this.descriptionDecorator.apply(sender, helpEntry.description().textDescription());
+                        description = this.descriptionDecorator.apply(sender, commandDescription.description().textDescription());
                     }
 
                     final boolean lastBranch =
-                            isLastOfPage || helpTopic.getEntries().indexOf(helpEntry) == helpTopic.getEntries().size() - 1;
+                            isLastOfPage || helpTopic.entries().indexOf(helpEntry) == helpTopic.entries().size() - 1;
 
                     return text()
                             .append(text("   "))
                             .append(lastBranch ? this.lastBranch() : this.branch())
                             .append(this.highlight(text(
-                                                    String.format(" /%s", helpEntry.syntaxString()),
+                                                    String.format(" /%s", helpEntry.syntax()),
                                                     this.colors.highlight
                                             ))
                                             .hoverEvent(description.color(this.colors.text))
-                                            .clickEvent(runCommand(this.commandPrefix + " " + helpEntry.syntaxString()))
+                                            .clickEvent(runCommand(this.commandPrefix + " " + helpEntry.syntax()))
                             )
                             .build();
                 },
                 (currentPage, maxPages) -> this.paginatedFooter(sender, currentPage, maxPages, query),
                 (attemptedPage, maxPages) -> this.pageOutOfRange(sender, attemptedPage, maxPages)
-        ).render(helpTopic.getEntries(), page, this.maxResultsPerPage).forEach(audience::sendMessage);
+        ).render(helpTopic.entries(), page, this.maxResultsPerPage).forEach(audience::sendMessage);
     }
 
     private void printMultiHelpTopic(
             final @NonNull C sender,
             final @NonNull String query,
             final int page,
-            final CommandHelpHandler.@NonNull MultiHelpTopic<C> helpTopic
+            final @NonNull MultipleCommandResult<C> helpTopic
     ) {
-        if (helpTopic.getChildSuggestions().isEmpty()) {
+        if (helpTopic.childSuggestions().isEmpty()) {
             this.printNoResults(sender, query);
             return;
         }
 
         final Audience audience = this.getAudience(sender);
-        final int headerIndentation = helpTopic.getLongestPath().length();
+        final int headerIndentation = helpTopic.longestPath().length();
         new Pagination<String>(
                 (currentPage, maxPages) -> {
                     final List<Component> header = new ArrayList<>();
                     header.add(this.paginatedHeader(sender, currentPage, maxPages));
                     header.add(this.showingResults(sender, query));
                     header.add(this.lastBranch()
-                            .append(this.highlight(text(" /" + helpTopic.getLongestPath(), this.colors.highlight))));
+                            .append(this.highlight(text(" /" + helpTopic.longestPath(), this.colors.highlight))));
                     return header;
                 },
                 (suggestion, isLastOfPage) -> {
                     final boolean lastBranch = isLastOfPage
-                            || helpTopic.getChildSuggestions().indexOf(suggestion) == helpTopic.getChildSuggestions().size() - 1;
+                            || helpTopic.childSuggestions().indexOf(suggestion) == helpTopic.childSuggestions().size() - 1;
 
                     return ComponentHelper.repeat(space(), headerIndentation)
                             .append(lastBranch ? this.lastBranch() : this.branch())
@@ -457,19 +463,19 @@ public final class MinecraftHelp<C> {
                 },
                 (currentPage, maxPages) -> this.paginatedFooter(sender, currentPage, maxPages, query),
                 (attemptedPage, maxPages) -> this.pageOutOfRange(sender, attemptedPage, maxPages)
-        ).render(helpTopic.getChildSuggestions(), page, this.maxResultsPerPage).forEach(audience::sendMessage);
+        ).render(helpTopic.childSuggestions(), page, this.maxResultsPerPage).forEach(audience::sendMessage);
     }
 
     private void printVerboseHelpTopic(
             final @NonNull C sender,
             final @NonNull String query,
-            final CommandHelpHandler.@NonNull VerboseHelpTopic<C> helpTopic
+            final @NonNull VerboseCommandResult<C> helpTopic
     ) {
         final Audience audience = this.getAudience(sender);
         audience.sendMessage(this.basicHeader(sender));
         audience.sendMessage(this.showingResults(sender, query));
         final String command = this.commandManager.commandSyntaxFormatter()
-                .apply(helpTopic.command().components(), null);
+                .apply(helpTopic.entry().command().components(), null);
         audience.sendMessage(text()
                 .append(this.lastBranch())
                 .append(space())
@@ -478,21 +484,21 @@ public final class MinecraftHelp<C> {
                 .append(this.highlight(text("/" + command, this.colors.highlight)))
         );
         /* Topics will use the long description if available, but fall back to the short description. */
-        final Description commandDescription = helpTopic.commandDescription();
+        final Description commandDescription = helpTopic.entry().command().commandDescription().verboseDescription();
 
         final Component topicDescription;
         if (commandDescription instanceof RichDescription) {
             topicDescription = ((RichDescription) commandDescription).contents();
-        } else if (helpTopic.commandDescription().isEmpty()) {
+        } else if (commandDescription.isEmpty()) {
             topicDescription = this.messageProvider.provide(sender, MESSAGE_NO_DESCRIPTION);
         } else {
             topicDescription = this.descriptionDecorator.apply(
                     sender,
-                    helpTopic.commandDescription().textDescription()
+                    commandDescription.textDescription()
             );
         }
 
-        final boolean hasArguments = helpTopic.command().components().size() > 1;
+        final boolean hasArguments = helpTopic.entry().command().components().size() > 1;
         audience.sendMessage(text()
                 .append(text("   "))
                 .append(hasArguments ? this.branch() : this.lastBranch())
@@ -510,7 +516,7 @@ public final class MinecraftHelp<C> {
                     .append(text(":", this.colors.primary))
             );
 
-            final Iterator<CommandComponent<C>> iterator = helpTopic.command().components().iterator();
+            final Iterator<CommandComponent<C>> iterator = helpTopic.entry().command().components().iterator();
             /* Skip the first one because it's the command literal */
             iterator.next();
 

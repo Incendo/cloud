@@ -25,19 +25,15 @@ package cloud.commandframework.fabric.testmod;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.TypedCommandComponent;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
-import cloud.commandframework.fabric.argument.ItemInputArgument;
-import cloud.commandframework.fabric.argument.NamedColorArgument;
-import cloud.commandframework.fabric.argument.RegistryEntryArgument;
-import cloud.commandframework.fabric.argument.server.ColumnPosArgument;
-import cloud.commandframework.fabric.argument.server.MultipleEntitySelectorArgument;
-import cloud.commandframework.fabric.argument.server.MultiplePlayerSelectorArgument;
-import cloud.commandframework.fabric.argument.server.Vec3dArgument;
+import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
+import cloud.commandframework.fabric.argument.NamedColorParser;
+import cloud.commandframework.fabric.argument.RegistryEntryParser;
 import cloud.commandframework.fabric.data.Coordinates;
 import cloud.commandframework.fabric.data.Coordinates.ColumnCoordinates;
 import cloud.commandframework.fabric.data.MultipleEntitySelector;
@@ -56,6 +52,7 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.ClickEvent;
@@ -90,56 +87,54 @@ public final class FabricExample implements ModInitializer {
                 .required(name, stringParser())
                 .optional(hugs, integerParser(), DefaultValue.constant(1))
                 .handler(ctx -> {
-                    ctx.getSender().sendSuccess(Component.literal("Hello, ")
+                    ctx.sender().sendSuccess(Component.literal("Hello, ")
                             .append(ctx.get(name))
                             .append(", hope you're doing well!")
                             .withStyle(style -> style.withColor(TextColor.fromRgb(0xAA22BB))), false);
 
-                    ctx.getSender().sendSuccess(Component.literal("Cloud would like to give you ")
+                    ctx.sender().sendSuccess(Component.literal("Cloud would like to give you ")
                             .append(Component.literal(String.valueOf(ctx.get(hugs)))
                                     .withStyle(style -> style.withColor(TextColor.fromRgb(0xFAB3DA))))
                             .append(" hug(s) <3")
                             .withStyle(style -> style.withBold(true)), false);
                 }));
 
-        final CommandArgument<CommandSourceStack, Biome> biomeArgument = RegistryEntryArgument.of(
-                "biome",
-                Biome.class,
-                Registries.BIOME
+        final ParserDescriptor<CommandSourceStack, Biome> biomeArgument = RegistryEntryParser.registryEntryParser(
+                Registries.BIOME,
+                Biome.class
         );
 
         manager.command(base
                 .literal("land")
-                .required(biomeArgument)
+                .required("biome", biomeArgument)
                 .handler(ctx -> {
-                    ctx.getSender().sendSuccess(Component.literal("Yes, the biome ")
+                    ctx.sender().sendSuccess(Component.literal("Yes, the biome ")
                             .append(Component.literal(
-                                            ctx.getSender().registryAccess()
+                                            ctx.sender().registryAccess()
                                                     .registryOrThrow(Registries.BIOME)
-                                                    .getKey(ctx.get(biomeArgument)).toString())
+                                                    .getKey(ctx.get("biome")).toString())
                                     .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD))
                             .append(Component.literal(" is pretty cool"))
                             .withStyle(style -> style.withColor(0x884433)), false);
                 })
         );
 
-        final CommandArgument<CommandSourceStack, MultiplePlayerSelector> playerSelector =
-                MultiplePlayerSelectorArgument.of("players");
-        final CommandArgument<CommandSourceStack, ChatFormatting> textColor = NamedColorArgument.of("color");
+        final CloudKey<MultiplePlayerSelector> playersKey = CloudKey.of("players", MultiplePlayerSelector.class);
+        final CloudKey<ChatFormatting> textColorKey = CloudKey.of("color", ChatFormatting.class);
 
         manager.command(base.literal("wave")
-                .required(playerSelector)
-                .required(textColor)
+                .required(playersKey, FabricVanillaArgumentParsers.multiplePlayerSelectorParser())
+                .required(textColorKey, NamedColorParser.namedColorParser())
                 .handler(ctx -> {
-                    final MultiplePlayerSelector selector = ctx.get(playerSelector);
+                    final MultiplePlayerSelector selector = ctx.get(playersKey);
                     final Collection<ServerPlayer> selected = selector.get();
                     selected.forEach(selectedPlayer ->
                             selectedPlayer.sendSystemMessage(
                                     Component.literal("Wave from ")
-                                            .withStyle(style -> style.withColor(ctx.get(textColor)))
-                                            .append(ctx.getSender().getDisplayName())
+                                            .withStyle(style -> style.withColor(ctx.get(textColorKey)))
+                                            .append(ctx.sender().getDisplayName())
                             ));
-                    ctx.getSender().sendSuccess(
+                    ctx.sender().sendSuccess(
                             Component.literal(String.format("Waved at %d players (%s)", selected.size(),
                                     selector.inputString()
                             )),
@@ -149,15 +144,15 @@ public final class FabricExample implements ModInitializer {
 
         manager.command(base.literal("give")
                 .permission("cloud.give")
-                .required(MultiplePlayerSelectorArgument.of("targets"))
-                .required(ItemInputArgument.of("item"))
+                .required("targets", FabricVanillaArgumentParsers.multiplePlayerSelectorParser())
+                .required("item", FabricVanillaArgumentParsers.contextualParser(ItemArgument::item, ItemInput.class))
                 .optional("amount", integerParser(1), DefaultValue.constant(1))
                 .handler(ctx -> {
                     final ItemInput item = ctx.get("item");
                     final MultiplePlayerSelector targets = ctx.get("targets");
                     final int amount = ctx.get("amount");
                     GiveCommandAccess.giveItem(
-                            ctx.getSender(),
+                            ctx.sender(),
                             item,
                             targets.get(),
                             amount
@@ -201,7 +196,7 @@ public final class FabricExample implements ModInitializer {
                     text.append(Component.literal(", ").withStyle(style -> style.withColor(ChatFormatting.GRAY)));
                 }
             }
-            ctx.getSender().sendSuccess(text, false);
+            ctx.sender().sendSuccess(text, false);
         }));
 
         final TypedCommandComponent<CommandSourceStack, ModMetadata> modMetadata = manager.componentBuilder(ModMetadata.class, "mod")
@@ -245,7 +240,7 @@ public final class FabricExample implements ModInitializer {
                     if (!meta.getLicense().isEmpty()) {
                         text.append(Component.literal("\n license: " + String.join(", ", meta.getLicense())));
                     }
-                    ctx.getSender().sendSuccess(
+                    ctx.sender().sendSuccess(
                             text,
                             false
                     );
@@ -253,8 +248,8 @@ public final class FabricExample implements ModInitializer {
 
         manager.command(base.literal("teleport")
                 .permission("cloud.teleport")
-                .required(MultipleEntitySelectorArgument.of("targets"))
-                .required(Vec3dArgument.of("location"))
+                .required("targets", FabricVanillaArgumentParsers.multiplePlayerSelectorParser())
+                .required("location", FabricVanillaArgumentParsers.vec3Parser(false))
                 .handler(ctx -> {
                     final MultipleEntitySelector selector = ctx.get("targets");
                     final Vec3 location = ctx.<Coordinates>get("location").position();
@@ -264,13 +259,13 @@ public final class FabricExample implements ModInitializer {
 
         manager.command(base.literal("gotochunk")
                 .permission("cloud.gotochunk")
-                .required(ColumnPosArgument.of("chunk_position"))
+                .required("chunk_position", FabricVanillaArgumentParsers.columnPosParser())
                 .handler(ctx -> {
                     final ServerPlayer player;
                     try {
-                        player = ctx.getSender().getPlayerOrException();
+                        player = ctx.sender().getPlayerOrException();
                     } catch (final CommandSyntaxException e) {
-                        ctx.getSender().sendSuccess(ComponentUtils.fromMessage(e.getRawMessage()), false);
+                        ctx.sender().sendSuccess(ComponentUtils.fromMessage(e.getRawMessage()), false);
                         return;
                     }
                     final Vec3 vec = ctx.<ColumnCoordinates>get("chunk_position").position();

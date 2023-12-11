@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.arguments.aggregate;
 
-import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.keys.MutableCloudKeyContainer;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -36,7 +36,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface AggregateCommandContext<C> {
+public interface AggregateCommandContext<C> extends MutableCloudKeyContainer {
 
     /**
      * Returns a new argument context instance that accepts values for the inner parsers of the given {@code parser}.
@@ -50,49 +50,4 @@ public interface AggregateCommandContext<C> {
     ) {
         return new AggregateCommandContextImpl<>(parser);
     }
-
-    /**
-     * Stores the given {@code value} identified by the given {@code key} in the context.
-     *
-     * @param key   the key
-     * @param value the value
-     */
-    void store(@NonNull CloudKey<?> key, @NonNull Object value);
-
-    /**
-     * Returns the value identified by the given {@code key} that was identified by the aggregate parser.
-     *
-     * @param <T> the type of the value
-     * @param key the key
-     * @return the value
-     * @throws NullPointerException if the value is not stored in the context
-     */
-    <T> @NonNull T get(@NonNull CloudKey<T> key);
-
-    /**
-     * Returns the value identified by the given {@code key} that was identified by the aggregate parser.
-     *
-     * @param <T> the type of the value
-     * @param key the key
-     * @return the value
-     * @throws NullPointerException if the value is not stored in the context
-     */
-    @SuppressWarnings("TypeParameterUnusedInFormals")
-    <T> @NonNull T get(@NonNull String key);
-
-    /**
-     * Returns whether the aggregate parser has stored a value identified by the given {@code key}.
-     *
-     * @param key the key
-     * @return {@code true} if the value exists, or {@code false} if not
-     */
-    boolean contains(@NonNull CloudKey<?> key);
-
-    /**
-     * Returns whether the aggregate parser has stored a value identified by the given {@code key}.
-     *
-     * @param key the key
-     * @return {@code true} if the value exists, or {@code false} if not
-     */
-    boolean contains(@NonNull String key);
 }

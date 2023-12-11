@@ -66,7 +66,7 @@ public final class FlagExample implements BuilderFeature {
                             );
                             String itemName = String.format(
                                     "%s's %s",
-                                    context.getSender().getName(),
+                                    context.sender().getName(),
                                     context.<Material>get("material").name()
                                             .toLowerCase()
                                             .replace('_', ' ')
@@ -84,8 +84,8 @@ public final class FlagExample implements BuilderFeature {
                                 final Enchantment enchantment = context.flags().get("enchant");
                                 itemStack.addUnsafeEnchantment(Objects.requireNonNull(enchantment), 10);
                             }
-                            context.getSender().getInventory().addItem(itemStack);
-                            context.getSender().sendMessage(
+                            context.sender().getInventory().addItem(itemStack);
+                            context.sender().sendMessage(
                                     ChatColor.GREEN + String.format(
                                             "You have been given %d x %s",
                                             context.<Integer>get("amount"),

@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.bukkit;
 
-import cloud.commandframework.captions.SimpleCaptionRegistry;
+import cloud.commandframework.captions.CaptionProvider;
+import cloud.commandframework.captions.StandardCaptionRegistry;
 import org.apiguardian.api.API;
 
 /**
@@ -31,28 +32,28 @@ import org.apiguardian.api.API;
  *
  * @param <C> Command sender type
  */
-public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
+public class BukkitCaptionRegistry<C> extends StandardCaptionRegistry<C> {
 
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_ENCHANTMENT}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_ENCHANTMENT = "'{input}' is not a valid enchantment";
+    public static final String ARGUMENT_PARSE_FAILURE_ENCHANTMENT = "'<input>' is not a valid enchantment";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_MATERIAL}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_MATERIAL = "'{input}' is not a valid material name";
+    public static final String ARGUMENT_PARSE_FAILURE_MATERIAL = "'<input>' is not a valid material name";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_OFFLINEPLAYER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_OFFLINEPLAYER = "No player found for input '{input}'";
+    public static final String ARGUMENT_PARSE_FAILURE_OFFLINEPLAYER = "No player found for input '<input>'";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "No player found for input '{input}'";
+    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "No player found for input '<input>'";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_WORLD}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_WORLD = "'{input}' is not a valid Minecraft world";
+    public static final String ARGUMENT_PARSE_FAILURE_WORLD = "'<input>' is not a valid Minecraft world";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED}
      *
@@ -60,7 +61,7 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
      */
     @API(status = API.Status.DEPRECATED, since = "1.8.0")
     @Deprecated
-    public static final String ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED = "Selector '{input}' is malformed.";
+    public static final String ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED = "Selector '<input>' is malformed.";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_SELECTOR_UNSUPPORTED}
      */
@@ -94,7 +95,7 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT}
      */
     public static final String ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT =
-            "'{input}' is not a valid location. Required format is '<x> <y> <z>'";
+            "'<input>' is not a valid location. Required format is '<x> <y> <z>'";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE}
      */
@@ -106,85 +107,76 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
      * @since 1.7.0
      */
     public static final String ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NAMESPACE =
-            "Invalid namespace '{input}'. Must be [a-z0-9._-]";
+            "Invalid namespace '<input>'. Must be [a-z0-9._-]";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY}
      *
      * @since 1.7.0
      */
     public static final String ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY =
-            "Invalid key '{input}'. Must be [a-z0-9/._-]";
+            "Invalid key '<input>'. Must be [a-z0-9/._-]";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY}
      *
      * @since 1.7.0
      */
     public static final String ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NEED_NAMESPACE =
-            "Invalid input '{input}', requires an explicit namespace.";
+            "Invalid input '<input>', requires an explicit namespace.";
 
 
     @SuppressWarnings("deprecation")
     protected BukkitCaptionRegistry() {
         super();
-        this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_ENCHANTMENT,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_ENCHANTMENT
-        );
-        this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_MATERIAL,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_MATERIAL
-        );
-        this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_OFFLINEPLAYER,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_OFFLINEPLAYER
-        );
-        this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_PLAYER,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_PLAYER
-        );
-        this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_WORLD,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_WORLD
-        );
-        this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED
-        );
-        this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_UNSUPPORTED,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_SELECTOR_UNSUPPORTED
-        );
-        this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_PLAYERS,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_PLAYERS
-        );
-        this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_ENTITIES,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_ENTITIES
-        );
-        this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER
-        );
-        this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT
-        );
-        this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE
-        );
-        this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NAMESPACE,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NAMESPACE
-        );
-        this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY
-        );
-        this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NEED_NAMESPACE,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NEED_NAMESPACE
+
+        this.registerProvider(
+                CaptionProvider.<C>constantProvider()
+                        .putCaptions(
+                                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_ENCHANTMENT,
+                                ARGUMENT_PARSE_FAILURE_ENCHANTMENT
+                        ).putCaptions(
+                                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_MATERIAL,
+                                ARGUMENT_PARSE_FAILURE_MATERIAL
+                        ).putCaptions(
+                                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_OFFLINEPLAYER,
+                                ARGUMENT_PARSE_FAILURE_OFFLINEPLAYER
+                        ).putCaptions(
+                                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_PLAYER,
+                                ARGUMENT_PARSE_FAILURE_PLAYER
+                        ).putCaptions(
+                                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_WORLD,
+                                ARGUMENT_PARSE_FAILURE_WORLD
+                        ).putCaptions(
+                                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED,
+                                ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED
+                        ).putCaptions(
+                                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_UNSUPPORTED,
+                                ARGUMENT_PARSE_FAILURE_SELECTOR_UNSUPPORTED
+                        ).putCaptions(
+                                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_PLAYERS,
+                                ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_PLAYERS
+                        ).putCaptions(
+                                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_ENTITIES,
+                                ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_ENTITIES
+                        ).putCaptions(
+                                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER,
+                                ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER
+                        ).putCaptions(
+                                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT,
+                                ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT
+                        ).putCaptions(
+                                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE,
+                                ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE
+                        ).putCaptions(
+                                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NAMESPACE,
+                                ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NAMESPACE
+                        ).putCaptions(
+                                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY,
+                                ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY
+                        ).putCaptions(
+                                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NEED_NAMESPACE,
+                                ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NEED_NAMESPACE
+                        )
+                        .build()
         );
     }
 }

@@ -28,8 +28,8 @@ import cloud.commandframework.minecraft.extras.AudienceProvider;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.velocity.CloudInjectionModule;
 import cloud.commandframework.velocity.VelocityCommandManager;
-import cloud.commandframework.velocity.arguments.PlayerArgument;
-import cloud.commandframework.velocity.arguments.ServerArgument;
+import cloud.commandframework.velocity.arguments.PlayerParser;
+import cloud.commandframework.velocity.arguments.ServerParser;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -88,10 +88,10 @@ public final class ExampleVelocityPlugin {
                 .apply(commandManager, AudienceProvider.nativeAudience());
         commandManager.command(
                 commandManager.commandBuilder("example")
-                        .required(PlayerArgument.of("player"))
+                        .required("player", PlayerParser.playerParser())
                         .handler(context -> {
                                     final Player player = context.get("player");
-                                    context.getSender().sendMessage(
+                                    context.sender().sendMessage(
                                             Identity.nil(),
                                             Component.text().append(
                                                     Component.text("Selected ", NamedTextColor.GOLD)
@@ -104,10 +104,10 @@ public final class ExampleVelocityPlugin {
         );
         commandManager.command(
                 commandManager.commandBuilder("example-server")
-                        .required(ServerArgument.of("server"))
+                        .required("server", ServerParser.serverParser())
                         .handler(context -> {
                             final RegisteredServer server = context.get("server");
-                            context.getSender().sendMessage(
+                            context.sender().sendMessage(
                                     Identity.nil(),
                                     Component.text().append(
                                             Component.text("Selected ", NamedTextColor.GOLD)

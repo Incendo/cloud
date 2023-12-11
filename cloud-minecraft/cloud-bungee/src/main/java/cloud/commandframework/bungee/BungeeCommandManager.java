@@ -25,8 +25,8 @@ package cloud.commandframework.bungee;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.bungee.arguments.PlayerArgument;
-import cloud.commandframework.bungee.arguments.ServerArgument;
+import cloud.commandframework.bungee.arguments.PlayerParser;
+import cloud.commandframework.bungee.arguments.ServerParser;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
@@ -43,12 +43,12 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
     /**
      * Default caption for {@link BungeeCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'{input}' is not a valid player";
+    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'<input>' is not a valid player";
 
     /**
      * Default caption for {@link BungeeCaptionKeys#ARGUMENT_PARSE_FAILURE_SERVER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'{input}' is not a valid server";
+    public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'<input>' is not a valid server";
 
     private final Plugin owningPlugin;
     private final Function<CommandSender, C> commandSenderMapper;
@@ -85,9 +85,9 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
 
         /* Register Bungee Parsers */
         this.parserRegistry().registerParserSupplier(TypeToken.get(ProxiedPlayer.class), parserParameters ->
-                new PlayerArgument.PlayerParser<>());
+                new PlayerParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(ServerInfo.class), parserParameters ->
-                new ServerArgument.ServerParser<>());
+                new ServerParser<>());
 
         /* Register default captions */
         if (this.captionRegistry() instanceof FactoryDelegatingCaptionRegistry) {

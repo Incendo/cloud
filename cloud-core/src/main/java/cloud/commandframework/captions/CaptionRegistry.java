@@ -23,8 +23,10 @@
 //
 package cloud.commandframework.captions;
 
+import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * Registry that allows for messages to be configurable per-sender
@@ -35,11 +37,25 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface CaptionRegistry<C> {
 
     /**
-     * Get a caption for a specific sender
+     * Returns the value of the given {@code caption} for the given {@code sender}.
      *
-     * @param caption Caption key
-     * @param sender  Sender
-     * @return Caption
+     * @param caption the caption key
+     * @param sender  the sender to get the caption for
+     * @return the caption value
      */
-    @NonNull String getCaption(@NonNull Caption caption, @NonNull C sender);
+    @NonNull String caption(@NonNull Caption caption, @NonNull C sender);
+
+    /**
+     * Registers the given {@code provider}.
+     * <p>
+     * When {@link #caption(Caption, Object)} is invoked, all providers will be iterated over (with the
+     * last registered provider getting priority) until a provider returns a non-{@code null} value for the caption.
+     * <p>
+     * You may use {@link CaptionProvider#forCaption(Caption, Function)} to register per-caption providers, or
+     * {@link CaptionProvider#constantProvider(Caption, String)} to register constant values.
+     *
+     * @param provider the provider
+     * @return {@code this}
+     */
+    @NonNull @This CaptionRegistry<C> registerProvider(@NonNull CaptionProvider<C> provider);
 }

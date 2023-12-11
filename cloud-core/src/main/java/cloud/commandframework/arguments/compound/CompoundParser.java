@@ -79,7 +79,7 @@ public final class CompoundParser<T extends Tuple, C, O> implements AggregateCom
         return (commandContext, context) -> {
             final Object[] values = this.components.stream().map(CommandComponent::name).map(context::get).toArray();
             final T tuple = this.tupleFactory.apply(values);
-            return CompletableFuture.completedFuture(this.mapper.apply(commandContext.getSender(), tuple));
+            return CompletableFuture.completedFuture(this.mapper.apply(commandContext.sender(), tuple));
         };
     }
 

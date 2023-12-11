@@ -84,6 +84,7 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
     @NonNull AggregateResultMapper<C, O> mapper();
 
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     default @NonNull CompletableFuture<@NonNull O> parseFuture(
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
@@ -98,7 +99,8 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
                                 if (value == null || exception != null) {
                                     return;
                                 }
-                                aggregateCommandContext.store(CloudKey.of(component.name(), component.valueType()), value);
+                                final CloudKey key = CloudKey.of(component.name(), component.valueType());
+                                aggregateCommandContext.store(key, value);
                             }));
         }
         return future.thenCompose(result -> this.mapper().map(commandContext, aggregateCommandContext));

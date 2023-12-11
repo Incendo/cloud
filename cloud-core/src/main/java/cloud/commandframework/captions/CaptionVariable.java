@@ -23,49 +23,41 @@
 //
 package cloud.commandframework.captions;
 
+import cloud.commandframework.internal.ImmutableImpl;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
 /**
- * Key-value pair used to replace variables in captions
+ * Key-value pair used to replace variables in captions.
  */
+@ImmutableImpl
+@Value.Immutable
 @API(status = API.Status.STABLE)
-public final class CaptionVariable {
+public interface CaptionVariable {
 
-    private final String key;
-    private final String value;
-
-    private CaptionVariable(final @NonNull String key, final @NonNull String value) {
-        this.key = key;
-        this.value = value;
+    /**
+     * Creates a new caption variable instance.
+     *
+     * @param key   the key
+     * @param value the value that replaces the placeholder
+     * @return the variable instance
+     */
+    static @NonNull CaptionVariable of(final @NonNull String key, final @NonNull String value) {
+        return CaptionVariableImpl.of(key, value);
     }
 
     /**
-     * Create a new caption variable instance
+     * Returns the variable key.
      *
-     * @param key   Key
-     * @param value Replacement
-     * @return Created instance
+     * @return the key
      */
-    public static @NonNull CaptionVariable of(final @NonNull String key, final @NonNull String value) {
-        return new CaptionVariable(key, value);
-    }
+    @NonNull String key();
 
     /**
-     * Get the variable key
+     * Returns the variable value
      *
-     * @return Key
+     * @return the value
      */
-    public @NonNull String getKey() {
-        return this.key;
-    }
-
-    /**
-     * Get the variable value
-     *
-     * @return Value
-     */
-    public @NonNull String getValue() {
-        return this.value;
-    }
+    @NonNull String value();
 }
