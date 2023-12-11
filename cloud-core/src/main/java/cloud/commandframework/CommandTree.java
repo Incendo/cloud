@@ -215,7 +215,7 @@ public final class CommandTree<C> {
             final @NonNull CommandInput commandInput,
             final @NonNull CommandNode<C> root
     ) {
-        final PermissionResult permissionResult = this.determinePermissionResult(commandContext.getSender(), root);
+        final PermissionResult permissionResult = this.determinePermissionResult(commandContext.sender(), root);
         if (permissionResult.failed()) {
             return this.failedCompletable(
                     new NoPermissionException(
