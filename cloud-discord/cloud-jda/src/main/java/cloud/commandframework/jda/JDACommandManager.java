@@ -28,9 +28,9 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.jda.parsers.ChannelArgument;
-import cloud.commandframework.jda.parsers.RoleArgument;
-import cloud.commandframework.jda.parsers.UserArgument;
+import cloud.commandframework.jda.parsers.ChannelParser;
+import cloud.commandframework.jda.parsers.RoleParser;
+import cloud.commandframework.jda.parsers.UserParser;
 import io.leangen.geantyref.TypeToken;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -104,17 +104,17 @@ public class JDACommandManager<C> extends CommandManager<C> {
 
         /* Register JDA Parsers */
         this.parserRegistry().registerParserSupplier(TypeToken.get(User.class), parserParameters ->
-                new UserArgument.UserParser<>(
-                        new HashSet<>(Arrays.asList(UserArgument.ParserMode.values())),
-                        UserArgument.Isolation.GLOBAL
+                new UserParser<>(
+                        new HashSet<>(Arrays.asList(UserParser.ParserMode.values())),
+                        UserParser.Isolation.GLOBAL
                 ));
         this.parserRegistry().registerParserSupplier(TypeToken.get(MessageChannel.class), parserParameters ->
-                new ChannelArgument.MessageParser<>(
-                        new HashSet<>(Arrays.asList(ChannelArgument.ParserMode.values()))
+                new ChannelParser<>(
+                        new HashSet<>(Arrays.asList(ChannelParser.ParserMode.values()))
                 ));
         this.parserRegistry().registerParserSupplier(TypeToken.get(Role.class), parserParameters ->
-                new RoleArgument.RoleParser<>(
-                        new HashSet<>(Arrays.asList(RoleArgument.ParserMode.values()))
+                new RoleParser<>(
+                        new HashSet<>(Arrays.asList(RoleParser.ParserMode.values()))
                 ));
 
         // No "native" command system means that we can delete commands just fine.

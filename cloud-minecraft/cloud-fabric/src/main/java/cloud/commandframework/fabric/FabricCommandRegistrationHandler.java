@@ -26,7 +26,7 @@ package cloud.commandframework.fabric;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.brigadier.permission.BrigadierPermissionChecker;
-import cloud.commandframework.fabric.argument.FabricArgumentParsers;
+import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -129,7 +129,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                 if (dispatcher == null) {
                     throw new IllegalStateException("Expected an active dispatcher!");
                 }
-                FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
+                FabricVanillaArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
                         this.commandManager(),
                         CommandBuildContext.simple(connection.registryAccess(), connection.enabledFeatures()),
                         false,
@@ -144,7 +144,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                 final CommandBuildContext commandBuildContext
         ) {
             this.registerEventFired = true;
-            FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
+            FabricVanillaArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
                     this.commandManager(),
                     commandBuildContext,
                     true,
@@ -210,7 +210,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                 final Commands.CommandSelection side
         ) {
             this.commandManager().registrationCalled();
-            FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
+            FabricVanillaArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
                     this.commandManager(),
                     access,
                     true,

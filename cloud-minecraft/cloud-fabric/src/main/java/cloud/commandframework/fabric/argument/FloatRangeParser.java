@@ -26,44 +26,46 @@ package cloud.commandframework.fabric.argument;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.commands.arguments.RangeArgument;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * An argument parsing a {@link ResourceLocation}.
+ * An argument parsing an unbounded {@link net.minecraft.advancements.critereon.MinMaxBounds.Doubles double range}, in the form
+ * {@code [min]..[max]}, where both lower and upper bounds are optional.
  *
  * @param <C> the sender type
  * @since 2.0.0
  */
-public final class ResourceLocationArgument<C> extends WrappedBrigadierParser<C, ResourceLocation> {
+public final class FloatRangeParser<C> extends WrappedBrigadierParser<C, MinMaxBounds.Doubles> {
 
     /**
-     * Creates a new resource location parser.
+     * Creates a new float range parser.
      *
      * @param <C> command sender type
      * @return the created parser
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> @NonNull ParserDescriptor<C, ResourceLocation> resourceLocationParser() {
-        return ParserDescriptor.of(new ResourceLocationArgument<>(), ResourceLocation.class);
+    public static <C> @NonNull ParserDescriptor<C, MinMaxBounds.Doubles> floatRangeParser() {
+        return ParserDescriptor.of(new FloatRangeParser<>(), MinMaxBounds.Doubles.class);
     }
 
     /**
-     * Returns a {@link CommandComponent.Builder} using {@link #resourceLocationParser()} as the parser.
+     * Returns a {@link CommandComponent.Builder} using {@link #floatRangeParser()} as the parser.
      *
      * @param <C> the command sender type
      * @return the component builder
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> CommandComponent.@NonNull Builder<C, ResourceLocation> resourceLocationComponent() {
-        return CommandComponent.<C, ResourceLocation>builder().parser(resourceLocationParser());
+    public static <C> CommandComponent.@NonNull Builder<C, MinMaxBounds.Doubles> floatRangeComponent() {
+        return CommandComponent.<C, MinMaxBounds.Doubles>builder().parser(floatRangeParser());
     }
 
-    ResourceLocationArgument() {
-        super(net.minecraft.commands.arguments.ResourceLocationArgument.id());
+    FloatRangeParser() {
+        super(RangeArgument.floatRange());
     }
 
 }

@@ -26,10 +26,9 @@ package cloud.commandframework.examples.bungee;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.Description;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.bungee.BungeeCommandManager;
-import cloud.commandframework.bungee.arguments.PlayerArgument;
-import cloud.commandframework.bungee.arguments.ServerArgument;
+import cloud.commandframework.bungee.arguments.PlayerParser;
+import cloud.commandframework.bungee.arguments.ServerParser;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
@@ -113,16 +112,17 @@ public final class ExamplePlugin extends Plugin {
                 .commandDescription(commandDescription("Confirm a pending command"))
                 .handler(this.confirmationManager.createConfirmationExecutionHandler()));
 
-        final CommandArgument<CommandSender, ProxiedPlayer> playerArgument = PlayerArgument.of("player");
-        final CommandArgument<CommandSender, ServerInfo> serverArgument = ServerArgument.of("server");
-
         //
         // Create a player command
         //
         this.manager.command(
                 this.manager.commandBuilder("player")
                         .senderType(ProxiedPlayer.class)
-                        .required(playerArgument, RichDescription.of(text("Player ").append(text("name", NamedTextColor.GOLD))))
+                        .required(
+                                "player",
+                                PlayerParser.playerParser(),
+                                RichDescription.of(text("Player ").append(text("name", NamedTextColor.GOLD)))
+                        )
                         .handler(context -> {
                             final ProxiedPlayer player = context.get("player");
                             this.bungeeAudiences.sender(context.getSender()).sendMessage(
@@ -138,7 +138,7 @@ public final class ExamplePlugin extends Plugin {
         this.manager.command(
                 this.manager.commandBuilder("server")
                         .senderType(ProxiedPlayer.class)
-                        .required(serverArgument, Description.of("Server name"))
+                        .required("server", ServerParser.serverParser(), Description.of("Server name"))
                         .handler(context -> {
                             final ServerInfo server = context.get("server");
                             this.bungeeAudiences.sender(context.getSender()).sendMessage(

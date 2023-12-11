@@ -28,7 +28,10 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.jda.JDA4CommandManager;
 import cloud.commandframework.jda.JDAGuildSender;
 import cloud.commandframework.jda.JDAPrivateSender;
-import cloud.commandframework.jda.parsers.UserArgument;
+import cloud.commandframework.jda.parsers.UserParser;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -44,6 +47,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 
 public final class ExampleBot {
+
+    // :)
+    private static final Set<UserParser.ParserMode> USER_PARSER_MODES = Stream.of(UserParser.ParserMode.MENTION)
+            .collect(Collectors.toSet());
 
     private ExampleBot() {
         throw new UnsupportedOperationException();
@@ -113,7 +120,7 @@ public final class ExampleBot {
 
         commandManager.command(builder
                 .literal("add")
-                .required(UserArgument.of("user"))
+                .required("user", UserParser.userParser(USER_PARSER_MODES, UserParser.Isolation.GUILD))
                 .required("perm", stringParser())
                 .handler(context -> {
                     final User user = context.get("user");
@@ -125,7 +132,7 @@ public final class ExampleBot {
 
         commandManager.command(builder
                 .literal("remove")
-                .required(UserArgument.of("user"))
+                .required("user", UserParser.userParser(USER_PARSER_MODES, UserParser.Isolation.GUILD))
                 .required("perm", stringParser())
                 .handler(context -> {
                     final User user = context.get("user");
@@ -139,7 +146,7 @@ public final class ExampleBot {
                 .commandBuilder("kick")
                 .senderType(GuildUser.class)
                 .permission("kick")
-                .required(UserArgument.of("user"))
+                .required("user", UserParser.userParser(USER_PARSER_MODES, UserParser.Isolation.GUILD))
                 .handler(context -> {
                     final GuildUser guildUser = context.getSender();
                     final TextChannel textChannel = guildUser.getTextChannel();

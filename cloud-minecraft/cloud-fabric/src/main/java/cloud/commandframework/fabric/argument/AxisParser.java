@@ -26,44 +26,49 @@ package cloud.commandframework.fabric.argument;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
-import net.minecraft.resources.ResourceLocation;
+import io.leangen.geantyref.TypeToken;
+import java.util.EnumSet;
+import net.minecraft.commands.arguments.coordinates.SwizzleArgument;
+import net.minecraft.core.Direction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * An argument parsing a {@link ResourceLocation}.
+ * An argument parser for a set of {@link net.minecraft.core.Direction.Axis axes}, described in Vanilla as a "swizzle".
  *
  * @param <C> the sender type
  * @since 2.0.0
  */
-public final class ResourceLocationArgument<C> extends WrappedBrigadierParser<C, ResourceLocation> {
+public final class AxisParser<C> extends WrappedBrigadierParser<C, EnumSet<Direction.Axis>> {
+
+    private static final TypeToken<EnumSet<Direction.Axis>> TYPE = new TypeToken<EnumSet<Direction.Axis>>() {
+    };
 
     /**
-     * Creates a new resource location parser.
+     * Creates a new axis parser.
      *
      * @param <C> command sender type
      * @return the created parser
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> @NonNull ParserDescriptor<C, ResourceLocation> resourceLocationParser() {
-        return ParserDescriptor.of(new ResourceLocationArgument<>(), ResourceLocation.class);
+    public static <C> @NonNull ParserDescriptor<C, EnumSet<Direction.Axis>> axisParser() {
+        return ParserDescriptor.of(new AxisParser<>(), TYPE);
     }
 
     /**
-     * Returns a {@link CommandComponent.Builder} using {@link #resourceLocationParser()} as the parser.
+     * Returns a {@link CommandComponent.Builder} using {@link #axisParser()} as the parser.
      *
      * @param <C> the command sender type
      * @return the component builder
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> CommandComponent.@NonNull Builder<C, ResourceLocation> resourceLocationComponent() {
-        return CommandComponent.<C, ResourceLocation>builder().parser(resourceLocationParser());
+    public static <C> CommandComponent.@NonNull Builder<C, EnumSet<Direction.Axis>> axisComponent() {
+        return CommandComponent.<C, EnumSet<Direction.Axis>>builder().parser(axisParser());
     }
 
-    ResourceLocationArgument() {
-        super(net.minecraft.commands.arguments.ResourceLocationArgument.id());
+    AxisParser() {
+        super(SwizzleArgument.swizzle());
     }
-
 }
