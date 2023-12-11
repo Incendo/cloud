@@ -24,7 +24,6 @@
 package cloud.commandframework;
 
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.CommandSyntaxFormatter;
 import cloud.commandframework.arguments.StandardCommandSyntaxFormatter;
 import cloud.commandframework.arguments.flags.CommandFlag;
@@ -162,7 +161,7 @@ public abstract class CommandManager<C> {
      * or at some point in the future, depending on the {@link CommandExecutionCoordinator} used in the command manager.
      * <p>
      * The command may also be filtered out by preprocessors (see {@link CommandPreprocessor}) before they are parsed,
-     * or by the {@link CommandArgument} command arguments during parsing. The execution may also be filtered out
+     * or by the {@link CommandComponent} command components during parsing. The execution may also be filtered out
      * after parsing by a {@link CommandPostprocessor}. In the case that a command was filtered out at any of the
      * execution stages, the future will complete with {@code null}.
      * <p>
@@ -729,7 +728,7 @@ public abstract class CommandManager<C> {
     /**
      * Create a new command component builder.
      * <p>
-     * This will also invoke {@link CommandArgument.Builder#manager(CommandManager)}
+     * This will also invoke {@link CommandComponent.Builder#commandManager(CommandManager)}
      * so that the argument is associated with the calling command manager. This allows for parser inference based on
      * the type, with the help of the {@link ParserRegistry parser registry}.
      *
