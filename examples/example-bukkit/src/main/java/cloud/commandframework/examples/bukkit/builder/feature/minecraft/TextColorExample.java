@@ -26,6 +26,7 @@ package cloud.commandframework.examples.bukkit.builder.feature.minecraft;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
+import cloud.commandframework.minecraft.extras.ImmutableMinecraftHelp;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.minecraft.extras.RichDescription;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -73,13 +74,17 @@ public final class TextColorExample implements BuilderFeature {
                                 RichDescription.of(text("The secondary color used to highlight commands and queries"))
                         ).required("text", textColorParser(), RichDescription.of(text("The color used for description text")))
                         .required("accent", textColorParser(), RichDescription.of(text("The color used for accents and symbols")))
-                        .handler(c -> examplePlugin.minecraftHelp().setHelpColors(MinecraftHelp.HelpColors.of(
-                            c.get("primary"),
-                            c.get("highlight"),
-                            c.get("alternate_highlight"),
-                            c.get("text"),
-                            c.get("accent")
-                        )))
+                        .handler(c -> examplePlugin.minecraftHelp(
+                                ImmutableMinecraftHelp.copyOf(examplePlugin.minecraftHelp()).withColors(
+                                        MinecraftHelp.HelpColors.of(
+                                                c.get("primary"),
+                                                c.get("highlight"),
+                                                c.get("alternate_highlight"),
+                                                c.get("text"),
+                                                c.get("accent")
+                                        )
+                                )
+                        ))
         );
     }
 }
