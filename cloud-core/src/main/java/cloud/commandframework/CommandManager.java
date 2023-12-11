@@ -80,6 +80,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
@@ -191,10 +192,42 @@ public abstract class CommandManager<C> {
             final @NonNull C commandSender,
             final @NonNull String input
     ) {
+        return this.executeCommand(commandSender, input, context -> {});
+    }
+
+    /**
+     * Executes a command and get a future that completes with the result. The command may be executed immediately
+     * or at some point in the future, depending on the {@link CommandExecutionCoordinator} used in the command manager.
+     * <p>
+     * The command may also be filtered out by preprocessors (see {@link CommandPreprocessor}) before they are parsed,
+     * or by the {@link CommandComponent} command components during parsing. The execution may also be filtered out
+     * after parsing by a {@link CommandPostprocessor}. In the case that a command was filtered out at any of the
+     * execution stages, the future will complete with {@code null}.
+     * <p>
+     * The future may also complete exceptionally.
+     * These exceptions will be handled using exception handlers registered in the {@link #exceptionController()}.
+     * The exceptions will be forwarded to the future, if the exception was transformed during the exception handling, then the
+     * new exception will be present in the completed future.
+     *
+     * @param commandSender   the sender of the command
+     * @param input           the input provided by the sender. Prefixes should be removed before the method is being called, and
+     *                        the input here will be passed directly to the command parsing pipeline, after having been tokenized.
+     * @param contextConsumer consumer that accepts the context before the command is executed
+     * @return future that completes with the command result, or {@code null} if the execution was cancelled at any of the
+     *         processing stages.
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CompletableFuture<CommandResult<C>> executeCommand(
+            final @NonNull C commandSender,
+            final @NonNull String input,
+            final @NonNull Consumer<CommandContext<C>> contextConsumer
+    ) {
         final CommandContext<C> context = this.commandContextFactory.create(
                 false,
                 commandSender
         );
+        contextConsumer.accept(context);
         final CommandInput commandInput = CommandInput.of(input);
         return this.executeCommand(context, commandInput).whenComplete((result, throwable) -> {
             if (throwable == null) {

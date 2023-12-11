@@ -74,7 +74,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @Singleton
 public class VelocityCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C> {
 
-
     private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS =
             "I'm sorry, but you do not have permission to perform this command. "
