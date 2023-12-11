@@ -25,6 +25,7 @@ package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
@@ -72,11 +73,11 @@ import org.jetbrains.annotations.ApiStatus;
 /**
  * Parsers for Vanilla command argument types.
  *
- * @since 1.5.0
+ * @since 2.0.0
  */
-public final class FabricArgumentParsers {
+public final class FabricVanillaArgumentParsers {
 
-    private FabricArgumentParsers() {
+    private FabricVanillaArgumentParsers() {
     }
 
     /**
@@ -85,44 +86,59 @@ public final class FabricArgumentParsers {
      * @param <C>     sender type
      * @param <V>     argument value type
      * @param factory factory that creates these arguments
+     * @param valueType value type of parsers output
      * @return the parser
+     * @since 2.0.0
      */
-    public static <C, V> @NonNull ArgumentParser<C, V> contextual(final @NonNull Function<CommandBuildContext, ArgumentType<V>> factory) {
-        return new WrappedBrigadierParser<>(new ContextualArgumentTypeProvider<>(factory));
+    public static <C, V> @NonNull ParserDescriptor<C, V> contextualParser(
+            final @NonNull Function<CommandBuildContext, ArgumentType<V>> factory,
+            final @NonNull Class<V> valueType
+    ) {
+        return ParserDescriptor.of(new WrappedBrigadierParser<>(new ContextualArgumentTypeProvider<>(factory)), valueType);
     }
 
     /**
      * A parser for in-game time, in ticks.
      *
      * @param <C> sender type
-     * @return a parser instance
-     * @since 1.5.0
+     * @return a parser descriptor
+     * @since 2.0.0
      */
-    public static <C> @NonNull ArgumentParser<C, MinecraftTime> time() {
-        return new WrappedBrigadierParser<C, Integer>(TimeArgument.time())
+    public static <C> @NonNull ParserDescriptor<C, MinecraftTime> timeParser() {
+        ArgumentParser<C, MinecraftTime> parser = new WrappedBrigadierParser<C, Integer>(TimeArgument.time())
                 .map((ctx, val) -> CompletableFuture.completedFuture(MinecraftTime.of(val)));
+
+        return ParserDescriptor.of(parser, MinecraftTime.class);
     }
 
     /**
      * A parser for block coordinates.
      *
      * @param <C> sender type
-     * @return a parser instance
+     * @return a parser descriptor
+     * @since 2.0.0
      */
-    public static <C> @NonNull ArgumentParser<C, Coordinates.BlockCoordinates> blockPos() {
-        return new WrappedBrigadierParser<C, net.minecraft.commands.arguments.coordinates.Coordinates>(BlockPosArgument.blockPos())
-                .map(FabricArgumentParsers::mapToCoordinates);
+    public static <C> @NonNull ParserDescriptor<C, Coordinates.BlockCoordinates> blockPosParser() {
+        ArgumentParser<C, Coordinates.BlockCoordinates> parser = new WrappedBrigadierParser<C,
+                net.minecraft.commands.arguments.coordinates.Coordinates>(BlockPosArgument.blockPos())
+                .map(FabricVanillaArgumentParsers::mapToCoordinates);
+
+        return ParserDescriptor.of(parser, Coordinates.BlockCoordinates.class);
     }
 
     /**
      * A parser for column coordinates.
      *
      * @param <C> sender type
-     * @return a parser instance
+     * @return a parser descriptor
+     * @since 2.0.0
      */
-    public static <C> @NonNull ArgumentParser<C, Coordinates.ColumnCoordinates> columnPos() {
-        return new WrappedBrigadierParser<C, net.minecraft.commands.arguments.coordinates.Coordinates>(ColumnPosArgument.columnPos())
-                .map(FabricArgumentParsers::mapToCoordinates);
+    public static <C> @NonNull ParserDescriptor<C, Coordinates.ColumnCoordinates> columnPosParser() {
+        ArgumentParser<C, Coordinates.ColumnCoordinates> parser = new WrappedBrigadierParser<C,
+                net.minecraft.commands.arguments.coordinates.Coordinates>(ColumnPosArgument.columnPos())
+                .map(FabricVanillaArgumentParsers::mapToCoordinates);
+
+        return ParserDescriptor.of(parser, Coordinates.ColumnCoordinates.class);
     }
 
     /**
@@ -131,12 +147,15 @@ public final class FabricArgumentParsers {
      *
      * @param centerIntegers whether to center integers at x.5
      * @param <C>            sender type
-     * @return a parser instance
+     * @return a parser descriptor
+     * @since 2.0.0
      */
-    public static <C> @NonNull ArgumentParser<C, Coordinates.CoordinatesXZ> vec2(final boolean centerIntegers) {
-        return new WrappedBrigadierParser<C, net.minecraft.commands.arguments.coordinates.Coordinates>(new Vec2Argument(
-                centerIntegers))
-                .map(FabricArgumentParsers::mapToCoordinates);
+    public static <C> @NonNull ParserDescriptor<C, Coordinates.CoordinatesXZ> vec2Parser(final boolean centerIntegers) {
+        ArgumentParser<C, Coordinates.CoordinatesXZ> parser = new WrappedBrigadierParser<C,
+                net.minecraft.commands.arguments.coordinates.Coordinates>(new Vec2Argument(centerIntegers))
+                .map(FabricVanillaArgumentParsers::mapToCoordinates);
+
+        return ParserDescriptor.of(parser, Coordinates.CoordinatesXZ.class);
     }
 
     /**
@@ -144,12 +163,15 @@ public final class FabricArgumentParsers {
      *
      * @param centerIntegers whether to center integers at x.5
      * @param <C>            sender type
-     * @return a parser instance
+     * @return a parser descriptor
+     * @since 2.0.0
      */
-    public static <C> @NonNull ArgumentParser<C, Coordinates> vec3(final boolean centerIntegers) {
-        return new WrappedBrigadierParser<C, net.minecraft.commands.arguments.coordinates.Coordinates>(Vec3Argument.vec3(
-                centerIntegers))
-                .map(FabricArgumentParsers::mapToCoordinates);
+    public static <C> @NonNull ParserDescriptor<C, Coordinates> vec3Parser(final boolean centerIntegers) {
+        ArgumentParser<C, Coordinates> parser = new WrappedBrigadierParser<C,
+                net.minecraft.commands.arguments.coordinates.Coordinates>(Vec3Argument.vec3(centerIntegers))
+                .map(FabricVanillaArgumentParsers::mapToCoordinates);
+
+        return ParserDescriptor.of(parser, Coordinates.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -170,11 +192,11 @@ public final class FabricArgumentParsers {
      * A parser for {@link SinglePlayerSelector}.
      *
      * @param <C> sender type
-     * @return a parser instance
-     * @since 1.5.0
+     * @return a parser descriptor
+     * @since 2.0.0
      */
-    public static <C> @NonNull ArgumentParser<C, SinglePlayerSelector> singlePlayerSelector() {
-        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.player())
+    public static <C> @NonNull ParserDescriptor<C, SinglePlayerSelector> singlePlayerSelectorParser() {
+        ArgumentParser<C, SinglePlayerSelector> parser = new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.player())
                 .map((ctx, entitySelector) -> requireCommandSourceStack(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
@@ -185,17 +207,19 @@ public final class FabricArgumentParsers {
                                 ))
                         )
                 ));
+
+        return ParserDescriptor.of(parser, SinglePlayerSelector.class);
     }
 
     /**
      * A parser for {@link MultiplePlayerSelector}.
      *
      * @param <C> sender type
-     * @return a parser instance
-     * @since 1.5.0
+     * @return a parser descriptor
+     * @since 2.0.0
      */
-    public static <C> @NonNull ArgumentParser<C, MultiplePlayerSelector> multiplePlayerSelector() {
-        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.players())
+    public static <C> @NonNull ParserDescriptor<C, MultiplePlayerSelector> multiplePlayerSelectorParser() {
+        ArgumentParser<C, MultiplePlayerSelector> parser = new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.players())
                 .map((ctx, entitySelector) -> requireCommandSourceStack(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
@@ -206,6 +230,8 @@ public final class FabricArgumentParsers {
                                 ))
                         )
                 ));
+
+        return ParserDescriptor.of(parser, MultiplePlayerSelector.class);
     }
 
     /**
@@ -213,10 +239,10 @@ public final class FabricArgumentParsers {
      *
      * @param <C> sender type
      * @return a parser instance
-     * @since 1.5.0
+     * @since 2.0.0
      */
-    public static <C> @NonNull ArgumentParser<C, SingleEntitySelector> singleEntitySelector() {
-        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.entity())
+    public static <C> @NonNull ParserDescriptor<C, SingleEntitySelector> singleEntitySelectorParser() {
+        ArgumentParser<C, SingleEntitySelector> parser = new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.entity())
                 .map((ctx, entitySelector) -> requireCommandSourceStack(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
@@ -227,6 +253,8 @@ public final class FabricArgumentParsers {
                                 ))
                         )
                 ));
+
+        return ParserDescriptor.of(parser, SingleEntitySelector.class);
     }
 
     /**
@@ -234,10 +262,10 @@ public final class FabricArgumentParsers {
      *
      * @param <C> sender type
      * @return a parser instance
-     * @since 1.5.0
+     * @since 2.0.0
      */
-    public static <C> @NonNull ArgumentParser<C, MultipleEntitySelector> multipleEntitySelector() {
-        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.entities())
+    public static <C> @NonNull ParserDescriptor<C, MultipleEntitySelector> multipleEntitySelectorParser() {
+        ArgumentParser<C, MultipleEntitySelector> parser = new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.entities())
                 .map((ctx, entitySelector) -> requireCommandSourceStack(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
@@ -248,6 +276,8 @@ public final class FabricArgumentParsers {
                                 ))
                         )
                 ));
+
+        return ParserDescriptor.of(parser, MultipleEntitySelector.class);
     }
 
     /**
@@ -255,10 +285,10 @@ public final class FabricArgumentParsers {
      *
      * @param <C> sender type
      * @return a parser instance
-     * @since 1.5.0
+     * @since 2.0.0
      */
-    public static <C> @NonNull ArgumentParser<C, Message> message() {
-        return new WrappedBrigadierParser<C, MessageArgument.Message>(MessageArgument.message())
+    public static <C> @NonNull ParserDescriptor<C, Message> messageParser() {
+        ArgumentParser<C, Message> parser = new WrappedBrigadierParser<C, MessageArgument.Message>(MessageArgument.message())
                 .map((ctx, format) -> requireCommandSourceStack(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
@@ -269,6 +299,8 @@ public final class FabricArgumentParsers {
                                 ))
                         )
                 ));
+
+        return ParserDescriptor.of(parser, Message.class);
     }
 
     @FunctionalInterface

@@ -35,9 +35,9 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
-import cloud.commandframework.fabric.argument.FabricArgumentParsers;
-import cloud.commandframework.fabric.argument.RegistryEntryArgument;
-import cloud.commandframework.fabric.argument.TeamArgument;
+import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
+import cloud.commandframework.fabric.argument.RegistryEntryParser;
+import cloud.commandframework.fabric.argument.TeamParser;
 import cloud.commandframework.fabric.data.MinecraftTime;
 import cloud.commandframework.permission.PredicatePermission;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -174,11 +174,11 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         brigadier.registerMapping(new TypeToken<UUIDParser<C>>() {
         }, builder -> builder.toConstant(UuidArgument.uuid()));
         this.registerRegistryEntryMappings();
-        brigadier.registerMapping(new TypeToken<TeamArgument.TeamParser<C>>() {
+        brigadier.registerMapping(new TypeToken<TeamParser<C>>() {
         }, builder -> builder.toConstant(net.minecraft.commands.arguments.TeamArgument.team()));
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(PlayerTeam.class),
-                params -> new TeamArgument.TeamParser<>()
+                params -> new TeamParser<>()
         );
 
         /* Wrapped/Constant Brigadier types, native value type */
@@ -203,14 +203,14 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         this.registerConstantNativeParserSupplier(MessageArgument.Message.class, MessageArgument.message());
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(MinecraftTime.class),
-                params -> FabricArgumentParsers.time()
+                params -> FabricVanillaArgumentParsers.<C>timeParser().parser()
         );
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void registerRegistryEntryMappings() {
         this.brigadierManager.registerMapping(
-                new TypeToken<RegistryEntryArgument.Parser<C, ?>>() {
+                new TypeToken<RegistryEntryParser<C, ?>>() {
                 },
                 builder -> {
                     builder.to(argument -> ResourceKeyArgument.key((ResourceKey) argument.registryKey()));
@@ -265,7 +265,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
             /* and now, finally, we can register */
             this.parserRegistry().registerParserSupplier(
                     TypeToken.get(valueType),
-                    params -> new RegistryEntryArgument.Parser(key)
+                    params -> new RegistryEntryParser(key)
             );
         }
     }
@@ -284,7 +284,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
     ) {
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(type),
-                params -> FabricArgumentParsers.contextual(argument)
+                params -> FabricVanillaArgumentParsers.<C, T>contextualParser(argument, type).parser()
         );
     }
 

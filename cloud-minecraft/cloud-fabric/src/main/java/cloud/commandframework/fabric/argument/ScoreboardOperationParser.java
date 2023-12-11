@@ -26,44 +26,47 @@ package cloud.commandframework.fabric.argument;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.commands.arguments.OperationArgument;
+import net.minecraft.commands.arguments.OperationArgument.Operation;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * An argument parsing a {@link ResourceLocation}.
+ * An argument for selecting any of the logical operations in {@link Operation}.
+ *
+ * <p>These operations can be used to compare scores on a {@link net.minecraft.world.scores.Scoreboard}.</p>
  *
  * @param <C> the sender type
  * @since 2.0.0
  */
-public final class ResourceLocationArgument<C> extends WrappedBrigadierParser<C, ResourceLocation> {
+public final class ScoreboardOperationParser<C> extends WrappedBrigadierParser<C, Operation> {
 
     /**
-     * Creates a new resource location parser.
+     * Creates a new scoreboard operation parser.
      *
      * @param <C> command sender type
      * @return the created parser
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> @NonNull ParserDescriptor<C, ResourceLocation> resourceLocationParser() {
-        return ParserDescriptor.of(new ResourceLocationArgument<>(), ResourceLocation.class);
+    public static <C> @NonNull ParserDescriptor<C, Operation> scoreboardOperationParser() {
+        return ParserDescriptor.of(new ScoreboardOperationParser<>(), Operation.class);
     }
 
     /**
-     * Returns a {@link CommandComponent.Builder} using {@link #resourceLocationParser()} as the parser.
+     * Returns a {@link CommandComponent.Builder} using {@link #scoreboardOperationParser()} as the parser.
      *
      * @param <C> the command sender type
      * @return the component builder
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> CommandComponent.@NonNull Builder<C, ResourceLocation> resourceLocationComponent() {
-        return CommandComponent.<C, ResourceLocation>builder().parser(resourceLocationParser());
+    public static <C> CommandComponent.@NonNull Builder<C, Operation> scoreboardOperationComponent() {
+        return CommandComponent.<C, Operation>builder().parser(scoreboardOperationParser());
     }
 
-    ResourceLocationArgument() {
-        super(net.minecraft.commands.arguments.ResourceLocationArgument.id());
+    ScoreboardOperationParser() {
+        super(OperationArgument.operation());
     }
 
 }

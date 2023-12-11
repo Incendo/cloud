@@ -32,8 +32,8 @@ import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
-import cloud.commandframework.velocity.arguments.PlayerArgument;
-import cloud.commandframework.velocity.arguments.ServerArgument;
+import cloud.commandframework.velocity.arguments.PlayerParser;
+import cloud.commandframework.velocity.arguments.ServerParser;
 import com.google.inject.Inject;
 import com.google.inject.Module;
 import com.google.inject.Singleton;
@@ -112,9 +112,9 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
 
         /* Register Velocity Parsers */
         this.parserRegistry().registerParserSupplier(TypeToken.get(Player.class), parserParameters ->
-                new PlayerArgument.PlayerParser<>());
+                new PlayerParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(RegisteredServer.class), parserParameters ->
-                new ServerArgument.ServerParser<>());
+                new ServerParser<>());
 
         /* Register default captions */
         if (this.captionRegistry() instanceof FactoryDelegatingCaptionRegistry) {
