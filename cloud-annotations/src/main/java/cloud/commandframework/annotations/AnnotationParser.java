@@ -98,6 +98,7 @@ public final class AnnotationParser<C> {
     private final Map<Class<? extends Annotation>, AnnotationMapper<?>> annotationMappers;
     private final Map<Class<? extends Annotation>, PreprocessorMapper<?, C>> preprocessorMappers;
     private final Map<Class<? extends Annotation>, BuilderModifier<?, C>> builderModifiers;
+    private final List<BuilderDecorator<C>> builderDecorators;
     private final Map<Predicate<Method>, CommandMethodExecutionHandlerFactory<C>> commandMethodFactories;
     private final TypeToken<C> commandSenderType;
     private final MetaFactory metaFactory;
@@ -190,6 +191,7 @@ public final class AnnotationParser<C> {
         this.commandExtractor = new CommandExtractorImpl(this);
         this.suggestionProviderFactory = SuggestionProviderFactory.defaultFactory();
         this.exceptionHandlerFactory = ExceptionHandlerFactory.defaultFactory();
+        this.builderDecorators = new ArrayList<>();
         this.registerBuilderModifier(
                 CommandDescription.class,
                 (description, builder) -> builder.commandDescription(commandDescription(this.mapDescription(description.value())))
@@ -305,6 +307,20 @@ public final class AnnotationParser<C> {
             final @NonNull BuilderModifier<A, C> builderModifier
     ) {
         this.builderModifiers.put(annotation, builderModifier);
+    }
+
+    /**
+     * Registers the given {@code decorator}.
+     * <p>
+     * The decorators are allowed to modify the command builders to set up default values.
+     * All other steps of the command construction process take priority over the decorators.
+     *
+     * @param decorator the decorator
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void registerBuilderDecorator(final @NonNull BuilderDecorator<C> decorator) {
+        this.builderDecorators.add(decorator);
     }
 
     /**
@@ -844,6 +860,10 @@ public final class AnnotationParser<C> {
                 commandDescriptor.syntax().get(0).getMinor(),
                 metaBuilder.build()
         );
+        for (final BuilderDecorator<C> decorator : this.builderDecorators) {
+            builder = decorator.decorate(builder);
+        }
+
         final Collection<ArgumentDescriptor> arguments = this.argumentExtractor.extractArguments(commandDescriptor.syntax(), method);
         final Collection<FlagDescriptor> flagDescriptors = this.flagExtractor.extractFlags(method);
         final Collection<CommandFlag<?>> flags = flagDescriptors.stream()
