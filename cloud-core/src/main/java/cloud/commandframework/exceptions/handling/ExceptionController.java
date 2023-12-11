@@ -208,6 +208,18 @@ public final class ExceptionController<C> {
         return this.register(ExceptionHandlerRegistration.of(TypeToken.get(exceptionType), exceptionHandler));
     }
 
+    /**
+     * Removes all registered handlers.
+     * <p>
+     * This can be used to make sure that no default handlers of higher precision are invoked before your handler.
+     * <p>
+     * It is recommended that you register a handler for {@link Throwable} if you use this, to make sure that no uncaught
+     * errors leak out of the controller.
+     */
+    public void clearHandlers() {
+        this.registrations.clear();
+    }
+
     private @NonNull List<@NonNull ExceptionHandlerRegistration<C, ?>> registrations(final @NonNull Type type) {
         return Collections.unmodifiableList(this.registrations.getOrDefault(type, new LinkedList<>()));
     }

@@ -23,8 +23,10 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.internal.ImmutableImpl;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
 import static java.util.Objects.requireNonNull;
 
@@ -33,8 +35,12 @@ import static java.util.Objects.requireNonNull;
  *
  * @since 2.0.0
  */
+@ImmutableImpl
+@Value.Immutable
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface Description {
+
+    Description EMPTY = DescriptionImpl.of("");
 
     /**
      * Returns an empty command description.
@@ -42,7 +48,7 @@ public interface Description {
      * @return Command description
      */
     static @NonNull Description empty() {
-        return DescriptionImpl.EMPTY;
+        return EMPTY;
     }
 
     /**
@@ -53,9 +59,9 @@ public interface Description {
      */
     static @NonNull Description of(final @NonNull String string) {
         if (requireNonNull(string, "string").isEmpty()) {
-            return DescriptionImpl.EMPTY;
+            return empty();
         } else {
-            return new DescriptionImpl(string);
+            return DescriptionImpl.of(string);
         }
     }
 

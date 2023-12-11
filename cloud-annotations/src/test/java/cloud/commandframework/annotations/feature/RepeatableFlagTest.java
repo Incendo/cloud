@@ -29,13 +29,7 @@ import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
-import cloud.commandframework.arguments.parser.StandardParameters;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandResult;
-import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
-import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,8 +45,7 @@ class RepeatableFlagTest {
         this.commandManager = new TestCommandManager();
         final AnnotationParser<TestCommandSender> annotationParser = new AnnotationParser<>(
                 this.commandManager,
-                TestCommandSender.class,
-                p -> SimpleCommandMeta.empty()
+                TestCommandSender.class
         );
         annotationParser.parse(new TestClassA());
     }

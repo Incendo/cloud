@@ -114,68 +114,77 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
             );
         }
 
-        final CommandMethod commandMethod = e.getAnnotation(CommandMethod.class);
-        final List<String> parameterArgumentNames = e.getParameters()
-                .stream()
-                .map(parameter -> parameter.getAnnotation(Argument.class))
-                .filter(Objects::nonNull)
-                .map(Argument::value)
-                .collect(Collectors.toList());
-        final List<String> parsedArgumentNames = new ArrayList<>(parameterArgumentNames.size());
 
-        final List<SyntaxFragment> syntaxFragments = this.syntaxParser.parseSyntax(null, commandMethod.value());
+        final CommandMethod[] commandMethods = e.getAnnotationsByType(CommandMethod.class);
+        for (final CommandMethod commandMethod : commandMethods) {
+            final List<String> annotatedArgumentNames = e.getParameters()
+                    .stream()
+                    .map(parameter -> parameter.getAnnotation(Argument.class))
+                    .filter(Objects::nonNull)
+                    .map(Argument::value)
+                    .collect(Collectors.toList());
+            final List<String> parameterArgumentNames = new ArrayList<>(annotatedArgumentNames);
 
-        boolean foundOptional = false;
-        for (final SyntaxFragment fragment : syntaxFragments) {
-            if (fragment.getArgumentMode() == ArgumentMode.LITERAL) {
-                continue;
-            }
+            e.getParameters()
+                    .stream()
+                    .filter(parameter -> parameter.getAnnotation(Argument.class) == null)
+                    .map(parameter -> parameter.getSimpleName().toString())
+                    .forEach(parameterArgumentNames::add);
 
-            if (!parameterArgumentNames.contains(fragment.getMajor())) {
-                this.processingEnvironment.getMessager().printMessage(
-                        Diagnostic.Kind.ERROR,
-                        String.format(
-                                "@Argument(\"%s\") is missing from @CommandMethod (%s)",
-                                fragment.getMajor(),
-                                e.getSimpleName()
-                        ),
-                        e
-                );
-            }
+            final List<String> parsedArgumentNames = new ArrayList<>(parameterArgumentNames.size());
+            final List<SyntaxFragment> syntaxFragments = this.syntaxParser.parseSyntax(null, commandMethod.value());
 
-            if (fragment.getArgumentMode() == ArgumentMode.REQUIRED) {
-                if (foundOptional) {
+            boolean foundOptional = false;
+            for (final SyntaxFragment fragment : syntaxFragments) {
+                if (fragment.getArgumentMode() == ArgumentMode.LITERAL) {
+                    continue;
+                }
+
+                if (!parameterArgumentNames.contains(fragment.getMajor())) {
                     this.processingEnvironment.getMessager().printMessage(
                             Diagnostic.Kind.ERROR,
                             String.format(
-                                    "Required argument '%s' cannot succeed an optional argument (%s)",
+                                    "@Argument(\"%s\") is missing from @CommandMethod (%s)",
                                     fragment.getMajor(),
                                     e.getSimpleName()
                             ),
                             e
                     );
                 }
-            } else {
-                foundOptional = true;
+
+                if (fragment.getArgumentMode() == ArgumentMode.REQUIRED) {
+                    if (foundOptional) {
+                        this.processingEnvironment.getMessager().printMessage(
+                                Diagnostic.Kind.ERROR,
+                                String.format(
+                                        "Required argument '%s' cannot succeed an optional argument (%s)",
+                                        fragment.getMajor(),
+                                        e.getSimpleName()
+                                ),
+                                e
+                        );
+                    }
+                } else {
+                    foundOptional = true;
+                }
+
+                parsedArgumentNames.add(fragment.getMajor());
             }
 
-            parsedArgumentNames.add(fragment.getMajor());
-        }
-
-        for (final String argument : parameterArgumentNames) {
-            if (!parsedArgumentNames.contains(argument)) {
-                this.processingEnvironment.getMessager().printMessage(
-                        Diagnostic.Kind.ERROR,
-                        String.format(
-                                "Argument '%s' is missing from the @CommandMethod syntax (%s)",
-                                argument,
-                                e.getSimpleName()
-                        ),
-                        e
-                );
+            for (final String argument : annotatedArgumentNames) {
+                if (!parsedArgumentNames.contains(argument)) {
+                    this.processingEnvironment.getMessager().printMessage(
+                            Diagnostic.Kind.ERROR,
+                            String.format(
+                                    "Argument '%s' is missing from the @CommandMethod syntax (%s)",
+                                    argument,
+                                    e.getSimpleName()
+                            ),
+                            e
+                    );
+                }
             }
         }
-
         return null;
     }
 

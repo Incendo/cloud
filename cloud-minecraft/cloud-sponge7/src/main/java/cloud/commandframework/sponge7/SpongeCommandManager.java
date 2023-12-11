@@ -28,8 +28,6 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import java.util.function.Function;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -88,11 +86,6 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
     @Override
     public final boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
         return this.reverseMapper.apply(sender).hasPermission(permission);
-    }
-
-    @Override
-    public final @NonNull CommandMeta createDefaultCommandMeta() {
-        return SimpleCommandMeta.empty();
     }
 
     /**

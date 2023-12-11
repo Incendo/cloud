@@ -27,7 +27,6 @@ import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.permission.PredicatePermission;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -45,7 +44,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class BuilderModifierExample implements AnnotationFeature {
 
-    private static final CloudKey<Void> PERMISSION_KEY = SimpleCloudKey.of("gamemode");
+    private static final CloudKey<Void> PERMISSION_KEY = CloudKey.of("gamemode");
 
     @Override
     public void registerFeature(

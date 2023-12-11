@@ -32,8 +32,6 @@ import cloud.commandframework.brigadier.suggestion.CloudDelegatingSuggestionProv
 import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.types.tuples.Pair;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -72,7 +70,7 @@ class LiteralBrigadierNodeFactoryTest {
         this.commandManager = new TestCommandManager();
         final CloudBrigadierManager<Object, Object> cloudBrigadierManager = new CloudBrigadierManager<>(
                 this.commandManager,
-                () -> this.commandManager.commandContextFactory().create(false, new Object(), this.commandManager),
+                () -> this.commandManager.commandContextFactory().create(false, new Object()),
                 this.commandManager.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion)
         );
         this.literalBrigadierNodeFactory = cloudBrigadierManager.literalBrigadierNodeFactory();
@@ -216,11 +214,6 @@ class LiteralBrigadierNodeFactoryTest {
         @Override
         public boolean hasPermission(@NonNull final Object sender, @NonNull final String permission) {
             return true;
-        }
-
-        @Override
-        public @NonNull CommandMeta createDefaultCommandMeta() {
-            return SimpleCommandMeta.empty();
         }
     }
 }

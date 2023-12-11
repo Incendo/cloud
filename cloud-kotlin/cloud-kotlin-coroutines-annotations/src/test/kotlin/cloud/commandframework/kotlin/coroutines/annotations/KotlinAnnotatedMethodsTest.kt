@@ -34,8 +34,6 @@ import cloud.commandframework.context.StandardCommandContextFactory
 import cloud.commandframework.exceptions.CommandExecutionException
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
-import cloud.commandframework.meta.CommandMeta
-import cloud.commandframework.meta.SimpleCommandMeta
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
@@ -68,9 +66,7 @@ class KotlinAnnotatedMethodsTest {
 
     @Test
     fun `test suspending command methods`(): Unit = runBlocking {
-        AnnotationParser(commandManager, TestCommandSender::class.java) {
-            SimpleCommandMeta.empty()
-        }
+        AnnotationParser(commandManager, TestCommandSender::class.java)
             .installCoroutineSupport()
             .parse(CommandMethods())
 
@@ -79,9 +75,7 @@ class KotlinAnnotatedMethodsTest {
 
     @Test
     fun `test suspending command methods with exception`(): Unit = runBlocking {
-        AnnotationParser(commandManager, TestCommandSender::class.java) {
-            SimpleCommandMeta.empty()
-        }
+        AnnotationParser(commandManager, TestCommandSender::class.java)
             .installCoroutineSupport()
             .parse(CommandMethods())
 
@@ -92,9 +86,7 @@ class KotlinAnnotatedMethodsTest {
 
     @Test
     fun `test method with default value`(): Unit = runBlocking {
-        AnnotationParser(commandManager, TestCommandSender::class.java) {
-            SimpleCommandMeta.empty()
-        }
+        AnnotationParser(commandManager, TestCommandSender::class.java)
             .installCoroutineSupport()
             .parse(CommandMethods())
 
@@ -104,16 +96,13 @@ class KotlinAnnotatedMethodsTest {
 
     @Test
     fun `test suspending suggestion method`(): Unit = runBlocking {
-        AnnotationParser(commandManager, TestCommandSender::class.java) {
-            SimpleCommandMeta.empty()
-        }
+        AnnotationParser(commandManager, TestCommandSender::class.java)
             .installCoroutineSupport()
             .parse(SuggestionMethods())
 
-        val commandContext = StandardCommandContextFactory<TestCommandSender>().create(
+        val commandContext = StandardCommandContextFactory<TestCommandSender>(commandManager).create(
             true,
-            TestCommandSender(),
-            commandManager
+            TestCommandSender()
         )
         val suggestions = commandManager.parserRegistry().getSuggestionProvider("suspending-suggestions").get()
             .suggestionsFuture(commandContext, "")
@@ -125,16 +114,13 @@ class KotlinAnnotatedMethodsTest {
 
     @Test
     fun `test non-suspending suggestion method`(): Unit = runBlocking {
-        AnnotationParser(commandManager, TestCommandSender::class.java) {
-            SimpleCommandMeta.empty()
-        }
+        AnnotationParser(commandManager, TestCommandSender::class.java)
             .installCoroutineSupport()
             .parse(SuggestionMethods())
 
-        val commandContext = StandardCommandContextFactory<TestCommandSender>().create(
+        val commandContext = StandardCommandContextFactory<TestCommandSender>(commandManager).create(
             true,
-            TestCommandSender(),
-            commandManager
+            TestCommandSender()
         )
         val suggestions = commandManager.parserRegistry().getSuggestionProvider("non-suspending-suggestions").get()
             .suggestionsFuture(commandContext, "")
@@ -154,8 +140,6 @@ class KotlinAnnotatedMethodsTest {
     ) {
 
         override fun hasPermission(sender: TestCommandSender, permission: String): Boolean = true
-
-        override fun createDefaultCommandMeta(): CommandMeta = SimpleCommandMeta.empty()
     }
 
     public class CommandMethods {

@@ -34,7 +34,6 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.Collections;
@@ -62,11 +61,11 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
     /**
      * Metadata for the last argument that was suggested
      */
-    public static final CloudKey<String> FLAG_META_KEY = SimpleCloudKey.of("__last_flag__", TypeToken.get(String.class));
+    public static final CloudKey<String> FLAG_META_KEY = CloudKey.of("__last_flag__", TypeToken.get(String.class));
     /**
      * Metadata for the set of parsed flags, used to detect duplicates.
      */
-    public static final CloudKey<Set<CommandFlag<?>>> PARSED_FLAGS = SimpleCloudKey.of("__parsed_flags__",
+    public static final CloudKey<Set<CommandFlag<?>>> PARSED_FLAGS = CloudKey.of("__parsed_flags__",
             new TypeToken<Set<CommandFlag<?>>>(){});
 
     private static final Pattern FLAG_PRIMARY_PATTERN = Pattern.compile(" --(?<name>([A-Za-z]+))");
@@ -151,7 +150,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
         /* Check if we have a last flag stored */
         final String lastArg = Objects.requireNonNull(commandContext.getOrDefault(FLAG_META_KEY, ""));
         if (!lastArg.startsWith("-")) {
-            final String rawInput = commandContext.getRawInputJoined();
+            final String rawInput = commandContext.rawInput().input();
             /* Collection containing all used flags */
             final List<CommandFlag<?>> usedFlags = new LinkedList<>();
             /* Find all "primary" flags, using --flag */

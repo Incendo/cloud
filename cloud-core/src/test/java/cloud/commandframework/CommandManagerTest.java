@@ -27,8 +27,6 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -65,11 +63,6 @@ class CommandManagerTest {
                     final @NonNull String permission
             ) {
                 return true;
-            }
-
-            @Override
-            public @NonNull CommandMeta createDefaultCommandMeta() {
-                return SimpleCommandMeta.empty();
             }
         };
     }
@@ -117,11 +110,11 @@ class CommandManagerTest {
 
         verify(handlerA).executeFuture(contextArgumentCaptor.capture());
         final CommandContext<TestCommandSender> contextA = contextArgumentCaptor.getValue();
-        assertThat(contextA.getRawInputJoined()).isEqualTo("test a");
+        assertThat(contextA.rawInput().input()).isEqualTo("test a");
 
         verify(handlerB).executeFuture(contextArgumentCaptor.capture());
         final CommandContext<TestCommandSender> contextB = contextArgumentCaptor.getValue();
-        assertThat(contextB.getRawInputJoined()).isEqualTo("test b");
+        assertThat(contextB.rawInput().input()).isEqualTo("test b");
 
         // Reset captor to reset the list of values.
         contextArgumentCaptor = ArgumentCaptor.forClass(
@@ -129,9 +122,9 @@ class CommandManagerTest {
         );
         verify(handlerC, times(2)).executeFuture(contextArgumentCaptor.capture());
         final CommandContext<TestCommandSender> contextC1 = contextArgumentCaptor.getAllValues().get(0);
-        assertThat(contextC1.getRawInputJoined()).isEqualTo("test c");
+        assertThat(contextC1.rawInput().input()).isEqualTo("test c");
         final CommandContext<TestCommandSender> contextC2 = contextArgumentCaptor.getAllValues().get(1);
-        assertThat(contextC2.getRawInputJoined()).isEqualTo("test c 123");
+        assertThat(contextC2.rawInput().input()).isEqualTo("test c 123");
     }
 
     @Test

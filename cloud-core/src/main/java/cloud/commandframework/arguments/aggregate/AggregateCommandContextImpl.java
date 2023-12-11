@@ -25,11 +25,12 @@ package cloud.commandframework.arguments.aggregate;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -49,36 +50,81 @@ final class AggregateCommandContextImpl<C> implements AggregateCommandContext<C>
     }
 
     @Override
-    public void store(final @NonNull CloudKey<?> key, final @NonNull Object value) {
+    public <@NonNull V> void store(final @NonNull CloudKey<V> key, final @NonNull V value) {
         this.storage.put(key, value);
     }
 
     @Override
-    public <T> @NonNull T get(@NonNull final CloudKey<T> key) {
-        if (!this.validKeys.contains(key.getName())) {
+    public <V> void store(final @NonNull String key, final @NonNull V value) {
+        this.storage.put(CloudKey.of(key), value);
+    }
+
+    @Override
+    public void remove(final @NonNull CloudKey<?> key) {
+        this.storage.remove(key);
+    }
+
+    @Override
+    public <V> V computeIfAbsent(
+            final @NonNull CloudKey<V> key,
+            final @NonNull Function<@NonNull CloudKey<V>, V> defaultFunction
+    ) {
+        return (V) this.storage.computeIfAbsent(key, k -> defaultFunction.apply((CloudKey<V>) k));
+    }
+
+    @Override
+    public @NonNull <V> Optional<V> optional(final @NonNull CloudKey<V> key) {
+        final Object value = this.storage.get(key);
+        if (value != null) {
+            @SuppressWarnings("unchecked") final V castedValue = (V) value;
+            return Optional.of(castedValue);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public @NonNull <V> Optional<V> optional(final @NonNull String key) {
+        final Object value = this.storage.get(CloudKey.of(key));
+        if (value != null) {
+            @SuppressWarnings("unchecked") final V castedValue = (V) value;
+            return Optional.of(castedValue);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public <V> @NonNull V get(final @NonNull CloudKey<V> key) {
+        if (!this.validKeys.contains(key.name())) {
             throw new NullPointerException("No value with the given key has been stored in the context");
         }
         final Object value = Objects.requireNonNull(this.storage.get(key));
-        return (T) value;
+        return (V) value;
     }
 
     @Override
     @SuppressWarnings("TypeParameterUnusedInFormals")
-    public <T> @NonNull T get(@NonNull final String key) {
+    public <V> @NonNull V get(final @NonNull String key) {
         if (!this.validKeys.contains(key)) {
             throw new NullPointerException("No value with the given key has been stored in the context");
         }
-        final Object value = Objects.requireNonNull(this.storage.get(SimpleCloudKey.of(key)));
-        return (T) value;
+        final Object value = Objects.requireNonNull(this.storage.get(CloudKey.of(key)));
+        return (V) value;
     }
 
     @Override
-    public boolean contains(@NonNull final CloudKey<?> key) {
+    public boolean contains(final @NonNull CloudKey<?> key) {
         return this.storage.containsKey(key);
     }
 
     @Override
-    public boolean contains(@NonNull final String key) {
-        return this.storage.containsKey(SimpleCloudKey.of(key));
+    public boolean contains(final @NonNull String key) {
+        return this.storage.containsKey(CloudKey.of(key));
+    }
+
+    @Override
+    public @NonNull Map<@NonNull CloudKey<?>, @NonNull ?> all() {
+        return this.storage;
     }
 }

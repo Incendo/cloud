@@ -29,7 +29,6 @@ import cloud.commandframework.CommandDescription
 import cloud.commandframework.CommandManager
 import cloud.commandframework.Description
 import cloud.commandframework.TypedCommandComponent
-import cloud.commandframework.arguments.CommandArgument
 import cloud.commandframework.arguments.parser.ParserDescriptor
 import cloud.commandframework.execution.CommandExecutionHandler
 import cloud.commandframework.keys.CloudKey
@@ -246,7 +245,7 @@ public class MutableCommandBuilder<C : Any>(
     ): MutableCommandBuilder<C> = copy(literal, description, lambda).register()
 
     /**
-     * Set the value for a certain [CommandMeta.Key] in the command meta storage for this builder
+     * Set the value for a certain [CloudKey] in the command meta storage for this builder
      *
      * @param T value type
      * @param key the key to set a value for
@@ -254,20 +253,20 @@ public class MutableCommandBuilder<C : Any>(
      * @return this mutable builder
      * @since 1.3.0
      */
-    public fun <T : Any> meta(key: CommandMeta.Key<T>, value: T): MutableCommandBuilder<C> =
+    public fun <T : Any> meta(key: CloudKey<T>, value: T): MutableCommandBuilder<C> =
         mutate {
             it.meta(key, value)
         }
 
     /**
-     * Set the value for a certain [CommandMeta.Key] in the command meta storage for this builder
+     * Set the value for a certain [CloudKey] in the command meta storage for this builder
      *
      * @param T value type
      * @param value new value
      * @return this mutable builder
      * @since 1.3.0
      */
-    public infix fun <T : Any> CommandMeta.Key<T>.to(value: T): MutableCommandBuilder<C> =
+    public infix fun <T : Any> CloudKey<T>.to(value: T): MutableCommandBuilder<C> =
         meta(this, value)
 
     /**
@@ -375,19 +374,6 @@ public class MutableCommandBuilder<C : Any>(
     public var commandPermission: CommandPermission
         get() = this.commandBuilder.commandPermission()
         set(permission) = onlyMutate { it.permission(permission) }
-
-    /**
-     * Add a new argument to this command
-     *
-     * @param argument argument to add
-     * @param description description of the argument
-     * @return this mutable builder
-     * @since 2.0.0
-     */
-    public fun required(
-        argument: CommandArgument<C, *>,
-        description: Description = Description.empty()
-    ): MutableCommandBuilder<C> = mutate { it.required(argument, description) }
 
     /**
      * Adds a new component to this command
@@ -501,32 +487,6 @@ public class MutableCommandBuilder<C : Any>(
     /**
      * Add a new argument to this command
      *
-     * @param argument argument to add
-     * @param description description of the argument
-     * @return this mutable builder
-     * @since 2.0.0
-     */
-    public fun optional(
-        argument: CommandArgument<C, *>,
-        description: Description = Description.empty()
-    ): MutableCommandBuilder<C> = mutate { it.optional(argument, description) }
-
-    /**
-     * Add a new argument to this command
-     *
-     * @param description description of the argument
-     * @param argumentSupplier supplier of the argument to add
-     * @return this mutable builder
-     * @since 2.0.0
-     */
-    public fun required(
-        description: Description = Description.empty(),
-        argumentSupplier: () -> CommandArgument<C, *>
-    ): MutableCommandBuilder<C> = mutate { it.required(argumentSupplier(), description) }
-
-    /**
-     * Add a new argument to this command
-     *
      * @param componentSupplier supplier of the component
      * @return this mutable builder
      * @since 2.0.0
@@ -556,19 +516,6 @@ public class MutableCommandBuilder<C : Any>(
     public fun optional(
         componentSupplier: () -> CommandComponent.Builder<C, *>
     ): MutableCommandBuilder<C> = mutate { it.optional(componentSupplier()) }
-
-    /**
-     * Add a new argument to this command
-     *
-     * @param description description of the argument
-     * @param argumentSupplier supplier of the argument to add
-     * @return this mutable builder
-     * @since 2.0.0
-     */
-    public fun optional(
-        description: Description = Description.empty(),
-        argumentSupplier: () -> CommandArgument<C, *>
-    ): MutableCommandBuilder<C> = mutate { it.optional(argumentSupplier(), description) }
 
     /**
      * Add a new literal argument to this command

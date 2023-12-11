@@ -60,10 +60,9 @@ public abstract class ServerTest {
 
     @BeforeEach
     void setupCommandContext() {
-        this.commandContext = new StandardCommandContextFactory<CommandSender>().create(
+        this.commandContext = new StandardCommandContextFactory<CommandSender>(this.commandManager).create(
                 false /* suggestions */,
-                this.commandSender,
-                this.commandManager
+                this.commandSender
         );
         this.commandContext.set(BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER, this.commandSender);
     }

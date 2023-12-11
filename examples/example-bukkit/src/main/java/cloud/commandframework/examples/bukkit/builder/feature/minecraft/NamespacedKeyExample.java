@@ -49,7 +49,7 @@ public final class NamespacedKeyExample implements BuilderFeature {
                     .handler(ctx -> {
                         final NamespacedKey namespacedKey = ctx.get("key");
                         final String key = namespacedKey.getNamespace() + ":" + namespacedKey.getKey();
-                        ctx.getSender().sendMessage("The key you typed is '" + key + "'.");
+                        ctx.sender().sendMessage("The key you typed is '" + key + "'.");
                     })
         );
     }

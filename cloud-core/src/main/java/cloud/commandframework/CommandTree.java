@@ -173,7 +173,7 @@ public final class CommandTree<C> {
         if (this.internalTree.isLeaf() && this.internalTree.component() == null) {
             return this.failedCompletable(
                     new NoSuchCommandException(
-                            commandContext.getSender(),
+                            commandContext.sender(),
                             new ArrayList<>(),
                             commandInput.peekString()
                     )
@@ -188,10 +188,10 @@ public final class CommandTree<C> {
         ).thenCompose(command -> {
             if (command != null
                     && command.senderType().isPresent()
-                    && !command.senderType().get().isInstance(commandContext.getSender())) {
+                    && !command.senderType().get().isInstance(commandContext.sender())) {
                 return this.failedCompletable(
                         new InvalidCommandSenderException(
-                                commandContext.getSender(),
+                                commandContext.sender(),
                                 command.senderType().get(),
                                 new ArrayList<>(command.components()),
                                 command
@@ -214,12 +214,12 @@ public final class CommandTree<C> {
             final @NonNull CommandInput commandInput,
             final @NonNull CommandNode<C> root
     ) {
-        final CommandPermission permission = this.findMissingPermission(commandContext.getSender(), root);
+        final CommandPermission permission = this.findMissingPermission(commandContext.sender(), root);
         if (permission != null) {
             return this.failedCompletable(
                     new NoPermissionException(
                             permission,
-                            commandContext.getSender(),
+                            commandContext.sender(),
                             this.getChain(root)
                                     .stream()
                                     .filter(node -> node.component() != null)
@@ -248,7 +248,7 @@ public final class CommandTree<C> {
                         new InvalidSyntaxException(
                                 this.commandManager.commandSyntaxFormatter()
                                         .apply(parsedArguments, root),
-                                commandContext.getSender(), this.getChain(root)
+                                commandContext.sender(), this.getChain(root)
                                 .stream()
                                 .filter(node -> node.component() != null)
                                 .map(CommandNode::component)
@@ -311,7 +311,7 @@ public final class CommandTree<C> {
                     if (root.equals(this.internalTree)) {
                        return this.failedCompletable(
                            new NoSuchCommandException(
-                                   commandContext.getSender(),
+                                   commandContext.sender(),
                                    this.getChain(root).stream().map(CommandNode::component).collect(Collectors.toList()),
                                    commandInput.peekString()
                            )
@@ -323,13 +323,13 @@ public final class CommandTree<C> {
                     if (rootComponent != null && rootComponent.owningCommand() != null && commandInput.isEmpty()) {
                         final Command<C> command = rootComponent.owningCommand();
                         if (!this.commandManager().hasPermission(
-                                commandContext.getSender(),
+                                commandContext.sender(),
                                 command.commandPermission()
                         )) {
                             return this.failedCompletable(
                                     new NoPermissionException(
                                             command.commandPermission(),
-                                            commandContext.getSender(),
+                                            commandContext.sender(),
                                             this.getChain(root)
                                                     .stream()
                                                     .filter(node -> node.component() != null)
@@ -346,7 +346,7 @@ public final class CommandTree<C> {
                             new InvalidSyntaxException(
                                     this.commandManager.commandSyntaxFormatter()
                                             .apply(parsedArguments, root),
-                                    commandContext.getSender(), this.getChain(root)
+                                    commandContext.sender(), this.getChain(root)
                                     .stream()
                                     .filter(node -> node.component() != null)
                                     .map(CommandNode::component)
@@ -382,12 +382,12 @@ public final class CommandTree<C> {
         final CommandNode<C> child = argumentNodes.get(0);
 
         // Check if we're allowed to execute the child command. If not, exit
-        final CommandPermission permission = this.findMissingPermission(commandContext.getSender(), child);
+        final CommandPermission permission = this.findMissingPermission(commandContext.sender(), child);
         if (!commandInput.isEmpty() && permission != null) {
             return this.failedCompletable(
                     new NoPermissionException(
                             permission,
-                            commandContext.getSender(),
+                            commandContext.sender(),
                             this.getChain(child)
                                     .stream()
                                     .filter(node -> node.component() != null)
@@ -444,7 +444,7 @@ public final class CommandTree<C> {
                     return this.failedCompletable(
                             new InvalidSyntaxException(
                                     this.commandManager.commandSyntaxFormatter().apply(components, child),
-                                    commandContext.getSender(),
+                                    commandContext.sender(),
                                     this.getChain(root)
                                             .stream()
                                             .filter(node -> node.component() != null)
@@ -455,13 +455,13 @@ public final class CommandTree<C> {
                 }
 
                 final Command<C> command = rootComponent.owningCommand();
-                if (this.commandManager().hasPermission(commandContext.getSender(), command.commandPermission())) {
+                if (this.commandManager().hasPermission(commandContext.sender(), command.commandPermission())) {
                     return CompletableFuture.completedFuture(command);
                 }
                 return this.failedCompletable(
                         new NoPermissionException(
                                 command.commandPermission(),
-                                commandContext.getSender(),
+                                commandContext.sender(),
                                 this.getChain(root)
                                         .stream()
                                         .filter(node -> node.component() != null)
@@ -478,7 +478,7 @@ public final class CommandTree<C> {
                             new InvalidSyntaxException(
                                     this.commandManager.commandSyntaxFormatter()
                                             .apply(parsedArguments, root),
-                                    commandContext.getSender(),
+                                    commandContext.sender(),
                                     this.getChain(root)
                                             .stream()
                                             .filter(node -> node.component() != null)
@@ -490,14 +490,14 @@ public final class CommandTree<C> {
 
                 // If the sender has permission to use the command, then we're completely done
                 final Command<C> command = Objects.requireNonNull(rootComponent.owningCommand());
-                if (this.commandManager().hasPermission(commandContext.getSender(), command.commandPermission())) {
+                if (this.commandManager().hasPermission(commandContext.sender(), command.commandPermission())) {
                     return CompletableFuture.completedFuture(command);
                 }
 
                 return this.failedCompletable(
                         new NoPermissionException(
                                 command.commandPermission(),
-                                commandContext.getSender(),
+                                commandContext.sender(),
                                 this.getChain(root)
                                         .stream()
                                         .filter(node -> node.component() != null)
@@ -533,7 +533,7 @@ public final class CommandTree<C> {
                return this.failedCompletable(
                        new InvalidSyntaxException(
                                this.commandManager.commandSyntaxFormatter().apply(parsedArguments, child),
-                               commandContext.getSender(),
+                               commandContext.sender(),
                                this.getChain(root)
                                        .stream()
                                        .filter(node -> node.component() != null)
@@ -597,7 +597,7 @@ public final class CommandTree<C> {
                         resultFuture.completeExceptionally(
                                 new ArgumentParseException(
                                         result.getFailure().get(),
-                                        commandContext.getSender(),
+                                        commandContext.sender(),
                                         this.getChain(node)
                                                 .stream()
                                                 .filter(n -> n.component() != null)
@@ -636,7 +636,7 @@ public final class CommandTree<C> {
             final @NonNull CommandNode<C> root
     ) {
         // If the sender isn't allowed to access the root node, no suggestions are needed
-        if (this.findMissingPermission(context.commandContext().getSender(), root) != null) {
+        if (this.findMissingPermission(context.commandContext().sender(), root) != null) {
             return CompletableFuture.completedFuture(context);
         }
 
@@ -717,7 +717,7 @@ public final class CommandTree<C> {
             final @NonNull CommandNode<C> node,
             final @NonNull String input
     ) {
-        if (this.findMissingPermission(context.commandContext().getSender(), node) != null) {
+        if (this.findMissingPermission(context.commandContext().sender(), node) != null) {
             return CompletableFuture.completedFuture(context);
         }
         final CommandComponent<C> component = Objects.requireNonNull(node.component());
@@ -931,7 +931,7 @@ public final class CommandTree<C> {
             final boolean isParsingFlag = component.type() == CommandComponent.ComponentType.FLAG
                     && !node.children().isEmpty() // Has children
                     && !text.startsWith("-") // Not a flag
-                    && !context.commandContext().getOptional(CommandFlagParser.FLAG_META_KEY).isPresent();
+                    && !context.commandContext().optional(CommandFlagParser.FLAG_META_KEY).isPresent();
 
             if (!isParsingFlag) {
                 return CompletableFuture.completedFuture(ctx);

@@ -65,7 +65,6 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
-import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.tasks.TaskFactory;
 import cloud.commandframework.tasks.TaskRecipe;
 import io.leangen.geantyref.TypeToken;
@@ -274,16 +273,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     }
 
     /**
-     * Create default command meta data
-     *
-     * @return Meta data
-     */
-    @Override
-    public @NonNull CommandMeta createDefaultCommandMeta() {
-        return CommandMeta.simple().build();
-    }
-
-    /**
      * Get the command sender mapper
      *
      * @return Command sender mapper
@@ -443,33 +432,33 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
 
     private void registerDefaultExceptionHandlers() {
         this.exceptionController().registerHandler(Throwable.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().getSender()).sendMessage(MESSAGE_INTERNAL_ERROR);
+            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(MESSAGE_INTERNAL_ERROR);
             this.owningPlugin.getLogger().log(
                     Level.SEVERE,
                     "An unhandled exception was thrown during command execution",
                     context.exception()
             );
         }).registerHandler(CommandExecutionException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().getSender()).sendMessage(MESSAGE_INTERNAL_ERROR);
+            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(MESSAGE_INTERNAL_ERROR);
             this.owningPlugin.getLogger().log(
                     Level.SEVERE,
                     "Exception executing command handler",
                     context.exception().getCause()
             );
         }).registerHandler(ArgumentParseException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().getSender()).sendMessage(
+            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(
                     ChatColor.RED + "Invalid Command Argument: " + ChatColor.GRAY + context.exception().getCause().getMessage()
             );
         }).registerHandler(NoSuchCommandException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().getSender()).sendMessage(MESSAGE_UNKNOWN_COMMAND);
+            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(MESSAGE_UNKNOWN_COMMAND);
         }).registerHandler(NoPermissionException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().getSender()).sendMessage(MESSAGE_NO_PERMS);
+            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(MESSAGE_NO_PERMS);
         }).registerHandler(InvalidCommandSenderException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().getSender()).sendMessage(
+            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(
                     ChatColor.RED + context.exception().getMessage()
             );
         }).registerHandler(InvalidSyntaxException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().getSender()).sendMessage(
+            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(
                     ChatColor.RED + "Invalid Command Syntax. Correct command syntax is: "
                             + ChatColor.GRAY + context.exception().getCorrectSyntax()
             );

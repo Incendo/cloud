@@ -52,7 +52,7 @@ import static java.util.Objects.requireNonNull;
  * @param <T> the value type of the argument
  * @since 1.5.0
  */
-public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> {
+public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> {
 
     public static final String COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER = "_cloud_brigadier_native_sender";
 
@@ -134,23 +134,17 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
      * @return the argument type
      * @since 1.5.0
      */
-    public ArgumentType<T> getNativeArgument() {
+    public final ArgumentType<T> getNativeArgument() {
         return this.nativeType.get();
     }
 
     @Override
-    public @NonNull ArgumentParseResult<@NonNull T> parse(
+    public final @NonNull ArgumentParseResult<@NonNull T> parse(
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
         // Convert to a brig reader
-        final StringReader reader;
-
-        if (commandInput instanceof StringReader) {
-            reader = (StringReader) commandInput;
-        } else {
-            reader = CloudStringReader.of(commandInput);
-        }
+        final StringReader reader = CloudStringReader.of(commandInput);
 
         // Then try to parse
         try {
@@ -166,7 +160,7 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public final @NonNull List<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
@@ -176,8 +170,8 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
          * is use it to query data on the native sender. Hopefully this hack holds up.
          */
         final com.mojang.brigadier.context.CommandContext<Object> reverseMappedContext = new com.mojang.brigadier.context.CommandContext<>(
-                commandContext.getOrDefault(COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER, commandContext.getSender()),
-                commandContext.getRawInputJoined(),
+                commandContext.getOrDefault(COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER, commandContext.sender()),
+                commandContext.rawInput().input(),
                 Collections.emptyMap(),
                 null,
                 null,
@@ -203,12 +197,12 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
     }
 
     @Override
-    public boolean isContextFree() {
+    public final boolean isContextFree() {
         return true;
     }
 
     @Override
-    public int getRequestedArgumentCount() {
+    public final int getRequestedArgumentCount() {
         return this.expectedArgumentCount;
     }
 

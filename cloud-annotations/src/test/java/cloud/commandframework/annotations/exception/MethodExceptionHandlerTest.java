@@ -33,7 +33,6 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.exceptions.handling.ExceptionContext;
 import cloud.commandframework.exceptions.handling.ExceptionController;
 import java.util.Collections;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,7 +50,7 @@ class MethodExceptionHandlerTest {
         final CommandManager<TestCommandSender> commandManager = new TestCommandManager();
         this.exceptionController = commandManager.exceptionController();
         this.annotationParser = new AnnotationParser<>(commandManager, TestCommandSender.class);
-        this.context = commandManager.commandContextFactory().create(false, new TestCommandSender(), commandManager);
+        this.context = commandManager.commandContextFactory().create(false, new TestCommandSender());
         commandManager.parameterInjectorRegistry().registerInjector(Integer.class, ParameterInjector.constantInjector(5));
     }
 
@@ -63,7 +62,7 @@ class MethodExceptionHandlerTest {
         // Act
         this.exceptionController.handleException(
                 this.context,
-                new NoSuchCommandException(this.context.getSender(), Collections.emptyList(), "")
+                new NoSuchCommandException(this.context.sender(), Collections.emptyList(), "")
         );
 
         // Assert

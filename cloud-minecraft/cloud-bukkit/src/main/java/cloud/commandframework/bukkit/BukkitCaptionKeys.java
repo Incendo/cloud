@@ -38,27 +38,27 @@ public final class BukkitCaptionKeys {
     private static final Collection<Caption> RECOGNIZED_CAPTIONS = new LinkedList<>();
 
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_ENCHANTMENT = of("argument.parse.failure.enchantment");
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_MATERIAL = of("argument.parse.failure.material");
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_OFFLINEPLAYER = of("argument.parse.failure.offlineplayer");
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_PLAYER = of("argument.parse.failure.player");
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_WORLD = of("argument.parse.failure.world");
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      *
      * @deprecated parsing is now handled by Brigadier and will throw {@link com.mojang.brigadier.exceptions.CommandSyntaxException} instead.
      */
@@ -97,7 +97,7 @@ public final class BukkitCaptionKeys {
     public static final Caption ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER = of(
             "argument.parse.failure.selector.non_player_in_player_selector");
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT = of(
             "argument.parse.failure.location.invalid_format");
@@ -107,21 +107,21 @@ public final class BukkitCaptionKeys {
     public static final Caption ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE = of(
             "argument.parse.failure.location.mixed_local_absolute");
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      *
      * @since 1.7.0
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NAMESPACE =
             of("argument.parse.failure.namespacedkey.namespace");
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      *
      * @since 1.7.0
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY =
             of("argument.parse.failure.namespacedkey.key");
     /**
-     * Variables: {input}
+     * Variables: {@code <input>}
      *
      * @since 1.7.0
      */

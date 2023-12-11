@@ -38,7 +38,6 @@ import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -72,7 +71,7 @@ class AnnotationParserTest {
     @BeforeAll
     void setup() {
         manager = new TestCommandManager();
-        annotationParser = new AnnotationParser<>(manager, TestCommandSender.class, p -> SimpleCommandMeta.empty());
+        annotationParser = new AnnotationParser<>(manager, TestCommandSender.class);
         manager.parserRegistry().registerNamedParserSupplier("potato", p -> new StringParser<>(StringParser.StringMode.SINGLE));
         /* Register a suggestion provider */
         manager.parserRegistry().registerSuggestionProvider(
@@ -228,7 +227,7 @@ class AnnotationParserTest {
     public void testCommand(
             final TestCommandSender sender,
             @Argument("int") @Range(max = "100") final int argument,
-            @Argument(value = "string", defaultValue = "potato", parserName = "potato") final String string
+            @Argument(value = "string", parserName = "potato") @Default("potato") final String string
     ) {
         System.out.printf("Received int: %d and string '%s'\n", argument, string);
     }

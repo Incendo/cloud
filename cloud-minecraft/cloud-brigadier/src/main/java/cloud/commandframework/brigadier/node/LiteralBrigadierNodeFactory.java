@@ -287,15 +287,15 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
 
         final SuggestionProvider<S> suggestionProvider = mapping.makeSuggestionProvider(argumentParser);
         if (suggestionProvider == BrigadierMapping.delegateSuggestions()) {
-            return new ArgumentMapping<>(
-                    (ArgumentType) ((Function) mapping.mapper()).apply(argumentParser),
-                    SuggestionsType.CLOUD_SUGGESTIONS
-            );
+            return ImmutableArgumentMapping.<S>builder()
+                    .argumentType((ArgumentType) ((Function) mapping.mapper()).apply(argumentParser))
+                    .suggestionsType(SuggestionsType.CLOUD_SUGGESTIONS)
+                    .build();
         }
-        return new ArgumentMapping<>(
-                (ArgumentType) ((Function) mapping.mapper()).apply(argumentParser),
-                suggestionProvider
-        );
+        return ImmutableArgumentMapping.<S>builder()
+                .argumentType((ArgumentType) ((Function) mapping.mapper()).apply(argumentParser))
+                .suggestionProvider(suggestionProvider)
+                .build();
     }
 
     /**
@@ -311,9 +311,14 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
         if (argumentTypeSupplier != null) {
             final ArgumentType<?> argumentType = argumentTypeSupplier.create();
             if (argumentType != null) {
-                return new ArgumentMapping<>(argumentType);
+                return ImmutableArgumentMapping.<S>builder()
+                        .argumentType(argumentType)
+                        .build();
             }
         }
-        return new ArgumentMapping<>(StringArgumentType.word(), SuggestionsType.CLOUD_SUGGESTIONS);
+        return ImmutableArgumentMapping.<S>builder()
+                .argumentType(StringArgumentType.word())
+                .suggestionsType(SuggestionsType.CLOUD_SUGGESTIONS)
+                .build();
     }
 }

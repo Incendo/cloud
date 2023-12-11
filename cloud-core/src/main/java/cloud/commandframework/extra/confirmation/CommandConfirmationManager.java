@@ -27,8 +27,8 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessingContext;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
-import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.meta.CommandMetaBuilder;
 import cloud.commandframework.services.types.ConsumerService;
 import cloud.commandframework.types.tuples.Pair;
 import java.util.LinkedHashMap;
@@ -48,7 +48,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * {@link #registerConfirmationProcessor(CommandManager)}. After this is done, a confirmation command has
  * been added. To do this, create a command builder and attach {@link #createConfirmationExecutionHandler()}.
  * <p>
- * To require a command to be confirmed, use {@link #decorate(SimpleCommandMeta.Builder)} on the command meta builder.
+ * To require a command to be confirmed, use {@link #decorate(CommandMetaBuilder)} on the command meta builder.
  *
  * @param <C> Command sender type
  */
@@ -61,9 +61,9 @@ public class CommandConfirmationManager<C> {
      * @since 1.3.0
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
-    public static final CommandMeta.Key<Boolean> META_CONFIRMATION_REQUIRED = CommandMeta.Key.of(
-            Boolean.class,
-            "cloud:require_confirmation"
+    public static final CloudKey<Boolean> META_CONFIRMATION_REQUIRED = CloudKey.of(
+            "cloud:require_confirmation",
+            Boolean.class
     );
     private static final int MAXIMUM_PENDING_SIZE = 100;
 
@@ -103,7 +103,7 @@ public class CommandConfirmationManager<C> {
     }
 
     private void addPending(final @NonNull CommandPostprocessingContext<C> context) {
-        this.pendingCommands.put(context.getCommandContext().getSender(), Pair.of(context, System.currentTimeMillis()));
+        this.pendingCommands.put(context.getCommandContext().sender(), Pair.of(context, System.currentTimeMillis()));
     }
 
     /**
@@ -128,7 +128,7 @@ public class CommandConfirmationManager<C> {
      * @param builder Command meta builder
      * @return Builder instance
      */
-    public SimpleCommandMeta.@NonNull Builder decorate(final SimpleCommandMeta.@NonNull Builder builder) {
+    public @NonNull CommandMetaBuilder decorate(final @NonNull CommandMetaBuilder builder) {
         return builder.with(META_CONFIRMATION_REQUIRED, true);
     }
 
@@ -148,14 +148,14 @@ public class CommandConfirmationManager<C> {
      */
     public @NonNull CommandExecutionHandler<C> createConfirmationExecutionHandler() {
         return (CommandExecutionHandler.FutureCommandExecutionHandler<C>) context -> {
-            final Optional<CommandPostprocessingContext<C>> pending = this.getPending(context.getSender());
+            final Optional<CommandPostprocessingContext<C>> pending = this.getPending(context.sender());
             if (pending.isPresent()) {
                 final CommandPostprocessingContext<C> postprocessingContext = pending.get();
                 return postprocessingContext.getCommand()
                         .commandExecutionHandler()
                         .executeFuture(postprocessingContext.getCommandContext());
             } else {
-                this.errorNotifier.accept(context.getSender());
+                this.errorNotifier.accept(context.sender());
             }
             return CompletableFuture.completedFuture(null);
         };

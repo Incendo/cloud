@@ -25,7 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
-import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.services.types.ConsumerService;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Assertions;
@@ -42,15 +42,15 @@ public class CommandPreProcessorTest {
     @BeforeAll
     static void newTree() {
         manager = createManager();
-        manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
+        manager.command(manager.commandBuilder("test", CommandMeta.empty())
                 .required("enum", enumParser(SampleEnum.class))
                 .handler(
                         commandContext -> System.out.printf(
                                 "enum = %s | integer = %d\n",
-                                commandContext.<SampleEnum>getOptional(
+                                commandContext.<SampleEnum>optional(
                                         "enum").orElse(
                                         SampleEnum.VALUE1),
-                                commandContext.<Integer>getOptional(
+                                commandContext.<Integer>optional(
                                         "int").orElseThrow(
                                         () -> new NullPointerException(
                                                 "int"))
@@ -62,7 +62,7 @@ public class CommandPreProcessorTest {
     @Test
     void testPreprocessing() {
         Assertions.assertEquals(10, manager.executeCommand(new TestCommandSender(), "10 test value1")
-                .join().getCommandContext().<Integer>getOptional("int").orElse(0));
+                .join().getCommandContext().<Integer>optional("int").orElse(0));
         manager.executeCommand(new TestCommandSender(), "aa test value1").join();
     }
 

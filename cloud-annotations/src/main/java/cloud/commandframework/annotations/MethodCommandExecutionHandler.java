@@ -132,7 +132,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
                 if (commandComponent.required()) {
                     arguments.add(new ParameterValue(parameter, argumentDescriptor, commandContext.get(argumentName)));
                 } else {
-                    final Object optional = commandContext.getOptional(argumentName).orElse(null);
+                    final Object optional = commandContext.optional(argumentName).orElse(null);
                     arguments.add(new ParameterValue(parameter, argumentDescriptor, optional));
                 }
             } else if (flagDescriptor != null) {
@@ -162,8 +162,8 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
                     );
                 }
             } else {
-                if (parameter.getType().isAssignableFrom(commandContext.getSender().getClass())) {
-                    arguments.add(new ParameterValue(parameter, null, commandContext.getSender()));
+                if (parameter.getType().isAssignableFrom(commandContext.sender().getClass())) {
+                    arguments.add(new ParameterValue(parameter, null, commandContext.sender()));
                 } else {
                     final Optional<?> value = this.context.injectorRegistry.getInjectable(
                             parameter.getType(),

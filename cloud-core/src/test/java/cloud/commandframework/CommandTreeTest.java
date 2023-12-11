@@ -32,8 +32,8 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.AmbiguousNodeException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.execution.CommandExecutionHandler;
-import cloud.commandframework.keys.SimpleCloudKey;
-import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.meta.CommandMeta;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collections;
 import java.util.List;
@@ -78,16 +78,16 @@ class CommandTreeTest {
         // Arrange
         final int defaultInputNumber = ThreadLocalRandom.current().nextInt();
         this.commandManager.command(
-                this.commandManager.commandBuilder("test", SimpleCommandMeta.empty())
+                this.commandManager.commandBuilder("test", CommandMeta.empty())
                         .literal("one")
                         .build()
         ).command(
-                this.commandManager.commandBuilder("test", SimpleCommandMeta.empty())
+                this.commandManager.commandBuilder("test", CommandMeta.empty())
                         .literal("two")
                         .permission("no")
                         .build()
         ).command(
-                this.commandManager.commandBuilder("test", SimpleCommandMeta.empty())
+                this.commandManager.commandBuilder("test", CommandMeta.empty())
                         .literal("opt")
                         .optional("num", integerParser(), DefaultValue.constant(defaultInputNumber))
                         .build()
@@ -124,7 +124,7 @@ class CommandTreeTest {
         // Arrange
         final int defaultInputNumber = ThreadLocalRandom.current().nextInt();
         final Command<TestCommandSender> command = this.commandManager.commandBuilder(
-                        "test", Collections.singleton("other"), SimpleCommandMeta.empty()
+                        "test", Collections.singleton("other"), CommandMeta.empty()
                 ).literal("opt", "öpt")
                 .optional("num", integerParser(), DefaultValue.constant(defaultInputNumber))
                 .build();
@@ -185,7 +185,7 @@ class CommandTreeTest {
         verify(executionHandler).executeFuture(contextArgumentCaptor.capture());
 
         final CommandContext<TestCommandSender> context = contextArgumentCaptor.getValue();
-        assertThat(context.get(SimpleCloudKey.of("int", TypeToken.get(Integer.class)))).isEqualTo(5);
+        assertThat(context.get(CloudKey.of("int", TypeToken.get(Integer.class)))).isEqualTo(5);
     }
 
     @Test
@@ -569,8 +569,8 @@ class CommandTreeTest {
         verify(executionHandler).executeFuture(contextArgumentCaptor.capture());
 
         final CommandContext<TestCommandSender> context = contextArgumentCaptor.getValue();
-        assertThat(context.getOrDefault(SimpleCloudKey.of("opt1", TypeToken.get(String.class)), null)).isNull();
-        assertThat(context.getOrDefault(SimpleCloudKey.of("opt2", TypeToken.get(String.class)), null)).isNull();
+        assertThat(context.getOrDefault(CloudKey.of("opt1", TypeToken.get(String.class)), null)).isNull();
+        assertThat(context.getOrDefault(CloudKey.of("opt2", TypeToken.get(String.class)), null)).isNull();
     }
 
     enum FlagEnum {

@@ -30,11 +30,11 @@ import cloud.commandframework.annotations.ArgumentExtractor;
 import cloud.commandframework.annotations.ArgumentMode;
 import cloud.commandframework.annotations.CommandDescriptor;
 import cloud.commandframework.annotations.CommandExtractor;
+import cloud.commandframework.annotations.ImmutableCommandDescriptor;
 import cloud.commandframework.annotations.SyntaxFragment;
 import cloud.commandframework.annotations.SyntaxParser;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -62,8 +62,7 @@ class ArgumentDrivenCommandsTest {
         this.commandManager = new TestCommandManager();
         this.annotationParser = new AnnotationParser<>(
                 this.commandManager,
-                TestCommandSender.class,
-                p -> SimpleCommandMeta.empty()
+                TestCommandSender.class
         );
     }
 
@@ -96,7 +95,7 @@ class ArgumentDrivenCommandsTest {
                 }
                 final ArgumentDescriptor argumentDescriptor = ArgumentDescriptor.builder()
                         .parameter(parameter)
-                        .name(AnnotationParser.INFERRED_ARGUMENT_NAME)
+                        .name(parameter.getName())
                         .build();
                 arguments.add(argumentDescriptor);
             }
@@ -157,13 +156,14 @@ class ArgumentDrivenCommandsTest {
                 if (!commandMethod) {
                     continue;
                 }
+
                 commandDescriptors.add(
-                        new CommandDescriptor(
-                                method,
-                                this.annotationParser.syntaxParser().parseSyntax(method, ""),
-                                commandName,
-                                Object.class
-                        )
+                        ImmutableCommandDescriptor.builder()
+                                .method(method)
+                                .syntax(this.annotationParser.syntaxParser().parseSyntax(method, ""))
+                                .commandToken(commandName)
+                                .requiredSender(Object.class)
+                                .build()
                 );
             }
             return commandDescriptors;

@@ -23,14 +23,17 @@
 //
 package cloud.commandframework.annotations.issue;
 
-import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
-import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.help.HelpHandler;
+import cloud.commandframework.help.HelpQuery;
+import cloud.commandframework.help.result.HelpQueryResult;
+import cloud.commandframework.help.result.MultipleCommandResult;
+import cloud.commandframework.help.result.VerboseCommandResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,18 +50,17 @@ import static com.google.common.truth.Truth.assertThat;
 @ExtendWith(MockitoExtension.class)
 class Issue262 {
 
-    private CommandHelpHandler<TestCommandSender> commandHelpHandler;
+    private HelpHandler<TestCommandSender> commandHelpHandler;
     private CommandManager<TestCommandSender> manager;
     private AnnotationParser<TestCommandSender> annotationParser;
 
     @BeforeEach
     void setup() {
         this.manager = new TestCommandManager();
-        this.commandHelpHandler = this.manager.createCommandHelpHandler();
+        this.commandHelpHandler = this.manager.createHelpHandler();
         this.annotationParser = new AnnotationParser<>(
                 this.manager,
-                TestCommandSender.class,
-                (parameters) -> SimpleCommandMeta.empty()
+                TestCommandSender.class
         );
     }
 
@@ -68,14 +70,16 @@ class Issue262 {
         this.annotationParser.parse(this);
 
         // Act
-        final CommandHelpHandler.HelpTopic<TestCommandSender> result = this.commandHelpHandler.queryHelp("cc sub2");
+        final HelpQueryResult<TestCommandSender> result = this.commandHelpHandler.query(
+                HelpQuery.of(new TestCommandSender(), "cc sub2")
+        );
 
         // Assert
-        assertThat(result).isInstanceOf(CommandHelpHandler.VerboseHelpTopic.class);
+        assertThat(result).isInstanceOf(VerboseCommandResult.class);
 
-        final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> topic =
-                (CommandHelpHandler.VerboseHelpTopic<TestCommandSender>) result;
-        assertThat(topic.command().toString()).isEqualTo("cloudcommand sub2 argument");
+        final VerboseCommandResult<TestCommandSender> topic =
+                (VerboseCommandResult<TestCommandSender>) result;
+        assertThat(topic.entry().command().toString()).isEqualTo("cloudcommand sub2 argument");
     }
 
     @Test
@@ -84,14 +88,16 @@ class Issue262 {
         this.annotationParser.parse(this);
 
         // Act
-        final CommandHelpHandler.HelpTopic<TestCommandSender> result = this.commandHelpHandler.queryHelp("cc s");
+        final HelpQueryResult<TestCommandSender> result = this.commandHelpHandler.query(
+                HelpQuery.of(new TestCommandSender(), "cc s")
+        );
 
         // Assert
-        assertThat(result).isInstanceOf(CommandHelpHandler.VerboseHelpTopic.class);
+        assertThat(result).isInstanceOf(VerboseCommandResult.class);
 
-        final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> topic =
-                (CommandHelpHandler.VerboseHelpTopic<TestCommandSender>) result;
-        assertThat(topic.command().toString()).isEqualTo("cloudcommand sub2 argument");
+        final VerboseCommandResult<TestCommandSender> topic =
+                (VerboseCommandResult<TestCommandSender>) result;
+        assertThat(topic.entry().command().toString()).isEqualTo("cloudcommand sub2 argument");
     }
 
     @Test
@@ -100,16 +106,16 @@ class Issue262 {
         this.annotationParser.parse(this);
 
         // Act
-        final CommandHelpHandler.HelpTopic<TestCommandSender> result = this.commandHelpHandler.queryHelp(
-                "cloudcommand sub2"
+        final HelpQueryResult<TestCommandSender> result = this.commandHelpHandler.query(
+                HelpQuery.of(new TestCommandSender(), "cloudcommand sub2")
         );
 
         // Assert
-        assertThat(result).isInstanceOf(CommandHelpHandler.VerboseHelpTopic.class);
+        assertThat(result).isInstanceOf(VerboseCommandResult.class);
 
-        final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> topic =
-                (CommandHelpHandler.VerboseHelpTopic<TestCommandSender>) result;
-        assertThat(topic.command().toString()).isEqualTo("cloudcommand sub2 argument");
+        final VerboseCommandResult<TestCommandSender> topic =
+                (VerboseCommandResult<TestCommandSender>) result;
+        assertThat(topic.entry().command().toString()).isEqualTo("cloudcommand sub2 argument");
     }
 
     @Test
@@ -118,16 +124,16 @@ class Issue262 {
         this.annotationParser.parse(this);
 
         // Act
-        final CommandHelpHandler.HelpTopic<TestCommandSender> result = this.commandHelpHandler.queryHelp(
-                "cloudcommand sub1"
+        final HelpQueryResult<TestCommandSender> result = this.commandHelpHandler.query(
+                HelpQuery.of(new TestCommandSender(), "cloudcommand sub1")
         );
 
         // Assert
-        assertThat(result).isInstanceOf(CommandHelpHandler.VerboseHelpTopic.class);
+        assertThat(result).isInstanceOf(VerboseCommandResult.class);
 
-        final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> topic =
-                (CommandHelpHandler.VerboseHelpTopic<TestCommandSender>) result;
-        assertThat(topic.command().toString()).isEqualTo("cloudcommand sub1 argument");
+        final VerboseCommandResult<TestCommandSender> topic =
+                (VerboseCommandResult<TestCommandSender>) result;
+        assertThat(topic.entry().command().toString()).isEqualTo("cloudcommand sub1 argument");
     }
 
     @Test
@@ -136,20 +142,20 @@ class Issue262 {
         this.annotationParser.parse(this);
 
         // Act
-        final CommandHelpHandler.HelpTopic<TestCommandSender> result = this.commandHelpHandler.queryHelp(
-                "cc"
+        final HelpQueryResult<TestCommandSender> result = this.commandHelpHandler.query(
+                HelpQuery.of(new TestCommandSender(), "cc")
         );
 
         // Assert
-        assertThat(result).isInstanceOf(CommandHelpHandler.MultiHelpTopic.class);
+        assertThat(result).isInstanceOf(MultipleCommandResult.class);
 
-        final CommandHelpHandler.MultiHelpTopic<TestCommandSender> topic =
-                (CommandHelpHandler.MultiHelpTopic<TestCommandSender>) result;
-        assertThat(topic.getChildSuggestions()).containsExactly(
+        final MultipleCommandResult<TestCommandSender> topic =
+                (MultipleCommandResult<TestCommandSender>) result;
+        assertThat(topic.childSuggestions()).containsExactly(
                 "cloudcommand sub1 [argument]",
                 "cloudcommand sub2 [argument]"
         );
-        assertThat(topic.getLongestPath()).isEqualTo("cloudcommand");
+        assertThat(topic.longestPath()).isEqualTo("cloudcommand");
     }
 
     @CommandMethod("cloudcommand|cc sub1 [argument]")

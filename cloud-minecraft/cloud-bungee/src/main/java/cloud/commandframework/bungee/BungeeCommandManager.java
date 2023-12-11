@@ -25,8 +25,8 @@ package cloud.commandframework.bungee;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.bungee.arguments.PlayerArgument;
-import cloud.commandframework.bungee.arguments.ServerArgument;
+import cloud.commandframework.bungee.arguments.PlayerParser;
+import cloud.commandframework.bungee.arguments.ServerParser;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
@@ -36,7 +36,6 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -59,12 +58,12 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
     /**
      * Default caption for {@link BungeeCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'{input}' is not a valid player";
+    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'<input>' is not a valid player";
 
     /**
      * Default caption for {@link BungeeCaptionKeys#ARGUMENT_PARSE_FAILURE_SERVER}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'{input}' is not a valid server";
+    public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'<input>' is not a valid server";
 
     private final Plugin owningPlugin;
     private final Function<CommandSender, C> commandSenderMapper;
@@ -101,9 +100,9 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
 
         /* Register Bungee Parsers */
         this.parserRegistry().registerParserSupplier(TypeToken.get(ProxiedPlayer.class), parserParameters ->
-                new PlayerArgument.PlayerParser<>());
+                new PlayerParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(ServerInfo.class), parserParameters ->
-                new ServerArgument.ServerParser<>());
+                new ServerParser<>());
 
         /* Register default captions */
         if (this.captionRegistry() instanceof FactoryDelegatingCaptionRegistry) {
@@ -133,11 +132,6 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
     }
 
-    @Override
-    public final @NonNull SimpleCommandMeta createDefaultCommandMeta() {
-        return SimpleCommandMeta.empty();
-    }
-
     final @NonNull Function<@NonNull CommandSender, @NonNull C> getCommandSenderMapper() {
         return this.commandSenderMapper;
     }
@@ -153,14 +147,14 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
 
     private void registerDefaultExceptionHandlers() {
         this.exceptionController().registerHandler(Throwable.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().getSender())
+            this.backwardsCommandSenderMapper.apply(context.context().sender())
                     .sendMessage(new ComponentBuilder(MESSAGE_INTERNAL_ERROR).color(ChatColor.RED).create());
             this.owningPlugin.getLogger().log(
                     Level.SEVERE,
                     "An unhandled exception was thrown during command execution",
                     context.exception());
         }).registerHandler(CommandExecutionException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().getSender())
+            this.backwardsCommandSenderMapper.apply(context.context().sender())
                     .sendMessage(new ComponentBuilder(MESSAGE_INTERNAL_ERROR)
                     .color(ChatColor.RED)
                     .create());
@@ -170,19 +164,19 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
                     context.exception().getCause()
             );
         }).registerHandler(ArgumentParseException.class, context -> this.backwardsCommandSenderMapper.apply(
-                context.context().getSender()).sendMessage(new ComponentBuilder("Invalid Command Argument: ")
+                context.context().sender()).sendMessage(new ComponentBuilder("Invalid Command Argument: ")
                 .color(ChatColor.GRAY).append(context.exception().getCause().getMessage()).create())
         ).registerHandler(NoSuchCommandException.class, context -> this.backwardsCommandSenderMapper.apply(
-                context.context().getSender()).sendMessage(new ComponentBuilder(MESSAGE_UNKNOWN_COMMAND)
+                context.context().sender()).sendMessage(new ComponentBuilder(MESSAGE_UNKNOWN_COMMAND)
                 .color(ChatColor.WHITE).create())
         ).registerHandler(NoPermissionException.class, context -> this.backwardsCommandSenderMapper.apply(
-                context.context().getSender()).sendMessage(new ComponentBuilder(MESSAGE_NO_PERMS)
+                context.context().sender()).sendMessage(new ComponentBuilder(MESSAGE_NO_PERMS)
                 .color(ChatColor.WHITE).create())
         ).registerHandler(InvalidCommandSenderException.class, context -> this.backwardsCommandSenderMapper.apply(
-                context.context().getSender()).sendMessage(new ComponentBuilder(context.exception().getMessage())
+                context.context().sender()).sendMessage(new ComponentBuilder(context.exception().getMessage())
                 .color(ChatColor.RED).create())
         ).registerHandler(InvalidSyntaxException.class, context -> this.backwardsCommandSenderMapper.apply(
-                context.context().getSender()).sendMessage(new ComponentBuilder(
+                context.context().sender()).sendMessage(new ComponentBuilder(
                         "Invalid Command Syntax. Correct command syntax is: ").color(ChatColor.RED).append("/")
                         .color(ChatColor.GRAY).append(context.exception().getCorrectSyntax()).color(ChatColor.GRAY).create()
         ));

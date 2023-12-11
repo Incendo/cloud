@@ -28,12 +28,11 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationAccessor;
 import cloud.commandframework.arguments.flags.FlagContext;
 import cloud.commandframework.captions.Caption;
+import cloud.commandframework.captions.CaptionFormatter;
 import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.captions.CaptionVariable;
-import cloud.commandframework.captions.CaptionVariableReplacementHandler;
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.CloudKeyHolder;
-import cloud.commandframework.keys.SimpleCloudKey;
+import cloud.commandframework.keys.MutableCloudKeyContainer;
 import cloud.commandframework.permission.CommandPermission;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,7 +42,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -54,9 +52,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  */
 @API(status = API.Status.STABLE)
-public class CommandContext<C> {
+public class CommandContext<C> implements MutableCloudKeyContainer {
 
-    private final CaptionVariableReplacementHandler captionVariableReplacementHandler;
     private final List<ParsingContext<C>> parsingContexts = new LinkedList<>();
     private final FlagContext flagContext = FlagContext.create();
     private final Map<CloudKey<?>, Object> internalStorage = new HashMap<>();
@@ -68,10 +65,10 @@ public class CommandContext<C> {
     private CommandComponent<C> currentComponent = null;
 
     /**
-     * Create a new command context instance
+     * Creates a new command context instance.
      *
-     * @param commandSender  Sender of the command
-     * @param commandManager Command manager
+     * @param commandSender  the sender of the command
+     * @param commandManager command manager
      * @since 1.3.0
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
@@ -80,11 +77,11 @@ public class CommandContext<C> {
     }
 
     /**
-     * Create a new command context instance
+     * Creates a new command context instance.
      *
-     * @param suggestions    Whether the context is created for command suggestions
-     * @param commandSender  Sender of the command
-     * @param commandManager Command manager
+     * @param suggestions    whether the context is created for command suggestions
+     * @param commandSender  the sender of the command
+     * @param commandManager command manager
      * @since 1.3.0
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
@@ -97,40 +94,60 @@ public class CommandContext<C> {
         this.suggestions = suggestions;
         this.commandManager = commandManager;
         this.captionRegistry = commandManager.captionRegistry();
-        this.captionVariableReplacementHandler = commandManager.captionVariableReplacementHandler();
     }
 
     /**
-     * Format a caption
+     * Formats a {@code caption} using the {@link CommandManager#captionFormatter()}.
      *
-     * @param caption   Caption key
-     * @param variables Replacements
-     * @return Formatted message
+     * @param caption   the caption key
+     * @param variables the variables to use during formatting
+     * @return the formatted caption
      */
-    public @NonNull String formatMessage(
+    public @NonNull String formatCaption(
             final @NonNull Caption caption,
-            final @NonNull CaptionVariable... variables
+            final @NonNull CaptionVariable @NonNull... variables
     ) {
-        return this.captionVariableReplacementHandler.replaceVariables(
-                this.captionRegistry.getCaption(caption, this.commandSender),
+        return this.formatCaption(this.commandManager.captionFormatter(), caption, variables);
+    }
+
+    /**
+     * Formats a {@code caption} using the given {@code formatter}.
+     *
+     * @param <T>       the message type produced by the formatter
+     * @param formatter the formatter
+     * @param caption   the caption key
+     * @param variables the variables to use during formatting
+     * @return the formatted caption
+     */
+    public <T> @NonNull T formatCaption(
+            final @NonNull CaptionFormatter<C, T> formatter,
+            final @NonNull Caption caption,
+            final @NonNull CaptionVariable @NonNull... variables
+    ) {
+        return formatter.formatCaption(
+                caption,
+                this.commandSender,
+                this.captionRegistry.caption(caption, this.commandSender),
                 variables
         );
     }
 
     /**
-     * Get the sender that executed the command
+     * Returns the sender that executed the command.
      *
-     * @return Command sender
+     * @return the command sender
+     * @since 2.0.0
      */
-    public @NonNull C getSender() {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull C sender() {
         return this.commandSender;
     }
 
     /**
-     * Check whether the sender that executed the command has a permission.
+     * Checks whether the sender that executed the command has a permission.
      *
-     * @param permission The permission
-     * @return Command sender
+     * @param permission the permission
+     * @return {@code true} if the {@link #sender()} has the permission, else {@code false}
      * @since 1.6.0
      */
     @API(status = API.Status.STABLE, since = "1.6.0")
@@ -139,10 +156,10 @@ public class CommandContext<C> {
     }
 
     /**
-     * Check whether the sender that executed the command has a permission.
+     * Checks whether the sender that executed the command has a permission.
      *
-     * @param permission The permission
-     * @return Command sender
+     * @param permission the permission
+     * @return {@code true} if the {@link #sender()} has the permission, else {@code false}
      * @since 1.6.0
      */
     @API(status = API.Status.STABLE, since = "1.6.0")
@@ -151,7 +168,7 @@ public class CommandContext<C> {
     }
 
     /**
-     * Check if this context was created for tab completion purposes
+     * Checks if this context was created for tab completion purposes.
      *
      * @return {@code true} if this context is requesting suggestions, else {@code false}
      */
@@ -160,149 +177,34 @@ public class CommandContext<C> {
     }
 
     /**
-     * Store a value in the context map. This will overwrite any existing
-     * value stored with the same key
-     *
-     * @param key   Key
-     * @param value Value
-     * @param <T>   Value type
+     * {@inheritDoc}
      */
+    @Override
     public <T extends @NonNull Object> void store(final @NonNull String key, final T value) {
-        this.internalStorage.put(SimpleCloudKey.of(key), value);
+        this.internalStorage.put(CloudKey.of(key), value);
     }
 
     /**
-     * Store a value in the context map. This will overwrite any existing
-     * value stored with the same key
-     *
-     * @param key   Key
-     * @param value Value
-     * @param <T>   Value type
+     * {@inheritDoc}
      */
+    @Override
     public <T extends @NonNull Object> void store(final @NonNull CloudKey<T> key, final T value) {
         this.internalStorage.put(key, value);
     }
 
     /**
-     * Store a value in the context map. This will overwrite any existing
-     * value stored with the same key
-     *
-     * @param keyHolder Holder of the identifying key
-     * @param value     Value
-     * @param <T>       Value type
-     * @since 1.4.0
+     * {@inheritDoc}
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public <T extends @NonNull Object> void store(final @NonNull CloudKeyHolder<T> keyHolder, final T value) {
-        this.internalStorage.put(keyHolder.getKey(), value);
-    }
-
-    /**
-     * Store or remove a value in the context map. This will overwrite any existing
-     * value stored with the same key.
-     * <p>
-     * If the provided value is {@code null}, any current value stored for the provided key will be removed.
-     *
-     * @param key   Key
-     * @param value Value
-     * @param <T>   Value type
-     * @since 1.3.0
-     */
-    @API(status = API.Status.STABLE, since = "1.3.0")
-    public <T> void set(final @NonNull String key, final @Nullable T value) {
-        if (value != null) {
-            this.store(key, value);
-        } else {
-            this.remove(key);
-        }
-    }
-
-    /**
-     * Store or remove a value in the context map. This will overwrite any existing
-     * value stored with the same key.
-     * <p>
-     * If the provided value is {@code null}, any current value stored for the provided key will be removed.
-     *
-     * @param key   Key
-     * @param value Value
-     * @param <T>   Value type
-     * @since 1.4.0
-     */
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public <T> void set(final @NonNull CloudKey<T> key, final @Nullable T value) {
-        if (value != null) {
-            this.store(key, value);
-        } else {
-            this.remove(key);
-        }
-    }
-
-    /**
-     * Check if the context has a value stored for a key
-     *
-     * @param key Key
-     * @return Whether the context has a value for the provided key
-     * @since 1.3.0
-     */
-    @API(status = API.Status.STABLE, since = "1.3.0")
-    public boolean contains(final @NonNull String key) {
-        return this.contains(SimpleCloudKey.of(key));
-    }
-
-    /**
-     * Check if the context has a value stored for a key
-     *
-     * @param key Key
-     * @return Whether the context has a value for the provided key
-     * @since 1.4.0
-     */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @Override
     public boolean contains(final @NonNull CloudKey<?> key) {
         return this.internalStorage.containsKey(key);
     }
 
     /**
-     * Get the current state of this command context as a map of String to context value.
-     *
-     * @return An immutable copy of this command context as a map
-     * @since 1.3.0
+     * {@inheritDoc}
      */
-    @API(status = API.Status.STABLE, since = "1.3.0")
-    public @NonNull Map<@NonNull String, @Nullable ?> asMap() {
-        final Map<String, Object> values = new HashMap<>();
-        this.internalStorage.forEach((key, value) -> values.put(key.getName(), value));
-        return Collections.unmodifiableMap(values);
-    }
-
-    /**
-     * Get a value from its key. Will return {@link Optional#empty()}
-     * if no value is stored with the given key
-     *
-     * @param key Key
-     * @param <T> Value type
-     * @return Value
-     */
-    public <T extends @NonNull Object> @NonNull Optional<T> getOptional(final @NonNull String key) {
-        final Object value = this.internalStorage.get(SimpleCloudKey.of(key));
-        if (value != null) {
-            @SuppressWarnings("unchecked") final T castedValue = (T) value;
-            return Optional.of(castedValue);
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    /**
-     * Get a value from its key. Will return {@link Optional#empty()}
-     * if no value is stored with the given key
-     *
-     * @param key Key
-     * @param <T> Value type
-     * @return Value
-     * @since 1.4.0
-     */
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public <T extends @NonNull Object> @NonNull Optional<T> getOptional(final @NonNull CloudKey<T> key) {
+    @Override
+    public <T extends @NonNull Object> @NonNull Optional<T> optional(final @NonNull CloudKey<T> key) {
         final Object value = this.internalStorage.get(key);
         if (value != null) {
             @SuppressWarnings("unchecked") final T castedValue = (T) value;
@@ -313,18 +215,11 @@ public class CommandContext<C> {
     }
 
     /**
-     * Get a value from its key. Will return {@link Optional#empty()}
-     * if no value is stored with the given key
-     *
-     * @param keyHolder Holder of the key
-     * @param <T>       Value type
-     * @return Value
-     * @since 1.4.0
+     * {@inheritDoc}
      */
-    @SuppressWarnings("unused")
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public <T extends @NonNull Object> @NonNull Optional<T> getOptional(final @NonNull CloudKeyHolder<T> keyHolder) {
-        final Object value = this.internalStorage.get(keyHolder.getKey());
+    @Override
+    public <T extends @NonNull Object> @NonNull Optional<T> optional(final @NonNull String key) {
+        final Object value = this.internalStorage.get(CloudKey.of(key));
         if (value != null) {
             @SuppressWarnings("unchecked") final T castedValue = (T) value;
             return Optional.of(castedValue);
@@ -334,188 +229,17 @@ public class CommandContext<C> {
     }
 
     /**
-     * Remove a stored value from the context
-     *
-     * @param key Key to remove
+     * {@inheritDoc}
      */
-    public void remove(final @NonNull String key) {
-        this.remove(SimpleCloudKey.of(key));
-    }
-
-    /**
-     * Remove a stored value from the context
-     *
-     * @param key Key to remove
-     * @since 1.4.0
-     */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @Override
     public void remove(final @NonNull CloudKey<?> key) {
         this.internalStorage.remove(key);
     }
 
     /**
-     * Get a required argument from the context. This will throw an exception
-     * if there's no value associated with the given key
-     *
-     * @param key Argument key
-     * @param <T> Argument type
-     * @return Argument
-     * @throws NullPointerException If no such argument is stored
+     * {@inheritDoc}
      */
-    @SuppressWarnings({"unchecked", "TypeParameterUnusedInFormals"})
-    public <T extends @NonNull Object> T get(final @NonNull String key) {
-        final Object value = this.internalStorage.get(SimpleCloudKey.of(key));
-        if (value == null) {
-            throw new NullPointerException("No such object stored in the context: " + key);
-        }
-        return (T) value;
-    }
-
-    /**
-     * Get a required argument from the context. This will throw an exception
-     * if there's no value associated with the given key
-     *
-     * @param key Argument key
-     * @param <T> Argument type
-     * @return Argument
-     * @throws NullPointerException If no such argument is stored
-     * @since 1.4.0
-     */
-    @SuppressWarnings({"unchecked", "TypeParameterUnusedInFormals"})
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public <T extends @NonNull Object> T get(final @NonNull CloudKey<T> key) {
-        final Object value = this.internalStorage.get(key);
-        if (value == null) {
-            throw new NullPointerException("No such object stored in the context: " + key);
-        }
-        return (T) value;
-    }
-
-    /**
-     * Get a required argument from the context. This will throw an exception
-     * if there's no value associated with the given argument
-     *
-     * @param keyHolder Holder of the identifying key
-     * @param <T>       Argument type
-     * @return Stored value
-     * @throws NullPointerException If no such value is stored
-     * @since 1.4.0
-     */
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public <T extends @NonNull Object> T get(final @NonNull CloudKeyHolder<T> keyHolder) {
-        return this.get(keyHolder.getKey());
-    }
-
-    /**
-     * Get a value if it exists, else return the provided default value
-     *
-     * @param key          Cloud key
-     * @param defaultValue Default value
-     * @param <T>          Value type
-     * @return Argument, or supplied default value
-     */
-    public <T> T getOrDefault(
-            final @NonNull String key,
-            final T defaultValue
-    ) {
-        return this.<@NonNull T>getOptional(key).orElse(defaultValue);
-    }
-
-    /**
-     * Get a value if it exists, else return the provided default value
-     *
-     * @param key          Cloud key
-     * @param defaultValue Default value
-     * @param <T>          Value type
-     * @return Argument, or supplied default value
-     * @since 1.4.0
-     */
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public <T> T getOrDefault(
-            final @NonNull CloudKey<@NonNull T> key,
-            final T defaultValue
-    ) {
-        return this.getOptional(key).orElse(defaultValue);
-    }
-
-    /**
-     * Get a value if it exists, else return the provided default value
-     *
-     * @param key          Cloud key
-     * @param defaultValue Default value
-     * @param <T>          Value type
-     * @return Argument, or supplied default value
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public <T> T getOrDefault(
-            final @NonNull CloudKeyHolder<@NonNull T> key,
-            final T defaultValue
-    ) {
-        return this.getOptional(key).orElse(defaultValue);
-    }
-
-    /**
-     * Get a value if it exists, else return the value supplied by the given supplier
-     *
-     * @param key             Cloud key
-     * @param defaultSupplier Supplier of default value
-     * @param <T>             Value type
-     * @return Argument, or supplied default value
-     * @since 1.2.0
-     */
-    @API(status = API.Status.STABLE, since = "1.2.0")
-    public <T> T getOrSupplyDefault(
-            final @NonNull String key,
-            final @NonNull Supplier<T> defaultSupplier
-    ) {
-        return this.<@NonNull T>getOptional(key).orElseGet(defaultSupplier);
-    }
-
-    /**
-     * Get a value if it exists, else return the value supplied by the given supplier
-     *
-     * @param key             Cloud key
-     * @param defaultSupplier Supplier of default value
-     * @param <T>             Value type
-     * @return Argument, or supplied default value
-     * @since 1.4.0
-     */
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public <T> T getOrSupplyDefault(
-            final @NonNull CloudKey<@NonNull T> key,
-            final @NonNull Supplier<T> defaultSupplier
-    ) {
-        return this.getOptional(key).orElseGet(defaultSupplier);
-    }
-
-    /**
-     * Get a value if it exists, else return the value supplied by the given supplier
-     *
-     * @param key             Cloud key
-     * @param defaultSupplier Supplier of default value
-     * @param <T>             Value type
-     * @return Argument, or supplied default value
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public <T> T getOrSupplyDefault(
-            final @NonNull CloudKeyHolder<@NonNull T> key,
-            final @NonNull Supplier<T> defaultSupplier
-    ) {
-        return this.getOptional(key).orElseGet(defaultSupplier);
-    }
-
-    /**
-     * Get a value if it exists, else compute and store the value returned by the function and return it.
-     *
-     * @param key             Cloud key
-     * @param defaultFunction Default value function
-     * @param <T>             Value type
-     * @return present or computed value
-     * @since 1.8.0
-     */
-    @API(status = API.Status.STABLE, since = "1.8.0")
+    @Override
     public <T> T computeIfAbsent(
             final @NonNull CloudKey<T> key,
             final @NonNull Function<CloudKey<T>, T> defaultFunction
@@ -526,7 +250,7 @@ public class CommandContext<C> {
     }
 
     /**
-     * Returns a copy of the raw input
+     * Returns a copy of the raw input.
      *
      * @return raw input
      * @since 2.0.0
@@ -537,18 +261,7 @@ public class CommandContext<C> {
     }
 
     /**
-     * Get the raw input as a joined string
-     *
-     * @return {@link #rawInput()} joined with {@code " "} as the delimiter
-     * @since 1.1.0
-     */
-    @API(status = API.Status.STABLE, since = "1.1.0")
-    public @NonNull String getRawInputJoined() {
-        return this.rawInput().remainingInput();
-    }
-
-    /**
-     * Create a parsing context instance for the given component
+     * Creates a parsing context instance for the given component.
      *
      * @param component the component
      * @return the created context
@@ -562,7 +275,7 @@ public class CommandContext<C> {
     }
 
     /**
-     * Returns the context for the given component
+     * Returns the context for the given component.
      *
      * @param component the component
      * @return the context
@@ -578,7 +291,7 @@ public class CommandContext<C> {
     }
 
     /**
-     * Returns the context for the component at the given position
+     * Returns the context for the component at the given position.
      *
      * @param position the position
      * @return the context
@@ -590,7 +303,7 @@ public class CommandContext<C> {
     }
 
     /**
-     * Return the context for the component with the given name.
+     * Returns the context for the component with the given name.
      *
      * @param name the name
      * @return the context
@@ -605,7 +318,7 @@ public class CommandContext<C> {
     }
 
     /**
-     * Return an unmodifiable view of the stored parsing contexts
+     * Returns an unmodifiable view of the stored parsing contexts.
      *
      * @return the contexts
      * @since 2.0.0
@@ -616,9 +329,9 @@ public class CommandContext<C> {
     }
 
     /**
-     * Get the associated {@link FlagContext} instance
+     * Returns the associated {@link FlagContext} instance.
      *
-     * @return Flag context
+     * @return flag context
      */
     public @NonNull FlagContext flags() {
         return this.flagContext;
@@ -627,7 +340,7 @@ public class CommandContext<C> {
     /**
      * Returns the component that is currently being parsed for this command context.
      * This value will be updated whenever the context is used to provide new
-     * suggestions or parse a new command argument
+     * suggestions or parse a new command argument.
      *
      * @return the {@link CommandComponent} that is currently being parsed, or {@code null}
      * @since 2.0.0
@@ -640,7 +353,7 @@ public class CommandContext<C> {
     /**
      * Sets the component that is currently being parsed for this command context.
      * This value should be updated whenever the context is used to provide new
-     * suggestions or parse a new command argument
+     * suggestions or parse a new command argument.
      *
      * @param component the component that is currently being parsed, or {@code null}
      * @since 2.0.0
@@ -651,12 +364,12 @@ public class CommandContext<C> {
     }
 
     /**
-     * Attempt to retrieve a value that has been registered to the associated command manager's
-     * {@link cloud.commandframework.annotations.injection.ParameterInjectorRegistry}
+     * Attempts to retrieve a value that has been registered to the associated command manager's
+     * {@link cloud.commandframework.annotations.injection.ParameterInjectorRegistry}.
      *
-     * @param clazz Class of type to inject
-     * @param <T>   Type to inject
-     * @return Optional that may contain the created value
+     * @param clazz class of type to inject
+     * @param <T>   type to inject
+     * @return optional that may contain the created value
      * @since 1.3.0
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
@@ -667,5 +380,10 @@ public class CommandContext<C> {
             );
         }
         return this.commandManager.parameterInjectorRegistry().getInjectable(clazz, this, AnnotationAccessor.empty());
+    }
+
+    @Override
+    public final @NonNull Map<@NonNull CloudKey<?>, @NonNull ?> all() {
+        return Collections.unmodifiableMap(this.internalStorage);
     }
 }

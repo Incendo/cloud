@@ -23,7 +23,6 @@
 //
 package cloud.commandframework.examples.bukkit.annotations.feature;
 
-import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
@@ -34,6 +33,7 @@ import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
+import cloud.commandframework.help.result.CommandEntry;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,13 +71,13 @@ public final class HelpExample implements AnnotationFeature {
     }
 
     private void setupHelp() {
-        this.minecraftHelp = new MinecraftHelp<>(
+        this.minecraftHelp = MinecraftHelp.create(
                 // The help command. This gets prefixed onto all the clickable queries.
                 "/annotations help",
-                // Tells the help manager how to map command senders to adventure audiences.
-                this.bukkitAudiences::sender,
                 // The command manager instance that is used to look up the commands.
-                this.manager
+                this.manager,
+                // Tells the help manager how to map command senders to adventure audiences.
+                this.bukkitAudiences::sender
         );
     }
 
@@ -86,11 +86,11 @@ public final class HelpExample implements AnnotationFeature {
             final @NonNull CommandContext<CommandSender> ctx,
             final @NonNull String input
     ) {
-        return this.manager.createCommandHelpHandler()
-                .queryRootIndex(ctx.getSender())
-                .getEntries()
+        return this.manager.createHelpHandler()
+                .queryRootIndex(ctx.sender())
+                .entries()
                 .stream()
-                .map(CommandHelpHandler.VerboseHelpEntry::syntaxString)
+                .map(CommandEntry::syntax)
                 .collect(Collectors.toList());
     }
 

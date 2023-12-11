@@ -24,58 +24,24 @@
 package cloud.commandframework.brigadier.node;
 
 import cloud.commandframework.brigadier.suggestion.SuggestionsType;
+import cloud.commandframework.internal.ImmutableBuilder;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.immutables.value.Value;
 
+@ImmutableBuilder
+@Value.Immutable
 @API(status = API.Status.INTERNAL, since = "2.0.0")
-final class ArgumentMapping<S> {
+interface ArgumentMapping<S> {
 
-    private final ArgumentType<?> argumentType;
-    private final SuggestionProvider<S> suggestionProvider;
-    private final SuggestionsType suggestionsType;
+    @NonNull ArgumentType<?> argumentType();
 
-    ArgumentMapping(
-            final @NonNull ArgumentType<?> argumentType,
-            final @Nullable SuggestionProvider<S> suggestionProvider,
-            final @NonNull SuggestionsType suggestionsType
-    ) {
-        this.argumentType = argumentType;
-        this.suggestionProvider = suggestionProvider;
-        this.suggestionsType = suggestionsType;
+    default @NonNull SuggestionsType suggestionsType() {
+        return SuggestionsType.BRIGADIER_SUGGESTIONS;
     }
 
-    ArgumentMapping(
-            final @NonNull ArgumentType<?> argumentType,
-            final @Nullable SuggestionProvider<S> suggestionProvider
-    ) {
-        this(argumentType, suggestionProvider, SuggestionsType.BRIGADIER_SUGGESTIONS);
-    }
-
-    ArgumentMapping(
-            final @NonNull ArgumentType<?> argumentType,
-            final @NonNull SuggestionsType suggestionsType
-    ) {
-        this(argumentType, null, suggestionsType);
-    }
-
-    ArgumentMapping(
-            final @NonNull ArgumentType<?> argumentType
-    ) {
-        this(argumentType, null, SuggestionsType.BRIGADIER_SUGGESTIONS);
-    }
-
-    @NonNull ArgumentType<?> argumentType() {
-        return this.argumentType;
-    }
-
-    @NonNull SuggestionsType suggestionsType() {
-        return this.suggestionsType;
-    }
-
-    @Nullable SuggestionProvider<S> suggestionProvider() {
-        return this.suggestionProvider;
-    }
+    @Nullable SuggestionProvider<S> suggestionProvider();
 }
