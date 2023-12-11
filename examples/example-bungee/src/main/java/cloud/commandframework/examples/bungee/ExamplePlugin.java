@@ -77,7 +77,7 @@ public final class ExamplePlugin extends Plugin {
         this.confirmationManager = new CommandConfirmationManager<>(
                 30L,
                 TimeUnit.SECONDS,
-                context -> this.bungeeAudiences.sender(context.getCommandContext().getSender()).sendMessage(
+                context -> this.bungeeAudiences.sender(context.getCommandContext().sender()).sendMessage(
                         text(
                                 "Confirmation required. Confirm using /example confirm.", NamedTextColor.RED)),
                 sender -> this.bungeeAudiences.sender(sender).sendMessage(
@@ -125,7 +125,7 @@ public final class ExamplePlugin extends Plugin {
                         )
                         .handler(context -> {
                             final ProxiedPlayer player = context.get("player");
-                            this.bungeeAudiences.sender(context.getSender()).sendMessage(
+                            this.bungeeAudiences.sender(context.sender()).sendMessage(
                                     text("Selected ", NamedTextColor.GOLD)
                                             .append(text(player.getDisplayName(), NamedTextColor.AQUA))
                             );
@@ -141,7 +141,7 @@ public final class ExamplePlugin extends Plugin {
                         .required("server", ServerParser.serverParser(), Description.of("Server name"))
                         .handler(context -> {
                             final ServerInfo server = context.get("server");
-                            this.bungeeAudiences.sender(context.getSender()).sendMessage(
+                            this.bungeeAudiences.sender(context.sender()).sendMessage(
                                     text("Selected ", NamedTextColor.GOLD)
                                             .append(text(server.getName(), NamedTextColor.AQUA))
                             );

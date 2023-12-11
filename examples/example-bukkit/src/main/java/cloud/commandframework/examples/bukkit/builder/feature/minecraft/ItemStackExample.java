@@ -63,7 +63,7 @@ public final class ItemStackExample implements BuilderFeature {
                         )
                         .handler(ctx -> {
                             final ItemStack stack = ctx.get("itemstack");
-                            ctx.getSender().getInventory().addItem(stack);
+                            ctx.sender().getInventory().addItem(stack);
                         })
         );
     }

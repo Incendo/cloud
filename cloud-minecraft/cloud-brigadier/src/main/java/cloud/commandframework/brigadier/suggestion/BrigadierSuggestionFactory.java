@@ -120,7 +120,7 @@ public final class BrigadierSuggestionFactory<C, S> {
             command = command.substring(leading.split(":")[0].length() + 1);
         }
 
-        return this.suggestionFactory.suggest(commandContext.getSender(), command).thenCompose(suggestionsUnfiltered -> {
+        return this.suggestionFactory.suggest(commandContext.sender(), command).thenCompose(suggestionsUnfiltered -> {
             /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
             final List<TooltipSuggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
             if (parentNode != null) {

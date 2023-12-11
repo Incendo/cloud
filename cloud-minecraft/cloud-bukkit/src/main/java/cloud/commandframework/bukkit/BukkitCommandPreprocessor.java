@@ -64,13 +64,13 @@ final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
             if (!context.getCommandContext().contains(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER)) {
                 context.getCommandContext().store(
                         WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER,
-                        this.mapper.apply(context.getCommandContext().getSender())
+                        this.mapper.apply(context.getCommandContext().sender())
                 );
             }
         }
         context.getCommandContext().store(
                 BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER,
-                this.commandManager.getBackwardsCommandSenderMapper().apply(context.getCommandContext().getSender())
+                this.commandManager.getBackwardsCommandSenderMapper().apply(context.getCommandContext().sender())
         );
         context.getCommandContext().store(
                 BukkitCommandContextKeys.CLOUD_BUKKIT_CAPABILITIES,

@@ -50,7 +50,7 @@ public final class StringArrayExample implements BuilderFeature {
                         .optional("args", stringArrayParser(), Description.of("Arguments"))
                         .handler(context -> {
                             final String[] args = context.getOrDefault("args", new String[0]);
-                            context.getSender().sendMessage("You wrote: " + StringUtils.join(args, " "));
+                            context.sender().sendMessage("You wrote: " + StringUtils.join(args, " "));
                         })
         );
     }

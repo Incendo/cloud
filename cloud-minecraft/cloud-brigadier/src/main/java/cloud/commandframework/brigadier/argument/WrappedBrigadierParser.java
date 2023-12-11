@@ -170,8 +170,8 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> {
          * is use it to query data on the native sender. Hopefully this hack holds up.
          */
         final com.mojang.brigadier.context.CommandContext<Object> reverseMappedContext = new com.mojang.brigadier.context.CommandContext<>(
-                commandContext.getOrDefault(COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER, commandContext.getSender()),
-                commandContext.getRawInputJoined(),
+                commandContext.getOrDefault(COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER, commandContext.sender()),
+                commandContext.rawInput().input(),
                 Collections.emptyMap(),
                 null,
                 null,

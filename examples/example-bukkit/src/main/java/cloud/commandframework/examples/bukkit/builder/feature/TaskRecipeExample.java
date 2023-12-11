@@ -48,13 +48,13 @@ public final class TaskRecipeExample implements BuilderFeature {
                         .handler(context -> manager.taskRecipe()
                                 .begin(context)
                                 .asynchronous(c -> {
-                                    c.getSender().sendMessage("ASYNC: " + !Bukkit.isPrimaryThread());
+                                    c.sender().sendMessage("ASYNC: " + !Bukkit.isPrimaryThread());
                                     return c;
                                 })
                                 .synchronous(c -> {
-                                    c.getSender().sendMessage("SYNC: " + Bukkit.isPrimaryThread());
+                                    c.sender().sendMessage("SYNC: " + Bukkit.isPrimaryThread());
                                 })
-                                .execute(() -> context.getSender().sendMessage("DONE!"))
+                                .execute(() -> context.sender().sendMessage("DONE!"))
                         )
         );
     }

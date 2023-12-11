@@ -62,7 +62,7 @@ public final class RegexExample implements BuilderFeature {
                         ).handler(commandContext -> {
                             final String money = commandContext.get("money");
                             examplePlugin.bukkitAudiences()
-                                    .sender(commandContext.getSender())
+                                    .sender(commandContext.sender())
                                     .sendMessage(text().append(text("You have been given ", NamedTextColor.AQUA))
                                                     .append(text(money, NamedTextColor.GOLD)));
                         })

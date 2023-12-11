@@ -91,7 +91,7 @@ public final class ExampleVelocityPlugin {
                         .required("player", PlayerParser.playerParser())
                         .handler(context -> {
                                     final Player player = context.get("player");
-                                    context.getSender().sendMessage(
+                                    context.sender().sendMessage(
                                             Identity.nil(),
                                             Component.text().append(
                                                     Component.text("Selected ", NamedTextColor.GOLD)
@@ -107,7 +107,7 @@ public final class ExampleVelocityPlugin {
                         .required("server", ServerParser.serverParser())
                         .handler(context -> {
                             final RegisteredServer server = context.get("server");
-                            context.getSender().sendMessage(
+                            context.sender().sendMessage(
                                     Identity.nil(),
                                     Component.text().append(
                                             Component.text("Selected ", NamedTextColor.GOLD)

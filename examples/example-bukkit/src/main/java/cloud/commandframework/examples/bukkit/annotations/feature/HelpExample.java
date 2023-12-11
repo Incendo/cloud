@@ -87,7 +87,7 @@ public final class HelpExample implements AnnotationFeature {
             final @NonNull String input
     ) {
         return this.manager.createHelpHandler()
-                .queryRootIndex(ctx.getSender())
+                .queryRootIndex(ctx.sender())
                 .entries()
                 .stream()
                 .map(CommandEntry::syntax)

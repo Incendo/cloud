@@ -150,7 +150,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
         /* Check if we have a last flag stored */
         final String lastArg = Objects.requireNonNull(commandContext.getOrDefault(FLAG_META_KEY, ""));
         if (!lastArg.startsWith("-")) {
-            final String rawInput = commandContext.getRawInputJoined();
+            final String rawInput = commandContext.rawInput().input();
             /* Collection containing all used flags */
             final List<CommandFlag<?>> usedFlags = new LinkedList<>();
             /* Find all "primary" flags, using --flag */

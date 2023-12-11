@@ -113,7 +113,7 @@ public final class ExampleBot {
         commandManager.command(commandManager
                 .commandBuilder("ping")
                 .handler(context -> {
-                    context.getSender().getChannel().sendMessage("pong").complete();
+                    context.sender().getChannel().sendMessage("pong").complete();
                 }));
 
         final Command.Builder<CustomUser> builder = commandManager.commandBuilder("permission");
@@ -127,7 +127,7 @@ public final class ExampleBot {
                     final String perm = context.get("perm");
 
                     permissionRegistry.add(user.getIdLong(), perm);
-                    context.getSender().getChannel().sendMessage("permission added").complete();
+                    context.sender().getChannel().sendMessage("permission added").complete();
                 }));
 
         commandManager.command(builder
@@ -139,7 +139,7 @@ public final class ExampleBot {
                     final String perm = context.get("perm");
 
                     permissionRegistry.remove(user.getIdLong(), perm);
-                    context.getSender().getChannel().sendMessage("permission removed").complete();
+                    context.sender().getChannel().sendMessage("permission removed").complete();
                 }));
 
         commandManager.command(commandManager
@@ -148,7 +148,7 @@ public final class ExampleBot {
                 .permission("kick")
                 .required("user", UserParser.userParser(USER_PARSER_MODES, UserParser.Isolation.GUILD))
                 .handler(context -> {
-                    final GuildUser guildUser = context.getSender();
+                    final GuildUser guildUser = context.sender();
                     final TextChannel textChannel = guildUser.getTextChannel();
                     final User user = context.get("user");
 

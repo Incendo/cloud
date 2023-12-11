@@ -64,7 +64,7 @@ public final class ConfirmationExample implements AnnotationFeature {
         final CommandConfirmationManager<CommandSender> confirmationManager = new CommandConfirmationManager<>(
                 /* Timeout */ 30L,
                 /* Timeout unit */ TimeUnit.SECONDS,
-                /* Action when confirmation is required */ context -> context.getCommandContext().getSender().sendMessage(
+                /* Action when confirmation is required */ context -> context.getCommandContext().sender().sendMessage(
                 ChatColor.RED + "Confirmation required. Confirm using /annotations confirm."),
                 /* Action when no confirmation is pending */ sender -> sender.sendMessage(
                 ChatColor.RED + "You don't have any pending commands.")

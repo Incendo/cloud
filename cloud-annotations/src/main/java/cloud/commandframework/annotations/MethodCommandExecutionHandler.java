@@ -162,8 +162,8 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
                     );
                 }
             } else {
-                if (parameter.getType().isAssignableFrom(commandContext.getSender().getClass())) {
-                    arguments.add(new ParameterValue(parameter, null, commandContext.getSender()));
+                if (parameter.getType().isAssignableFrom(commandContext.sender().getClass())) {
+                    arguments.add(new ParameterValue(parameter, null, commandContext.sender()));
                 } else {
                     final Optional<?> value = this.context.injectorRegistry.getInjectable(
                             parameter.getType(),
