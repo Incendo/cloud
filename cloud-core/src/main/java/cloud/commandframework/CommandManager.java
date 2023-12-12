@@ -74,7 +74,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -85,7 +84,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
@@ -157,15 +155,6 @@ public abstract class CommandManager<C> {
                 CommandContext.class,
                 (context, annotationAccessor) -> context
         );
-        // TODO(City): Remove!
-        this.exceptionController.registerHandler(Throwable.class, ctx -> {
-            this.handleException(
-                    ctx.context().sender(),
-                    (Class) ctx.exception().getClass(),
-                    (Exception) ctx.exception(),
-                    (cmdCtx, ex) -> {}
-            );
-        });
     }
 
     /**
@@ -976,24 +965,6 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get the exception handler for an exception type, if one has been registered
-     *
-     * @param clazz Exception class
-     * @param <E>   Exception type
-     * @return Exception handler, or {@code null}
-     * @see #registerCommandPreProcessor(CommandPreprocessor) Registering an exception handler
-     */
-    @SuppressWarnings("unchecked")
-    public final <E extends Exception> @Nullable BiConsumer<@NonNull C, @NonNull E>
-    getExceptionHandler(final @NonNull Class<E> clazz) {
-        final BiConsumer<C, ? extends Exception> consumer = this.exceptionHandlers.get(clazz);
-        if (consumer == null) {
-            return null;
-        }
-        return (BiConsumer<C, E>) consumer;
-    }
-
-    /**
      * Returns the exception controller.
      * <p>
      * The exception controller is responsible for exception handler registration.
@@ -1004,42 +975,6 @@ public abstract class CommandManager<C> {
     @API(status = API.Status.STABLE, since = "2.0.0")
     public final @NonNull ExceptionController<C> exceptionController() {
         return this.exceptionController;
-    }
-
-    /**
-     * Register an exception handler for an exception type. This will then be used
-     * when {@link #handleException(Object, Class, Exception, BiConsumer)} is called
-     * for the particular exception type
-     *
-     * @param clazz   Exception class
-     * @param handler Exception handler
-     * @param <E>     Exception type
-     */
-    public final <E extends Exception> void registerExceptionHandler(
-            final @NonNull Class<E> clazz,
-            final @NonNull BiConsumer<@NonNull C, @NonNull E> handler
-    ) {
-        this.exceptionHandlers.put(clazz, handler);
-    }
-
-    /**
-     * Handle an exception using the registered exception handler for the exception type, or using the
-     * provided default handler if no exception handler has been registered for the exception type
-     *
-     * @param sender         Executing command sender
-     * @param clazz          Exception class
-     * @param exception      Exception instance
-     * @param defaultHandler Default exception handler. Will be called if there is no exception
-     *                       handler stored for the exception type
-     * @param <E>            Exception type
-     */
-    public final <E extends Exception> void handleException(
-            final @NonNull C sender,
-            final @NonNull Class<E> clazz,
-            final @NonNull E exception,
-            final @NonNull BiConsumer<C, E> defaultHandler
-    ) {
-        Optional.ofNullable(this.getExceptionHandler(clazz)).orElse(defaultHandler).accept(sender, exception);
     }
 
     /**
