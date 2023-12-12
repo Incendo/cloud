@@ -24,25 +24,15 @@
 package cloud.commandframework.javacord;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.exceptions.ArgumentParseException;
-import cloud.commandframework.exceptions.CommandExecutionException;
-import cloud.commandframework.exceptions.InvalidCommandSenderException;
-import cloud.commandframework.exceptions.InvalidSyntaxException;
-import cloud.commandframework.exceptions.NoPermissionException;
-import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.javacord.sender.JavacordCommandSender;
 import cloud.commandframework.javacord.sender.JavacordPrivateSender;
 import cloud.commandframework.javacord.sender.JavacordServerSender;
-import java.util.concurrent.CompletionException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 
 public class JavacordCommand<C> implements MessageCreateListener {
-
-    private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
-    private static final String MESSAGE_NO_PERMS = "I'm sorry, but you do not have the permission to do this :/";
 
     private final JavacordCommandManager<C> manager;
     private final CommandComponent<C> command;
@@ -90,86 +80,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
             return;
         }
 
-        this.manager.executeCommand(sender, finalContent)
-                .whenComplete((commandResult, throwable) -> {
-                    if (throwable == null) {
-                        return;
-                    }
-                    final Throwable finalThrowable = throwable;
-
-                    if (throwable instanceof CompletionException) {
-                        throwable = throwable.getCause();
-                    }
-
-                    if (throwable instanceof NoSuchCommandException) {
-                        //Ignore, should never happen
-                        return;
-                    }
-
-                    if (throwable instanceof InvalidSyntaxException) {
-                        this.manager.handleException(
-                                sender,
-                                InvalidSyntaxException.class,
-                                (InvalidSyntaxException) throwable,
-                                (c, e) -> commandSender.sendErrorMessage(
-                                        "Invalid Command Syntax. Correct command syntax is: `"
-                                                + e.getCorrectSyntax()
-                                                + "`")
-                        );
-
-                        return;
-                    }
-
-                    if (throwable instanceof InvalidCommandSenderException) {
-                        this.manager.handleException(
-                                sender,
-                                InvalidCommandSenderException.class,
-                                (InvalidCommandSenderException) throwable,
-                                (c, e) -> commandSender.sendErrorMessage(e.getMessage())
-                        );
-
-                        return;
-                    }
-
-                    if (throwable instanceof NoPermissionException) {
-                        this.manager.handleException(
-                                sender,
-                                NoPermissionException.class,
-                                (NoPermissionException) throwable,
-                                (c, e) -> commandSender.sendErrorMessage(MESSAGE_NO_PERMS)
-                        );
-
-                        return;
-                    }
-
-                    if (throwable instanceof ArgumentParseException) {
-                        this.manager.handleException(
-                                sender,
-                                ArgumentParseException.class,
-                                (ArgumentParseException) throwable,
-                                (c, e) -> commandSender.sendErrorMessage(
-                                        "Invalid Command Argument: `" + e.getCause().getMessage() + "`")
-                        );
-
-                        return;
-                    }
-
-                    if (throwable instanceof CommandExecutionException) {
-                        this.manager.handleException(
-                                sender,
-                                CommandExecutionException.class,
-                                (CommandExecutionException) throwable,
-                                (c, e) -> {
-                                    commandSender.sendErrorMessage(MESSAGE_INTERNAL_ERROR);
-                                    finalThrowable.getCause().printStackTrace();
-                                }
-                        );
-
-                        return;
-                    }
-
-                    commandSender.sendErrorMessage(throwable.getMessage());
-                    throwable.printStackTrace();
-                });
+        this.manager.executeCommand(sender, finalContent, ctx ->
+                        ctx.store(JavacordCommandManager.JAVACORD_COMMAND_SENDER_KEY, commandSender));
     }
 }
