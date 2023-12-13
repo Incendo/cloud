@@ -36,7 +36,6 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -259,7 +258,6 @@ public final class MinecraftExceptionHandler<C> {
      * @param manager        the manager instance
      * @param audienceMapper the mapper that maps command sender to audience instances
      */
-    @SuppressWarnings("deprecation") // adventure's replacement for the deprecated method only exists in Minecraft 1.19+
     public void apply(
             final @NonNull CommandManager<C> manager,
             final @NonNull Function<@NonNull C, @NonNull Audience> audienceMapper
@@ -267,7 +265,6 @@ public final class MinecraftExceptionHandler<C> {
         this.componentBuilders.forEach((type, handler) -> manager.exceptionController().registerHandler(
                 type.exceptionClass(),
                 ctx -> audienceMapper.apply(ctx.context().sender()).sendMessage(
-                        Identity.nil(),
                         this.decorator.apply(handler.apply(ctx.context().sender(), ctx.exception()))
                 )
         ));
