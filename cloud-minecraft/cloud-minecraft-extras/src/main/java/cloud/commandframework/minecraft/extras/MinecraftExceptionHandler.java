@@ -68,11 +68,11 @@ public final class MinecraftExceptionHandler<C> {
      *
      * @param <C> sender type
      * @return {@link InvalidSyntaxException} handler function
-     * @see #withInvalidSyntaxHandler()
+     * @see #defaultInvalidSyntaxHandler()
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> Function<ExceptionContext<C, InvalidSyntaxException>, Component> defaultInvalidSyntaxFunction() {
+    public static <C> Function<ExceptionContext<C, InvalidSyntaxException>, Component> createDefaultInvalidSyntaxHandler() {
         return ctx -> text("Invalid command syntax. Correct command syntax is: ", NamedTextColor.RED)
                 .append(ComponentHelper.highlight(
                         text(
@@ -88,11 +88,11 @@ public final class MinecraftExceptionHandler<C> {
      *
      * @param <C> sender type
      * @return {@link InvalidCommandSenderException} handler function
-     * @see #withInvalidSenderHandler()
+     * @see #defaultInvalidSenderHandler()
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> Function<ExceptionContext<C, InvalidCommandSenderException>, Component> defaultInvalidSenderFunction() {
+    public static <C> Function<ExceptionContext<C, InvalidCommandSenderException>, Component> createDefaultInvalidSenderHandler() {
         return ctx -> text("Invalid command sender. You must be of type ", NamedTextColor.RED)
                 .append(text(
                         ctx.exception().getRequiredSender().getSimpleName(),
@@ -105,11 +105,11 @@ public final class MinecraftExceptionHandler<C> {
      *
      * @param <C> sender type
      * @return {@link NoPermissionException} handler function
-     * @see #withNoPermissionHandler()
+     * @see #defaultNoPermissionHandler()
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> Function<ExceptionContext<C, NoPermissionException>, Component> defaultNoPermissionFunction() {
+    public static <C> Function<ExceptionContext<C, NoPermissionException>, Component> createDefaultNoPermissionHandler() {
         return ctx -> text(
                 "I'm sorry, but you do not have permission to perform this command. \n"
                         + "Please contact the server administrators if you believe that this is in error.",
@@ -122,40 +122,39 @@ public final class MinecraftExceptionHandler<C> {
      *
      * @param <C> sender type
      * @return {@link ArgumentParseException} handler function
-     * @see #withArgumentParsingHandler()
+     * @see #defaultArgumentParsingHandler()
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> Function<ExceptionContext<C, ArgumentParseException>, Component> defaultArgumentParsingFunction() {
+    public static <C> Function<ExceptionContext<C, ArgumentParseException>, Component> createDefaultArgumentParsingHandler() {
         return ctx -> text("Invalid command argument: ", NamedTextColor.RED)
                 .append(getMessage(ctx.exception().getCause()).colorIfAbsent(NamedTextColor.GRAY));
     }
 
     /**
-     * The default logger for {@link #defaultCommandExecutionFunction()}, using
-     * {@link Throwable#printStackTrace()}.
+     * Default logger for {@link #createDefaultCommandExecutionHandler(Consumer)}, using
+     * {@link Throwable#printStackTrace()} on the {@link CommandExecutionException}'s cause.
      *
      * @param <C> sender type
      * @return default logger
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> Consumer<ExceptionContext<C, CommandExecutionException>> defaultCommandExecutionLogger() {
+    public static <C> Consumer<ExceptionContext<C, CommandExecutionException>> createDefaultCommandExecutionLogger() {
         return ctx -> ctx.exception().getCause().printStackTrace();
     }
 
     /**
-     * The default {@link CommandExecutionException} handler.
+     * The default {@link CommandExecutionException} handler, using {@link #createDefaultCommandExecutionLogger()}.
      *
      * @param <C> sender type
      * @return {@link CommandExecutionException} handler function
-     * @see #defaultCommandExecutionLogger()
-     * @see #withCommandExecutionHandler()
+     * @see #defaultCommandExecutionHandler()
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> Function<ExceptionContext<C, CommandExecutionException>, Component> defaultCommandExecutionFunction() {
-        return defaultCommandExecutionFunction(defaultCommandExecutionLogger());
+    public static <C> Function<ExceptionContext<C, CommandExecutionException>, Component> createDefaultCommandExecutionHandler() {
+        return createDefaultCommandExecutionHandler(createDefaultCommandExecutionLogger());
     }
 
     /**
@@ -164,12 +163,11 @@ public final class MinecraftExceptionHandler<C> {
      * @param logger logger
      * @param <C>    sender type
      * @return {@link CommandExecutionException} handler function
-     * @see #defaultCommandExecutionLogger()
-     * @see #defaultCommandExecutionFunction()
+     * @see #defaultCommandExecutionHandler(Consumer)
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> Function<ExceptionContext<C, CommandExecutionException>, Component> defaultCommandExecutionFunction(
+    public static <C> Function<ExceptionContext<C, CommandExecutionException>, Component> createDefaultCommandExecutionHandler(
             final Consumer<ExceptionContext<C, CommandExecutionException>> logger
     ) {
         return ctx -> {
@@ -206,69 +204,101 @@ public final class MinecraftExceptionHandler<C> {
     private BiFunction<ExceptionContext<C, ?>, Component, Component> decorator = (ctx, msg) -> msg;
 
     /**
-     * Sets the default invalid syntax handler.
+     * Use the default {@link InvalidSyntaxException} handler.
      *
      * @return {@code this}
+     * @since 2.0.0
      */
-    public @NonNull @This MinecraftExceptionHandler<C> withInvalidSyntaxHandler() {
-        return this.withHandler(InvalidSyntaxException.class, defaultInvalidSyntaxFunction());
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull @This MinecraftExceptionHandler<C> defaultInvalidSyntaxHandler() {
+        return this.handler(InvalidSyntaxException.class, createDefaultInvalidSyntaxHandler());
     }
 
     /**
-     * Sets the default invalid sender handler.
+     * Use the default {@link InvalidCommandSenderException} handler.
      *
      * @return {@code this}
+     * @since 2.0.0
      */
-    public @NonNull @This MinecraftExceptionHandler<C> withInvalidSenderHandler() {
-        return this.withHandler(InvalidCommandSenderException.class, defaultInvalidSenderFunction());
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull @This MinecraftExceptionHandler<C> defaultInvalidSenderHandler() {
+        return this.handler(InvalidCommandSenderException.class, createDefaultInvalidSenderHandler());
     }
 
     /**
-     * Use the default no permission handler
+     * Use the default {@link NoPermissionException} handler.
      *
      * @return {@code this}
+     * @since 2.0.0
      */
-    public @NonNull @This MinecraftExceptionHandler<C> withNoPermissionHandler() {
-        return this.withHandler(NoPermissionException.class, defaultNoPermissionFunction());
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull @This MinecraftExceptionHandler<C> defaultNoPermissionHandler() {
+        return this.handler(NoPermissionException.class, createDefaultNoPermissionHandler());
     }
 
     /**
-     * Sets the default argument parsing handler.
+     * Use the default {@link ArgumentParseException} handler.
      *
      * @return {@code this}
+     * @since 2.0.0
      */
-    public @NonNull @This MinecraftExceptionHandler<C> withArgumentParsingHandler() {
-        return this.withHandler(ArgumentParseException.class, defaultArgumentParsingFunction());
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull @This MinecraftExceptionHandler<C> defaultArgumentParsingHandler() {
+        return this.handler(ArgumentParseException.class, createDefaultArgumentParsingHandler());
     }
 
     /**
-     * Sets the default {@link CommandExecutionException} handler.
+     * Use the default {@link CommandExecutionException} handler with {@link #createDefaultCommandExecutionLogger()}.
      *
      * @return {@code this}
-     * @since 1.2.0
+     * @see #defaultCommandExecutionHandler(Consumer)
+     * @since 2.0.0
      */
-    public @NonNull @This MinecraftExceptionHandler<C> withCommandExecutionHandler() {
-        return this.withHandler(CommandExecutionException.class, defaultCommandExecutionFunction());
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull @This MinecraftExceptionHandler<C> defaultCommandExecutionHandler() {
+        return this.defaultCommandExecutionHandler(createDefaultCommandExecutionLogger());
     }
 
     /**
-     * Sets all the default exception handlers.
+     * Use the default {@link CommandExecutionException} handler with a custom logger.
+     *
+     * @param logger logger
+     * @return {@code this}
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull @This MinecraftExceptionHandler<C> defaultCommandExecutionHandler(
+            final @NonNull Consumer<ExceptionContext<C, CommandExecutionException>> logger
+    ) {
+        return this.handler(CommandExecutionException.class, createDefaultCommandExecutionHandler(logger));
+    }
+
+    /**
+     * Use all the default exception handlers.
      *
      * @return {@code this}
+     * @see #defaultArgumentParsingHandler()
+     * @see #defaultInvalidSenderHandler()
+     * @see #defaultInvalidSyntaxHandler()
+     * @see #defaultNoPermissionHandler()
+     * @see #defaultCommandExecutionHandler()
+     * @since 2.0.0
      */
-    public @NonNull @This MinecraftExceptionHandler<C> withDefaultHandlers() {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull @This MinecraftExceptionHandler<C> defaultHandlers() {
         return this
-                .withArgumentParsingHandler()
-                .withInvalidSenderHandler()
-                .withInvalidSyntaxHandler()
-                .withNoPermissionHandler()
-                .withCommandExecutionHandler();
+                .defaultArgumentParsingHandler()
+                .defaultInvalidSenderHandler()
+                .defaultInvalidSyntaxHandler()
+                .defaultNoPermissionHandler()
+                .defaultCommandExecutionHandler();
     }
 
     /**
      * Sets the exception handler for the given {@code type}. A handler
      * can return {@code null} to indicate no message should be sent.
      *
+     * @param <T>              exception type
      * @param type             the exception type to handle
      * @param componentFactory the factory that produces the components
      * @return {@code this}
@@ -276,7 +306,7 @@ public final class MinecraftExceptionHandler<C> {
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public <T extends Throwable> @NonNull @This MinecraftExceptionHandler<C> withHandler(
+    public <T extends Throwable> @NonNull @This MinecraftExceptionHandler<C> handler(
             final @NonNull Class<T> type,
             final @NonNull Function<@NonNull ExceptionContext<@NonNull C, @NonNull T>, @Nullable Component> componentFactory
     ) {
@@ -292,7 +322,7 @@ public final class MinecraftExceptionHandler<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull @This MinecraftExceptionHandler<C> withDecorator(
+    public @NonNull @This MinecraftExceptionHandler<C> decorator(
             final @NonNull BiFunction<@NonNull ExceptionContext<@NonNull C, ?>, @NonNull Component, @NonNull Component> decorator
     ) {
         this.decorator = decorator;
@@ -304,11 +334,13 @@ public final class MinecraftExceptionHandler<C> {
      *
      * @param decorator the component decorator
      * @return {@code this}
+     * @since 2.0.0
      */
-    public @NonNull @This MinecraftExceptionHandler<C> withDecorator(
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull @This MinecraftExceptionHandler<C> decorator(
             final @NonNull Function<@NonNull Component, @NonNull Component> decorator
     ) {
-        return this.withDecorator((ctx, message) -> decorator.apply(message));
+        return this.decorator((ctx, message) -> decorator.apply(message));
     }
 
     /**

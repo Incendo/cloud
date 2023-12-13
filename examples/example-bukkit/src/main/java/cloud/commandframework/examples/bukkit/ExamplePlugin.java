@@ -105,12 +105,12 @@ public final class ExamplePlugin extends JavaPlugin {
         // Override the default exception handlers and use the exception handlers from cloud-minecraft-extras instead.
         //
         new MinecraftExceptionHandler<CommandSender>()
-                .withInvalidSyntaxHandler()
-                .withInvalidSenderHandler()
-                .withNoPermissionHandler()
-                .withArgumentParsingHandler()
-                .withCommandExecutionHandler()
-                .withDecorator(
+                .defaultInvalidSyntaxHandler()
+                .defaultInvalidSenderHandler()
+                .defaultNoPermissionHandler()
+                .defaultArgumentParsingHandler()
+                .defaultCommandExecutionHandler()
+                .decorator(
                         component -> text()
                                 .append(text("[", NamedTextColor.DARK_GRAY))
                                 .append(text("Example", NamedTextColor.GOLD))

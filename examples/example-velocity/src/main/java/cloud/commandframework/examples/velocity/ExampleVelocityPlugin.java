@@ -77,8 +77,8 @@ public final class ExampleVelocityPlugin {
                 })
         );
         new MinecraftExceptionHandler<CommandSource>()
-                .withDefaultHandlers()
-                .withDecorator(component -> Component.text()
+                .defaultHandlers()
+                .decorator(component -> Component.text()
                         .append(Component.text('['))
                         .append(Component.text("cloud-velocity-example", TextColor.color(0x1CBAE0)))
                         .append(Component.text("] "))

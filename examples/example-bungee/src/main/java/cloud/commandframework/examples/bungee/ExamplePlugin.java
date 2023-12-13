@@ -87,11 +87,11 @@ public final class ExamplePlugin extends Plugin {
         this.confirmationManager.registerConfirmationProcessor(this.manager);
 
         new MinecraftExceptionHandler<CommandSender>()
-                .withInvalidSyntaxHandler()
-                .withInvalidSenderHandler()
-                .withNoPermissionHandler()
-                .withArgumentParsingHandler()
-                .withDecorator(component -> text()
+                .defaultInvalidSyntaxHandler()
+                .defaultInvalidSenderHandler()
+                .defaultNoPermissionHandler()
+                .defaultArgumentParsingHandler()
+                .decorator(component -> text()
                         .append(text("[", NamedTextColor.DARK_GRAY))
                         .append(text("Example", NamedTextColor.GOLD))
                         .append(text("] ", NamedTextColor.DARK_GRAY))
