@@ -615,7 +615,7 @@ public class Command<C> {
                     .parser(argument)
                     .description(description);
             if (argument instanceof SuggestionProvider) {
-                builder.suggestionProvider((SuggestionProvider<C>) argument);
+                builder.suggestionProvider((SuggestionProvider<? super C>) argument);
             }
             if (argument instanceof PreprocessorHolder) {
                 builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
@@ -704,7 +704,7 @@ public class Command<C> {
                     .optional()
                     .description(description);
             if (argument instanceof SuggestionProvider) {
-                builder.suggestionProvider((SuggestionProvider<C>) argument);
+                builder.suggestionProvider((SuggestionProvider<? super C>) argument);
             }
             if (argument instanceof PreprocessorHolder) {
                 builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
@@ -729,7 +729,7 @@ public class Command<C> {
                     .key(argument.key())
                     .parser(argument);
             if (argument instanceof SuggestionProvider) {
-                builder.suggestionProvider((SuggestionProvider<C>) argument);
+                builder.suggestionProvider((SuggestionProvider<? super C>) argument);
             }
             if (argument instanceof PreprocessorHolder) {
                 builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
@@ -755,7 +755,7 @@ public class Command<C> {
                     .parser(argument)
                     .optional();
             if (argument instanceof SuggestionProvider) {
-                builder.suggestionProvider((SuggestionProvider<C>) argument);
+                builder.suggestionProvider((SuggestionProvider<? super C>) argument);
             }
             if (argument instanceof PreprocessorHolder) {
                 builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
@@ -775,7 +775,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser
+                final @NonNull ParserDescriptor<? super C, T> parser
         ) {
             return this.argument(CommandComponent.<C, T>builder().name(name).parser(parser).build());
         }
@@ -793,8 +793,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -817,7 +817,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser
+                final @NonNull ParserDescriptor<? super C, T> parser
         ) {
             return this.argument(CommandComponent.<C, T>builder().key(name).parser(parser).build());
         }
@@ -835,8 +835,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -860,7 +860,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description
         ) {
             return this.argument(CommandComponent.<C, T>builder().key(name).parser(parser).description(description).build());
@@ -880,9 +880,9 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -907,7 +907,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description
         ) {
             return this.argument(CommandComponent.<C, T>builder().name(name).parser(parser).description(description).build());
@@ -927,9 +927,9 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -954,7 +954,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser
+                final @NonNull ParserDescriptor<? super C, T> parser
         ) {
             return this.argument(CommandComponent.<C, T>builder().name(name).parser(parser).optional().build());
         }
@@ -972,8 +972,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -997,7 +997,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser
+                final @NonNull ParserDescriptor<? super C, T> parser
         ) {
             return this.argument(CommandComponent.<C, T>builder().key(name).parser(parser).optional().build());
         }
@@ -1015,8 +1015,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1041,7 +1041,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description
         ) {
             return this.argument(
@@ -1068,9 +1068,9 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1096,7 +1096,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description
         ) {
             return this.argument(
@@ -1123,9 +1123,9 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1151,8 +1151,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1177,9 +1177,9 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue,
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1204,8 +1204,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1230,9 +1230,9 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue,
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1258,8 +1258,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue,
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue,
                 final @NonNull Description description
         ) {
             return this.argument(
@@ -1287,10 +1287,10 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue,
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue,
                 final @NonNull Description description,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1317,8 +1317,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue,
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue,
                 final @NonNull Description description
         ) {
             return this.argument(
@@ -1346,10 +1346,10 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue,
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue,
                 final @NonNull Description description,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()

@@ -404,6 +404,7 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
     }
 
 
+    @SuppressWarnings("unchecked")
     @API(status = API.Status.STABLE, since = "2.0.0")
     public static class Builder<C, T> {
 
@@ -476,7 +477,7 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
          * @param parserDescriptor descriptor of the parser
          * @return {@code this}
          */
-        public @NonNull @This Builder<C, T> parser(final @NonNull ParserDescriptor<C, T> parserDescriptor) {
+        public @NonNull @This Builder<C, T> parser(final @NonNull ParserDescriptor<? super C, T> parserDescriptor) {
             return this.parser(parserDescriptor.parser()).valueType(parserDescriptor.valueType());
         }
 
@@ -486,8 +487,8 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
          * @param defaultValue the default value
          * @return {@code this}
          */
-        public @NonNull @This Builder<C, T> defaultValue(final @Nullable DefaultValue<C, T> defaultValue) {
-            this.defaultValue = defaultValue;
+        public @NonNull @This Builder<C, T> defaultValue(final @Nullable DefaultValue<? super C, T> defaultValue) {
+            this.defaultValue = (DefaultValue<C, ?>) defaultValue;
             return this;
         }
 
@@ -526,7 +527,7 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
          * @param defaultValue the default value
          * @return {@code this}
          */
-        public @NonNull @This Builder<C, T> optional(final @Nullable DefaultValue<C, T> defaultValue) {
+        public @NonNull @This Builder<C, T> optional(final @Nullable DefaultValue<? super C, T> defaultValue) {
             return this.optional().defaultValue(defaultValue);
         }
 
@@ -547,8 +548,8 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
          * @param suggestionProvider the suggestion provider
          * @return {@code this}
          */
-        public @NonNull @This Builder<C, T> suggestionProvider(final @Nullable SuggestionProvider<C> suggestionProvider) {
-            this.suggestionProvider = suggestionProvider;
+        public @NonNull @This Builder<C, T> suggestionProvider(final @Nullable SuggestionProvider<? super C> suggestionProvider) {
+            this.suggestionProvider = (SuggestionProvider<C>) suggestionProvider;
             return this;
         }
 
@@ -558,8 +559,8 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
          * @param preprocessor the preprocessor
          * @return {@code this}
          */
-        public @NonNull @This Builder<C, T> preprocessor(final @NonNull ComponentPreprocessor<C> preprocessor) {
-            this.componentPreprocessors.add(preprocessor);
+        public @NonNull @This Builder<C, T> preprocessor(final @NonNull ComponentPreprocessor<? super C> preprocessor) {
+            this.componentPreprocessors.add((ComponentPreprocessor<C>) preprocessor);
             return this;
         }
 
@@ -583,8 +584,8 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
          * @param parser the parser
          * @return {@code this}
          */
-        public @NonNull @This Builder<C, T> parser(final @NonNull ArgumentParser<C, T> parser) {
-            this.parser = parser;
+        public @NonNull @This Builder<C, T> parser(final @NonNull ArgumentParser<? super C, T> parser) {
+            this.parser = (ArgumentParser<C, T>) parser;
             return this;
         }
 
