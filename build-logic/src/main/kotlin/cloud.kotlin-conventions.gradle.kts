@@ -9,14 +9,14 @@ plugins {
 kotlin {
     explicitApi()
     jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion = JavaLanguageVersion.of(8)
     }
-    coreLibrariesVersion = "1.9.20"
+    coreLibrariesVersion = libs.versions.kotlin.get()
     target {
         compilations.configureEach {
             kotlinOptions {
                 jvmTarget = "1.8"
-                languageVersion = "1.9"
+                languageVersion = libs.versions.kotlin.get().split(".").take(2).joinToString(".")
             }
         }
     }
