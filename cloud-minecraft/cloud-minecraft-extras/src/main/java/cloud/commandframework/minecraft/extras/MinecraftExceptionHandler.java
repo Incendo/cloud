@@ -202,6 +202,36 @@ public final class MinecraftExceptionHandler<C> {
     private final Map<Class<? extends Throwable>, Function<ExceptionContext<C, ?>, @Nullable Component>> componentBuilders =
             new HashMap<>();
     private BiFunction<ExceptionContext<C, ?>, Component, Component> decorator = (ctx, msg) -> msg;
+    private final AudienceProvider<C> audienceProvider;
+
+    private MinecraftExceptionHandler(final AudienceProvider<C> audienceProvider) {
+        this.audienceProvider = audienceProvider;
+    }
+
+    /**
+     * Create a new {@link MinecraftExceptionHandler} using {@code audienceProvider}.
+     *
+     * @param audienceProvider audience provider
+     * @param <C>              sender type
+     * @return new {@link MinecraftExceptionHandler}
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> MinecraftExceptionHandler<C> create(final AudienceProvider<C> audienceProvider) {
+        return new MinecraftExceptionHandler<>(audienceProvider);
+    }
+
+    /**
+     * Create a new {@link MinecraftExceptionHandler} using {@link AudienceProvider#nativeAudience()}.
+     *
+     * @param <C> sender type
+     * @return new {@link MinecraftExceptionHandler}
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C extends Audience> MinecraftExceptionHandler<C> createNative() {
+        return create(AudienceProvider.nativeAudience());
+    }
 
     /**
      * Use the default {@link InvalidSyntaxException} handler.
@@ -344,20 +374,18 @@ public final class MinecraftExceptionHandler<C> {
     }
 
     /**
-     * Registers the exceptions to the {@link cloud.commandframework.exceptions.handling.ExceptionController}.
+     * Registers configured handlers to the {@link cloud.commandframework.exceptions.handling.ExceptionController}.
      *
-     * @param manager        the manager instance
-     * @param audienceMapper the mapper that maps command sender to audience instances
+     * @param manager the manager instance
+     * @since 2.0.0
      */
-    public void apply(
-            final @NonNull CommandManager<C> manager,
-            final @NonNull Function<@NonNull C, @NonNull Audience> audienceMapper
-    ) {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void registerTo(final @NonNull CommandManager<C> manager) {
         this.componentBuilders.forEach((type, handler) -> {
             manager.exceptionController().registerHandler(type, ctx -> {
                 final @Nullable Component message = handler.apply(ctx);
                 if (message != null) {
-                    audienceMapper.apply(ctx.context().sender()).sendMessage(this.decorator.apply(ctx, message));
+                    this.audienceProvider.apply(ctx.context().sender()).sendMessage(this.decorator.apply(ctx, message));
                 }
             });
         });

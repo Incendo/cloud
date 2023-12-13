@@ -24,7 +24,6 @@
 package cloud.commandframework.examples.velocity;
 
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.minecraft.extras.AudienceProvider;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.velocity.CloudInjectionModule;
 import cloud.commandframework.velocity.VelocityCommandManager;
@@ -76,7 +75,7 @@ public final class ExampleVelocityPlugin {
                 Key.get(new TypeLiteral<VelocityCommandManager<CommandSource>>() {
                 })
         );
-        new MinecraftExceptionHandler<CommandSource>()
+        MinecraftExceptionHandler.<CommandSource>createNative()
                 .defaultHandlers()
                 .decorator(component -> Component.text()
                         .append(Component.text('['))
@@ -84,7 +83,7 @@ public final class ExampleVelocityPlugin {
                         .append(Component.text("] "))
                         .append(component)
                         .build())
-                .apply(commandManager, AudienceProvider.nativeAudience());
+                .registerTo(commandManager);
         commandManager.command(
                 commandManager.commandBuilder("example")
                         .required("player", PlayerParser.playerParser())
