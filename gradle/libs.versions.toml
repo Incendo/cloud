@@ -1,6 +1,6 @@
 [plugins]
 shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }
-versions = { id = "com.github.ben-manes.versions", version = "0.49.0" }
+versions = { id = "com.github.ben-manes.versions", version = "0.50.0" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-task" }
 run-velocity = { id = "xyz.jpenilla.run-velocity", version.ref = "run-task" }
@@ -9,7 +9,7 @@ run-waterfall = { id = "xyz.jpenilla.run-waterfall", version.ref = "run-task" }
 [versions]
 run-task = "2.2.2"
 checkstyle = "10.5.0"
-checkerQual = "3.40.0"
+checkerQual = "3.41.0"
 errorprone = "2.23.0"
 geantyref = "1.3.14"
 jmh = "1.37"
@@ -20,7 +20,7 @@ immutables = "2.10.0"
 guice = "7.0.0"
 
 # kotlin
-kotlin = "1.9.20"
+kotlin = "1.9.21"
 dokka = "1.9.10"
 coroutines = "1.7.3"
 ktlint = "0.50.0"
@@ -44,7 +44,7 @@ adventurePlatform = "4.3.1"
 paperApi = "1.16.5-R0.1-SNAPSHOT"
 velocityApi = "3.1.1"
 spongeApi7 = "7.3.0"
-jetbrainsAnnotations = "23.0.0"
+jetbrainsAnnotations = "24.1.0"
 fabricMinecraft = "1.19.4"
 fabricLoader = "0.14.22"
 fabricApi = "0.87.0+1.19.4"
@@ -60,9 +60,8 @@ compileTesting = "0.21.0"
 
 # build-logic
 indra = "3.1.3"
-gradleTestLogger = "3.2.0"
 gradleErrorprone = "3.0.1"
-spotless = "6.21.0"
+spotless = "6.23.3"
 revapi = "1.7.0"
 
 [libraries]
@@ -123,7 +122,6 @@ compileTesting = { group = "com.google.testing.compile", name = "compile-testing
 # build-logic
 indraCommon = { group = "net.kyori", name = "indra-common", version.ref = "indra" }
 indraPublishingSonatype = { group = "net.kyori", name = "indra-publishing-sonatype", version.ref = "indra" }
-gradleTestLogger = { group = "com.adarshr", name = "gradle-test-logger-plugin", version.ref = "gradleTestLogger" }
 gradleErrorprone = { group = "net.ltgt.gradle", name = "gradle-errorprone-plugin", version.ref = "gradleErrorprone" }
 gradleKotlinJvm = { group = "org.jetbrains.kotlin.jvm", name = "org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlin" }
 gradleDokka = { group = "org.jetbrains.dokka", name = "dokka-gradle-plugin", version.ref = "dokka" }
