@@ -52,9 +52,9 @@ fabricPermissionsApi = "0.2-SNAPSHOT"
 
 # testing
 jupiterEngine = "5.10.1"
-mockitoCore = "5.7.0"
-mockitoKotlin = "5.1.0"
-mockitoJupiter = "5.7.0"
+mockitoCore = "4.11.0"
+mockitoKotlin = "4.1.0"
+mockitoJupiter = "4.11.0"
 truth = "1.1.5"
 compileTesting = "0.21.0"
 
