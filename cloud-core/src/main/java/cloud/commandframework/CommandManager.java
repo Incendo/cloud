@@ -65,6 +65,8 @@ import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PredicatePermission;
 import cloud.commandframework.services.ServicePipeline;
 import cloud.commandframework.services.State;
+import cloud.commandframework.state.RegistrationState;
+import cloud.commandframework.state.Stateful;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.Collections;
@@ -92,7 +94,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  * @param <C> the command sender type used to execute commands
  */
 @API(status = API.Status.STABLE)
-public abstract class CommandManager<C> {
+public abstract class CommandManager<C> implements Stateful<RegistrationState> {
 
     private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = new HashMap<>();
     private final EnumSet<ManagerSettings> managerSettings = EnumSet.of(
@@ -1090,48 +1092,14 @@ public abstract class CommandManager<C> {
         return this.commandExecutionCoordinator;
     }
 
-    /**
-     * Transition from the {@code in} state to the {@code out} state, if the manager is not already in that state.
-     *
-     * @param in  The starting state
-     * @param out The ending state
-     * @throws IllegalStateException if the manager is in any state but {@code in} or {@code out}
-     * @since 1.2.0
-     */
-    @API(status = API.Status.STABLE, since = "1.2.0")
-    protected final void transitionOrThrow(final @NonNull RegistrationState in, final @NonNull RegistrationState out) {
-        if (!this.transitionIfPossible(in, out)) {
-            throw new IllegalStateException("Command manager was in state " + this.state.get() + ", while we were expecting a state "
-                    + "of " + in + " or " + out + "!");
-        }
+    @Override
+    public final @NonNull RegistrationState state() {
+        return this.state.get();
     }
 
-    /**
-     * Transition from the {@code in} state to the {@code out} state, if the manager is not already in that state.
-     *
-     * @param in  The starting state
-     * @param out The ending state
-     * @return {@code true} if the state transition was successful, or the manager was already in the desired state
-     * @since 1.2.0
-     */
-    @API(status = API.Status.STABLE, since = "1.2.0")
-    protected final boolean transitionIfPossible(final @NonNull RegistrationState in, final @NonNull RegistrationState out) {
+    @Override
+    public final boolean transitionIfPossible(final @NonNull RegistrationState in, final @NonNull RegistrationState out) {
         return this.state.compareAndSet(in, out) || this.state.get() == out;
-    }
-
-    /**
-     * Require that the commands manager is in a certain state.
-     *
-     * @param expected The required state
-     * @throws IllegalStateException if the manager is not in the expected state
-     * @since 1.2.0
-     */
-    @API(status = API.Status.STABLE, since = "1.2.0")
-    protected final void requireState(final @NonNull RegistrationState expected) {
-        if (this.state.get() != expected) {
-            throw new IllegalStateException("This operation required the commands manager to be in state " + expected + ", but it "
-                    + "was in " + this.state.get() + " instead!");
-        }
     }
 
     /**
@@ -1143,24 +1111,11 @@ public abstract class CommandManager<C> {
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     protected final void lockRegistration() {
-        if (this.registrationState() == RegistrationState.BEFORE_REGISTRATION) {
+        if (this.state() == RegistrationState.BEFORE_REGISTRATION) {
             this.transitionOrThrow(RegistrationState.BEFORE_REGISTRATION, RegistrationState.AFTER_REGISTRATION);
             return;
         }
         this.transitionOrThrow(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
-    }
-
-    /**
-     * Returns the active registration state for this manager.
-     * <p>
-     * If the state is {@link RegistrationState#AFTER_REGISTRATION}, commands can no longer be registered.
-     *
-     * @return the current state
-     * @since 1.7.0
-     */
-    @API(status = API.Status.STABLE, since = "1.7.0")
-    public final @NonNull RegistrationState registrationState() {
-        return this.state.get();
     }
 
     /**
@@ -1228,37 +1183,5 @@ public abstract class CommandManager<C> {
          */
         @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
         LIBERAL_FLAG_PARSING
-    }
-
-
-    /**
-     * The point in the registration lifecycle for this commands manager
-     *
-     * @since 1.2.0
-     */
-    @API(status = API.Status.STABLE, since = "1.2.0")
-    public enum RegistrationState {
-        /**
-         * The point when no commands have been registered yet.
-         *
-         * <p>At this point, all configuration options can be changed.</p>
-         */
-        BEFORE_REGISTRATION,
-
-        /**
-         * When at least one command has been registered, and more commands have been registered.
-         *
-         * <p>In this state, some options that affect how commands are registered with the platform are frozen. Some platforms
-         * will remain in this state for their lifetime.</p>
-         */
-        REGISTERING,
-
-        /**
-         * Once registration has been completed.
-         *
-         * <p>At this point, the command manager is effectively immutable. On platforms where command registration happens via
-         * callback, this state is achieved the first time the manager's callback is executed for registration.</p>
-         */
-        AFTER_REGISTRATION
     }
 }
