@@ -29,11 +29,14 @@ import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
+import cloud.commandframework.exceptions.handling.ExceptionContext;
+import cloud.commandframework.exceptions.handling.ExceptionHandler;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -44,90 +47,163 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.util.ComponentMessageThrowable;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
+import static net.kyori.adventure.text.Component.newline;
+import static net.kyori.adventure.text.Component.text;
+
 /**
- * Exception handler that sends {@link Component} to the sender. All component builders
- * can be overridden and the handled exception types can be configured (see {@link ExceptionType} for types)
+ * Creates and registers {@link ExceptionHandler ExceptionHandlers} that send a {@link Component} to the
+ * command sender.
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 public final class MinecraftExceptionHandler<C> {
 
-    private static final Component NULL = Component.text("null");
+    private static final Component NULL = text("null");
 
     /**
-     * Default component builder for {@link InvalidSyntaxException}
-     */
-    public static final Function<Exception, Component> DEFAULT_INVALID_SYNTAX_FUNCTION =
-            e -> Component.text("Invalid command syntax. Correct command syntax is: ", NamedTextColor.RED)
-                    .append(ComponentHelper.highlight(
-                            Component.text(
-                                    String.format("/%s", ((InvalidSyntaxException) e).getCorrectSyntax()),
-                                    NamedTextColor.GRAY
-                            ),
-                            NamedTextColor.WHITE
-                    ));
-    /**
-     * Default component builder for {@link InvalidCommandSenderException}
-     */
-    public static final Function<Exception, Component> DEFAULT_INVALID_SENDER_FUNCTION =
-            e -> Component.text("Invalid command sender. You must be of type ", NamedTextColor.RED)
-                    .append(Component.text(
-                            ((InvalidCommandSenderException) e).getRequiredSender().getSimpleName(),
-                            NamedTextColor.GRAY
-                    ));
-    /**
-     * Default component builder for {@link NoPermissionException}
-     */
-    public static final Function<Exception, Component> DEFAULT_NO_PERMISSION_FUNCTION =
-            e -> Component.text(
-                    "I'm sorry, but you do not have permission to perform this command. \n"
-                            + "Please contact the server administrators if you believe that this is in error.",
-                    NamedTextColor.RED
-            );
-    /**
-     * Default component builder for {@link ArgumentParseException}
-     */
-    public static final Function<Exception, Component> DEFAULT_ARGUMENT_PARSING_FUNCTION =
-            e -> Component.text("Invalid command argument: ", NamedTextColor.RED)
-                    .append(getMessage(e.getCause()).colorIfAbsent(NamedTextColor.GRAY));
-    /**
-     * Default component builder for {@link CommandExecutionException}
+     * The default {@link InvalidSyntaxException} handler.
      *
-     * @since 1.2.0
+     * @param <C> sender type
+     * @return {@link InvalidSyntaxException} handler function
+     * @see #withInvalidSyntaxHandler()
+     * @since 2.0.0
      */
-    public static final Function<Exception, Component> DEFAULT_COMMAND_EXECUTION_FUNCTION =
-            e -> {
-                final Throwable cause = e.getCause();
-                cause.printStackTrace();
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> Function<ExceptionContext<C, InvalidSyntaxException>, Component> defaultInvalidSyntaxFunction() {
+        return ctx -> text("Invalid command syntax. Correct command syntax is: ", NamedTextColor.RED)
+                .append(ComponentHelper.highlight(
+                        text(
+                                String.format("/%s", ctx.exception().getCorrectSyntax()),
+                                NamedTextColor.GRAY
+                        ),
+                        NamedTextColor.WHITE
+                ));
+    }
 
-                final StringWriter writer = new StringWriter();
-                cause.printStackTrace(new PrintWriter(writer));
-                final String stackTrace = writer.toString().replaceAll("\t", "    ");
-                final HoverEvent<Component> hover = HoverEvent.showText(
-                        Component.text()
-                                .append(getMessage(cause))
-                                .append(Component.newline())
-                                .append(Component.text(stackTrace))
-                                .append(Component.newline())
-                                .append(Component.text(
-                                        "    Click to copy",
-                                        NamedTextColor.GRAY,
-                                        TextDecoration.ITALIC
-                                ))
-                );
-                final ClickEvent click = ClickEvent.copyToClipboard(stackTrace);
-                return Component.text()
-                        .content("An internal error occurred while attempting to perform this command.")
-                        .color(NamedTextColor.RED)
-                        .hoverEvent(hover)
-                        .clickEvent(click)
-                        .build();
-            };
+    /**
+     * The default {@link InvalidCommandSenderException} handler.
+     *
+     * @param <C> sender type
+     * @return {@link InvalidCommandSenderException} handler function
+     * @see #withInvalidSenderHandler()
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> Function<ExceptionContext<C, InvalidCommandSenderException>, Component> defaultInvalidSenderFunction() {
+        return ctx -> text("Invalid command sender. You must be of type ", NamedTextColor.RED)
+                .append(text(
+                        ctx.exception().getRequiredSender().getSimpleName(),
+                        NamedTextColor.GRAY
+                ));
+    }
 
-    private final Map<ExceptionType, BiFunction<C, Exception, Component>> componentBuilders = new HashMap<>();
-    private Function<Component, Component> decorator = Function.identity();
+    /**
+     * The default {@link NoPermissionException} handler.
+     *
+     * @param <C> sender type
+     * @return {@link NoPermissionException} handler function
+     * @see #withNoPermissionHandler()
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> Function<ExceptionContext<C, NoPermissionException>, Component> defaultNoPermissionFunction() {
+        return ctx -> text(
+                "I'm sorry, but you do not have permission to perform this command. \n"
+                        + "Please contact the server administrators if you believe that this is in error.",
+                NamedTextColor.RED
+        );
+    }
+
+    /**
+     * The default {@link ArgumentParseException} handler.
+     *
+     * @param <C> sender type
+     * @return {@link ArgumentParseException} handler function
+     * @see #withArgumentParsingHandler()
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> Function<ExceptionContext<C, ArgumentParseException>, Component> defaultArgumentParsingFunction() {
+        return ctx -> text("Invalid command argument: ", NamedTextColor.RED)
+                .append(getMessage(ctx.exception().getCause()).colorIfAbsent(NamedTextColor.GRAY));
+    }
+
+    /**
+     * The default logger for {@link #defaultCommandExecutionFunction()}, using
+     * {@link Throwable#printStackTrace()}.
+     *
+     * @param <C> sender type
+     * @return default logger
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> Consumer<ExceptionContext<C, CommandExecutionException>> defaultCommandExecutionLogger() {
+        return ctx -> ctx.exception().getCause().printStackTrace();
+    }
+
+    /**
+     * The default {@link CommandExecutionException} handler.
+     *
+     * @param <C> sender type
+     * @return {@link CommandExecutionException} handler function
+     * @see #defaultCommandExecutionLogger()
+     * @see #withCommandExecutionHandler()
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> Function<ExceptionContext<C, CommandExecutionException>, Component> defaultCommandExecutionFunction() {
+        return defaultCommandExecutionFunction(defaultCommandExecutionLogger());
+    }
+
+    /**
+     * The default {@link CommandExecutionException} handler, with a specific logger.
+     *
+     * @param logger logger
+     * @param <C>    sender type
+     * @return {@link CommandExecutionException} handler function
+     * @see #defaultCommandExecutionLogger()
+     * @see #defaultCommandExecutionFunction()
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> Function<ExceptionContext<C, CommandExecutionException>, Component> defaultCommandExecutionFunction(
+            final Consumer<ExceptionContext<C, CommandExecutionException>> logger
+    ) {
+        return ctx -> {
+            logger.accept(ctx);
+            final Throwable cause = ctx.exception().getCause();
+
+            final StringWriter writer = new StringWriter();
+            cause.printStackTrace(new PrintWriter(writer));
+            final String stackTrace = writer.toString().replaceAll("\t", "    ");
+            final HoverEvent<Component> hover = HoverEvent.showText(
+                    text()
+                            .append(getMessage(cause))
+                            .append(newline())
+                            .append(text(stackTrace))
+                            .append(newline())
+                            .append(text(
+                                    "    Click to copy",
+                                    NamedTextColor.GRAY,
+                                    TextDecoration.ITALIC
+                            ))
+            );
+            final ClickEvent click = ClickEvent.copyToClipboard(stackTrace);
+            return text()
+                    .content("An internal error occurred while attempting to perform this command.")
+                    .color(NamedTextColor.RED)
+                    .hoverEvent(hover)
+                    .clickEvent(click)
+                    .build();
+        };
+    }
+
+    private final Map<Class<? extends Throwable>, Function<ExceptionContext<C, ?>, @Nullable Component>> componentBuilders =
+            new HashMap<>();
+    private BiFunction<ExceptionContext<C, ?>, Component, Component> decorator = (ctx, msg) -> msg;
 
     /**
      * Sets the default invalid syntax handler.
@@ -135,7 +211,7 @@ public final class MinecraftExceptionHandler<C> {
      * @return {@code this}
      */
     public @NonNull @This MinecraftExceptionHandler<C> withInvalidSyntaxHandler() {
-        return this.withDefaultHandler(ExceptionType.INVALID_SYNTAX);
+        return this.withHandler(InvalidSyntaxException.class, defaultInvalidSyntaxFunction());
     }
 
     /**
@@ -144,7 +220,7 @@ public final class MinecraftExceptionHandler<C> {
      * @return {@code this}
      */
     public @NonNull @This MinecraftExceptionHandler<C> withInvalidSenderHandler() {
-        return this.withDefaultHandler(ExceptionType.INVALID_SENDER);
+        return this.withHandler(InvalidCommandSenderException.class, defaultInvalidSenderFunction());
     }
 
     /**
@@ -153,7 +229,7 @@ public final class MinecraftExceptionHandler<C> {
      * @return {@code this}
      */
     public @NonNull @This MinecraftExceptionHandler<C> withNoPermissionHandler() {
-        return this.withDefaultHandler(ExceptionType.NO_PERMISSION);
+        return this.withHandler(NoPermissionException.class, defaultNoPermissionFunction());
     }
 
     /**
@@ -162,7 +238,7 @@ public final class MinecraftExceptionHandler<C> {
      * @return {@code this}
      */
     public @NonNull @This MinecraftExceptionHandler<C> withArgumentParsingHandler() {
-        return this.withDefaultHandler(ExceptionType.ARGUMENT_PARSING);
+        return this.withHandler(ArgumentParseException.class, defaultArgumentParsingFunction());
     }
 
     /**
@@ -172,7 +248,7 @@ public final class MinecraftExceptionHandler<C> {
      * @since 1.2.0
      */
     public @NonNull @This MinecraftExceptionHandler<C> withCommandExecutionHandler() {
-        return this.withDefaultHandler(ExceptionType.COMMAND_EXECUTION);
+        return this.withHandler(CommandExecutionException.class, defaultCommandExecutionFunction());
     }
 
     /**
@@ -190,52 +266,36 @@ public final class MinecraftExceptionHandler<C> {
     }
 
     /**
-     * Sets the exception handler for the given {@code type}.
-     *
-     * @param type             the type of exception to handle
-     * @param componentFactory the factory that produces the components
-     * @return {@code this}
-     */
-    public @NonNull @This MinecraftExceptionHandler<C> withHandler(
-            final @NonNull ExceptionType type,
-            final @NonNull Function<@NonNull Exception, @NonNull Component> componentFactory
-    ) {
-        return this.withHandler(
-                type,
-                (sender, exception) -> componentFactory.apply(exception)
-        );
-    }
-
-    /**
-     * Sets the exception handler for the given {@code type} to the {@link ExceptionType#defaultHandler()}.
-     *
-     * @param type the type of exception to handle
-     * @return {@code this}
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull @This MinecraftExceptionHandler<C> withDefaultHandler(
-            final @NonNull ExceptionType type
-    ) {
-        return this.withHandler(type, type.defaultHandler());
-    }
-
-    /**
-     * Sets the exception handler for the given {@code type}.
+     * Sets the exception handler for the given {@code type}. A handler
+     * can return {@code null} to indicate no message should be sent.
      *
      * @param type             the exception type to handle
      * @param componentFactory the factory that produces the components
      * @return {@code this}
-     * @since 1.2.0
+     * @since 2.0.0
      */
-    public @NonNull @This MinecraftExceptionHandler<C> withHandler(
-            final @NonNull ExceptionType type,
-            final @NonNull BiFunction<@NonNull C, @NonNull Exception, @NonNull Component> componentFactory
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public <T extends Throwable> @NonNull @This MinecraftExceptionHandler<C> withHandler(
+            final @NonNull Class<T> type,
+            final @NonNull Function<@NonNull ExceptionContext<@NonNull C, @NonNull T>, @Nullable Component> componentFactory
     ) {
-        this.componentBuilders.put(
-                type,
-                componentFactory
-        );
+        this.componentBuilders.put(type, (Function) componentFactory);
+        return this;
+    }
+
+    /**
+     * Sets the decorator that acts on a component before it's sent to the sender.
+     *
+     * @param decorator the component decorator
+     * @return {@code this}
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull @This MinecraftExceptionHandler<C> withDecorator(
+            final @NonNull BiFunction<@NonNull ExceptionContext<@NonNull C, ?>, @NonNull Component, @NonNull Component> decorator
+    ) {
+        this.decorator = decorator;
         return this;
     }
 
@@ -248,8 +308,7 @@ public final class MinecraftExceptionHandler<C> {
     public @NonNull @This MinecraftExceptionHandler<C> withDecorator(
             final @NonNull Function<@NonNull Component, @NonNull Component> decorator
     ) {
-        this.decorator = decorator;
-        return this;
+        return this.withDecorator((ctx, message) -> decorator.apply(message));
     }
 
     /**
@@ -262,77 +321,18 @@ public final class MinecraftExceptionHandler<C> {
             final @NonNull CommandManager<C> manager,
             final @NonNull Function<@NonNull C, @NonNull Audience> audienceMapper
     ) {
-        this.componentBuilders.forEach((type, handler) -> manager.exceptionController().registerHandler(
-                type.exceptionClass(),
-                ctx -> audienceMapper.apply(ctx.context().sender()).sendMessage(
-                        this.decorator.apply(handler.apply(ctx.context().sender(), ctx.exception()))
-                )
-        ));
+        this.componentBuilders.forEach((type, handler) -> {
+            manager.exceptionController().registerHandler(type, ctx -> {
+                final @Nullable Component message = handler.apply(ctx);
+                if (message != null) {
+                    audienceMapper.apply(ctx.context().sender()).sendMessage(this.decorator.apply(ctx, message));
+                }
+            });
+        });
     }
 
     private static Component getMessage(final Throwable throwable) {
         final Component msg = ComponentMessageThrowable.getOrConvertMessage(throwable);
         return msg == null ? NULL : msg;
-    }
-
-    /**
-     * Exception types.
-     */
-    public enum ExceptionType {
-        /**
-         * The input does not correspond to any known command ({@link InvalidSyntaxException})
-         */
-        INVALID_SYNTAX(InvalidSyntaxException.class, DEFAULT_INVALID_SYNTAX_FUNCTION),
-        /**
-         * The sender is not of the right type ({@link InvalidCommandSenderException})
-         */
-        INVALID_SENDER(InvalidCommandSenderException.class, DEFAULT_INVALID_SENDER_FUNCTION),
-        /**
-         * The sender does not have permission to execute the command ({@link NoPermissionException})
-         */
-        NO_PERMISSION(NoPermissionException.class, DEFAULT_NO_PERMISSION_FUNCTION),
-        /**
-         * An argument failed to parse ({@link ArgumentParseException})
-         */
-        ARGUMENT_PARSING(ArgumentParseException.class, DEFAULT_ARGUMENT_PARSING_FUNCTION),
-        /**
-         * A command handler had an exception ({@link CommandExecutionException})
-         *
-         * @since 1.2.0
-         */
-        COMMAND_EXECUTION(CommandExecutionException.class, DEFAULT_COMMAND_EXECUTION_FUNCTION);
-
-        private final Class<? extends Exception> exceptionClass;
-        private final Function<Exception, Component> defaultHandler;
-
-        ExceptionType(
-                final @NonNull Class<? extends Exception> exceptionClass,
-                final @NonNull Function<@NonNull Exception, @NonNull Component> defaultHandler
-        ) {
-            this.exceptionClass = exceptionClass;
-            this.defaultHandler = defaultHandler;
-        }
-
-        /**
-         * Returns the associated exception class.
-         *
-         * @return the exception class
-         * @since 2.0.0
-         */
-        @API(status = API.Status.STABLE, since = "2.0.0")
-        public @NonNull Class<? extends Exception> exceptionClass() {
-            return this.exceptionClass;
-        }
-
-        /**
-         * Returns the default handler for the type.
-         *
-         * @return the default handler
-         * @since 2.0.0
-         */
-        @API(status = API.Status.STABLE, since = "2.0.0")
-        public @NonNull Function<@NonNull Exception, @NonNull Component> defaultHandler() {
-            return this.defaultHandler;
-        }
     }
 }
