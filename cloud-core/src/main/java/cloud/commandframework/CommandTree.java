@@ -186,9 +186,9 @@ public final class CommandTree<C> {
                 commandInput,
                 this.internalTree
         ).thenCompose(command -> {
-            if (command != null && command.senderType().isPresent() && !command.senderType().get()
-                    .isAssignableFrom(commandContext.sender().getClass())
-            ) {
+            if (command != null
+                    && command.senderType().isPresent()
+                    && !command.senderType().get().isInstance(commandContext.sender())) {
                 return this.failedCompletable(
                         new InvalidCommandSenderException(
                                 commandContext.sender(),

@@ -32,6 +32,12 @@ import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
+import cloud.commandframework.exceptions.InvalidCommandSenderException;
+import cloud.commandframework.exceptions.InvalidSyntaxException;
+import cloud.commandframework.exceptions.NoPermissionException;
+import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
@@ -41,9 +47,12 @@ import cloud.commandframework.fabric.argument.TeamParser;
 import cloud.commandframework.fabric.data.MinecraftTime;
 import cloud.commandframework.permission.PredicatePermission;
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -52,6 +61,7 @@ import java.lang.reflect.WildcardType;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import net.minecraft.ChatFormatting;
@@ -81,6 +91,11 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.scores.PlayerTeam;
@@ -109,10 +124,19 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int MOD_PUBLIC_STATIC_FINAL = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
 
+    private static final Component NEWLINE = Component.literal("\n");
+    private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
+    private static final String MESSAGE_NO_PERMS =
+            "I'm sorry, but you do not have permission to perform this command. "
+                    + "Please contact the server administrators if you believe that this is in error.";
+    private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
+
+
     private final Function<S, C> commandSourceMapper;
     private final Function<C, S> backwardsCommandSourceMapper;
     private final CloudBrigadierManager<C, S> brigadierManager;
     private final SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory;
+    private final FabricExceptionHandlerFactory<C, S> exceptionHandlerFactory = new FabricExceptionHandlerFactory<>(this);
 
 
     /**
@@ -361,5 +385,92 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         return sender -> this.backwardsCommandSourceMapper()
                 .apply(sender)
                 .hasPermission(permissionLevel);
+    }
+
+    protected final void registerDefaultExceptionHandlers(
+            final @NonNull BiConsumer<@NonNull S, @NonNull Component> sendError,
+            final @NonNull Function<@NonNull S, @NonNull String> getName
+    ) {
+        this.exceptionController().registerHandler(
+                Throwable.class,
+                this.exceptionHandlerFactory.createHandler((source, sender, throwable) -> {
+                    sendError.accept(
+                            source,
+                            this.decorateHoverStacktrace(
+                                    Component.literal(MESSAGE_INTERNAL_ERROR),
+                                    throwable,
+                                    sender
+                            )
+                    );
+                    LOGGER.warn("Error occurred while executing command for user {}:", getName.apply(source), throwable);
+                })
+        ).registerHandler(
+                CommandExecutionException.class,
+                this.exceptionHandlerFactory.createHandler((source, sender, throwable) -> {
+                    sendError.accept(
+                            source,
+                            this.decorateHoverStacktrace(
+                                    Component.literal(MESSAGE_INTERNAL_ERROR),
+                                    throwable.getCause(),
+                                    sender
+                            )
+                    );
+                    LOGGER.warn("Error occurred while executing command for user {}:", getName.apply(source), throwable);
+                })
+        ).registerHandler(
+                ArgumentParseException.class,
+                this.exceptionHandlerFactory.createHandler((source, sender, throwable) -> {
+                    if (throwable.getCause() instanceof CommandSyntaxException) {
+                        sendError.accept(source, Component.literal("Invalid Command Argument: ")
+                                .append(Component.literal("")
+                                        .append(ComponentUtils
+                                                .fromMessage(((CommandSyntaxException) throwable.getCause()).getRawMessage()))
+                                        .withStyle(ChatFormatting.GRAY)));
+                    } else {
+                        sendError.accept(source, Component.literal("Invalid Command Argument: ")
+                                .append(Component.literal(throwable.getCause().getMessage())
+                                        .withStyle(ChatFormatting.GRAY)));
+                    }
+                })
+        ).registerHandler(NoSuchCommandException.class, this.exceptionHandlerFactory.createHandler(
+                (source, sender, throwable) -> sendError.accept(source, Component.literal(MESSAGE_UNKNOWN_COMMAND))
+        )).registerHandler(NoPermissionException.class, this.exceptionHandlerFactory.createHandler(
+                (source, sender, throwable) -> sendError.accept(source, Component.literal(MESSAGE_NO_PERMS))
+        )).registerHandler(InvalidCommandSenderException.class, this.exceptionHandlerFactory.createHandler(
+                (source, sender, throwable) -> sendError.accept(source, Component.literal(throwable.getMessage()))
+        )).registerHandler(InvalidSyntaxException.class, this.exceptionHandlerFactory.createHandler(
+                (source, sender, throwable) -> sendError.accept(
+                        source,
+                        Component.literal("Invalid Command Syntax. Correct command syntax is: ")
+                                .append(Component.literal(String.format("/%s", throwable.getCorrectSyntax()))
+                                        .withStyle(style -> style.withColor(ChatFormatting.GRAY)))
+                )
+        ));
+    }
+
+    private @NonNull MutableComponent decorateHoverStacktrace(
+            final @NonNull MutableComponent input,
+            final @NonNull Throwable cause,
+            final @NonNull C sender
+    ) {
+        if (!this.hasPermission(sender, "cloud.hover-stacktrace")) {
+            return input;
+        }
+
+        final StringWriter writer = new StringWriter();
+        cause.printStackTrace(new PrintWriter(writer));
+        final String stackTrace = writer.toString().replace("\t", "    ");
+        return input.withStyle(style -> style
+                .withHoverEvent(new HoverEvent(
+                        HoverEvent.Action.SHOW_TEXT,
+                        Component.literal(stackTrace)
+                                .append(NEWLINE)
+                                .append(Component.literal("    Click to copy")
+                                        .withStyle(s2 -> s2.withColor(ChatFormatting.GRAY).withItalic(true)))
+                ))
+                .withClickEvent(new ClickEvent(
+                        ClickEvent.Action.COPY_TO_CLIPBOARD,
+                        stackTrace
+                )));
     }
 }

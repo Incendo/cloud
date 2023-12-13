@@ -682,7 +682,7 @@ You first have to create a command confirmation manager:
 CommandConfirmationManager<YourSender> confirmationManager = new CommandConfirmationManager<>(
     30L, <1>
     TimeUnit.SECONDS,
-    context -> context.getCommandContext().getSender().sendMessage("Confirmation required!"), <2>
+    context -> context.getCommandContext().sender().sendMessage("Confirmation required!"), <2>
     sender -> sender.sendMessage("You don't have any pending commands") <3>
 );
 ----
@@ -1182,7 +1182,7 @@ manager.command(
         .literal("help")
         .argument(StringArgument.optional("query", StringArgument.StringMode.GREEDY))
         .handler(context -> {
-            minecraftHelp.queryCommands(context.getOrDefault("query", ""), context.getSender());
+            minecraftHelp.queryCommands(context.getOrDefault("query", ""), context.sender());
         })
 );
 ----

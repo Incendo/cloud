@@ -79,7 +79,7 @@ public class ExampleApplication {
 
         this.commandsComponent.registerCommand(this.commandsComponent.getCommandManager()
                 .commandBuilder("ping")
-                .handler(context -> context.getSender().sendMessage("Pong!")).build());
+                .handler(context -> context.sender().sendMessage("Pong!")).build());
 
         this.commandsComponent.registerCommand(this.commandsComponent.getCommandManager()
                 .commandBuilder("shutdown", "sd")
@@ -89,22 +89,22 @@ public class ExampleApplication {
                         .withArgument(IntegerArgument.optional("time", 60)))
                 .senderType(JavacordPrivateSender.class)
                 .handler(context -> {
-                    final MessageAuthor messageAuthor = context.getSender().getAuthor();
+                    final MessageAuthor messageAuthor = context.sender().getAuthor();
                     messageAuthor.asUser().ifPresent(user -> {
                         if (!user.getIdAsString().equals(System.getProperty("bot.owner"))) {
-                            context.getSender().sendErrorMessage("You need to be the owner of the bot to do this!");
+                            context.sender().sendErrorMessage("You need to be the owner of the bot to do this!");
                             return;
                         }
 
                         final int time = context.flags().getValue("time", 60);
 
                         if (time > 0) {
-                            context.getSender().sendSuccessMessage("Shutting down in " + time + " seconds!");
+                            context.sender().sendSuccessMessage("Shutting down in " + time + " seconds!");
                             this.executorService.schedule(this::shutdown, time, TimeUnit.SECONDS);
                             return;
                         }
 
-                        context.getSender().sendSuccessMessage("Shutting down now...");
+                        context.sender().sendSuccessMessage("Shutting down now...");
                         this.shutdown();
                     });
                 })

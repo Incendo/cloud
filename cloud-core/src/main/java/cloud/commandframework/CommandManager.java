@@ -74,16 +74,16 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
@@ -91,6 +91,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  *
  * @param <C> the command sender type used to execute commands
  */
+@SuppressWarnings({"unchecked", "rawtypes", "unused"})
 @API(status = API.Status.STABLE)
 public abstract class CommandManager<C> {
 
@@ -166,7 +167,9 @@ public abstract class CommandManager<C> {
      * execution stages, the future will complete with {@code null}.
      * <p>
      * The future may also complete exceptionally.
-     * These exceptions may be handled using exception handlers registered in the {@link #exceptionController()}.
+     * These exceptions will be handled using exception handlers registered in the {@link #exceptionController()}.
+     * The exceptions will be forwarded to the future, if the exception was transformed during the exception handling, then the
+     * new exception will be present in the completed future.
      *
      * @param commandSender Sender of the command
      * @param input         Input provided by the sender. Prefixes should be removed before the method is being called, and
@@ -178,11 +181,61 @@ public abstract class CommandManager<C> {
             final @NonNull C commandSender,
             final @NonNull String input
     ) {
+        return this.executeCommand(commandSender, input, context -> {});
+    }
+
+    /**
+     * Executes a command and get a future that completes with the result. The command may be executed immediately
+     * or at some point in the future, depending on the {@link CommandExecutionCoordinator} used in the command manager.
+     * <p>
+     * The command may also be filtered out by preprocessors (see {@link CommandPreprocessor}) before they are parsed,
+     * or by the {@link CommandComponent} command components during parsing. The execution may also be filtered out
+     * after parsing by a {@link CommandPostprocessor}. In the case that a command was filtered out at any of the
+     * execution stages, the future will complete with {@code null}.
+     * <p>
+     * The future may also complete exceptionally.
+     * These exceptions will be handled using exception handlers registered in the {@link #exceptionController()}.
+     * The exceptions will be forwarded to the future, if the exception was transformed during the exception handling, then the
+     * new exception will be present in the completed future.
+     *
+     * @param commandSender   the sender of the command
+     * @param input           the input provided by the sender. Prefixes should be removed before the method is being called, and
+     *                        the input here will be passed directly to the command parsing pipeline, after having been tokenized.
+     * @param contextConsumer consumer that accepts the context before the command is executed
+     * @return future that completes with the command result, or {@code null} if the execution was cancelled at any of the
+     *         processing stages.
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CompletableFuture<CommandResult<C>> executeCommand(
+            final @NonNull C commandSender,
+            final @NonNull String input,
+            final @NonNull Consumer<CommandContext<C>> contextConsumer
+    ) {
         final CommandContext<C> context = this.commandContextFactory.create(
                 false,
                 commandSender
         );
+        contextConsumer.accept(context);
         final CommandInput commandInput = CommandInput.of(input);
+        return this.executeCommand(context, commandInput).whenComplete((result, throwable) -> {
+            if (throwable == null) {
+                return;
+            }
+            try {
+                this.exceptionController.handleException(context, ExceptionController.unwrapCompletionException(throwable));
+            } catch (final RuntimeException runtimeException) {
+                throw runtimeException;
+            } catch (final Throwable e) {
+                throw new CompletionException(e);
+            }
+        });
+    }
+
+    private @NonNull CompletableFuture<CommandResult<C>> executeCommand(
+            final @NonNull CommandContext<C> context,
+            final @NonNull CommandInput commandInput
+    ) {
         /* Store a copy of the input queue in the context */
         context.store("__raw_input__", commandInput.copy());
         try {
@@ -524,7 +577,6 @@ public abstract class CommandManager<C> {
      * @return Root command names.
      * @since 1.7.0
      */
-    @SuppressWarnings("unchecked")
     @API(status = API.Status.STABLE, since = "1.7.0")
     public @NonNull Collection<@NonNull String> rootCommands() {
         return this.commandTree.rootNodes()
@@ -913,24 +965,6 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get the exception handler for an exception type, if one has been registered
-     *
-     * @param clazz Exception class
-     * @param <E>   Exception type
-     * @return Exception handler, or {@code null}
-     * @see #registerCommandPreProcessor(CommandPreprocessor) Registering an exception handler
-     */
-    @SuppressWarnings("unchecked")
-    public final <E extends Exception> @Nullable BiConsumer<@NonNull C, @NonNull E>
-    getExceptionHandler(final @NonNull Class<E> clazz) {
-        final BiConsumer<C, ? extends Exception> consumer = this.exceptionHandlers.get(clazz);
-        if (consumer == null) {
-            return null;
-        }
-        return (BiConsumer<C, E>) consumer;
-    }
-
-    /**
      * Returns the exception controller.
      * <p>
      * The exception controller is responsible for exception handler registration.
@@ -941,42 +975,6 @@ public abstract class CommandManager<C> {
     @API(status = API.Status.STABLE, since = "2.0.0")
     public final @NonNull ExceptionController<C> exceptionController() {
         return this.exceptionController;
-    }
-
-    /**
-     * Register an exception handler for an exception type. This will then be used
-     * when {@link #handleException(Object, Class, Exception, BiConsumer)} is called
-     * for the particular exception type
-     *
-     * @param clazz   Exception class
-     * @param handler Exception handler
-     * @param <E>     Exception type
-     */
-    public final <E extends Exception> void registerExceptionHandler(
-            final @NonNull Class<E> clazz,
-            final @NonNull BiConsumer<@NonNull C, @NonNull E> handler
-    ) {
-        this.exceptionHandlers.put(clazz, handler);
-    }
-
-    /**
-     * Handle an exception using the registered exception handler for the exception type, or using the
-     * provided default handler if no exception handler has been registered for the exception type
-     *
-     * @param sender         Executing command sender
-     * @param clazz          Exception class
-     * @param exception      Exception instance
-     * @param defaultHandler Default exception handler. Will be called if there is no exception
-     *                       handler stored for the exception type
-     * @param <E>            Exception type
-     */
-    public final <E extends Exception> void handleException(
-            final @NonNull C sender,
-            final @NonNull Class<E> clazz,
-            final @NonNull E exception,
-            final @NonNull BiConsumer<C, E> defaultHandler
-    ) {
-        Optional.ofNullable(this.getExceptionHandler(clazz)).orElse(defaultHandler).accept(sender, exception);
     }
 
     /**

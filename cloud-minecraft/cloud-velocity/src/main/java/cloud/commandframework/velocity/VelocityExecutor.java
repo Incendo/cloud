@@ -23,30 +23,12 @@
 //
 package cloud.commandframework.velocity;
 
-import cloud.commandframework.exceptions.ArgumentParseException;
-import cloud.commandframework.exceptions.CommandExecutionException;
-import cloud.commandframework.exceptions.InvalidCommandSenderException;
-import cloud.commandframework.exceptions.InvalidSyntaxException;
-import cloud.commandframework.exceptions.NoPermissionException;
-import cloud.commandframework.exceptions.NoSuchCommandException;
-import cloud.commandframework.execution.CommandResult;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.velocitypowered.api.command.CommandSource;
-import java.util.concurrent.CompletionException;
-import java.util.function.BiConsumer;
-import net.kyori.adventure.identity.Identity;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 final class VelocityExecutor<C> implements Command<CommandSource> {
-
-    private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
-    private static final String MESSAGE_NO_PERMS =
-            "I'm sorry, but you do not have permission to perform this command. "
-                    + "Please contact the server administrators if you believe that this is in error.";
-    private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
     private final VelocityCommandManager<C> manager;
 
@@ -60,113 +42,7 @@ final class VelocityExecutor<C> implements Command<CommandSource> {
         final String input = commandContext.getInput();
         final C sender = this.manager.commandSenderMapper().apply(
                 source);
-        this.manager.executeCommand(sender, input).whenComplete(this.getResultConsumer(source, sender));
+        this.manager.executeCommand(sender, input);
         return com.mojang.brigadier.Command.SINGLE_SUCCESS;
-    }
-
-    private @NonNull BiConsumer<@NonNull CommandResult<C>, ? super Throwable> getResultConsumer(
-            final @NonNull CommandSource source,
-            final @NonNull C sender
-    ) {
-        return (result, throwable) -> {
-            if (throwable != null) {
-                if (throwable instanceof CompletionException) {
-                    throwable = throwable.getCause();
-                }
-                final Throwable finalThrowable = throwable;
-                if (throwable instanceof InvalidSyntaxException) {
-                    this.manager.handleException(
-                            sender,
-                            InvalidSyntaxException.class,
-                            (InvalidSyntaxException) throwable,
-                            (c, e) ->
-                                    source.sendMessage(
-                                            Identity.nil(),
-                                            Component
-                                                    .text()
-                                                    .append(
-                                                            Component.text(
-                                                                    "Invalid Command Syntax. Correct command syntax is: ",
-                                                                    NamedTextColor.RED
-                                                            )
-                                                    ).append(
-                                                            Component.text(
-                                                                    e.getCorrectSyntax(),
-                                                                    NamedTextColor.GRAY
-                                                            )
-                                                    ).build()
-                                    )
-                    );
-                } else if (throwable instanceof InvalidCommandSenderException) {
-                    this.manager.handleException(
-                            sender,
-                            InvalidCommandSenderException.class,
-                            (InvalidCommandSenderException) throwable,
-                            (c, e) ->
-                                    source.sendMessage(
-                                            Identity.nil(),
-                                            Component.text(
-                                                    finalThrowable.getMessage(),
-                                                    NamedTextColor.RED
-                                            )
-                                    )
-                    );
-                } else if (throwable instanceof NoPermissionException) {
-                    this.manager.handleException(
-                            sender,
-                            NoPermissionException.class,
-                            (NoPermissionException) throwable,
-                            (c, e) -> source.sendMessage(Identity.nil(), Component.text(MESSAGE_NO_PERMS))
-                    );
-                } else if (throwable instanceof NoSuchCommandException) {
-                    this.manager.handleException(
-                            sender,
-                            NoSuchCommandException.class,
-                            (NoSuchCommandException) throwable,
-                            (c, e) -> source.sendMessage(Identity.nil(), Component.text(MESSAGE_UNKNOWN_COMMAND))
-                    );
-                } else if (throwable instanceof ArgumentParseException) {
-                    this.manager.handleException(
-                            sender,
-                            ArgumentParseException.class,
-                            (ArgumentParseException) throwable,
-                            (c, e) -> source.sendMessage(
-                                    Identity.nil(),
-                                    Component.text()
-                                            .append(Component.text(
-                                                    "Invalid Command Argument: ",
-                                                    NamedTextColor.RED
-                                            ))
-                                            .append(Component.text(
-                                                    finalThrowable.getCause().getMessage(),
-                                                    NamedTextColor.GRAY
-                                            ))
-                            )
-                    );
-                } else if (throwable instanceof CommandExecutionException) {
-                    this.manager.handleException(
-                            sender,
-                            CommandExecutionException.class,
-                            (CommandExecutionException) throwable,
-                            (c, e) -> {
-                                source.sendMessage(
-                                        Identity.nil(),
-                                        Component.text(
-                                                MESSAGE_INTERNAL_ERROR,
-                                                NamedTextColor.RED
-                                        )
-                                );
-                                finalThrowable.getCause().printStackTrace();
-                            }
-                    );
-                } else {
-                    source.sendMessage(
-                            Identity.nil(),
-                            Component.text(MESSAGE_INTERNAL_ERROR, NamedTextColor.RED)
-                    );
-                    throwable.printStackTrace();
-                }
-            }
-        };
     }
 }

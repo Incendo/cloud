@@ -117,7 +117,6 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public boolean registerCommand(final @NonNull Command<C> command) {
             this.registeredCommands.add(command);
             if (this.registerEventFired) {
@@ -156,7 +155,6 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
             );
         }
 
-        @SuppressWarnings("unchecked")
         private void registerClientCommand(
                 final CommandDispatcher<FabricClientCommandSource> dispatcher,
                 final Command<C> command
@@ -174,11 +172,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                                     perm
                             ),
                             true,
-                            new FabricExecutor<>(
-                                    this.commandManager(),
-                                    source -> source.getPlayer().getGameProfile().getName(),
-                                    FabricClientCommandSource::sendError
-                            )
+                            new FabricExecutor<>(this.commandManager())
                     );
 
             rootNode.addChild(baseNode);
@@ -234,11 +228,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
 
         private void registerCommand(final RootCommandNode<CommandSourceStack> dispatcher, final Command<C> command) {
             final CommandComponent<C> component = command.rootComponent();
-            final FabricExecutor<C, CommandSourceStack> executor = new FabricExecutor<>(
-                    this.commandManager(),
-                    CommandSourceStack::getTextName,
-                    CommandSourceStack::sendFailure
-            );
+            final FabricExecutor<C, CommandSourceStack> executor = new FabricExecutor<>(this.commandManager());
             final BrigadierPermissionChecker<CommandSourceStack> permission = (src, perm) -> this.commandManager().hasPermission(
                     this.commandManager().commandSourceMapper().apply(src),
                     perm

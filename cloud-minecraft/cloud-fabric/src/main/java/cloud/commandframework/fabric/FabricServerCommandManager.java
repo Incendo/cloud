@@ -133,6 +133,10 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
         }
 
         this.registerParsers();
+        this.registerDefaultExceptionHandlers(
+                CommandSourceStack::sendFailure,
+                CommandSourceStack::getTextName
+        );
     }
 
     private void registerParsers() {

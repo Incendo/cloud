@@ -26,6 +26,14 @@ package cloud.commandframework.jda;
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
+import cloud.commandframework.exceptions.InvalidCommandSenderException;
+import cloud.commandframework.exceptions.InvalidSyntaxException;
+import cloud.commandframework.exceptions.NoPermissionException;
+import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.exceptions.handling.ExceptionContext;
+import cloud.commandframework.exceptions.handling.ExceptionHandler;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.jda.parsers.ChannelParser;
@@ -53,6 +61,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 @Deprecated
 public class JDACommandManager<C> extends CommandManager<C> {
+
+    private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
+    private static final String MESSAGE_INVALID_SYNTAX = "Invalid Command Syntax. Correct command syntax is: ";
+    private static final String MESSAGE_NO_PERMS = "I'm sorry, but you do not have permission to perform this command. "
+            + "Please contact the server administrators if you believe that this is in error.";
+    private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command";
 
     private final JDA jda;
     private final long botId;
@@ -119,6 +133,8 @@ public class JDACommandManager<C> extends CommandManager<C> {
 
         // No "native" command system means that we can delete commands just fine.
         this.registerCapability(CloudCapability.StandardCapabilities.ROOT_COMMAND_DELETION);
+
+        this.registerDefaultExceptionHandlers();
     }
 
     /**
@@ -185,5 +201,52 @@ public class JDACommandManager<C> extends CommandManager<C> {
         final JDAGuildSender guildSender = (JDAGuildSender) jdaSender;
 
         return guildSender.getMember().hasPermission(Permission.valueOf(permission));
+    }
+
+    private void registerDefaultExceptionHandlers() {
+        this.registerHandler(Throwable.class, (channel, throwable) -> channel.sendMessage(throwable.getMessage()).queue());
+        this.registerHandler(CommandExecutionException.class, (channel, throwable) -> {
+            channel.sendMessage(MESSAGE_INTERNAL_ERROR).queue();
+            throwable.getCause().printStackTrace();
+        });
+        this.registerHandler(ArgumentParseException.class, (channel, throwable) ->
+                channel.sendMessage("Invalid Command Argument: " + throwable.getCause().getMessage()).queue()
+        );
+        this.registerHandler(NoSuchCommandException.class, (channel, throwable) ->
+                channel.sendMessage(MESSAGE_UNKNOWN_COMMAND).queue()
+        );
+        this.registerHandler(NoPermissionException.class, (channel, throwable) ->
+                channel.sendMessage(MESSAGE_NO_PERMS).queue()
+        );
+        this.registerHandler(InvalidCommandSenderException.class, (channel, throwable) ->
+                channel.sendMessage(throwable.getMessage()).queue()
+        );
+        this.exceptionController().registerHandler(InvalidSyntaxException.class, context -> {
+            final String prefix = this.getPrefixMapper().apply(context.context().sender());
+            context.context().<MessageChannel>get("MessageChannel").sendMessage(
+                    MESSAGE_INVALID_SYNTAX + prefix + context.exception().getCorrectSyntax()
+            ).queue();
+        });
+    }
+
+    private <T extends Throwable> void registerHandler(
+            final @NonNull Class<T> exceptionClass,
+            final @NonNull JDAExceptionHandler<C, T> exceptionHandler
+    ) {
+        this.exceptionController().registerHandler(exceptionClass, exceptionHandler);
+    }
+
+
+    @FunctionalInterface
+    @SuppressWarnings("FunctionalInterfaceMethodChanged")
+    private interface JDAExceptionHandler<C, T extends Throwable> extends ExceptionHandler<C, T> {
+
+        @Override
+        default void handle(@NonNull ExceptionContext<C, T> context) throws Throwable {
+            final MessageChannel messageChannel = context.context().get("MessageChannel");
+            this.handle(messageChannel, context.exception());
+        }
+
+        void handle(@NonNull MessageChannel channel, @NonNull T throwable) throws Throwable;
     }
 }

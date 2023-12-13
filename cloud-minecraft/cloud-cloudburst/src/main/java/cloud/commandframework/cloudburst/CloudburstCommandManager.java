@@ -25,6 +25,14 @@ package cloud.commandframework.cloudburst;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
+import cloud.commandframework.exceptions.InvalidCommandSenderException;
+import cloud.commandframework.exceptions.InvalidSyntaxException;
+import cloud.commandframework.exceptions.NoPermissionException;
+import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.exceptions.handling.ExceptionContext;
+import cloud.commandframework.exceptions.handling.ExceptionHandler;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import java.util.function.Function;
@@ -41,6 +49,12 @@ import org.cloudburstmc.server.plugin.Plugin;
  * @param <C> Command sender type
  */
 public class CloudburstCommandManager<C> extends CommandManager<C> {
+
+    private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
+    private static final String MESSAGE_NO_PERMS =
+            "I'm sorry, but you do not have permission to perform this command. "
+                    + "Please contact the server administrators if you believe that this is in error.";
+    private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
     private final Function<CommandSender, C> commandSenderMapper;
     private final Function<C, CommandSender> backwardsCommandSenderMapper;
@@ -71,6 +85,10 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
         this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
                 FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
         ));
+        this.parameterInjectorRegistry().registerInjector(
+                CommandSender.class,
+                (context, annotations) -> this.backwardsCommandSenderMapper.apply(context.sender())
+        );
 
         // Prevent commands from being registered when the server would reject them anyways
         this.owningPlugin.getServer().getPluginManager().registerEvent(
@@ -80,6 +98,8 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
                 (listener, event) -> this.lockRegistration(),
                 this.owningPlugin
         );
+
+        this.registerDefaultExceptionHandlers();
     }
 
     @Override
@@ -108,11 +128,64 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
         return this.owningPlugin;
     }
 
+    private void registerDefaultExceptionHandlers() {
+        this.registerHandler(Throwable.class, (commandSender, throwable) -> {
+            commandSender.sendMessage(MESSAGE_INTERNAL_ERROR);
+            this.getOwningPlugin().getLogger().error(
+                    "An unhandled exception was thrown during command execution",
+                    throwable
+            );
+        });
+        this.registerHandler(CommandExecutionException.class, (commandSender, throwable) -> {
+            commandSender.sendMessage(MESSAGE_INTERNAL_ERROR);
+            this.getOwningPlugin().getLogger().error(
+                    "Exception executing command handler",
+                    throwable.getCause()
+            );
+        });
+        this.registerHandler(ArgumentParseException.class, (commandSender, throwable) ->
+                commandSender.sendMessage("Invalid Command Argument: " + throwable.getCause().getMessage())
+        );
+        this.registerHandler(NoSuchCommandException.class, (commandSender, throwable) ->
+                commandSender.sendMessage(MESSAGE_UNKNOWN_COMMAND)
+        );
+        this.registerHandler(NoPermissionException.class, (commandSender, throwable) ->
+                commandSender.sendMessage(MESSAGE_NO_PERMS)
+        );
+        this.registerHandler(InvalidCommandSenderException.class, (commandSender, throwable) ->
+                commandSender.sendMessage(throwable.getMessage())
+        );
+        this.registerHandler(InvalidSyntaxException.class, (commandSender, throwable) ->
+                commandSender.sendMessage("Invalid Command Syntax. Correct command syntax is: /" + throwable.getCorrectSyntax())
+        );
+    }
+
+    private <T extends Throwable> void registerHandler(
+            final @NonNull Class<T> exceptionClass,
+            final @NonNull CloudburstExceptionHandler<C, T> handler
+    ) {
+        this.exceptionController().registerHandler(exceptionClass, handler);
+    }
+
+
     static final class CloudListener implements Listener {
 
         static final CloudListener INSTANCE = new CloudListener();
 
         private CloudListener() {
         }
+    }
+
+
+    private interface CloudburstExceptionHandler<C, T extends Throwable> extends ExceptionHandler<C, T> {
+
+        @Override
+        default void handle(final @NonNull ExceptionContext<C, T> context) throws Throwable {
+            final CommandSender commandSender = context.context().inject(CommandSender.class)
+                    .orElseThrow(NullPointerException::new);
+            this.handle(commandSender, context.exception());
+        }
+
+        void handle(@NonNull CommandSender commandSender, @NonNull T throwable);
     }
 }

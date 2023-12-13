@@ -23,26 +23,37 @@
 //
 package cloud.commandframework.fabric;
 
-import com.mojang.brigadier.Command;
-import com.mojang.brigadier.context.CommandContext;
+import cloud.commandframework.exceptions.handling.ExceptionContext;
+import cloud.commandframework.exceptions.handling.ExceptionHandler;
 import net.minecraft.commands.SharedSuggestionProvider;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class FabricExecutor<C, S extends SharedSuggestionProvider> implements Command<S> {
+@API(status = API.Status.INTERNAL, since = "2.0.0")
+final class FabricExceptionHandler<C, S extends SharedSuggestionProvider, T extends Throwable> implements ExceptionHandler<C, T> {
 
-    private final FabricCommandManager<C, S> manager;
+    private final FabricCommandManager<C, S> fabricCommandManager;
+    private final ExceptionConsumer<C, S, T> consumer;
 
-    FabricExecutor(final @NonNull FabricCommandManager<C, S> manager) {
-        this.manager = manager;
+    FabricExceptionHandler(
+            final @NonNull FabricCommandManager<C, S> fabricCommandManager,
+            final @NonNull ExceptionConsumer<C, S, T> consumer
+    ) {
+        this.fabricCommandManager = fabricCommandManager;
+        this.consumer = consumer;
     }
 
     @Override
-    public int run(final @NonNull CommandContext<S> ctx) {
-        final S source = ctx.getSource();
-        final String input = ctx.getInput().substring(ctx.getLastChild().getNodes().get(0).getRange().getStart());
-        final C sender = this.manager.commandSourceMapper().apply(source);
+    public void handle(@NonNull final ExceptionContext<C, T> context) throws Throwable {
+        this.consumer.handle(
+                this.fabricCommandManager.backwardsCommandSourceMapper().apply(context.context().sender()),
+                context.context().sender(),
+                context.exception()
+        );
+    }
 
-        this.manager.executeCommand(sender, input);
-        return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+    interface ExceptionConsumer<C, S, T extends Throwable> {
+
+        void handle(@NonNull S source, @NonNull C sender, @NonNull T exception);
     }
 }

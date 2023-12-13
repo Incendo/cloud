@@ -21,31 +21,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.pircbotx;
+package cloud.commandframework.fabric;
 
+import net.minecraft.commands.SharedSuggestionProvider;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.pircbotx.hooks.ListenerAdapter;
-import org.pircbotx.hooks.types.GenericMessageEvent;
 
-final class CloudListenerAdapter<C> extends ListenerAdapter {
+@API(status = API.Status.STABLE, since = "2.0.0")
+final class FabricExceptionHandlerFactory<C, S extends SharedSuggestionProvider> {
 
-    private final PircBotXCommandManager<C> manager;
+    private final FabricCommandManager<C, S> fabricCommandManager;
 
-    CloudListenerAdapter(final @NonNull PircBotXCommandManager<C> manager) {
-        this.manager = manager;
+    FabricExceptionHandlerFactory(final @NonNull FabricCommandManager<C, S> fabricCommandManager) {
+        this.fabricCommandManager = fabricCommandManager;
     }
 
-    @Override
-    public void onGenericMessage(final @NonNull GenericMessageEvent event) {
-        final String message = event.getMessage();
-        if (!message.startsWith(this.manager.getCommandPrefix())) {
-            return;
-        }
-        final C sender = this.manager.getUserMapper().apply(event.getUser());
-        this.manager.executeCommand(
-                sender,
-                message.substring(this.manager.getCommandPrefix().length()),
-                context -> context.store(PircBotXCommandManager.PIRCBOTX_MESSAGE_EVENT_KEY, event)
-        );
+    <T extends Throwable> @NonNull FabricExceptionHandler<C, S, T> createHandler(
+            final FabricExceptionHandler.@NonNull ExceptionConsumer<C, S, T> handler
+    ) {
+        return new FabricExceptionHandler<>(this.fabricCommandManager, handler);
     }
 }
