@@ -92,10 +92,6 @@ public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
      * parsing is. Particular care should be taken when parsing for suggestions, as the parsing
      * method is then likely to be called once for every character written by the command sender.
      * <p>
-     * This method should never throw any exceptions under normal circumstances. Instead, if the
-     * parsing for some reason cannot be done successfully {@link ArgumentParseResult#failure(Throwable)}
-     * should be returned. This then wraps any exception that should be forwarded to the command sender.
-     * <p>
      * The parser is assumed to be completely stateless and should not store any information about
      * the command sender or the command context. Instead, information should be stored in the
      * {@link CommandContext}.
