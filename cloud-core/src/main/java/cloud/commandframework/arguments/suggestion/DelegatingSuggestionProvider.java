@@ -25,6 +25,7 @@ package cloud.commandframework.arguments.suggestion;
 
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -38,8 +39,11 @@ final class DelegatingSuggestionProvider<C> implements SuggestionProvider<C> {
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> suggestions(final @NonNull CommandContext<C> context, final @NonNull String s) {
-        return this.suggestionProvider.suggestions(context, s);
+    public @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
+            final @NonNull CommandContext<C> context,
+            final @NonNull String s
+    ) {
+        return this.suggestionProvider.suggestionsFuture(context, s);
     }
 
     @Override

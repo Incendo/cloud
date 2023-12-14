@@ -196,14 +196,14 @@ final class SelectorUtils {
         }
 
         @Override
-        public List<@NonNull Suggestion> suggestions(
+        public CompletableFuture<List<@NonNull Suggestion>> suggestionsFuture(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
             if (this.modernParser != null) {
-                return this.modernParser.suggestions(commandContext, input);
+                return this.modernParser.suggestionsFuture(commandContext, input);
             }
-            return this.legacySuggestions(commandContext, input);
+            return CompletableFuture.completedFuture(this.legacySuggestions(commandContext, input));
         }
 
         // returns SimpleCommandExceptionType, does not reference in signature for ABI with pre-1.13
@@ -301,7 +301,7 @@ final class SelectorUtils {
         }
 
         @Override
-        public List<@NonNull Suggestion> suggestions(
+        public CompletableFuture<List<@NonNull Suggestion>> suggestionsFuture(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
@@ -315,7 +315,7 @@ final class SelectorUtils {
                         prev = bypassField.getBoolean(commandSourceStack);
                         bypassField.setBoolean(commandSourceStack, true);
                     }
-                    return this.wrappedBrigadierParser.suggestions(commandContext, input);
+                    return this.wrappedBrigadierParser.suggestionsFuture(commandContext, input);
                 } finally {
                     if (bypassField != null) {
                         bypassField.setBoolean(commandSourceStack, prev);

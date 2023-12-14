@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.aggregate;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import java.util.Arrays;
@@ -101,7 +102,7 @@ class AggregateCommandParserTest {
     void testSuggestionsFirstArgument() {
         // Arrange
         final AggregateCommandParser<Object, OutputType> parser = AggregateCommandParser.builder()
-                .withComponent("number", integerParser(), (ctx, in) -> Arrays.asList(
+                .withComponent("number", integerParser(), (SuggestionProvider.Blocking<Object>) (ctx, in) -> Arrays.asList(
                         Suggestion.simple("1"),
                         Suggestion.simple("2"),
                         Suggestion.simple("3")
@@ -128,7 +129,7 @@ class AggregateCommandParserTest {
         // Arrange
         final AggregateCommandParser<Object, OutputType> parser = AggregateCommandParser.builder()
                 .withComponent("number", integerParser())
-                .withComponent("string", stringParser(), (ctx, in) -> Arrays.asList(
+                .withComponent("string", stringParser(), (SuggestionProvider.Blocking<Object>) (ctx, in) -> Arrays.asList(
                         Suggestion.simple("a"),
                         Suggestion.simple("b"),
                         Suggestion.simple("c")

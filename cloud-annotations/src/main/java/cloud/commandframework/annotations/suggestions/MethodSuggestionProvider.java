@@ -44,7 +44,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 1.3.0
  */
-public final class MethodSuggestionProvider<C> implements SuggestionProvider.FutureSuggestionProvider<C> {
+public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> {
 
     private final MethodHandle methodHandle;
 

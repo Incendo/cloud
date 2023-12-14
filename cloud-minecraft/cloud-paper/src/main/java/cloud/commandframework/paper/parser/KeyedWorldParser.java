@@ -35,6 +35,7 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -121,12 +122,12 @@ public final class KeyedWorldParser<C> implements ArgumentParser<C, World> {
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> suggestions(
+    public @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
         if (this.parser != null) {
-            return this.parser.suggestions(commandContext, input);
+            return this.parser.suggestionsFuture(commandContext, input);
         }
 
         final List<World> worlds = Bukkit.getWorlds();
@@ -138,6 +139,6 @@ public final class KeyedWorldParser<C> implements ArgumentParser<C, World> {
             }
             completions.add(Suggestion.simple(key.getNamespace() + ':' + key.getKey()));
         }
-        return completions;
+        return CompletableFuture.completedFuture(completions);
     }
 }

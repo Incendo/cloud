@@ -65,19 +65,19 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser.Futur
 
     @Override
     public @NonNull CompletableFuture<@NonNull O> parseFuture(
-            @NonNull final CommandContext<@NonNull C> commandContext,
-            @NonNull final CommandInput commandInput
+            final @NonNull CommandContext<@NonNull C> commandContext,
+            final @NonNull CommandInput commandInput
     ) {
        return this.base.parseFuture(commandContext, commandInput)
                .thenCompose(result -> this.mapper.map(commandContext, result));
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> suggestions(
+    public @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
-        return this.base.suggestions(commandContext, input);
+        return this.base.suggestionsFuture(commandContext, input);
     }
 
     @Override

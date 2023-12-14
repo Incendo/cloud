@@ -33,6 +33,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -80,10 +81,10 @@ public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> suggestions(
+    public @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
-        return this.suggestionProvider.suggestions(commandContext, input);
+        return this.suggestionProvider.suggestionsFuture(commandContext, input);
     }
 }

@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.StringParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
@@ -69,15 +70,18 @@ class CommandSuggestionsTest {
         this.manager.command(manager.commandBuilder("test").literal("two").build());
         this.manager.command(manager.commandBuilder("test")
                 .literal("var")
-                .required("str", stringParser(), (c, s) -> suggestionList("one", "two"))
+                .required("str", stringParser(),
+                        (SuggestionProvider.Blocking<TestCommandSender>) (c, s) -> suggestionList("one", "two"))
                 .required("enum", enumParser(TestEnum.class)));
         this.manager.command(manager.commandBuilder("test")
                 .literal("comb")
-                .required("str", stringParser(), (c, s) -> suggestionList("one", "two"))
+                .required("str", stringParser(),
+                        (SuggestionProvider.Blocking<TestCommandSender>) (c, s) -> suggestionList("one", "two"))
                 .optional("num", integerParser(1, 95)));
         this.manager.command(manager.commandBuilder("test")
                 .literal("alt")
-                .required("num", integerComponent().suggestionProvider((c, s) -> suggestionList("3", "33", "333"))));
+                .required("num", integerComponent().suggestionProvider(
+                        (SuggestionProvider.Blocking<Object>) (c, s) -> suggestionList("3", "33", "333"))));
 
         this.manager.command(manager.commandBuilder("com")
                 .requiredArgumentPair("com", Pair.of("x", "y"), Pair.of(Integer.class, TestEnum.class),
@@ -111,8 +115,9 @@ class CommandSuggestionsTest {
         this.manager.command(manager.commandBuilder("partial")
                 .required(
                         "arg",
-                        stringComponent(StringParser.StringMode.SINGLE)
-                                .suggestionProvider((ctx, in) -> suggestionList("hi", "hey", "heya", "hai", "hello"))
+                        stringComponent(StringParser.StringMode.SINGLE).suggestionProvider(
+                                (SuggestionProvider.Blocking<Object>) (ctx, in) ->
+                                        suggestionList("hi", "hey", "heya", "hai", "hello"))
                 )
                 .literal("literal")
                 .build());
@@ -120,8 +125,9 @@ class CommandSuggestionsTest {
         this.manager.command(manager.commandBuilder("literal_with_variable")
                 .required(
                         "arg",
-                        stringComponent(StringParser.StringMode.SINGLE)
-                                .suggestionProvider((ctx, in) -> suggestionList("veni", "vidi"))
+                        stringComponent(StringParser.StringMode.SINGLE).suggestionProvider(
+                                (SuggestionProvider.Blocking<Object>) (ctx, in) ->
+                                        suggestionList("veni", "vidi"))
                 )
                 .literal("now"));
         this.manager.command(manager.commandBuilder("literal_with_variable")
@@ -606,7 +612,8 @@ class CommandSuggestionsTest {
         this.manager = createManager();
         this.manager.command(
                 this.manager.commandBuilder("command")
-                        .required("string", greedyFlagYieldingStringParser(), (c, i) -> suggestionList("hello"))
+                        .required("string", greedyFlagYieldingStringParser(),
+                                (SuggestionProvider.Blocking<TestCommandSender>) (c, i) -> suggestionList("hello"))
                         .flag(manager.flagBuilder("flag").withAliases("f").build())
                         .flag(manager.flagBuilder("flag2").build())
         );
@@ -666,7 +673,8 @@ class CommandSuggestionsTest {
         this.manager = createManager();
         this.manager.command(
                 this.manager.commandBuilder("command")
-                        .required("string", greedyStringParser(), (c, i) -> suggestionList("hello world"))
+                        .required("string", greedyStringParser(),
+                                (SuggestionProvider.Blocking<TestCommandSender>) (c, i) -> suggestionList("hello world"))
         );
         this.manager.commandSuggestionProcessor(
                 new FilteringCommandSuggestionProcessor<>(
@@ -697,7 +705,8 @@ class CommandSuggestionsTest {
         this.manager.setSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING, true);
         this.manager.command(
                 this.manager.commandBuilder("command")
-                        .required("string", greedyFlagYieldingStringParser(), (c, i) -> suggestionList("hello"))
+                        .required("string", greedyFlagYieldingStringParser(),
+                                (SuggestionProvider.Blocking<TestCommandSender>) (c, i) -> suggestionList("hello"))
                         .flag(manager.flagBuilder("flag").withAliases("f").build())
                         .flag(manager.flagBuilder("flag2").build())
         );

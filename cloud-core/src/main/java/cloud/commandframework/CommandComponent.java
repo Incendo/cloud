@@ -86,10 +86,10 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
     /**
      * Creates a new mutable builder.
      *
-     * @param <C> the command sender type
-     * @param <T> the component value type
+     * @param <C>   the command sender type
+     * @param <T>   the component value type
      * @param clazz the type of the component
-     * @param name the name of the component
+     * @param name  the name of the component
      * @return the builder
      * @since 2.0.0
      */
@@ -102,14 +102,14 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
     }
 
     CommandComponent(
-        final @NonNull String name,
-        final @NonNull ArgumentParser<C, ?> parser,
-        final @NonNull TypeToken<?> valueType,
-        final @NonNull Description description,
-        final @NonNull ComponentType componentType,
-        final @Nullable DefaultValue<C, ?> defaultValue,
-        final @NonNull SuggestionProvider<C> suggestionProvider,
-        final @NonNull Collection<@NonNull ComponentPreprocessor<C>> componentPreprocessors
+            final @NonNull String name,
+            final @NonNull ArgumentParser<C, ?> parser,
+            final @NonNull TypeToken<?> valueType,
+            final @NonNull Description description,
+            final @NonNull ComponentType componentType,
+            final @Nullable DefaultValue<C, ?> defaultValue,
+            final @NonNull SuggestionProvider<C> suggestionProvider,
+            final @NonNull Collection<@NonNull ComponentPreprocessor<C>> componentPreprocessors
     ) {
         this.name = name;
         this.parser = parser;
@@ -601,13 +601,13 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
             if (this.parser != null) {
                 parser = this.parser;
             } else if (this.commandManager != null) {
-               parser = this.commandManager.parserRegistry()
-                       .createParser(this.valueType, ParserParameters.empty())
-                       .orElse(null);
+                parser = this.commandManager.parserRegistry()
+                        .createParser(this.valueType, ParserParameters.empty())
+                        .orElse(null);
             }
             if (parser == null) {
-                parser = (c, i) -> ArgumentParseResult
-                        .failure(new UnsupportedOperationException("No parser was specified"));
+                parser = new ConstantParserNoSuggestions<>(ArgumentParseResult.failure(
+                        new UnsupportedOperationException("No parser was specified")));
             }
 
             final ComponentType componentType;
@@ -638,6 +638,23 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
                     suggestionProvider,
                     Objects.requireNonNull(this.componentPreprocessors, "componentPreprocessors")
             );
+        }
+    }
+
+    private static final class ConstantParserNoSuggestions<C, T> implements ArgumentParser<C, T>, SuggestionProvider.Empty<C> {
+
+        private final ArgumentParseResult<T> result;
+
+        ConstantParserNoSuggestions(final ArgumentParseResult<T> result) {
+            this.result = result;
+        }
+
+        @Override
+        public @NonNull ArgumentParseResult<@NonNull T> parse(
+                final @NonNull CommandContext<@NonNull C> commandContext,
+                final @NonNull CommandInput commandInput
+        ) {
+            return this.result;
         }
     }
 

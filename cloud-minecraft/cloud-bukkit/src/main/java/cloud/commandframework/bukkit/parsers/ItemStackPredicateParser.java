@@ -198,11 +198,11 @@ public final class ItemStackPredicateParser<C> implements ArgumentParser<C, Item
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> suggestions(
+    public @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
-        return this.parser.suggestions(commandContext, input);
+        return this.parser.suggestionsFuture(commandContext, input);
     }
 
 

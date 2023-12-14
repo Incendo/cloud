@@ -24,9 +24,10 @@
 package cloud.commandframework.arguments.suggestion;
 
 import cloud.commandframework.context.CommandContext;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -52,62 +53,81 @@ public interface SuggestionProvider<C> {
     }
 
     /**
-     * Returns the suggestions for the given {@code input}.
-     *
-     * @param context the context of the suggestion lookup
-     * @param input   the current input
-     * @return the suggestions
-     */
-    @NonNull List<@NonNull Suggestion> suggestions(@NonNull CommandContext<C> context, @NonNull String input);
-
-    /**
-     * Returns a future that completes with the suggestions for the given {@code input}. By default, this delegates to
-     * {@link #suggestions(CommandContext, String)}.
+     * Returns a future that completes with the suggestions for the given {@code input}.
      * <p>
-     * If you want to implement this method for your parser it is recommended to implement
-     * {@link FutureSuggestionProvider} rather than {@link SuggestionProvider}.
+     * If you don't need to return a future, you can implement {@link Blocking} instead.
      *
      * @param context the context of the suggestion lookup
      * @param input   the current input
      * @return the suggestions
      */
-    default @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
+    @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
             @NonNull CommandContext<C> context,
             @NonNull String input
-    ) {
-        return CompletableFuture.completedFuture(this.suggestions(context, input));
-    }
+    );
 
+    @SuppressWarnings("FunctionalInterfaceMethodChanged")
+    @FunctionalInterface
+    interface Blocking<C> extends SuggestionProvider<C> {
 
-    /**
-     * Utility interface extending {@link SuggestionProvider} to make it easier to implement
-     * {@link #suggestionsFuture(CommandContext, String)}.
-     *
-     * @param <C> the command sender type
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    interface FutureSuggestionProvider<C> extends SuggestionProvider<C> {
+        /**
+         * Returns the suggestions for the given {@code input}.
+         *
+         * @param context the context of the suggestion lookup
+         * @param input   the current input
+         * @return the suggestions
+         */
+        @NonNull List<@NonNull Suggestion> suggestions(@NonNull CommandContext<C> context, @NonNull String input);
 
         @Override
-        default @NonNull List<@NonNull Suggestion> suggestions(
-                @NonNull CommandContext<C> context,
-                @NonNull String input
+        default @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
+                final @NonNull CommandContext<C> context,
+                final @NonNull String input
         ) {
-            try {
-                return this.suggestionsFuture(context, input).join();
-            } catch (final CompletionException exception) {
-                final Throwable cause = exception.getCause();
-                if (cause instanceof RuntimeException) {
-                    throw (RuntimeException) cause;
-                }
-                throw exception;
-            }
+            return CompletableFuture.completedFuture(this.suggestions(context, input));
         }
 
+        @SuppressWarnings("FunctionalInterfaceMethodChanged")
+        @FunctionalInterface
+        interface Strings<C> extends Blocking<C> {
+
+            /**
+             * Returns a list of suggested arguments that would be correctly parsed by this parser
+             * <p>
+             * This method is likely to be called for every character provided by the sender and
+             * so it may be necessary to cache results locally to prevent unnecessary computations
+             *
+             * @param commandContext Command context
+             * @param input          Input string
+             * @return List of suggestions
+             * @since 2.0.0
+             */
+            @API(status = API.Status.STABLE, since = "2.0.0")
+            @NonNull List<@NonNull String> stringSuggestions(
+                    @NonNull CommandContext<C> commandContext,
+                    @NonNull String input
+            );
+
+            @Override
+            default @NonNull List<@NonNull Suggestion> suggestions(
+                    final @NonNull CommandContext<C> context,
+                    final @NonNull String input
+            ) {
+                return this.stringSuggestions(context, input).stream()
+                        .map(Suggestion::simple)
+                        .collect(Collectors.toList());
+            }
+        }
+    }
+
+    interface Empty<C> extends SuggestionProvider<C> {
+
         @Override
-        @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
-                @NonNull CommandContext<C> context,
-                @NonNull String input
-        );
+        default @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
+                final @NonNull CommandContext<C> context,
+                final @NonNull String input
+        ) {
+            return CompletableFuture.completedFuture(Collections.emptyList());
+        }
     }
 }

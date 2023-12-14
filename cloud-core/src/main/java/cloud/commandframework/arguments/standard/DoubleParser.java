@@ -27,6 +27,7 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
@@ -35,7 +36,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class DoubleParser<C> implements ArgumentParser<C, Double> {
+public final class DoubleParser<C> implements ArgumentParser<C, Double>, SuggestionProvider.Empty<C> {
 
     /**
      * Constant for the default/unset minimum value.

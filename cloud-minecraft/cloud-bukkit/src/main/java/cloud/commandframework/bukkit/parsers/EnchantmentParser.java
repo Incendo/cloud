@@ -27,6 +27,7 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
@@ -40,7 +41,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public final class EnchantmentParser<C> implements ArgumentParser<C, Enchantment> {
+public final class EnchantmentParser<C> implements ArgumentParser<C, Enchantment>, SuggestionProvider.Blocking.Strings<C> {
 
     /**
      * Creates a enchantment parser.
