@@ -104,19 +104,20 @@ public final class ExamplePlugin extends JavaPlugin {
         //
         // Override the default exception handlers and use the exception handlers from cloud-minecraft-extras instead.
         //
-        new MinecraftExceptionHandler<CommandSender>()
-                .withInvalidSyntaxHandler()
-                .withInvalidSenderHandler()
-                .withNoPermissionHandler()
-                .withArgumentParsingHandler()
-                .withCommandExecutionHandler()
-                .withDecorator(
+        MinecraftExceptionHandler.create(this.bukkitAudiences::sender)
+                .defaultInvalidSyntaxHandler()
+                .defaultInvalidSenderHandler()
+                .defaultNoPermissionHandler()
+                .defaultArgumentParsingHandler()
+                .defaultCommandExecutionHandler()
+                .decorator(
                         component -> text()
                                 .append(text("[", NamedTextColor.DARK_GRAY))
                                 .append(text("Example", NamedTextColor.GOLD))
                                 .append(text("] ", NamedTextColor.DARK_GRAY))
                                 .append(component).build()
-                ).apply(manager, this.bukkitAudiences::sender);
+                )
+                .registerTo(manager);
         //
         // Create a help instance which is used in TextColorExample and HelpExample.
         //
