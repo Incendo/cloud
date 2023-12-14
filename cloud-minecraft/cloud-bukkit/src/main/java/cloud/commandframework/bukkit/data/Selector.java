@@ -55,7 +55,9 @@ public interface Selector<V> {
      * A specialized {@link Selector} that can only return one value.
      *
      * @param <V> the value type
+     * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     interface Single<V> extends Selector<V> {
 
         @Override
