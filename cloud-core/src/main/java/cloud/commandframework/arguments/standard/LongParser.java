@@ -37,7 +37,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class LongParser<C> implements ArgumentParser<C, Long>, SuggestionProvider.Blocking.Strings<C> {
+public final class LongParser<C> implements ArgumentParser<C, Long>, SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Constant for the default/unset minimum value.

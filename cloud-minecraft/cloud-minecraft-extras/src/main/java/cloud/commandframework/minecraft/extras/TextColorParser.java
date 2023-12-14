@@ -53,7 +53,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 1.1.0
  */
-public final class TextColorParser<C> implements ArgumentParser<C, TextColor>, SuggestionProvider.Blocking.Strings<C> {
+public final class TextColorParser<C> implements ArgumentParser<C, TextColor>, SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     private static final Pattern LEGACY_PREDICATE = Pattern.compile(
             "&[0-9a-fA-F]"

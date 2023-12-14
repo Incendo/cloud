@@ -43,7 +43,8 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C, E>, SuggestionProvider.Blocking.Strings<C> {
+public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C, E>,
+        SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new enum parser.

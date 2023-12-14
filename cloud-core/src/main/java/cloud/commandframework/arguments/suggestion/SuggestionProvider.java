@@ -55,7 +55,7 @@ public interface SuggestionProvider<C> {
     /**
      * Returns a future that completes with the suggestions for the given {@code input}.
      * <p>
-     * If you don't need to return a future, you can implement {@link Blocking} instead.
+     * If you don't need to return a future, you can implement {@link BlockingSuggestionProvider} instead.
      *
      * @param context the context of the suggestion lookup
      * @param input   the current input
@@ -66,9 +66,52 @@ public interface SuggestionProvider<C> {
             @NonNull String input
     );
 
+    /**
+     * Get a suggestion provider that provides no suggestions.
+     *
+     * @param <C> sender type
+     * @return suggestion provider
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    static <C> SuggestionProvider<C> noSuggestions() {
+        return new NoSuggestions<C>() {
+        };
+    }
+
+    /**
+     * Utility method to simplify implementing {@link BlockingSuggestionProvider}
+     * using a lambda, for methods that accept a {@link SuggestionProvider}.
+     *
+     * @param blockingSuggestionProvider suggestion provider
+     * @param <C>                        sender type
+     * @return suggestion provider
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    static <C> SuggestionProvider<C> blocking(final BlockingSuggestionProvider<C> blockingSuggestionProvider) {
+        return blockingSuggestionProvider;
+    }
+
+    /**
+     * Utility method to simplify implementing {@link BlockingSuggestionProvider.Strings}
+     * using a lambda, for methods that accept a {@link SuggestionProvider}.
+     *
+     * @param blockingStringsSuggestionProvider suggestion provider
+     * @param <C>                               sender type
+     * @return suggestion provider
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    static <C> SuggestionProvider<C> blockingStrings(
+            final BlockingSuggestionProvider.Strings<C> blockingStringsSuggestionProvider
+    ) {
+        return blockingStringsSuggestionProvider;
+    }
+
     @SuppressWarnings("FunctionalInterfaceMethodChanged")
     @FunctionalInterface
-    interface Blocking<C> extends SuggestionProvider<C> {
+    interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
 
         /**
          * Returns the suggestions for the given {@code input}.
@@ -89,7 +132,7 @@ public interface SuggestionProvider<C> {
 
         @SuppressWarnings("FunctionalInterfaceMethodChanged")
         @FunctionalInterface
-        interface Strings<C> extends Blocking<C> {
+        interface Strings<C> extends BlockingSuggestionProvider<C> {
 
             /**
              * Returns a list of suggested arguments that would be correctly parsed by this parser
@@ -120,7 +163,7 @@ public interface SuggestionProvider<C> {
         }
     }
 
-    interface Empty<C> extends SuggestionProvider<C> {
+    interface NoSuggestions<C> extends SuggestionProvider<C> {
 
         @Override
         default @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(

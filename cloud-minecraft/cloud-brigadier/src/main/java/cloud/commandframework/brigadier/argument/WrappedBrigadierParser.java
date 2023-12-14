@@ -53,7 +53,7 @@ import static java.util.Objects.requireNonNull;
  * @param <T> the value type of the argument
  * @since 1.5.0
  */
-public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, SuggestionProvider.Blocking.Strings<C> {
+public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     public static final String COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER = "_cloud_brigadier_native_sender";
 

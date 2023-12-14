@@ -43,7 +43,7 @@ import org.apiguardian.api.API;
 import org.bukkit.Material;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public final class MaterialParser<C> implements ArgumentParser<C, Material>, SuggestionProvider.Blocking<C> {
+public final class MaterialParser<C> implements ArgumentParser<C, Material>, SuggestionProvider.BlockingSuggestionProvider<C> {
 
     /**
      * Creates a new material parser.

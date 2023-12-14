@@ -44,7 +44,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public final class PlayerParser<C> implements ArgumentParser<C, Player>, SuggestionProvider.Blocking<C> {
+public final class PlayerParser<C> implements ArgumentParser<C, Player>, SuggestionProvider.BlockingSuggestionProvider<C> {
 
     /**
      * Creates a new player parser.

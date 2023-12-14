@@ -57,7 +57,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <V> the registry entry type
  * @since 2.0.0
  */
-public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V>, SuggestionProvider.Blocking.Strings<C> {
+public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V>, SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     private static final String NAMESPACE_MINECRAFT = "minecraft";
 

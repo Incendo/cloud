@@ -83,10 +83,10 @@ class LiteralBrigadierNodeFactoryTest {
                 .literal("literal")
                 .required("integer", integerParser(0, 10))
                 .optional("string", greedyStringParser(),
-                        (cloud.commandframework.arguments.suggestion.SuggestionProvider.Blocking<Object>) (ctx, in) -> Arrays.asList(
+                        cloud.commandframework.arguments.suggestion.SuggestionProvider.blocking((ctx, in) -> Arrays.asList(
                                 Suggestion.simple("some"),
                                 Suggestion.simple("suggestions")
-                        )
+                        ))
                 ).build();
         this.commandManager.command(command);
         final com.mojang.brigadier.Command<Object> brigadierCommand = ctx -> 0;

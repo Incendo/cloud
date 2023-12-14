@@ -94,7 +94,9 @@ public fun interface SuspendingArgumentParser<C : Any, T : Any> {
             scope: CoroutineScope = GlobalScope,
             context: CoroutineContext = EmptyCoroutineContext,
             parser: SuspendingArgumentParser<C, T>
-        ): ArgumentParser<C, T> = object : ArgumentParser.FutureArgumentParser<C, T>, SuggestionProvider.Empty<C> {
+        ): ArgumentParser<C, T> = object :
+            ArgumentParser.FutureArgumentParser<C, T>,
+            SuggestionProvider.NoSuggestions<C> {
             override fun parseFuture(commandContext: CommandContext<C>, commandInput: CommandInput): CompletableFuture<T> {
                 return scope.future(context) {
                     parser(commandContext, commandInput)

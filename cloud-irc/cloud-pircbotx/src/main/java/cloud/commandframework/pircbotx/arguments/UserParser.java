@@ -46,7 +46,7 @@ import org.pircbotx.exception.DaoException;
  * @param <C> Command sender type
  * @since 2.0.0
  */
-public final class UserParser<C> implements ArgumentParser<C, User>, SuggestionProvider.Empty<C> {
+public final class UserParser<C> implements ArgumentParser<C, User>, SuggestionProvider.NoSuggestions<C> {
 
     /**
      * Creates a new server parser.

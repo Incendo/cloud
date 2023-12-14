@@ -36,7 +36,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class DoubleParser<C> implements ArgumentParser<C, Double>, SuggestionProvider.Empty<C> {
+public final class DoubleParser<C> implements ArgumentParser<C, Double>, SuggestionProvider.NoSuggestions<C> {
 
     /**
      * Constant for the default/unset minimum value.

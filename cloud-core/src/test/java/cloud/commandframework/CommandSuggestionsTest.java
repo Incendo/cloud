@@ -71,17 +71,17 @@ class CommandSuggestionsTest {
         this.manager.command(manager.commandBuilder("test")
                 .literal("var")
                 .required("str", stringParser(),
-                        (SuggestionProvider.Blocking<TestCommandSender>) (c, s) -> suggestionList("one", "two"))
+                        SuggestionProvider.blocking((c, s) -> suggestionList("one", "two")))
                 .required("enum", enumParser(TestEnum.class)));
         this.manager.command(manager.commandBuilder("test")
                 .literal("comb")
                 .required("str", stringParser(),
-                        (SuggestionProvider.Blocking<TestCommandSender>) (c, s) -> suggestionList("one", "two"))
+                        SuggestionProvider.blocking((c, s) -> suggestionList("one", "two")))
                 .optional("num", integerParser(1, 95)));
         this.manager.command(manager.commandBuilder("test")
                 .literal("alt")
                 .required("num", integerComponent().suggestionProvider(
-                        (SuggestionProvider.Blocking<Object>) (c, s) -> suggestionList("3", "33", "333"))));
+                        SuggestionProvider.blocking((c, s) -> suggestionList("3", "33", "333")))));
 
         this.manager.command(manager.commandBuilder("com")
                 .requiredArgumentPair("com", Pair.of("x", "y"), Pair.of(Integer.class, TestEnum.class),
@@ -116,8 +116,8 @@ class CommandSuggestionsTest {
                 .required(
                         "arg",
                         stringComponent(StringParser.StringMode.SINGLE).suggestionProvider(
-                                (SuggestionProvider.Blocking<Object>) (ctx, in) ->
-                                        suggestionList("hi", "hey", "heya", "hai", "hello"))
+                                SuggestionProvider.blocking((ctx, in) ->
+                                        suggestionList("hi", "hey", "heya", "hai", "hello")))
                 )
                 .literal("literal")
                 .build());
@@ -126,8 +126,8 @@ class CommandSuggestionsTest {
                 .required(
                         "arg",
                         stringComponent(StringParser.StringMode.SINGLE).suggestionProvider(
-                                (SuggestionProvider.Blocking<Object>) (ctx, in) ->
-                                        suggestionList("veni", "vidi"))
+                                SuggestionProvider.blocking((ctx, in) ->
+                                        suggestionList("veni", "vidi")))
                 )
                 .literal("now"));
         this.manager.command(manager.commandBuilder("literal_with_variable")
@@ -613,7 +613,7 @@ class CommandSuggestionsTest {
         this.manager.command(
                 this.manager.commandBuilder("command")
                         .required("string", greedyFlagYieldingStringParser(),
-                                (SuggestionProvider.Blocking<TestCommandSender>) (c, i) -> suggestionList("hello"))
+                                SuggestionProvider.blocking((c, i) -> suggestionList("hello")))
                         .flag(manager.flagBuilder("flag").withAliases("f").build())
                         .flag(manager.flagBuilder("flag2").build())
         );
@@ -674,7 +674,7 @@ class CommandSuggestionsTest {
         this.manager.command(
                 this.manager.commandBuilder("command")
                         .required("string", greedyStringParser(),
-                                (SuggestionProvider.Blocking<TestCommandSender>) (c, i) -> suggestionList("hello world"))
+                                SuggestionProvider.blocking((c, i) -> suggestionList("hello world")))
         );
         this.manager.commandSuggestionProcessor(
                 new FilteringCommandSuggestionProcessor<>(
@@ -706,7 +706,7 @@ class CommandSuggestionsTest {
         this.manager.command(
                 this.manager.commandBuilder("command")
                         .required("string", greedyFlagYieldingStringParser(),
-                                (SuggestionProvider.Blocking<TestCommandSender>) (c, i) -> suggestionList("hello"))
+                                SuggestionProvider.blocking((c, i) -> suggestionList("hello")))
                         .flag(manager.flagBuilder("flag").withAliases("f").build())
                         .flag(manager.flagBuilder("flag2").build())
         );

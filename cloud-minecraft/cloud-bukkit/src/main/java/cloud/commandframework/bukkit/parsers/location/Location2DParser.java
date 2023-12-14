@@ -48,7 +48,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 1.4.0
  */
-public final class Location2DParser<C> implements ArgumentParser<C, Location2D>, SuggestionProvider.Blocking.Strings<C> {
+public final class Location2DParser<C> implements ArgumentParser<C, Location2D>, SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     private static final int EXPECTED_PARAMETER_COUNT = 2;
 

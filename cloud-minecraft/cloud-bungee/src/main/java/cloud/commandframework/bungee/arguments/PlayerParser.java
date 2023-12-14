@@ -47,7 +47,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 2.0.0
  */
-public final class PlayerParser<C> implements ArgumentParser<C, ProxiedPlayer>, SuggestionProvider.Blocking.Strings<C> {
+public final class PlayerParser<C> implements ArgumentParser<C, ProxiedPlayer>, SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new player parser.

@@ -30,18 +30,15 @@ import cloud.commandframework.context.CommandInput;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.provider.Arguments;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -102,11 +99,11 @@ class AggregateCommandParserTest {
     void testSuggestionsFirstArgument() {
         // Arrange
         final AggregateCommandParser<Object, OutputType> parser = AggregateCommandParser.builder()
-                .withComponent("number", integerParser(), (SuggestionProvider.Blocking<Object>) (ctx, in) -> Arrays.asList(
+                .withComponent("number", integerParser(), SuggestionProvider.blocking((ctx, in) -> Arrays.asList(
                         Suggestion.simple("1"),
                         Suggestion.simple("2"),
                         Suggestion.simple("3")
-                )).withComponent("string", stringParser())
+                ))).withComponent("string", stringParser())
                 .withMapper(
                         OutputType.class,
                         (commandContext, context) ->
@@ -129,11 +126,11 @@ class AggregateCommandParserTest {
         // Arrange
         final AggregateCommandParser<Object, OutputType> parser = AggregateCommandParser.builder()
                 .withComponent("number", integerParser())
-                .withComponent("string", stringParser(), (SuggestionProvider.Blocking<Object>) (ctx, in) -> Arrays.asList(
+                .withComponent("string", stringParser(), SuggestionProvider.blocking((ctx, in) -> Arrays.asList(
                         Suggestion.simple("a"),
                         Suggestion.simple("b"),
                         Suggestion.simple("c")
-                ))
+                )))
                 .withMapper(
                         OutputType.class,
                         (commandContext, context) ->

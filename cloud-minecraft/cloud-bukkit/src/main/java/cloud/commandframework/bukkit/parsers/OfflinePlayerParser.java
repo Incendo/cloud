@@ -53,7 +53,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> Command sender type
  */
-public final class OfflinePlayerParser<C> implements ArgumentParser<C, OfflinePlayer>, SuggestionProvider.Blocking<C> {
+public final class OfflinePlayerParser<C> implements ArgumentParser<C, OfflinePlayer>, SuggestionProvider.BlockingSuggestionProvider<C> {
 
     /**
      * Creates a new offline player parser.

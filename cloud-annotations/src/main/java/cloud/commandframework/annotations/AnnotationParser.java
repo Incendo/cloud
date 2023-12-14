@@ -796,7 +796,7 @@ public final class AnnotationParser<C> {
                 final String suggestions = this.processString(parser.suggestions());
                 final SuggestionProvider<C> suggestionProvider;
                 if (suggestions.isEmpty()) {
-                    suggestionProvider = (SuggestionProvider.Blocking<C>) (context, input) -> Collections.emptyList();
+                    suggestionProvider = SuggestionProvider.noSuggestions();
                 } else {
                     suggestionProvider = this.manager.parserRegistry().getSuggestionProvider(suggestions)
                             .orElseThrow(() -> new NullPointerException(

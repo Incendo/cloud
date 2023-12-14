@@ -47,7 +47,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 2.0.0
  */
-public final class ServerParser<C> implements ArgumentParser<C, RegisteredServer>, SuggestionProvider.Blocking.Strings<C> {
+public final class ServerParser<C> implements ArgumentParser<C, RegisteredServer>,
+        SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new server parser.

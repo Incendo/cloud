@@ -43,7 +43,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 @SuppressWarnings("UnnecessaryLambda")
 @API(status = API.Status.STABLE)
-public final class StringParser<C> implements ArgumentParser<C, String>, SuggestionProvider.Empty<C> {
+public final class StringParser<C> implements ArgumentParser<C, String>, SuggestionProvider.NoSuggestions<C> {
 
     private static final Pattern QUOTED_DOUBLE = Pattern.compile("\"(?<inner>(?:[^\"\\\\]|\\\\.)*)\"");
     private static final Pattern QUOTED_SINGLE = Pattern.compile("'(?<inner>(?:[^'\\\\]|\\\\.)*)'");

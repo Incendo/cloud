@@ -45,7 +45,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <C> Command sender type
  */
 @SuppressWarnings("unused")
-public final class RoleParser<C> implements ArgumentParser<C, Role>, SuggestionProvider.Empty<C> {
+public final class RoleParser<C> implements ArgumentParser<C, Role>, SuggestionProvider.NoSuggestions<C> {
 
     /**
      * Creates a new server parser.

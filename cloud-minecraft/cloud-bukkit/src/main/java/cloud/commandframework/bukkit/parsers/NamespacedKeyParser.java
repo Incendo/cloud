@@ -50,7 +50,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> sender type
  * @since 1.7.0
  */
-public final class NamespacedKeyParser<C> implements ArgumentParser<C, NamespacedKey>, SuggestionProvider.Blocking.Strings<C> {
+public final class NamespacedKeyParser<C> implements ArgumentParser<C, NamespacedKey>,
+        SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new namespaced key parser that does not require a specific namespace,

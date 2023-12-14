@@ -41,7 +41,8 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public final class EnchantmentParser<C> implements ArgumentParser<C, Enchantment>, SuggestionProvider.Blocking.Strings<C> {
+public final class EnchantmentParser<C> implements ArgumentParser<C, Enchantment>,
+        SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a enchantment parser.

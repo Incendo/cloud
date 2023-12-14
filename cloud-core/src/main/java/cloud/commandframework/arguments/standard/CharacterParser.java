@@ -39,7 +39,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class CharacterParser<C> implements ArgumentParser<C, Character>, SuggestionProvider.Empty<C> {
+public final class CharacterParser<C> implements ArgumentParser<C, Character>, SuggestionProvider.NoSuggestions<C> {
 
     /**
      * Creates a new character parser.

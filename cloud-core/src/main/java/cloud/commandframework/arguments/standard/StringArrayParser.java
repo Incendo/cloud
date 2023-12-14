@@ -42,7 +42,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  */
 @API(status = API.Status.STABLE)
-public final class StringArrayParser<C> implements ArgumentParser<C, String[]>, SuggestionProvider.Empty<C> {
+public final class StringArrayParser<C> implements ArgumentParser<C, String[]>, SuggestionProvider.NoSuggestions<C> {
 
     private static final Pattern FLAG_PATTERN = Pattern.compile("(-[A-Za-z_\\-0-9])|(--[A-Za-z_\\-0-9]*)");
 

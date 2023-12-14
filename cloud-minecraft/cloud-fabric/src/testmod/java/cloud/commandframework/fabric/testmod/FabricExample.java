@@ -210,14 +210,14 @@ public final class FabricExample implements ModInitializer {
                         ModMetadata.class,
                         "mod"
                 )
-                .suggestionProvider((SuggestionProvider.Blocking<CommandSourceStack>) (ctx, input) -> FabricLoader
+                .suggestionProvider(SuggestionProvider.blocking((ctx, input) -> FabricLoader
                         .getInstance()
                         .getAllMods()
                         .stream()
                         .map(ModContainer::getMetadata)
                         .map(ModMetadata::getId)
                         .map(Suggestion::simple)
-                        .collect(Collectors.toList()))
+                        .collect(Collectors.toList())))
                 .parser(new ArgumentParser<>() {
                     @Override
                     public @NonNull ArgumentParseResult<@NonNull ModMetadata> parse(

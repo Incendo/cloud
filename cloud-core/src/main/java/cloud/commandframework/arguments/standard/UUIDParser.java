@@ -40,7 +40,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class UUIDParser<C> implements ArgumentParser<C, UUID>, SuggestionProvider.Empty<C> {
+public final class UUIDParser<C> implements ArgumentParser<C, UUID>, SuggestionProvider.NoSuggestions<C> {
 
     /**
      * Creates a new UUID parser.

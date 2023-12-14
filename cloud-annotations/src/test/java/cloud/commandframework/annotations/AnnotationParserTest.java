@@ -76,7 +76,7 @@ class AnnotationParserTest {
         /* Register a suggestion provider */
         manager.parserRegistry().registerSuggestionProvider(
                 "some-name",
-                (SuggestionProvider.Blocking<TestCommandSender>) (context, input) -> NAMED_SUGGESTIONS
+                SuggestionProvider.blocking((context, input) -> NAMED_SUGGESTIONS)
         );
         /* Register a parameter injector */
         annotationParser.getParameterInjectorRegistry().registerInjector(

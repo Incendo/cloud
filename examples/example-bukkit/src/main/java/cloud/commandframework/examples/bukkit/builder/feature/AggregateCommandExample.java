@@ -116,14 +116,14 @@ public final class AggregateCommandExample implements BuilderFeature {
         );
     }
 
-    private SuggestionProvider.@NonNull Blocking<CommandSender> slotSuggestions() {
+    private SuggestionProvider.@NonNull BlockingSuggestionProvider<CommandSender> slotSuggestions() {
         return (context, input) -> IntStream.rangeClosed(1, 9)
                 .mapToObj(Integer::toString)
                 .map(Suggestion::simple)
                 .collect(Collectors.toList());
     }
 
-    private SuggestionProvider.@NonNull Blocking<CommandSender> nameSuggestions() {
+    private SuggestionProvider.@NonNull BlockingSuggestionProvider<CommandSender> nameSuggestions() {
         return (context, input) -> Stream.of(context.<Integer>get("slot"), context.sender().getName())
                 .map(Object::toString)
                 .map(Suggestion::simple)

@@ -56,13 +56,13 @@ public final class HelpExample implements BuilderFeature {
                                 "query",
                                 greedyStringParser(),
                                 DefaultValue.constant(""),
-                                (SuggestionProvider.Blocking<CommandSender>) (ctx, in) -> manager.createHelpHandler()
+                                SuggestionProvider.blocking((ctx, in) -> manager.createHelpHandler()
                                         .queryRootIndex(ctx.sender())
                                         .entries()
                                         .stream()
                                         .map(CommandEntry::syntax)
                                         .map(Suggestion::simple)
-                                        .collect(Collectors.toList())
+                                        .collect(Collectors.toList()))
                         )
                         .handler(context -> {
                             examplePlugin.minecraftHelp().queryCommands(context.get("query"), context.sender());

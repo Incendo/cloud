@@ -40,7 +40,7 @@ import java.util.TreeSet;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public final class LiteralParser<C> implements ArgumentParser<C, String>, SuggestionProvider.Blocking.Strings<C> {
+public final class LiteralParser<C> implements ArgumentParser<C, String>, SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new literal parser that accepts the given {@code name} and {@code aliases}.

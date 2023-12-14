@@ -37,7 +37,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class ByteParser<C> implements ArgumentParser<C, Byte>, SuggestionProvider.Blocking.Strings<C> {
+public final class ByteParser<C> implements ArgumentParser<C, Byte>, SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Constant for the default/unset minimum value.

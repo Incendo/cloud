@@ -41,7 +41,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class IntegerParser<C> implements ArgumentParser<C, Integer>, SuggestionProvider.Blocking.Strings<C> {
+public final class IntegerParser<C> implements ArgumentParser<C, Integer>, SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Constant for the default/unset minimum value.

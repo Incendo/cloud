@@ -36,7 +36,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class FloatParser<C> implements ArgumentParser<C, Float>, SuggestionProvider.Empty<C> {
+public final class FloatParser<C> implements ArgumentParser<C, Float>, SuggestionProvider.NoSuggestions<C> {
 
     /**
      * Constant for the default/unset minimum value.

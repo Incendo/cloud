@@ -49,7 +49,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 2.0.0
  */
 @SuppressWarnings("unused")
-public final class UserParser<C> implements ArgumentParser<C, User>, SuggestionProvider.Empty<C> {
+public final class UserParser<C> implements ArgumentParser<C, User>, SuggestionProvider.NoSuggestions<C> {
 
     /**
      * Creates a new server parser.

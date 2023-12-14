@@ -53,7 +53,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 1.7.0
  */
 @API(status = API.Status.STABLE, since = "1.7.0")
-public final class DurationParser<C> implements ArgumentParser<C, Duration>, SuggestionProvider.Blocking.Strings<C> {
+public final class DurationParser<C> implements ArgumentParser<C, Duration>, SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new duration parser.

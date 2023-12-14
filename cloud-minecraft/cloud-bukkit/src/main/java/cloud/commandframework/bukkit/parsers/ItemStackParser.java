@@ -28,7 +28,6 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
@@ -281,7 +280,7 @@ public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
     }
 
     private static final class LegacyParser<C> implements ArgumentParser<C, ProtoItemStack>,
-            SuggestionProvider.Blocking.Strings<C> {
+            BlockingSuggestionProvider.Strings<C> {
 
         private final ArgumentParser<C, ProtoItemStack> parser = new MaterialParser<C>()
                 .map((ctx, material) -> CompletableFuture.completedFuture(new LegacyProtoItemStack(material)));

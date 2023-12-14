@@ -49,7 +49,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 2.0.0
  */
 public final class TeamParser<C> extends SidedArgumentParser<C, String, PlayerTeam> implements
-        SuggestionProvider.Blocking.Strings<C> {
+        SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new server parser.

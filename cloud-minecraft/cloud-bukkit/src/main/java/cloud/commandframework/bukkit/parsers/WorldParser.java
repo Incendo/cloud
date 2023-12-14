@@ -41,7 +41,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public final class WorldParser<C> implements ArgumentParser<C, World>, SuggestionProvider.Blocking.Strings<C> {
+public final class WorldParser<C> implements ArgumentParser<C, World>, SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new world parser.
