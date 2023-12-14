@@ -42,17 +42,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface SuggestionProvider<C> {
 
     /**
-     * Returns a suggestion provider that delegates to the {@code other} provider.
-     *
-     * @param <C>   the command sender type
-     * @param other the other provider
-     * @return the returned provider
-     */
-    static <C> @NonNull SuggestionProvider<C> delegating(final @NonNull SuggestionProvider<C> other) {
-        return new DelegatingSuggestionProvider<>(other);
-    }
-
-    /**
      * Returns a future that completes with the suggestions for the given {@code input}.
      * <p>
      * If you don't need to return a future, you can implement {@link BlockingSuggestionProvider} instead.
@@ -89,7 +78,9 @@ public interface SuggestionProvider<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    static <C> SuggestionProvider<C> blocking(final BlockingSuggestionProvider<C> blockingSuggestionProvider) {
+    static <C> @NonNull SuggestionProvider<C> blocking(
+            final @NonNull BlockingSuggestionProvider<C> blockingSuggestionProvider
+    ) {
         return blockingSuggestionProvider;
     }
 
@@ -103,8 +94,8 @@ public interface SuggestionProvider<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    static <C> SuggestionProvider<C> blockingStrings(
-            final BlockingSuggestionProvider.Strings<C> blockingStringsSuggestionProvider
+    static <C> @NonNull SuggestionProvider<C> blockingStrings(
+            final BlockingSuggestionProvider.@NonNull Strings<C> blockingStringsSuggestionProvider
     ) {
         return blockingStringsSuggestionProvider;
     }
