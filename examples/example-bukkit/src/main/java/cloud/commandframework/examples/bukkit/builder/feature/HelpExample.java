@@ -25,6 +25,7 @@ package cloud.commandframework.examples.bukkit.builder.feature;
 
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
@@ -55,7 +56,7 @@ public final class HelpExample implements BuilderFeature {
                                 "query",
                                 greedyStringParser(),
                                 DefaultValue.constant(""),
-                                (ctx, in) -> manager.createHelpHandler()
+                                (SuggestionProvider.Blocking<CommandSender>) (ctx, in) -> manager.createHelpHandler()
                                         .queryRootIndex(ctx.sender())
                                         .entries()
                                         .stream()
