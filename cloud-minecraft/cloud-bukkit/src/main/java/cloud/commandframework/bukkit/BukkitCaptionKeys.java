@@ -27,7 +27,6 @@ import cloud.commandframework.captions.Caption;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
-import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -58,44 +57,9 @@ public final class BukkitCaptionKeys {
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_WORLD = of("argument.parse.failure.world");
     /**
-     * Variables: {@code <input>}
-     *
-     * @deprecated parsing is now handled by Brigadier and will throw {@link com.mojang.brigadier.exceptions.CommandSyntaxException} instead.
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.8.0")
-    @Deprecated
-    public static final Caption ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED = of("argument.parse.failure.selector.malformed");
-    /**
      * Variables: None
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_SELECTOR_UNSUPPORTED = of("argument.parse.failure.selector.unsupported");
-    /**
-     * Variables: None
-     *
-     * @deprecated parsing is now handled by Brigadier and will throw {@link com.mojang.brigadier.exceptions.CommandSyntaxException} instead.
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.8.0")
-    @Deprecated
-    public static final Caption ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_PLAYERS = of(
-            "argument.parse.failure.selector.too_many_players");
-    /**
-     * Variables: None
-     *
-     * @deprecated parsing is now handled by Brigadier and will throw {@link com.mojang.brigadier.exceptions.CommandSyntaxException} instead.
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.8.0")
-    @Deprecated
-    public static final Caption ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_ENTITIES = of(
-            "argument.parse.failure.selector.too_many_entities");
-    /**
-     * Variables: None
-     *
-     * @deprecated parsing is now handled by Brigadier and will throw {@link com.mojang.brigadier.exceptions.CommandSyntaxException} instead.
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.8.0")
-    @Deprecated
-    public static final Caption ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER = of(
-            "argument.parse.failure.selector.non_player_in_player_selector");
     /**
      * Variables: {@code <input>}
      */
@@ -142,7 +106,7 @@ public final class BukkitCaptionKeys {
      *
      * @return Immutable collection of keys
      */
-    public static @NonNull Collection<@NonNull Caption> getBukkitCaptionKeys() {
+    public static @NonNull Collection<@NonNull Caption> bukkitCaptionKeys() {
         return Collections.unmodifiableCollection(RECOGNIZED_CAPTIONS);
     }
 }

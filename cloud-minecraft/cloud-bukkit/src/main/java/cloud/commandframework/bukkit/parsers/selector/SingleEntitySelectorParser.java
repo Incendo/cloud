@@ -34,7 +34,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Parser for {@link SingleEntitySelector}. On Minecraft 1.13+
  * this argument uses Minecraft's built-in entity selector argument for parsing
  * and suggestions. On prior versions, this argument will suggest nothing and
- * always fail parsing with {@link SelectorParseException.FailureReason#UNSUPPORTED_VERSION}.
+ * always fail parsing with {@link SelectorUnsupportedException}.
  *
  * @param <C> sender type
  */
