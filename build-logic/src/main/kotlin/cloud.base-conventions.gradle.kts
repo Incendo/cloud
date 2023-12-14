@@ -32,7 +32,8 @@ tasks {
                 "StringSplitter",
                 "EqualsGetClass",
                 "CatchAndPrintStackTrace",
-                "InlineMeSuggester"
+                "InlineMeSuggester",
+                "InlineTrivialConstant"
             )
             disableWarningsInGeneratedCode.set(true)
         }

@@ -30,6 +30,7 @@ import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
+import java.util.Locale;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -67,7 +68,7 @@ public final class FlagExample implements AnnotationFeature {
                 "%s's %s",
                 player.getName(),
                 material.name()
-                        .toLowerCase()
+                        .toLowerCase(Locale.ROOT)
                         .replace('_', ' ')
         );
         if (nameColor != null) {

@@ -36,7 +36,6 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -266,7 +265,6 @@ public final class MinecraftExceptionHandler<C> {
         this.componentBuilders.forEach((type, handler) -> manager.exceptionController().registerHandler(
                 type.exceptionClass(),
                 ctx -> audienceMapper.apply(ctx.context().sender()).sendMessage(
-                        Identity.nil(),
                         this.decorator.apply(handler.apply(ctx.context().sender(), ctx.exception()))
                 )
         ));

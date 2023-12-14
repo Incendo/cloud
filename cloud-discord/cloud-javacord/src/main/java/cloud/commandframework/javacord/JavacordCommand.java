@@ -27,6 +27,7 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.javacord.sender.JavacordCommandSender;
 import cloud.commandframework.javacord.sender.JavacordPrivateSender;
 import cloud.commandframework.javacord.sender.JavacordServerSender;
+import java.util.Locale;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.event.message.MessageCreateEvent;
@@ -46,7 +47,6 @@ public class JavacordCommand<C> implements MessageCreateListener {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public final void onMessageCreate(final @NonNull MessageCreateEvent event) {
         MessageAuthor messageAuthor = event.getMessageAuthor();
 
@@ -75,8 +75,8 @@ public class JavacordCommand<C> implements MessageCreateListener {
         final String finalContent = messageContent;
         if (this.command.aliases()
                 .stream()
-                .map(String::toLowerCase)
-                .noneMatch(commandAlias -> finalContent.toLowerCase().startsWith(commandAlias))) {
+                .map(s -> s.toLowerCase(Locale.ROOT))
+                .noneMatch(commandAlias -> finalContent.toLowerCase(Locale.ROOT).startsWith(commandAlias))) {
             return;
         }
 

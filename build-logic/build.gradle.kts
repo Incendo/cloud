@@ -12,7 +12,6 @@ dependencies {
     implementation("org.ow2.asm:asm:9.5")
     implementation(libs.indraCommon)
     implementation(libs.indraPublishingSonatype)
-    implementation(libs.gradleTestLogger)
     implementation(libs.gradleErrorprone)
     implementation(libs.gradleKotlinJvm)
     implementation(libs.gradleDokka)

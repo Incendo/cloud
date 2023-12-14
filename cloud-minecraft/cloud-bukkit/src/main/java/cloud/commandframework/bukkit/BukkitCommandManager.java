@@ -69,6 +69,7 @@ import cloud.commandframework.tasks.TaskFactory;
 import cloud.commandframework.tasks.TaskRecipe;
 import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Method;
+import java.util.Locale;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -395,7 +396,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         }
 
         /* Remove leading plugin namespace */
-        final String namespace = String.format("%s:", this.getOwningPlugin().getName().toLowerCase());
+        final String namespace = String.format("%s:", this.getOwningPlugin().getName().toLowerCase(Locale.ROOT));
         if (input.startsWith(namespace)) {
             input = input.substring(namespace.length());
         }
@@ -520,7 +521,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         public String getMessage() {
             return String.format(
                     "Could not initialize Brigadier mappings. Reason: %s (%s)",
-                    this.reason.name().toLowerCase().replace("_", " "),
+                    this.reason.name().toLowerCase(Locale.ROOT).replace("_", " "),
                     this.getCause() == null ? "" : this.getCause().getMessage()
             );
         }

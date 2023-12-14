@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.bukkit.parsers.location;
 
+import java.util.Locale;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -96,6 +97,6 @@ public final class LocationCoordinate {
 
     @Override
     public String toString() {
-        return String.format("LocationCoordinate{type=%s, coordinate=%f}", this.type.name().toLowerCase(), this.coordinate);
+        return String.format("LocationCoordinate{type=%s, coordinate=%f}", this.type.name().toLowerCase(Locale.ROOT), this.coordinate);
     }
 }

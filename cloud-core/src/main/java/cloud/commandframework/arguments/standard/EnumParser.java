@@ -35,6 +35,7 @@ import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
@@ -114,7 +115,7 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
-        return EnumSet.allOf(this.enumClass).stream().map(e -> e.name().toLowerCase()).collect(Collectors.toList());
+        return EnumSet.allOf(this.enumClass).stream().map(e -> e.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
     }
 
     @Override
@@ -157,7 +158,7 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
         private static @NonNull String join(final @NonNull Class<? extends Enum> clazz) {
             final EnumSet<?> enumSet = EnumSet.allOf(clazz);
             return enumSet.stream()
-                    .map(e -> e.toString().toLowerCase())
+                    .map(e -> e.toString().toLowerCase(Locale.ROOT))
                     .collect(Collectors.joining(", "));
         }
 

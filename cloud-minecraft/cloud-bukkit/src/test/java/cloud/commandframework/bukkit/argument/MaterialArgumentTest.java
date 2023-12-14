@@ -27,6 +27,7 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.bukkit.parsers.MaterialParser;
 import cloud.commandframework.bukkit.util.ServerTest;
 import cloud.commandframework.context.CommandInput;
+import java.util.Locale;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -44,7 +45,7 @@ class MaterialArgumentTest extends ServerTest {
     void Parse_HappyFlow_Success(final @NonNull Material material) {
         // Arrange
         final MaterialParser<CommandSender> parser = new MaterialParser<>();
-        final CommandInput commandInput = CommandInput.of(material.name().toLowerCase());
+        final CommandInput commandInput = CommandInput.of(material.name().toLowerCase(Locale.ROOT));
 
         // Act
         final ArgumentParseResult<Material> result = parser.parse(

@@ -32,6 +32,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 public final class ArgumentTestHelper {
 
+    @SuppressWarnings("NonApiType")
     static @NonNull LinkedList<@NonNull String> linkedListOf(
             final @NonNull String... strings
     ) {

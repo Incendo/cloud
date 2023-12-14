@@ -26,6 +26,7 @@ package cloud.commandframework.examples.bukkit.builder.feature;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
+import java.util.Locale;
 import java.util.Objects;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -68,7 +69,7 @@ public final class FlagExample implements BuilderFeature {
                                     "%s's %s",
                                     context.sender().getName(),
                                     context.<Material>get("material").name()
-                                            .toLowerCase()
+                                            .toLowerCase(Locale.ROOT)
                                             .replace('_', ' ')
                             );
                             if (context.flags().contains("color")) {
