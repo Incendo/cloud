@@ -127,7 +127,7 @@ public final class FabricExample implements ModInitializer {
                 .required(textColorKey, NamedColorParser.namedColorParser())
                 .handler(ctx -> {
                     final MultiplePlayerSelector selector = ctx.get(playersKey);
-                    final Collection<ServerPlayer> selected = selector.get();
+                    final Collection<ServerPlayer> selected = selector.values();
                     selected.forEach(selectedPlayer ->
                             selectedPlayer.sendSystemMessage(
                                     Component.literal("Wave from ")
@@ -154,7 +154,7 @@ public final class FabricExample implements ModInitializer {
                     GiveCommandAccess.giveItem(
                             ctx.sender(),
                             item,
-                            targets.get(),
+                            targets.values(),
                             amount
                     );
                 }));
@@ -253,7 +253,7 @@ public final class FabricExample implements ModInitializer {
                 .handler(ctx -> {
                     final MultipleEntitySelector selector = ctx.get("targets");
                     final Vec3 location = ctx.<Coordinates>get("location").position();
-                    selector.get().forEach(target ->
+                    selector.values().forEach(target ->
                             target.teleportToWithTicket(location.x(), location.y(), location.z()));
                 }));
 

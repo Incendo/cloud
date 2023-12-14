@@ -456,7 +456,7 @@ public final class FabricVanillaArgumentParsers {
         }
 
         @Override
-        public @NonNull Entity getSingle() {
+        public @NonNull Entity single() {
             return this.selectedEntity;
         }
     }
@@ -488,7 +488,7 @@ public final class FabricVanillaArgumentParsers {
         }
 
         @Override
-        public @NonNull Collection<Entity> get() {
+        public @NonNull Collection<Entity> values() {
             return this.selectedEntities;
         }
     }
@@ -520,7 +520,7 @@ public final class FabricVanillaArgumentParsers {
         }
 
         @Override
-        public @NonNull ServerPlayer getSingle() {
+        public @NonNull ServerPlayer single() {
             return this.selectedPlayer;
         }
     }
@@ -552,7 +552,7 @@ public final class FabricVanillaArgumentParsers {
         }
 
         @Override
-        public @NonNull Collection<ServerPlayer> get() {
+        public @NonNull Collection<ServerPlayer> values() {
             return this.selectedPlayers;
         }
     }

@@ -30,7 +30,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * A selector string to query multiple entity-like values
+ * A selector string to query multiple entity-like values.
  *
  * @param <V> Value type
  * @since 1.5.0
@@ -54,17 +54,17 @@ public interface Selector<V> {
     @Nullable EntitySelector selector();
 
     /**
-     * Resolve the value of this selector.
+     * Get the value of this selector.
      *
-     * <p>A successfully parsed selector must match one or more values</p>
+     * <p>A successfully parsed selector must match one or more values.</p>
      *
      * @return all matched entities
      * @since 1.5.0
      */
-    @NonNull Collection<V> get();
+    @NonNull Collection<V> values();
 
     /**
-     * A specialized selector that can only return one value.
+     * A specialized {@link Selector} that can only return one value.
      *
      * @param <V> the value type
      * @since 1.5.0
@@ -72,8 +72,8 @@ public interface Selector<V> {
     interface Single<V> extends Selector<V> {
 
         @Override
-        default @NonNull Collection<V> get() {
-            return Collections.singletonList(this.getSingle());
+        default @NonNull Collection<V> values() {
+            return Collections.singletonList(this.single());
         }
 
         /**
@@ -82,6 +82,6 @@ public interface Selector<V> {
          * @return the value
          * @since 1.5.0
          */
-        @NonNull V getSingle();
+        @NonNull V single();
     }
 }
