@@ -315,7 +315,10 @@ final class SelectorUtils {
                         prev = bypassField.getBoolean(commandSourceStack);
                         bypassField.setBoolean(commandSourceStack, true);
                     }
-                    return this.wrappedBrigadierParser.suggestionsFuture(commandContext, input);
+                    // stupid hack
+                    return CompletableFuture.completedFuture(
+                            this.wrappedBrigadierParser.suggestionsFuture(commandContext, input).join()
+                    );
                 } finally {
                     if (bypassField != null) {
                         bypassField.setBoolean(commandSourceStack, prev);
