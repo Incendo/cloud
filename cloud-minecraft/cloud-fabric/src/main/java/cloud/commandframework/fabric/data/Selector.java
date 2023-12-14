@@ -26,6 +26,7 @@ package cloud.commandframework.fabric.data;
 import java.util.Collection;
 import java.util.Collections;
 import net.minecraft.commands.arguments.selector.EntitySelector;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -59,8 +60,9 @@ public interface Selector<V> {
      * <p>A successfully parsed selector must match one or more values.</p>
      *
      * @return all matched entities
-     * @since 1.5.0
+     * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @NonNull Collection<V> values();
 
     /**
@@ -80,8 +82,9 @@ public interface Selector<V> {
          * Get the single value from this selector.
          *
          * @return the value
-         * @since 1.5.0
+         * @since 2.0.0
          */
+        @API(status = API.Status.STABLE, since = "2.0.0")
         @NonNull V single();
     }
 }
