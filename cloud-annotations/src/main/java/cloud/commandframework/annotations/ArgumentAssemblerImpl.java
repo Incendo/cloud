@@ -105,7 +105,7 @@ final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
             final List<Suggestion> suggestions = Arrays.stream(
                     completions.value().replace(" ", "").split(",")
             ).map(Suggestion::simple).collect(Collectors.toList());
-            componentBuilder.suggestionProvider(SuggestionProvider.blocking((commandContext, input) -> suggestions));
+            componentBuilder.suggestionProvider(SuggestionProvider.suggesting(suggestions));
         } else if (descriptor.suggestions() != null) {
             final String suggestionProviderName = this.annotationParser.processString(descriptor.suggestions());
             final Optional<SuggestionProvider<C>> suggestionsFunction =

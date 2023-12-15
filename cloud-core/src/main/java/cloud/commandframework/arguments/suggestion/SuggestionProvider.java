@@ -24,6 +24,8 @@
 package cloud.commandframework.arguments.suggestion;
 
 import cloud.commandframework.context.CommandContext;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -98,6 +100,74 @@ public interface SuggestionProvider<C> {
             final BlockingSuggestionProvider.@NonNull Strings<C> blockingStringsSuggestionProvider
     ) {
         return blockingStringsSuggestionProvider;
+    }
+
+    /**
+     * Create a {@link SuggestionProvider} that provides constant suggestions.
+     *
+     * @param suggestions list of strings to suggest
+     * @param <C>         sender type
+     * @return suggestion provider
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    static <C> @NonNull SuggestionProvider<C> suggesting(
+            final @NonNull Suggestion @NonNull... suggestions
+    ) {
+        return suggesting(Arrays.asList(suggestions));
+    }
+
+    /**
+     * Create a {@link SuggestionProvider} that provides constant string suggestions.
+     *
+     * @param suggestions list of strings to suggest
+     * @param <C>         sender type
+     * @return suggestion provider
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    static <C> @NonNull SuggestionProvider<C> suggestingStrings(
+            final @NonNull String @NonNull... suggestions
+    ) {
+        return suggestingStrings(Arrays.asList(suggestions));
+    }
+
+    /**
+     * Create a {@link SuggestionProvider} that provides constant suggestions.
+     *
+     * @param suggestions list of strings to suggest
+     * @param <C>         sender type
+     * @return suggestion provider
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    static <C> @NonNull SuggestionProvider<C> suggesting(
+            final @NonNull Iterable<@NonNull Suggestion> suggestions
+    ) {
+        final List<Suggestion> result = new ArrayList<>();
+        for (final Suggestion suggestion : suggestions) {
+            result.add(suggestion);
+        }
+        return blocking((ctx, input) -> result);
+    }
+
+    /**
+     * Create a {@link SuggestionProvider} that provides constant string suggestions.
+     *
+     * @param suggestions list of strings to suggest
+     * @param <C>         sender type
+     * @return suggestion provider
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    static <C> @NonNull SuggestionProvider<C> suggestingStrings(
+            final @NonNull Iterable<@NonNull String> suggestions
+    ) {
+        final List<String> result = new ArrayList<>();
+        for (final String suggestion : suggestions) {
+            result.add(suggestion);
+        }
+        return blockingStrings((ctx, input) -> result);
     }
 
     @SuppressWarnings("FunctionalInterfaceMethodChanged")

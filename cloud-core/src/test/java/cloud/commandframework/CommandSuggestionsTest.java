@@ -70,8 +70,7 @@ class CommandSuggestionsTest {
         this.manager.command(manager.commandBuilder("test").literal("two").build());
         this.manager.command(manager.commandBuilder("test")
                 .literal("var")
-                .required("str", stringParser(),
-                        SuggestionProvider.blocking((c, s) -> suggestionList("one", "two")))
+                .required("str", stringParser(), SuggestionProvider.suggestingStrings("one", "two"))
                 .required("enum", enumParser(TestEnum.class)));
         this.manager.command(manager.commandBuilder("test")
                 .literal("comb")
@@ -116,8 +115,7 @@ class CommandSuggestionsTest {
                 .required(
                         "arg",
                         stringComponent(StringParser.StringMode.SINGLE).suggestionProvider(
-                                SuggestionProvider.blocking((ctx, in) ->
-                                        suggestionList("hi", "hey", "heya", "hai", "hello")))
+                                SuggestionProvider.suggestingStrings("hi", "hey", "heya", "hai", "hello"))
                 )
                 .literal("literal")
                 .build());

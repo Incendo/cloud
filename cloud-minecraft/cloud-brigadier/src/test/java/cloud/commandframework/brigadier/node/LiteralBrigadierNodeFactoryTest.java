@@ -83,7 +83,7 @@ class LiteralBrigadierNodeFactoryTest {
                 .literal("literal")
                 .required("integer", integerParser(0, 10))
                 .optional("string", greedyStringParser(),
-                        cloud.commandframework.arguments.suggestion.SuggestionProvider.blocking((ctx, in) -> Arrays.asList(
+                        cloud.commandframework.arguments.suggestion.SuggestionProvider.suggesting(Arrays.asList(
                                 Suggestion.simple("some"),
                                 Suggestion.simple("suggestions")
                         ))
