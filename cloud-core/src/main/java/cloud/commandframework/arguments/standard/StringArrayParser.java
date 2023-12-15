@@ -27,7 +27,6 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import java.util.LinkedList;
@@ -42,7 +41,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  */
 @API(status = API.Status.STABLE)
-public final class StringArrayParser<C> implements ArgumentParser<C, String[]>, SuggestionProvider.NoSuggestions<C> {
+public final class StringArrayParser<C> implements ArgumentParser<C, String[]> {
 
     private static final Pattern FLAG_PATTERN = Pattern.compile("(-[A-Za-z_\\-0-9])|(--[A-Za-z_\\-0-9]*)");
 

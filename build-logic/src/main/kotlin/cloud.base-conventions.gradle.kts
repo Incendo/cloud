@@ -33,7 +33,8 @@ tasks {
                 "EqualsGetClass",
                 "CatchAndPrintStackTrace",
                 "InlineMeSuggester",
-                "InlineTrivialConstant"
+                "InlineTrivialConstant",
+                "FunctionalInterfaceMethodChanged"
             )
             disableWarningsInGeneratedCode.set(true)
         }

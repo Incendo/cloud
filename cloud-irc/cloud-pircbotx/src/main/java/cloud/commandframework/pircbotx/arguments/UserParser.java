@@ -27,7 +27,6 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -46,7 +45,7 @@ import org.pircbotx.exception.DaoException;
  * @param <C> Command sender type
  * @since 2.0.0
  */
-public final class UserParser<C> implements ArgumentParser<C, User>, SuggestionProvider.NoSuggestions<C> {
+public final class UserParser<C> implements ArgumentParser<C, User> {
 
     /**
      * Creates a new server parser.

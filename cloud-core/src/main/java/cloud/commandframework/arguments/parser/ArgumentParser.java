@@ -167,6 +167,7 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      * @param <T> the type produced by the parser
      * @since 2.0.0
      */
+    @FunctionalInterface
     @API(status = API.Status.STABLE, since = "2.0.0")
     interface FutureArgumentParser<C, T> extends ArgumentParser<C, T> {
 

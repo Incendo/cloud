@@ -27,7 +27,6 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
@@ -49,7 +48,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 2.0.0
  */
 @SuppressWarnings("unused")
-public final class UserParser<C> implements ArgumentParser<C, User>, SuggestionProvider.NoSuggestions<C> {
+public final class UserParser<C> implements ArgumentParser<C, User> {
 
     /**
      * Creates a new server parser.

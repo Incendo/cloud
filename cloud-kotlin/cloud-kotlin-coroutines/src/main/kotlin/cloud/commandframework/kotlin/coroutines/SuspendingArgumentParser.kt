@@ -27,7 +27,6 @@ import cloud.commandframework.CommandManager
 import cloud.commandframework.arguments.parser.ArgumentParser
 import cloud.commandframework.arguments.parser.ParserDescriptor
 import cloud.commandframework.arguments.suggestion.SuggestionFactory
-import cloud.commandframework.arguments.suggestion.SuggestionProvider
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.context.CommandInput
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
@@ -35,7 +34,6 @@ import cloud.commandframework.execution.CommandExecutionCoordinator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.future
-import java.util.concurrent.CompletableFuture
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -94,13 +92,9 @@ public fun interface SuspendingArgumentParser<C : Any, T : Any> {
             scope: CoroutineScope = GlobalScope,
             context: CoroutineContext = EmptyCoroutineContext,
             parser: SuspendingArgumentParser<C, T>
-        ): ArgumentParser<C, T> = object :
-            ArgumentParser.FutureArgumentParser<C, T>,
-            SuggestionProvider.NoSuggestions<C> {
-            override fun parseFuture(commandContext: CommandContext<C>, commandInput: CommandInput): CompletableFuture<T> {
-                return scope.future(context) {
-                    parser(commandContext, commandInput)
-                }
+        ): ArgumentParser<C, T> = ArgumentParser.FutureArgumentParser { ctx, commandInput ->
+            scope.future(context) {
+                parser(ctx, commandInput)
             }
         }
     }

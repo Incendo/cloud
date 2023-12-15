@@ -27,7 +27,6 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
@@ -40,7 +39,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class UUIDParser<C> implements ArgumentParser<C, UUID>, SuggestionProvider.NoSuggestions<C> {
+public final class UUIDParser<C> implements ArgumentParser<C, UUID> {
 
     /**
      * Creates a new UUID parser.

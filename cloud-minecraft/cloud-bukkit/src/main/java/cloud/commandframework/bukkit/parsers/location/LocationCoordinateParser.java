@@ -26,7 +26,6 @@ package cloud.commandframework.bukkit.parsers.location;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.standard.DoubleParser;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.parsers.PlayerParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -39,8 +38,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 1.1.0
  */
-public final class LocationCoordinateParser<C> implements ArgumentParser<C, LocationCoordinate>,
-        SuggestionProvider.NoSuggestions<C> {
+public final class LocationCoordinateParser<C> implements ArgumentParser<C, LocationCoordinate> {
 
     @Override
     public @NonNull ArgumentParseResult<@NonNull LocationCoordinate> parse(

@@ -641,8 +641,7 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
         }
     }
 
-    private static final class ConstantParserNoSuggestions<C, T> implements ArgumentParser<C, T>,
-            SuggestionProvider.NoSuggestions<C> {
+    private static final class ConstantParserNoSuggestions<C, T> implements ArgumentParser<C, T> {
 
         private final ArgumentParseResult<T> result;
 

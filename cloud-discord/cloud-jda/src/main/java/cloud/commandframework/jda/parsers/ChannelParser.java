@@ -27,7 +27,6 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
@@ -46,7 +45,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <C> Command sender type
  */
 @SuppressWarnings("unused")
-public final class ChannelParser<C> implements ArgumentParser<C, MessageChannel>, SuggestionProvider.NoSuggestions<C> {
+public final class ChannelParser<C> implements ArgumentParser<C, MessageChannel> {
 
     /**
      * Creates a new server parser.
