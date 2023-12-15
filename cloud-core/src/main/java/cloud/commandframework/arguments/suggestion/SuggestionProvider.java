@@ -66,8 +66,7 @@ public interface SuggestionProvider<C> {
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     static <C> SuggestionProvider<C> noSuggestions() {
-        return new NoSuggestions<C>() {
-        };
+        return (ctx, in) -> CompletableFuture.completedFuture(Collections.emptyList());
     }
 
     /**
@@ -221,17 +220,6 @@ public interface SuggestionProvider<C> {
                         .map(Suggestion::simple)
                         .collect(Collectors.toList());
             }
-        }
-    }
-
-    interface NoSuggestions<C> extends SuggestionProvider<C> {
-
-        @Override
-        default @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
-                final @NonNull CommandContext<C> context,
-                final @NonNull String input
-        ) {
-            return CompletableFuture.completedFuture(Collections.emptyList());
         }
     }
 }
