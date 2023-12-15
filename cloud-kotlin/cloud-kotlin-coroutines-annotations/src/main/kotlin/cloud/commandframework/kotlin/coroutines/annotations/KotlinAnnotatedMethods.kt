@@ -186,7 +186,7 @@ private class KotlinSuggestionProvider<C>(
     private val instance: Any
 ) : SuggestionProvider<C> {
 
-    override fun suggestionsFuture(context: CommandContext<C>, input: String): CompletableFuture<List<Suggestion>> {
+    override fun suggestionsFuture(context: CommandContext<C>, input: String): CompletableFuture<Iterable<Suggestion>> {
         return coroutineScope.future(coroutineContext) {
             try {
                 kFunction.callSuspend(instance, context, input)

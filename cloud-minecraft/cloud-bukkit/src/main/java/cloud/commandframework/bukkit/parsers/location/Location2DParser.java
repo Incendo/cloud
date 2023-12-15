@@ -31,7 +31,6 @@ import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import java.util.List;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -158,7 +157,7 @@ public final class Location2DParser<C> implements ArgumentParser<C, Location2D>,
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

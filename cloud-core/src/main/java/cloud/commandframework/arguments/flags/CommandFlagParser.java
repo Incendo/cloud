@@ -143,7 +143,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public @NonNull CompletableFuture<List<@NonNull Suggestion>> suggestionsFuture(
+    public @NonNull CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

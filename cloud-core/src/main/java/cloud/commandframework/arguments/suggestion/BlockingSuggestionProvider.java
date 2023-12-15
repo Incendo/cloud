@@ -24,9 +24,9 @@
 package cloud.commandframework.arguments.suggestion;
 
 import cloud.commandframework.context.CommandContext;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -50,10 +50,10 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
      * @param input   the current input
      * @return the suggestions
      */
-    @NonNull List<@NonNull Suggestion> suggestions(@NonNull CommandContext<C> context, @NonNull String input);
+    @NonNull Iterable<@NonNull Suggestion> suggestions(@NonNull CommandContext<C> context, @NonNull String input);
 
     @Override
-    default @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
+    default @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {
@@ -83,17 +83,17 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
          * @param input          Input string
          * @return List of suggestions
          */
-        @NonNull List<@NonNull String> stringSuggestions(
+        @NonNull Iterable<@NonNull String> stringSuggestions(
                 @NonNull CommandContext<C> commandContext,
                 @NonNull String input
         );
 
         @Override
-        default @NonNull List<@NonNull Suggestion> suggestions(
+        default @NonNull Iterable<@NonNull Suggestion> suggestions(
                 final @NonNull CommandContext<C> context,
                 final @NonNull String input
         ) {
-            return this.stringSuggestions(context, input).stream()
+            return StreamSupport.stream(this.stringSuggestions(context, input).spliterator(), false)
                     .map(Suggestion::simple)
                     .collect(Collectors.toList());
         }

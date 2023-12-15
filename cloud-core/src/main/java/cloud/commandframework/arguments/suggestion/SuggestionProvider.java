@@ -24,10 +24,8 @@
 package cloud.commandframework.arguments.suggestion;
 
 import cloud.commandframework.context.CommandContext;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -36,8 +34,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Provider of suggestions
  *
  * @param <C> command sender type
- * @see BlockingSuggestionProvider
- * @see BlockingSuggestionProvider.Strings
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
@@ -53,7 +49,7 @@ public interface SuggestionProvider<C> {
      * @param input   the current input
      * @return the suggestions
      */
-    @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
+    @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
             @NonNull CommandContext<C> context,
             @NonNull String input
     );
@@ -132,11 +128,7 @@ public interface SuggestionProvider<C> {
     static <C> @NonNull SuggestionProvider<C> suggesting(
             final @NonNull Iterable<@NonNull Suggestion> suggestions
     ) {
-        final List<Suggestion> result = new ArrayList<>();
-        for (final Suggestion suggestion : suggestions) {
-            result.add(suggestion);
-        }
-        return blocking((ctx, input) -> result);
+        return blocking((ctx, input) -> suggestions);
     }
 
     /**
@@ -149,10 +141,6 @@ public interface SuggestionProvider<C> {
     static <C> @NonNull SuggestionProvider<C> suggestingStrings(
             final @NonNull Iterable<@NonNull String> suggestions
     ) {
-        final List<String> result = new ArrayList<>();
-        for (final String suggestion : suggestions) {
-            result.add(suggestion);
-        }
-        return blockingStrings((ctx, input) -> result);
+        return blockingStrings((ctx, input) -> suggestions);
     }
 }

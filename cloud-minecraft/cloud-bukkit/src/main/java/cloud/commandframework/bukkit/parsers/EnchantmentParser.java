@@ -101,7 +101,7 @@ public final class EnchantmentParser<C> implements ArgumentParser<C, Enchantment
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

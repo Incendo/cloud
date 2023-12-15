@@ -164,7 +164,7 @@ public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V>, Bl
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

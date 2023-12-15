@@ -152,7 +152,7 @@ class ByteParserTest {
         }
 
         // Act
-        final List<Suggestion> suggestions = parser.suggestions(
+        final Iterable<Suggestion> suggestions = parser.suggestions(
                 this.context,
                 ""
         );
@@ -175,7 +175,7 @@ class ByteParserTest {
         }
 
         // Act
-        final List<Suggestion> suggestions = parser.suggestions(
+        final Iterable<Suggestion> suggestions = parser.suggestions(
                 this.context,
                 "-"
         );
