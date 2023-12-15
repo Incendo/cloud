@@ -52,7 +52,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "2.0.0")
-public final class CommandFlagParser<C> implements ArgumentParser.FutureArgumentParser<C, Object> {
+public final class CommandFlagParser<C> implements ArgumentParser.FutureArgumentParser<C, Object>, SuggestionProvider<C> {
 
     /**
      * Dummy object that indicates that flags were parsed successfully

@@ -28,14 +28,9 @@ import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Stream;
@@ -164,44 +159,14 @@ class CommandExecutionCoordinatorTest {
     }
 
     private static ArgumentParser<TestCommandSender, Integer> failingParser(final Exception exception) {
-        return new ArgumentParser<TestCommandSender, Integer>() {
-            @Override
-            public @NonNull ArgumentParseResult<@NonNull Integer> parse(
-                    @NonNull final CommandContext<@NonNull TestCommandSender> commandContext,
-                    @NonNull final CommandInput commandInput
-            ) {
-                return ArgumentParseResult.failure(exception);
-            }
-
-            @Override
-            public @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
-                    @NonNull final CommandContext<TestCommandSender> context,
-                    @NonNull final String input
-            ) {
-                return CompletableFuture.completedFuture(Collections.emptyList());
-            }
-        };
+        return (commandContext, commandInput) -> ArgumentParseResult.failure(exception);
     }
 
     private static ArgumentParser<TestCommandSender, Integer> failingFutureParser(final Exception exception) {
-        return new ArgumentParser.FutureArgumentParser<TestCommandSender, Integer>() {
-            @Override
-            public @NonNull CompletableFuture<@NonNull Integer> parseFuture(
-                    @NonNull final CommandContext<@NonNull TestCommandSender> commandContext,
-                    @NonNull final CommandInput commandInput
-            ) {
-                final CompletableFuture<Integer> result = new CompletableFuture<>();
-                result.completeExceptionally(exception);
-                return result;
-            }
-
-            @Override
-            public @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
-                    @NonNull final CommandContext<TestCommandSender> context,
-                    @NonNull final String input
-            ) {
-                return CompletableFuture.completedFuture(Collections.emptyList());
-            }
+        return (ArgumentParser.FutureArgumentParser<TestCommandSender, Integer>) (commandContext, commandInput) -> {
+            final CompletableFuture<Integer> result = new CompletableFuture<>();
+            result.completeExceptionally(exception);
+            return result;
         };
     }
 

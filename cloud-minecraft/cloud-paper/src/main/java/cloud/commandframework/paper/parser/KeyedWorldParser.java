@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.parsers.WorldParser;
 import cloud.commandframework.context.CommandContext;
@@ -51,7 +52,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 1.6.0
  */
-public final class KeyedWorldParser<C> implements ArgumentParser<C, World> {
+public final class KeyedWorldParser<C> implements ArgumentParser<C, World>, SuggestionProvider<C> {
 
     /**
      * Creates a new keyed world parser.
@@ -127,7 +128,7 @@ public final class KeyedWorldParser<C> implements ArgumentParser<C, World> {
             final @NonNull String input
     ) {
         if (this.parser != null) {
-            return this.parser.suggestionsFuture(commandContext, input);
+            return this.parser.suggestionProvider().suggestionsFuture(commandContext, input);
         }
 
         final List<World> worlds = Bukkit.getWorlds();
