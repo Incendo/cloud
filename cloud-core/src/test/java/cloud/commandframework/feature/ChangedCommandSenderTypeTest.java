@@ -49,7 +49,7 @@ class ChangedCommandSenderTypeTest {
         // Arrange
         final Command.Builder<TestCommandSender> root = commandManager.commandBuilder("root");
         final ParserDescriptor<TestCommandSender, Integer> integerParser = integerParser();
-        final SuggestionProvider<TestCommandSender> suggestionProvider = integerParser.parser();
+        final SuggestionProvider<TestCommandSender> suggestionProvider = integerParser.parser().suggestionProvider();
         final DefaultValue<TestCommandSender, Integer> defaultValue = DefaultValue.constant(5);
 
         // Act

@@ -26,6 +26,7 @@ package cloud.commandframework.bukkit.parsers.selector;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
@@ -135,7 +136,8 @@ final class SelectorUtils {
     }
 
     @SuppressWarnings("unused") // errorprone false positive
-    private abstract static class SelectorParser<C, T> implements ArgumentParser.FutureArgumentParser<C, T>, SelectorMapper<T> {
+    private abstract static class SelectorParser<C, T> implements ArgumentParser.FutureArgumentParser<C, T>, SelectorMapper<T>,
+            SuggestionProvider<C> {
 
         protected static final Supplier<Object> NO_PLAYERS_EXCEPTION_TYPE =
                 Suppliers.memoize(() -> findExceptionType("argument.entity.notfound.player"));
@@ -201,7 +203,7 @@ final class SelectorUtils {
                 final @NonNull String input
         ) {
             if (this.modernParser != null) {
-                return this.modernParser.suggestionsFuture(commandContext, input);
+                this.modernParser.suggestionProvider().suggestionsFuture(commandContext, input);
             }
             return CompletableFuture.completedFuture(this.legacySuggestions(commandContext, input));
         }
@@ -265,7 +267,7 @@ final class SelectorUtils {
         }
     }
 
-    private static class ModernSelectorParser<C, T> implements ArgumentParser.FutureArgumentParser<C, T> {
+    private static class ModernSelectorParser<C, T> implements ArgumentParser.FutureArgumentParser<C, T>, SuggestionProvider<C> {
 
         private final ArgumentParser<C, Object> wrappedBrigadierParser;
         private final SelectorMapper<T> mapper;
@@ -317,7 +319,7 @@ final class SelectorUtils {
                     }
                     // stupid hack
                     return CompletableFuture.completedFuture(
-                            this.wrappedBrigadierParser.suggestionsFuture(commandContext, input).join()
+                            this.wrappedBrigadierParser.suggestionProvider().suggestionsFuture(commandContext, input).join()
                     );
                 } finally {
                     if (bypassField != null) {

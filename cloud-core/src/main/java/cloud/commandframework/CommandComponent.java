@@ -623,7 +623,7 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
 
             final SuggestionProvider<C> suggestionProvider;
             if (this.suggestionProvider == null) {
-                suggestionProvider = parser;
+                suggestionProvider = parser.suggestionProvider();
             } else {
                 suggestionProvider = this.suggestionProvider;
             }

@@ -27,12 +27,9 @@ import cloud.commandframework.Command;
 import cloud.commandframework.TypedCommandComponent;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
 import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
@@ -46,10 +43,8 @@ import cloud.commandframework.fabric.testmod.mixin.GiveCommandAccess;
 import cloud.commandframework.keys.CloudKey;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
@@ -71,7 +66,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.Vec3;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.arguments.standard.StringParser.stringParser;
@@ -218,31 +212,17 @@ public final class FabricExample implements ModInitializer {
                         .map(ModMetadata::getId)
                         .map(Suggestion::simple)
                         .collect(Collectors.toList())))
-                .parser(new ArgumentParser<>() {
-                    @Override
-                    public @NonNull ArgumentParseResult<@NonNull ModMetadata> parse(
-                            @NonNull final CommandContext<@NonNull CommandSourceStack> commandContext,
-                            @NonNull final CommandInput commandInput
-                    ) {
-                        final ModMetadata meta = FabricLoader.getInstance().getModContainer(commandInput.readString())
-                                .map(ModContainer::getMetadata)
-                                .orElse(null);
-                        if (meta != null) {
-                            return ArgumentParseResult.success(meta);
-                        }
-                        return ArgumentParseResult.failure(new IllegalArgumentException(String.format(
-                                "No mod with id '%s'",
-                                commandInput.peek()
-                        )));
+                .parser((commandContext, commandInput) -> {
+                    final ModMetadata meta = FabricLoader.getInstance().getModContainer(commandInput.readString())
+                            .map(ModContainer::getMetadata)
+                            .orElse(null);
+                    if (meta != null) {
+                        return ArgumentParseResult.success(meta);
                     }
-
-                    @Override
-                    public @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
-                            @NonNull final CommandContext<CommandSourceStack> context,
-                            @NonNull final String input
-                    ) {
-                        return CompletableFuture.completedFuture(Collections.emptyList());
-                    }
+                    return ArgumentParseResult.failure(new IllegalArgumentException(String.format(
+                            "No mod with id '%s'",
+                            commandInput.peek()
+                    )));
                 })
                 .build();
 

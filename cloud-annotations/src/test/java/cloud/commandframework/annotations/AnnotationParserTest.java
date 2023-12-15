@@ -180,7 +180,7 @@ class AnnotationParserTest {
                 context,
                 CommandInput.empty()
         ).getParsedValue().orElse(new CustomType("")).toString());
-        Assertions.assertTrue(parser.suggestionsFuture(
+        Assertions.assertTrue(parser.suggestionProvider().suggestionsFuture(
                 context,
                 ""
         ).join().contains(Suggestion.simple("Stella")));

@@ -25,6 +25,7 @@ package cloud.commandframework.arguments.parser;
 
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.arguments.suggestion.SuggestionProviderHolder;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import java.util.concurrent.CompletableFuture;
@@ -40,8 +41,9 @@ import static java.util.Objects.requireNonNull;
  * @param <C> Command sender type
  * @param <T> Value type
  */
+@FunctionalInterface
 @API(status = API.Status.STABLE)
-public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
+public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
 
     /**
      * Default amount of arguments that the parser expects to consume
@@ -137,6 +139,23 @@ public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
     @API(status = API.Status.STABLE, since = "1.1.0")
     default int getRequestedArgumentCount() {
         return DEFAULT_ARGUMENT_COUNT;
+    }
+
+    /**
+     * Returns the suggestion provider.
+     * <p>
+     * By default, this will return the parser, if the parser is also a {@link SuggestionProvider}.
+     * Otherwise, {@link SuggestionProvider#noSuggestions()} will be returned.
+     *
+     * @return the suggestion provider
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    default @NonNull SuggestionProvider<C> suggestionProvider() {
+        if (this instanceof SuggestionProvider) {
+            return (SuggestionProvider<C>) this;
+        }
+        return SuggestionProvider.noSuggestions();
     }
 
 
