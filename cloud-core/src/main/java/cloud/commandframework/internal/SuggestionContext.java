@@ -38,9 +38,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class SuggestionContext<C> {
 
     private final List<Suggestion> suggestions = new ArrayList<>();
+    private final CommandPreprocessingContext<C> preprocessingContext;
     private final CommandSuggestionProcessor<C> processor;
     private final CommandContext<C> commandContext;
-    private final CommandInput commandInput;
 
     /**
      * Creates a new suggestion context
@@ -56,7 +56,7 @@ public final class SuggestionContext<C> {
     ) {
         this.processor = processor;
         this.commandContext = commandContext;
-        this.commandInput = commandInput;
+        this.preprocessingContext = new CommandPreprocessingContext<>(this.commandContext, commandInput);
     }
 
     /**
@@ -92,11 +92,7 @@ public final class SuggestionContext<C> {
      * @param suggestion the suggestion to add
      */
     public void addSuggestion(final @NonNull Suggestion suggestion) {
-        final CommandPreprocessingContext<C> context = new CommandPreprocessingContext<>(
-                this.commandContext,
-                this.commandInput
-        );
-        final Suggestion result = this.processor.process(context, suggestion);
+        final Suggestion result = this.processor.process(this.preprocessingContext, suggestion);
         if (result == null) {
             return;
         }
