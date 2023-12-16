@@ -67,8 +67,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Parsers for Vanilla command argument types.
@@ -557,7 +557,7 @@ public final class FabricVanillaArgumentParsers {
         }
     }
 
-    @ApiStatus.Internal
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public static final class ContextualArgumentTypeProvider<V> implements Supplier<ArgumentType<V>> {
 
         private static final ThreadLocal<ThreadLocalContext> CONTEXT = new ThreadLocal<>();
