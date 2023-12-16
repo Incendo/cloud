@@ -181,11 +181,6 @@ public final class ByteParser<C> implements ArgumentParser<C, Byte> {
     }
 
     @Override
-    public boolean isContextFree() {
-        return true;
-    }
-
-    @Override
     public @NonNull List<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input

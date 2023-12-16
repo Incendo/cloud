@@ -123,11 +123,6 @@ public final class BooleanParser<C> implements ArgumentParser<C, Boolean> {
         return LIBERAL_LOWER;
     }
 
-    @Override
-    public boolean isContextFree() {
-        return true;
-    }
-
 
     /**
      * Boolean parse exception

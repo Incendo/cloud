@@ -163,16 +163,6 @@ public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
     }
 
     /**
-     * Check whether this argument parser is context free. A context free
-     * parser will not use the provided command context, and so supports impromptu parsing
-     *
-     * @return {@code true} if the parser is context free, else {@code false}
-     */
-    default boolean isContextFree() {
-        return false;
-    }
-
-    /**
      * Get the amount of arguments that this parsers seeks to
      * consume
      *

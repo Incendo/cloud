@@ -181,11 +181,6 @@ public final class LongParser<C> implements ArgumentParser<C, Long> {
     }
 
     @Override
-    public boolean isContextFree() {
-        return true;
-    }
-
-    @Override
     public @NonNull List<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input

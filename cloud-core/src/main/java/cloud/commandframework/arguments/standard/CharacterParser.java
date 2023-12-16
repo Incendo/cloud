@@ -81,11 +81,6 @@ public final class CharacterParser<C> implements ArgumentParser<C, Character> {
         return ArgumentParseResult.success(commandInput.read());
     }
 
-    @Override
-    public boolean isContextFree() {
-        return true;
-    }
-
 
     /**
      * Char parse exception

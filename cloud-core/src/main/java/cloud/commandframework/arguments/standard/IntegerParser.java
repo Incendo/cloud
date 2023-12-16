@@ -231,11 +231,6 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer> {
     }
 
     @Override
-    public boolean isContextFree() {
-        return true;
-    }
-
-    @Override
     public @NonNull List<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
