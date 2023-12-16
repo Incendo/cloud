@@ -606,8 +606,8 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
                         .orElse(null);
             }
             if (parser == null) {
-                parser = new ConstantParserNoSuggestions<>(ArgumentParseResult.failure(
-                        new UnsupportedOperationException("No parser was specified")));
+                parser = (ctx, input) -> ArgumentParseResult.failure(
+                        new UnsupportedOperationException("No parser was specified"));
             }
 
             final ComponentType componentType;
@@ -638,23 +638,6 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
                     suggestionProvider,
                     Objects.requireNonNull(this.componentPreprocessors, "componentPreprocessors")
             );
-        }
-    }
-
-    private static final class ConstantParserNoSuggestions<C, T> implements ArgumentParser<C, T> {
-
-        private final ArgumentParseResult<T> result;
-
-        ConstantParserNoSuggestions(final ArgumentParseResult<T> result) {
-            this.result = result;
-        }
-
-        @Override
-        public @NonNull ArgumentParseResult<@NonNull T> parse(
-                final @NonNull CommandContext<@NonNull C> commandContext,
-                final @NonNull CommandInput commandInput
-        ) {
-            return this.result;
         }
     }
 
