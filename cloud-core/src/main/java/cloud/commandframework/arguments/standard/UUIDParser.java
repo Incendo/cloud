@@ -86,11 +86,6 @@ public final class UUIDParser<C> implements ArgumentParser<C, UUID> {
         }
     }
 
-    @Override
-    public boolean isContextFree() {
-        return true;
-    }
-
 
     @API(status = API.Status.STABLE)
     public static final class UUIDParseException extends ParserException {

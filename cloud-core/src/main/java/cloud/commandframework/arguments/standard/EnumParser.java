@@ -118,11 +118,6 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
         return EnumSet.allOf(this.enumClass).stream().map(e -> e.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
     }
 
-    @Override
-    public boolean isContextFree() {
-        return true;
-    }
-
 
     @API(status = API.Status.STABLE)
     public static final class EnumParseException extends ParserException {

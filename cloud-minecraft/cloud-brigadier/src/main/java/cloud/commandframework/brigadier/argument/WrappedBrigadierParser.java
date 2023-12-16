@@ -113,7 +113,7 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> {
      *
      * @param nativeType            the native command type provider, calculated lazily
      * @param expectedArgumentCount the number of arguments the brigadier type is expected to consume
-     * @param parse special function to replace {@link ArgumentType#parse(StringReader)} (for CraftBukkit weirdness)
+     * @param parse                 special function to replace {@link ArgumentType#parse(StringReader)} (for CraftBukkit weirdness)
      * @since 1.8.0
      */
     @API(status = API.Status.STABLE, since = "1.8.0")
@@ -197,11 +197,6 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> {
     }
 
     @Override
-    public final boolean isContextFree() {
-        return true;
-    }
-
-    @Override
     public final int getRequestedArgumentCount() {
         return this.expectedArgumentCount;
     }
@@ -215,10 +210,11 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> {
     @API(status = API.Status.STABLE, since = "1.8.0")
     @FunctionalInterface
     public interface ParseFunction<T> {
+
         /**
          * Apply the parse function.
          *
-         * @param type argument type
+         * @param type   argument type
          * @param reader string reader
          * @return result
          * @throws CommandSyntaxException on failure
