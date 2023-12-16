@@ -25,19 +25,19 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
-import java.util.List;
-import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Processor that formats command suggestions
  *
- * @param <C> Command sender type
+ * @param <C> the command sender type
+ * @since 2.0.0
  */
-@API(status = API.Status.STABLE)
-public interface CommandSuggestionProcessor<C> extends
-        BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<Suggestion>, @NonNull List<Suggestion>> {
+@FunctionalInterface
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface CommandSuggestionProcessor<C> {
 
     /**
      * Create a pass through {@link CommandSuggestionProcessor} that simply returns
@@ -49,6 +49,17 @@ public interface CommandSuggestionProcessor<C> extends
      */
     @API(status = API.Status.STABLE, since = "1.8.0")
     static <C> @NonNull CommandSuggestionProcessor<C> passThrough() {
-        return (ctx, suggestions) -> suggestions;
+        return (ctx, suggestion) -> suggestion;
     }
+
+    /**
+     * Processes the given {@code suggestion} and returns the result.
+     * <p>
+     * If {@code null} is returned, the suggestion will be dropped.
+     *
+     * @param context    the context
+     * @param suggestion the suggestion
+     * @return the result
+     */
+    @Nullable Suggestion process(@NonNull CommandPreprocessingContext<C> context, @NonNull Suggestion suggestion);
 }

@@ -25,6 +25,9 @@ package cloud.commandframework.internal;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.execution.CommandSuggestionProcessor;
+import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,15 +38,25 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class SuggestionContext<C> {
 
     private final List<Suggestion> suggestions = new ArrayList<>();
+    private final CommandSuggestionProcessor<C> processor;
     private final CommandContext<C> commandContext;
+    private final CommandInput commandInput;
 
     /**
      * Creates a new suggestion context
      *
+     * @param processor      the suggestion processor
      * @param commandContext the command context
+     * @param commandInput   the command input
      */
-    public SuggestionContext(final @NonNull CommandContext<C> commandContext) {
+    public SuggestionContext(
+            final CommandSuggestionProcessor<C> processor,
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull CommandInput commandInput
+    ) {
+        this.processor = processor;
         this.commandContext = commandContext;
+        this.commandInput = commandInput;
     }
 
     /**
@@ -70,7 +83,7 @@ public final class SuggestionContext<C> {
      * @param suggestions the suggestions to add
      */
     public void addSuggestions(final @NonNull List<@NonNull Suggestion> suggestions) {
-        this.suggestions.addAll(suggestions);
+        suggestions.forEach(this::addSuggestion);
     }
 
     /**
@@ -79,6 +92,14 @@ public final class SuggestionContext<C> {
      * @param suggestion the suggestion to add
      */
     public void addSuggestion(final @NonNull Suggestion suggestion) {
-        this.suggestions.add(suggestion);
+        final CommandPreprocessingContext<C> context = new CommandPreprocessingContext<>(
+                this.commandContext,
+                this.commandInput
+        );
+        final Suggestion result = this.processor.process(context, suggestion);
+        if (result == null) {
+            return;
+        }
+        this.suggestions.add(result);
     }
 }
