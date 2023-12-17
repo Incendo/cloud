@@ -44,7 +44,7 @@ public class CommandMetaBuilder {
      * @param commandMeta the instance to copy from
      * @return {@code this}
      */
-    public @NonNull @This CommandMetaBuilder with(final @NonNull CommandMeta commandMeta) {
+    public @This @NonNull CommandMetaBuilder with(final @NonNull CommandMeta commandMeta) {
         this.map.putAll(commandMeta.all());
         return this;
     }
@@ -57,7 +57,7 @@ public class CommandMetaBuilder {
      * @param value the value
      * @return {@code this}
      */
-    public <V> @NonNull @This CommandMetaBuilder with(
+    public <V> @This @NonNull CommandMetaBuilder with(
             final @NonNull CloudKey<V> key,
             final @NonNull V value
     ) {

@@ -215,8 +215,8 @@ public final class BlockPredicateParser<C> implements ArgumentParser<C, BlockPre
 
     @Override
     public @NonNull ArgumentParseResult<@NonNull BlockPredicate> parse(
-            @NonNull final CommandContext<@NonNull C> commandContext,
-            @NonNull final CommandInput commandInput
+            final @NonNull CommandContext<@NonNull C> commandContext,
+            final @NonNull CommandInput commandInput
     ) {
         return this.parser.parse(commandContext, commandInput);
     }

@@ -240,7 +240,7 @@ public final class MinecraftExceptionHandler<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull @This MinecraftExceptionHandler<C> defaultInvalidSyntaxHandler() {
+    public @This @NonNull MinecraftExceptionHandler<C> defaultInvalidSyntaxHandler() {
         return this.handler(InvalidSyntaxException.class, createDefaultInvalidSyntaxHandler());
     }
 
@@ -251,7 +251,7 @@ public final class MinecraftExceptionHandler<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull @This MinecraftExceptionHandler<C> defaultInvalidSenderHandler() {
+    public @This @NonNull MinecraftExceptionHandler<C> defaultInvalidSenderHandler() {
         return this.handler(InvalidCommandSenderException.class, createDefaultInvalidSenderHandler());
     }
 
@@ -262,7 +262,7 @@ public final class MinecraftExceptionHandler<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull @This MinecraftExceptionHandler<C> defaultNoPermissionHandler() {
+    public @This @NonNull MinecraftExceptionHandler<C> defaultNoPermissionHandler() {
         return this.handler(NoPermissionException.class, createDefaultNoPermissionHandler());
     }
 
@@ -273,7 +273,7 @@ public final class MinecraftExceptionHandler<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull @This MinecraftExceptionHandler<C> defaultArgumentParsingHandler() {
+    public @This @NonNull MinecraftExceptionHandler<C> defaultArgumentParsingHandler() {
         return this.handler(ArgumentParseException.class, createDefaultArgumentParsingHandler());
     }
 
@@ -285,7 +285,7 @@ public final class MinecraftExceptionHandler<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull @This MinecraftExceptionHandler<C> defaultCommandExecutionHandler() {
+    public @This @NonNull MinecraftExceptionHandler<C> defaultCommandExecutionHandler() {
         return this.defaultCommandExecutionHandler(createDefaultCommandExecutionLogger());
     }
 
@@ -297,7 +297,7 @@ public final class MinecraftExceptionHandler<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull @This MinecraftExceptionHandler<C> defaultCommandExecutionHandler(
+    public @This @NonNull MinecraftExceptionHandler<C> defaultCommandExecutionHandler(
             final @NonNull Consumer<ExceptionContext<C, CommandExecutionException>> logger
     ) {
         return this.handler(CommandExecutionException.class, createDefaultCommandExecutionHandler(logger));
@@ -315,7 +315,7 @@ public final class MinecraftExceptionHandler<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull @This MinecraftExceptionHandler<C> defaultHandlers() {
+    public @This @NonNull MinecraftExceptionHandler<C> defaultHandlers() {
         return this
                 .defaultArgumentParsingHandler()
                 .defaultInvalidSenderHandler()
@@ -336,7 +336,7 @@ public final class MinecraftExceptionHandler<C> {
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public <T extends Throwable> @NonNull @This MinecraftExceptionHandler<C> handler(
+    public <T extends Throwable> @This @NonNull MinecraftExceptionHandler<C> handler(
             final @NonNull Class<T> type,
             final @NonNull Function<@NonNull ExceptionContext<@NonNull C, @NonNull T>, @Nullable Component> componentFactory
     ) {
@@ -352,7 +352,7 @@ public final class MinecraftExceptionHandler<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull @This MinecraftExceptionHandler<C> decorator(
+    public @This @NonNull MinecraftExceptionHandler<C> decorator(
             final @NonNull BiFunction<@NonNull ExceptionContext<@NonNull C, ?>, @NonNull Component, @NonNull Component> decorator
     ) {
         this.decorator = decorator;
@@ -367,7 +367,7 @@ public final class MinecraftExceptionHandler<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull @This MinecraftExceptionHandler<C> decorator(
+    public @This @NonNull MinecraftExceptionHandler<C> decorator(
             final @NonNull Function<@NonNull Component, @NonNull Component> decorator
     ) {
         return this.decorator((ctx, message) -> decorator.apply(message));

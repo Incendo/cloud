@@ -94,8 +94,8 @@ public final class KeyedWorldParser<C> implements ArgumentParser<C, World>, Sugg
 
     @Override
     public @NonNull ArgumentParseResult<@NonNull World> parse(
-            @NonNull final CommandContext<@NonNull C> commandContext,
-            @NonNull final CommandInput commandInput
+            final @NonNull CommandContext<@NonNull C> commandContext,
+            final @NonNull CommandInput commandInput
     ) {
         final String input = commandInput.peekString();
         if (input.isEmpty()) {

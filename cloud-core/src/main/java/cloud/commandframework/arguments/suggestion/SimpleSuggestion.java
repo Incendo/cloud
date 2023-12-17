@@ -40,7 +40,7 @@ final class SimpleSuggestion implements Suggestion {
     }
 
     @Override
-    public @NonNull Suggestion withSuggestion(@NonNull final String suggestion) {
+    public @NonNull Suggestion withSuggestion(final @NonNull String suggestion) {
         return new SimpleSuggestion(suggestion);
     }
 

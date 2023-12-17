@@ -215,7 +215,7 @@ class LiteralBrigadierNodeFactoryTest {
         }
 
         @Override
-        public boolean hasPermission(@NonNull final Object sender, @NonNull final String permission) {
+        public boolean hasPermission(final @NonNull Object sender, final @NonNull String permission) {
             return true;
         }
     }

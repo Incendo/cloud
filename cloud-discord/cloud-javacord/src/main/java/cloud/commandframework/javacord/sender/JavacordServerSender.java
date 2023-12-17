@@ -44,8 +44,7 @@ public class JavacordServerSender extends JavacordCommandSender {
      *
      * @return The server channel
      */
-    @NonNull
-    public ServerChannel getServerChannel() {
+    public @NonNull ServerChannel getServerChannel() {
         return getEvent().getServerTextChannel()
                 .orElseThrow(() -> new UnsupportedOperationException(
                         "ServerTextChannel not present even though message was sent in a server channel"));
@@ -56,8 +55,7 @@ public class JavacordServerSender extends JavacordCommandSender {
      *
      * @return The server
      */
-    @NonNull
-    public Server getServer() {
+    public @NonNull Server getServer() {
         return getEvent().getServer()
                 .orElseThrow(() -> new UnsupportedOperationException(
                         "Server not present even though message was sent on a server"));

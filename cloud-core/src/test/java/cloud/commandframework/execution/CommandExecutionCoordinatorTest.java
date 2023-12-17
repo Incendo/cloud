@@ -53,7 +53,7 @@ class CommandExecutionCoordinatorTest {
                 registrationHandler
         ) {
             @Override
-            public boolean hasPermission(@NonNull final TestCommandSender sender, @NonNull final String permission) {
+            public boolean hasPermission(final @NonNull TestCommandSender sender, final @NonNull String permission) {
                 return true;
             }
         };
@@ -91,7 +91,7 @@ class CommandExecutionCoordinatorTest {
                 registrationHandler
         ) {
             @Override
-            public boolean hasPermission(@NonNull final TestCommandSender sender, @NonNull final String permission) {
+            public boolean hasPermission(final @NonNull TestCommandSender sender, final @NonNull String permission) {
                 return true;
             }
         };
@@ -129,7 +129,7 @@ class CommandExecutionCoordinatorTest {
                 registrationHandler
         ) {
             @Override
-            public boolean hasPermission(@NonNull final TestCommandSender sender, @NonNull final String permission) {
+            public boolean hasPermission(final @NonNull TestCommandSender sender, final @NonNull String permission) {
                 return true;
             }
         };
@@ -180,7 +180,7 @@ class CommandExecutionCoordinatorTest {
                 registrationHandler
         ) {
             @Override
-            public boolean hasPermission(@NonNull final TestCommandSender sender, @NonNull final String permission) {
+            public boolean hasPermission(final @NonNull TestCommandSender sender, final @NonNull String permission) {
                 return true;
             }
         };

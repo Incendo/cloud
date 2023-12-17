@@ -130,8 +130,8 @@ public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V>, Bl
 
     @Override
     public @NonNull ArgumentParseResult<@NonNull V> parse(
-            @NonNull final CommandContext<@NonNull C> commandContext,
-            @NonNull final CommandInput commandInput
+            final @NonNull CommandContext<@NonNull C> commandContext,
+            final @NonNull CommandInput commandInput
     ) {
         final String possibleIdentifier = commandInput.peekString();
         if (possibleIdentifier.isEmpty()) {

@@ -55,8 +55,8 @@ public final class AggregateCommandExample implements BuilderFeature {
 
     @Override
     public void registerFeature(
-            @NonNull final ExamplePlugin examplePlugin,
-            @NonNull final BukkitCommandManager<CommandSender> manager
+            final @NonNull ExamplePlugin examplePlugin,
+            final @NonNull BukkitCommandManager<CommandSender> manager
     ) {
         this.registerLocationExample(manager);
         this.registerRenameExample(manager);

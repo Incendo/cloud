@@ -190,8 +190,8 @@ public final class ItemStackPredicateParser<C> implements ArgumentParser<C, Item
 
     @Override
     public @NonNull ArgumentParseResult<@NonNull ItemStackPredicate> parse(
-            @NonNull final CommandContext<@NonNull C> commandContext,
-            @NonNull final CommandInput commandInput
+            final @NonNull CommandContext<@NonNull C> commandContext,
+            final @NonNull CommandInput commandInput
     ) {
         return this.parser.parse(commandContext, commandInput);
     }

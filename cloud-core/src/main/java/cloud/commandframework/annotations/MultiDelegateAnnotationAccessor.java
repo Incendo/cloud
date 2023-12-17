@@ -42,7 +42,7 @@ final class MultiDelegateAnnotationAccessor implements AnnotationAccessor {
     }
 
     @Override
-    public <A extends Annotation> @Nullable A annotation(@NonNull final Class<A> clazz) {
+    public <A extends Annotation> @Nullable A annotation(final @NonNull Class<A> clazz) {
         A instance = null;
         for (final AnnotationAccessor annotationAccessor : this.accessors) {
             instance = annotationAccessor.annotation(clazz);

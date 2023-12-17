@@ -85,8 +85,8 @@ public final class TeamParser<C> extends SidedArgumentParser<C, String, PlayerTe
 
     @Override
     protected @NonNull ArgumentParseResult<String> parseIntermediate(
-            @NonNull final CommandContext<@NonNull C> commandContext,
-            @NonNull final CommandInput commandInput
+            final @NonNull CommandContext<@NonNull C> commandContext,
+            final @NonNull CommandInput commandInput
     ) {
         final String input = commandInput.readString();
         if (input.isEmpty()) {

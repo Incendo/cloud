@@ -46,14 +46,14 @@ final class MappingSuggestionFactory<C, S extends Suggestion> implements Suggest
 
     @Override
     public @NonNull CompletableFuture<List<@NonNull S>> suggest(
-            @NonNull final CommandContext<C> context,
-            @NonNull final String input
+            final @NonNull CommandContext<C> context,
+            final @NonNull String input
     ) {
         return this.map(this.other.suggest(context, input));
     }
 
     @Override
-    public @NonNull CompletableFuture<List<@NonNull S>> suggest(@NonNull final C sender, @NonNull final String input) {
+    public @NonNull CompletableFuture<List<@NonNull S>> suggest(final @NonNull C sender, final @NonNull String input) {
         return this.map(this.other.suggest(sender, input));
     }
 

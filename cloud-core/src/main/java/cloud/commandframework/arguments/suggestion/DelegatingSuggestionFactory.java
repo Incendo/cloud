@@ -63,8 +63,8 @@ final class DelegatingSuggestionFactory<C, S extends Suggestion> implements Sugg
 
     @Override
     public @NonNull CompletableFuture<List<@NonNull S>> suggest(
-            @NonNull final CommandContext<C> context,
-            @NonNull final String input
+            final @NonNull CommandContext<C> context,
+            final @NonNull String input
     ) {
         return this.suggestFromTree(context, input).thenApply(suggestions -> suggestions.stream()
                 .map(this.suggestionMapper::map)
@@ -73,7 +73,7 @@ final class DelegatingSuggestionFactory<C, S extends Suggestion> implements Sugg
     }
 
     @Override
-    public @NonNull CompletableFuture<List<@NonNull S>> suggest(@NonNull final C sender, @NonNull final String input) {
+    public @NonNull CompletableFuture<List<@NonNull S>> suggest(final @NonNull C sender, final @NonNull String input) {
         return this.suggest(
                 this.commandManager.commandContextFactory().create(true /* suggestions */, sender),
                 input

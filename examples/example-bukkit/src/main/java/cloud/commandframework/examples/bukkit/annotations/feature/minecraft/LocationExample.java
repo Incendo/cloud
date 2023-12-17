@@ -51,7 +51,7 @@ public final class LocationExample implements AnnotationFeature {
     @CommandMethod("annotations teleport location <location>")
     public void teleportComplex(
             final @NonNull Player sender,
-            final @NonNull @Argument("location") Location location
+            final @Argument("location") @NonNull Location location
     ) {
         sender.teleport(location);
         sender.sendMessage("You have been teleported!");
@@ -60,7 +60,7 @@ public final class LocationExample implements AnnotationFeature {
     @CommandMethod("annotations teleport chunk <chunk>")
     public void teleportComplex(
             final @NonNull Player sender,
-            final @NonNull @Argument("chunk") Location2D chunkCoordinates
+            final @Argument("chunk") @NonNull Location2D chunkCoordinates
     ) {
         final Chunk chunk = sender.getWorld().getChunkAt(chunkCoordinates.getBlockX(), chunkCoordinates.getBlockY());
         sender.teleport(chunk.getBlock(0, sender.getLocation().getBlockY(), 0).getLocation());

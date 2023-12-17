@@ -32,7 +32,7 @@ enum ServiceFilterHandler {
     INSTANCE;
 
     <Context> boolean passes(
-            final @NonNull ServiceRepository<Context, ?>.ServiceWrapper<? extends Service<Context, ?>> service,
+            final ServiceRepository<Context, ?>.@NonNull ServiceWrapper<? extends Service<Context, ?>> service,
             final @NonNull Context context
     ) {
         if (!service.isDefaultImplementation()) {
