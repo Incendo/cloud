@@ -25,7 +25,9 @@ package cloud.commandframework.bukkit.parsers.selector;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
+import cloud.commandframework.bukkit.data.MultipleEntitySelector;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import org.apiguardian.api.API;
 import org.bukkit.entity.Entity;
@@ -35,7 +37,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Parser for {@link MultipleEntitySelector}. On Minecraft 1.13+
  * this argument uses Minecraft's built-in entity selector argument for parsing
  * and suggestions. On prior versions, this argument will suggest nothing and
- * always fail parsing with {@link SelectorParseException.FailureReason#UNSUPPORTED_VERSION}.
+ * always fail parsing with {@link SelectorUnsupportedException}.
  *
  * @param <C> sender type
  */
@@ -99,6 +101,7 @@ public final class MultipleEntitySelectorParser<C> extends SelectorUtils.EntityS
         this(true);
     }
 
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     @Override
     public MultipleEntitySelector mapResult(
             final @NonNull String input,
@@ -108,6 +111,16 @@ public final class MultipleEntitySelectorParser<C> extends SelectorUtils.EntityS
         if (entities.isEmpty() && !this.allowEmpty) {
             new Thrower(NO_ENTITIES_EXCEPTION_TYPE.get()).throwIt();
         }
-        return new MultipleEntitySelector(input, entities);
+        return new MultipleEntitySelector() {
+            @Override
+            public @NonNull String inputString() {
+                return input;
+            }
+
+            @Override
+            public @NonNull Collection<Entity> values() {
+                return Collections.unmodifiableCollection(entities);
+            }
+        };
     }
 }

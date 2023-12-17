@@ -169,10 +169,8 @@ final class SelectorUtils {
                 final CommandContext<C> commandContext,
                 final CommandInput commandInput
         ) {
-            return ArgumentParseResult.<T>failure(new SelectorParseException(
-                    "",
+            return ArgumentParseResult.<T>failure(new SelectorUnsupportedException(
                     commandContext,
-                    SelectorParseException.FailureReason.UNSUPPORTED_VERSION,
                     this.getClass()
             )).asFuture();
         }

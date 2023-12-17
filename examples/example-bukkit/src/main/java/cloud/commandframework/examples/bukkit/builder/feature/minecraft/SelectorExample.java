@@ -25,7 +25,7 @@ package cloud.commandframework.examples.bukkit.builder.feature.minecraft;
 
 import cloud.commandframework.Description;
 import cloud.commandframework.bukkit.BukkitCommandManager;
-import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
+import cloud.commandframework.bukkit.data.SingleEntitySelector;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
 import org.bukkit.ChatColor;
@@ -54,12 +54,8 @@ public final class SelectorExample implements BuilderFeature {
                 .handler(commandContext -> {
                     final Player player = commandContext.sender();
                     final SingleEntitySelector singleEntitySelector = commandContext.get("entity");
-                    if (singleEntitySelector.hasAny()) {
-                        singleEntitySelector.getEntity().teleport(player);
-                        player.sendMessage(ChatColor.GREEN + "The entity was teleported to you!");
-                    } else {
-                        player.sendMessage(ChatColor.RED + "No entity matched your query.");
-                    }
+                    singleEntitySelector.single().teleport(player);
+                    player.sendMessage(ChatColor.GREEN + "The entity was teleported to you!");
                 }));
     }
 }
