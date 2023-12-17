@@ -37,6 +37,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Provider of suggestions
  *
  * @param <C> command sender type
+ * @see BlockingSuggestionProvider
+ * @see BlockingSuggestionProvider.Strings
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
@@ -45,8 +47,8 @@ public interface SuggestionProvider<C> {
 
     /**
      * Returns a future that completes with the suggestions for the given {@code input}.
-     * <p>
-     * If you don't need to return a future, you can implement {@link BlockingSuggestionProvider} instead.
+     *
+     * <p>If you don't need to return a future, you can implement {@link BlockingSuggestionProvider} instead.</p>
      *
      * @param context the context of the suggestion lookup
      * @param input   the current input
@@ -62,9 +64,7 @@ public interface SuggestionProvider<C> {
      *
      * @param <C> sender type
      * @return suggestion provider
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
     static <C> SuggestionProvider<C> noSuggestions() {
         return (ctx, in) -> CompletableFuture.completedFuture(Collections.emptyList());
     }
@@ -76,9 +76,7 @@ public interface SuggestionProvider<C> {
      * @param blockingSuggestionProvider suggestion provider
      * @param <C>                        sender type
      * @return suggestion provider
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
     static <C> @NonNull SuggestionProvider<C> blocking(
             final @NonNull BlockingSuggestionProvider<C> blockingSuggestionProvider
     ) {
@@ -92,9 +90,7 @@ public interface SuggestionProvider<C> {
      * @param blockingStringsSuggestionProvider suggestion provider
      * @param <C>                               sender type
      * @return suggestion provider
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
     static <C> @NonNull SuggestionProvider<C> blockingStrings(
             final BlockingSuggestionProvider.@NonNull Strings<C> blockingStringsSuggestionProvider
     ) {
@@ -107,11 +103,9 @@ public interface SuggestionProvider<C> {
      * @param suggestions list of strings to suggest
      * @param <C>         sender type
      * @return suggestion provider
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
     static <C> @NonNull SuggestionProvider<C> suggesting(
-            final @NonNull Suggestion @NonNull... suggestions
+            final @NonNull Suggestion @NonNull ... suggestions
     ) {
         return suggesting(Arrays.asList(suggestions));
     }
@@ -122,11 +116,9 @@ public interface SuggestionProvider<C> {
      * @param suggestions list of strings to suggest
      * @param <C>         sender type
      * @return suggestion provider
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
     static <C> @NonNull SuggestionProvider<C> suggestingStrings(
-            final @NonNull String @NonNull... suggestions
+            final @NonNull String @NonNull ... suggestions
     ) {
         return suggestingStrings(Arrays.asList(suggestions));
     }
@@ -137,9 +129,7 @@ public interface SuggestionProvider<C> {
      * @param suggestions list of strings to suggest
      * @param <C>         sender type
      * @return suggestion provider
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
     static <C> @NonNull SuggestionProvider<C> suggesting(
             final @NonNull Iterable<@NonNull Suggestion> suggestions
     ) {
@@ -156,9 +146,7 @@ public interface SuggestionProvider<C> {
      * @param suggestions list of strings to suggest
      * @param <C>         sender type
      * @return suggestion provider
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
     static <C> @NonNull SuggestionProvider<C> suggestingStrings(
             final @NonNull Iterable<@NonNull String> suggestions
     ) {
@@ -169,8 +157,16 @@ public interface SuggestionProvider<C> {
         return blockingStrings((ctx, input) -> result);
     }
 
-    @SuppressWarnings("FunctionalInterfaceMethodChanged")
+    /**
+     * Specialized variant of {@link SuggestionProvider} that does work on the calling thread.
+     *
+     * <p>In the case that a specific thread context isn't required, this is usually simpler
+     * to implement than {@link SuggestionProvider}.</p>
+     *
+     * @param <C> command sender type
+     */
     @FunctionalInterface
+    @API(status = API.Status.STABLE, since = "2.0.0")
     interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
 
         /**
@@ -190,8 +186,17 @@ public interface SuggestionProvider<C> {
             return CompletableFuture.completedFuture(this.suggestions(context, input));
         }
 
-        @SuppressWarnings("FunctionalInterfaceMethodChanged")
+        /**
+         * Specialized variant of {@link BlockingSuggestionProvider} that has {@link String} results
+         * instead of {@link Suggestion} results.
+         *
+         * <p>The provided default implementation of {@link #suggestions(CommandContext, String)}
+         * maps the {@link String} results to {@link Suggestion suggestions} using {@link Suggestion#simple(String)}.</p>
+         *
+         * @param <C> command sender type
+         */
         @FunctionalInterface
+        @API(status = API.Status.STABLE, since = "2.0.0")
         interface Strings<C> extends BlockingSuggestionProvider<C> {
 
             /**
@@ -203,9 +208,7 @@ public interface SuggestionProvider<C> {
              * @param commandContext Command context
              * @param input          Input string
              * @return List of suggestions
-             * @since 2.0.0
              */
-            @API(status = API.Status.STABLE, since = "2.0.0")
             @NonNull List<@NonNull String> stringSuggestions(
                     @NonNull CommandContext<C> commandContext,
                     @NonNull String input
