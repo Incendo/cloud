@@ -625,7 +625,11 @@ public final class CommandTree<C> {
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput
     ) {
-        final SuggestionContext<C> suggestionContext = new SuggestionContext<>(context);
+        final SuggestionContext<C> suggestionContext = new SuggestionContext<>(
+                this.commandManager.commandSuggestionProcessor(),
+                context,
+                commandInput
+        );
         return this.getSuggestions(suggestionContext, commandInput, this.internalTree).thenApply(SuggestionContext::suggestions);
     }
 

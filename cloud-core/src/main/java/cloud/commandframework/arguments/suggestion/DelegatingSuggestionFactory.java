@@ -27,7 +27,6 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.services.State;
 import java.util.Collections;
 import java.util.List;
@@ -96,12 +95,7 @@ final class DelegatingSuggestionFactory<C, S extends Suggestion> implements Sugg
             return CompletableFuture.completedFuture(Collections.emptyList());
         }
 
-        return this.commandTree.getSuggestions(context, commandInput).thenApply(suggestions ->
-                this.commandManager.commandSuggestionProcessor().apply(
-                        new CommandPreprocessingContext<>(context, commandInput),
-                        suggestions
-                )
-        ).thenApply(suggestions -> {
+        return this.commandTree.getSuggestions(context, commandInput).thenApply(suggestions -> {
             if (this.commandManager.getSetting(CommandManager.ManagerSettings.FORCE_SUGGESTION) && suggestions.isEmpty()) {
                 return SINGLE_EMPTY_SUGGESTION;
             }

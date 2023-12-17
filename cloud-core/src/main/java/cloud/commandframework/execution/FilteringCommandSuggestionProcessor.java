@@ -25,8 +25,6 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -66,9 +64,9 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> apply(
+    public @Nullable Suggestion process(
             final @NonNull CommandPreprocessingContext<C> context,
-            final @NonNull List<@NonNull Suggestion> inputSuggestions
+            final @NonNull Suggestion suggestion
     ) {
         final String input;
         if (context.commandInput().isEmpty(true /* ignoreWhitespace */)) {
@@ -76,14 +74,11 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
         } else {
             input = context.commandInput().remainingInput();
         }
-        final List<Suggestion> suggestions = new ArrayList<>(inputSuggestions.size());
-        for (final Suggestion suggestion : inputSuggestions) {
-            final @Nullable String filtered = this.filter.filter(context, suggestion.suggestion(), input);
-            if (filtered != null) {
-                suggestions.add(suggestion.withSuggestion(filtered));
-            }
+        final String filtered = this.filter.filter(context, suggestion.suggestion(), input);
+        if (filtered == null) {
+            return null;
         }
-        return suggestions;
+        return suggestion.withSuggestion(filtered);
     }
 
     /**
