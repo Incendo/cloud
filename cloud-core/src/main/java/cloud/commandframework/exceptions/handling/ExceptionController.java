@@ -128,7 +128,7 @@ public final class ExceptionController<C> {
      * @param registration the exception handler registration
      * @return {@code this} exception controller
      */
-    public synchronized <T extends Throwable> @NonNull @This ExceptionController<C> register(
+    public synchronized <T extends Throwable> @This @NonNull ExceptionController<C> register(
             final @NonNull ExceptionHandlerRegistration<C, ? extends T> registration
     ) {
         this.registrations.computeIfAbsent(registration.exceptionType().getType(), t -> new LinkedList<>())
@@ -147,7 +147,7 @@ public final class ExceptionController<C> {
      * @param decorator     the builder decorator
      * @return {@code this} exception controller
      */
-    public <T extends Throwable> @NonNull @This ExceptionController<C> register(
+    public <T extends Throwable> @This @NonNull ExceptionController<C> register(
             final @NonNull TypeToken<T> exceptionType,
             final ExceptionHandlerRegistration.@NonNull BuilderDecorator<C, T> decorator
     ) {
@@ -165,7 +165,7 @@ public final class ExceptionController<C> {
      * @param decorator     the builder decorator
      * @return {@code this} exception controller
      */
-    public <T extends Throwable> @NonNull @This ExceptionController<C> register(
+    public <T extends Throwable> @This @NonNull ExceptionController<C> register(
             final @NonNull Class<T> exceptionType,
             final ExceptionHandlerRegistration.@NonNull BuilderDecorator<C, T> decorator
     ) {
@@ -183,7 +183,7 @@ public final class ExceptionController<C> {
      * @param exceptionHandler the exception handler
      * @return {@code this} exception controller
      */
-    public <T extends Throwable> @NonNull @This ExceptionController<C> registerHandler(
+    public <T extends Throwable> @This @NonNull ExceptionController<C> registerHandler(
             final @NonNull TypeToken<T> exceptionType,
             final @NonNull ExceptionHandler<C, ? extends T> exceptionHandler
     ) {
@@ -201,7 +201,7 @@ public final class ExceptionController<C> {
      * @param exceptionHandler the exception handler
      * @return {@code this} exception controller
      */
-    public <T extends Throwable> @NonNull @This ExceptionController<C> registerHandler(
+    public <T extends Throwable> @This @NonNull ExceptionController<C> registerHandler(
             final @NonNull Class<T> exceptionType,
             final @NonNull ExceptionHandler<C, ? extends T> exceptionHandler
     ) {

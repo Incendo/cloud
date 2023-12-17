@@ -43,8 +43,8 @@ public final class NamespacedKeyExample implements AnnotationFeature {
 
     @Override
     public void registerFeature(
-            @NonNull final ExamplePlugin examplePlugin,
-            @NonNull final AnnotationParser<CommandSender> annotationParser
+            final @NonNull ExamplePlugin examplePlugin,
+            final @NonNull AnnotationParser<CommandSender> annotationParser
     ) {
         annotationParser.parse(this);
     }

@@ -37,7 +37,7 @@ final class StandardHelpHandlerFactory<C> implements HelpHandlerFactory<C> {
     }
 
     @Override
-    public @NonNull HelpHandler<C> createHelpHandler(@NonNull final CommandPredicate<C> filter) {
+    public @NonNull HelpHandler<C> createHelpHandler(final @NonNull CommandPredicate<C> filter) {
         return new StandardHelpHandler<>(this.commandManager, filter);
     }
 }

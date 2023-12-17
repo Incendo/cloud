@@ -170,7 +170,7 @@ public abstract class ArgumentParseResult<T> {
         }
 
         @Override
-        public @NonNull @This ArgumentParseResult<T> mapFailure(final Function<Throwable, Throwable> mapper) {
+        public @This @NonNull ArgumentParseResult<T> mapFailure(final Function<Throwable, Throwable> mapper) {
             return this;
         }
 

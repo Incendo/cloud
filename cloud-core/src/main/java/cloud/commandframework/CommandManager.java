@@ -285,7 +285,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
      *         return {@code this}.
      */
     @SuppressWarnings("unchecked")
-    public @NonNull @This CommandManager<C> command(final @NonNull Command<? extends C> command) {
+    public @This @NonNull CommandManager<C> command(final @NonNull Command<? extends C> command) {
         if (!(this.transitionIfPossible(RegistrationState.BEFORE_REGISTRATION, RegistrationState.REGISTERING)
                 || this.isCommandRegistrationAllowed())) {
             throw new IllegalStateException("Unable to register commands because the manager is no longer in a registration "
@@ -311,7 +311,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull @This CommandManager<C> command(final @NonNull CommandFactory<C> commandFactory) {
+    public @This @NonNull CommandManager<C> command(final @NonNull CommandFactory<C> commandFactory) {
         commandFactory.createCommands(this).forEach(this::command);
         return this;
     }

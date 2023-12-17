@@ -45,8 +45,8 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
 
     @Override
     public @NonNull ArgumentParseResult<@NonNull R> parse(
-            @NonNull final CommandContext<@NonNull C> commandContext,
-            @NonNull final CommandInput commandInput
+            final @NonNull CommandContext<@NonNull C> commandContext,
+            final @NonNull CommandInput commandInput
     ) {
         final SharedSuggestionProvider source = commandContext.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
         final ArgumentParseResult<I> intermediate = this.parseIntermediate(commandContext, commandInput);

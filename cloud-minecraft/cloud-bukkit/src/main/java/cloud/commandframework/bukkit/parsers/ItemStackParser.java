@@ -207,8 +207,8 @@ public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull ProtoItemStack> parse(
-                @NonNull final CommandContext<@NonNull C> commandContext,
-                @NonNull final CommandInput commandInput
+                final @NonNull CommandContext<@NonNull C> commandContext,
+                final @NonNull CommandInput commandInput
         ) {
             // Minecraft has a parser for this - just use it
             return this.parser.parse(commandContext, commandInput);
@@ -283,8 +283,8 @@ public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull ProtoItemStack> parse(
-                @NonNull final CommandContext<@NonNull C> commandContext,
-                @NonNull final CommandInput commandInput
+                final @NonNull CommandContext<@NonNull C> commandContext,
+                final @NonNull CommandInput commandInput
         ) {
             return this.parser.parse(commandContext, commandInput);
         }

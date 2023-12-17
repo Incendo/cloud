@@ -147,7 +147,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
          *
          * @return Builder instance
          */
-        public @NonNull @This Builder<C> withSynchronousParsing() {
+        public @This @NonNull Builder<C> withSynchronousParsing() {
             this.synchronizeParsing = true;
             return this;
         }
@@ -157,7 +157,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
          *
          * @return Builder instance
          */
-        public @NonNull @This Builder<C> withAsynchronousParsing() {
+        public @This @NonNull Builder<C> withAsynchronousParsing() {
             this.synchronizeParsing = false;
             return this;
         }
@@ -169,7 +169,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
          * @param executor Executor to use
          * @return Builder instance
          */
-        public @NonNull @This Builder<C> withExecutor(final @NonNull Executor executor) {
+        public @This @NonNull Builder<C> withExecutor(final @NonNull Executor executor) {
             this.executor = executor;
             return this;
         }

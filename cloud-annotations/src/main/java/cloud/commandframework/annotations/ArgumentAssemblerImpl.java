@@ -52,8 +52,8 @@ final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
 
     @Override
     public @NonNull CommandComponent<C> assembleArgument(
-            @NonNull final SyntaxFragment syntaxFragment,
-            @NonNull final ArgumentDescriptor descriptor
+            final @NonNull SyntaxFragment syntaxFragment,
+            final @NonNull ArgumentDescriptor descriptor
     ) {
         final Parameter parameter = descriptor.parameter();
         final Collection<Annotation> annotations = Arrays.asList(parameter.getAnnotations());

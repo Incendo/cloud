@@ -49,7 +49,7 @@ final class FlagAssemblerImpl implements FlagAssembler {
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public @NonNull CommandFlag<?> assembleFlag(@NonNull final FlagDescriptor descriptor) {
+    public @NonNull CommandFlag<?> assembleFlag(final @NonNull FlagDescriptor descriptor) {
         final Description description;
         if (descriptor.description() == null) {
             description = Description.empty();

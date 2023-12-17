@@ -66,7 +66,7 @@ public class SimpleCommandMeta extends CommandMeta {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public @NonNull <V> Optional<V> optional(@NonNull final String key) {
+    public @NonNull <V> Optional<V> optional(final @NonNull String key) {
         final Object value = this.metaMap.get(CloudKey.of(key));
         if (value == null) {
             return Optional.empty();
@@ -79,7 +79,7 @@ public class SimpleCommandMeta extends CommandMeta {
      * {@inheritDoc}
      */
     @Override
-    public boolean contains(@NonNull final CloudKey<?> key) {
+    public boolean contains(final @NonNull CloudKey<?> key) {
         return this.metaMap.containsKey(key);
     }
 

@@ -57,5 +57,5 @@ public interface CaptionRegistry<C> {
      * @param provider the provider
      * @return {@code this}
      */
-    @NonNull @This CaptionRegistry<C> registerProvider(@NonNull CaptionProvider<C> provider);
+    @This @NonNull CaptionRegistry<C> registerProvider(@NonNull CaptionProvider<C> provider);
 }

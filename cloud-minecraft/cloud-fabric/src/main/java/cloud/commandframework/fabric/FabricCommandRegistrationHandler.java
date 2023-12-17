@@ -194,7 +194,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         }
 
         @Override
-        public boolean registerCommand(@NonNull final Command<C> command) {
+        public boolean registerCommand(final @NonNull Command<C> command) {
             return this.registeredCommands.add(command);
         }
 

@@ -185,8 +185,7 @@ public final class ServicePipeline {
      * @param <Context> Context type
      * @return Service pumper instance
      */
-    @NonNull
-    public <Context> ServicePump<Context> pump(final @NonNull Context context) {
+    public @NonNull <Context> ServicePump<Context> pump(final @NonNull Context context) {
         return new ServicePump<>(this, context);
     }
 
@@ -208,8 +207,7 @@ public final class ServicePipeline {
      *
      * @return Returns an Immutable collection of the service types registered.
      */
-    @NonNull
-    public Collection<Type> getRecognizedTypes() {
+    public @NonNull Collection<Type> getRecognizedTypes() {
         return Collections.unmodifiableCollection(this.repositories.keySet());
     }
 
@@ -223,9 +221,8 @@ public final class ServicePipeline {
      * @return Returns an collection of the {@link TypeToken}s of the implementations for a given
      *         service. Iterator order matches the priority when pumping contexts through the pipeline
      */
-    @NonNull
     @SuppressWarnings("unchecked")
-    public <Context, Result, S extends Service<Context, Result>> Collection<TypeToken<? extends S>> getImplementations(
+    public <Context, Result, S extends Service<Context, Result>> @NonNull Collection<TypeToken<? extends S>> getImplementations(
             final @NonNull TypeToken<S> type
     ) {
         ServiceRepository<Context, Result> repository = this.getRepository(type);
@@ -241,8 +238,7 @@ public final class ServicePipeline {
         return Collections.unmodifiableList(collection);
     }
 
-    @NonNull
-    Executor getExecutor() {
+    @NonNull Executor getExecutor() {
         return this.executor;
     }
 }

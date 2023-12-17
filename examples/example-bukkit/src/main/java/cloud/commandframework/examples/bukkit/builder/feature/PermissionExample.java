@@ -54,7 +54,7 @@ public final class PermissionExample implements BuilderFeature, CommandExecution
     }
 
     @Override
-    public void execute(@NonNull final CommandContext<CommandSender> commandContext) {
+    public void execute(final @NonNull CommandContext<CommandSender> commandContext) {
         Bukkit.getServer().getPluginManager().disablePlugin(this.examplePlugin);
     }
 }

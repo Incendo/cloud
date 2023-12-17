@@ -33,7 +33,6 @@ import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
 import cloud.commandframework.keys.CloudKey;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
 
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 
@@ -60,7 +59,7 @@ public final class CommandBeanExample extends CommandBean<CommandSender> impleme
     }
 
     @Override
-    protected Command.@NonNull Builder<CommandSender> configure(@NotNull final Command.Builder<CommandSender> builder) {
+    protected Command.@NonNull Builder<CommandSender> configure(final Command.@NonNull Builder<CommandSender> builder) {
         return builder.literal("bean").required(NUMBER_KEY, integerParser());
     }
 

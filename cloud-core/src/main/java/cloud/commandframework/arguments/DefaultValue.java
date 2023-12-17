@@ -94,7 +94,7 @@ public interface DefaultValue<C, T> {
         }
 
         @Override
-        public @NonNull T evaluateDefault(@NonNull final CommandContext<C> context) {
+        public @NonNull T evaluateDefault(final @NonNull CommandContext<C> context) {
             return this.value;
         }
 

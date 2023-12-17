@@ -178,8 +178,7 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
         }
 
         @Override
-        @NonNull
-        CompletableFuture<@NonNull T> parseFuture(
+        @NonNull CompletableFuture<@NonNull T> parseFuture(
                 @NonNull CommandContext<@NonNull C> commandContext,
                 @NonNull CommandInput commandInput
         );

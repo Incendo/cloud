@@ -167,7 +167,7 @@ public interface CommandExecutionHandler<C> {
 
         @Override
         public CompletableFuture<@Nullable Void> executeFuture(
-                @NonNull final CommandContext<C> commandContext
+                final @NonNull CommandContext<C> commandContext
         ) {
             @MonotonicNonNull CompletableFuture<@Nullable Void> composedHandler = null;
 
