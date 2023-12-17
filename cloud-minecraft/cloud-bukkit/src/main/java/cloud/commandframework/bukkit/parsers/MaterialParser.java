@@ -27,8 +27,8 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
@@ -43,7 +43,7 @@ import org.apiguardian.api.API;
 import org.bukkit.Material;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public final class MaterialParser<C> implements ArgumentParser<C, Material>, SuggestionProvider.BlockingSuggestionProvider<C> {
+public final class MaterialParser<C> implements ArgumentParser<C, Material>, BlockingSuggestionProvider<C> {
 
     /**
      * Creates a new material parser.

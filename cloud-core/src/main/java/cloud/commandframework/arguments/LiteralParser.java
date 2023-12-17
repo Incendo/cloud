@@ -26,7 +26,7 @@ package cloud.commandframework.arguments;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
@@ -40,7 +40,7 @@ import java.util.TreeSet;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public final class LiteralParser<C> implements ArgumentParser<C, String>, SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
+public final class LiteralParser<C> implements ArgumentParser<C, String>, BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new literal parser that accepts the given {@code name} and {@code aliases}.

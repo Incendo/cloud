@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -155,74 +154,5 @@ public interface SuggestionProvider<C> {
             result.add(suggestion);
         }
         return blockingStrings((ctx, input) -> result);
-    }
-
-    /**
-     * Specialized variant of {@link SuggestionProvider} that does work on the calling thread.
-     *
-     * <p>In the case that a specific thread context isn't required, this is usually simpler
-     * to implement than {@link SuggestionProvider}.</p>
-     *
-     * @param <C> command sender type
-     */
-    @FunctionalInterface
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
-
-        /**
-         * Returns the suggestions for the given {@code input}.
-         *
-         * @param context the context of the suggestion lookup
-         * @param input   the current input
-         * @return the suggestions
-         */
-        @NonNull List<@NonNull Suggestion> suggestions(@NonNull CommandContext<C> context, @NonNull String input);
-
-        @Override
-        default @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
-                final @NonNull CommandContext<C> context,
-                final @NonNull String input
-        ) {
-            return CompletableFuture.completedFuture(this.suggestions(context, input));
-        }
-
-        /**
-         * Specialized variant of {@link BlockingSuggestionProvider} that has {@link String} results
-         * instead of {@link Suggestion} results.
-         *
-         * <p>The provided default implementation of {@link #suggestions(CommandContext, String)}
-         * maps the {@link String} results to {@link Suggestion suggestions} using {@link Suggestion#simple(String)}.</p>
-         *
-         * @param <C> command sender type
-         */
-        @FunctionalInterface
-        @API(status = API.Status.STABLE, since = "2.0.0")
-        interface Strings<C> extends BlockingSuggestionProvider<C> {
-
-            /**
-             * Returns a list of suggested arguments that would be correctly parsed by this parser
-             * <p>
-             * This method is likely to be called for every character provided by the sender and
-             * so it may be necessary to cache results locally to prevent unnecessary computations
-             *
-             * @param commandContext Command context
-             * @param input          Input string
-             * @return List of suggestions
-             */
-            @NonNull List<@NonNull String> stringSuggestions(
-                    @NonNull CommandContext<C> commandContext,
-                    @NonNull String input
-            );
-
-            @Override
-            default @NonNull List<@NonNull Suggestion> suggestions(
-                    final @NonNull CommandContext<C> context,
-                    final @NonNull String input
-            ) {
-                return this.stringSuggestions(context, input).stream()
-                        .map(Suggestion::simple)
-                        .collect(Collectors.toList());
-            }
-        }
     }
 }
