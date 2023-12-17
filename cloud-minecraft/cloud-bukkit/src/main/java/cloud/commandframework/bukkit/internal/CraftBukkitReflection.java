@@ -23,23 +23,21 @@
 //
 package cloud.commandframework.bukkit.internal;
 
-import com.google.common.annotations.Beta;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Utilities for doing reflection on CraftBukkit, used by the cloud implementation.
- *
- * <p>This is not API to any extent, and as such, may break, change, or be removed without any notice.</p>
  */
-@Beta
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 @SuppressWarnings("EmptyCatch")
 public final class CraftBukkitReflection {
 

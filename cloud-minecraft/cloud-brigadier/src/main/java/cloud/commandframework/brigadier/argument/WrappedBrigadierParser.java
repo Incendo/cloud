@@ -25,7 +25,7 @@ package cloud.commandframework.brigadier.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import com.mojang.brigadier.StringReader;
@@ -53,7 +53,7 @@ import static java.util.Objects.requireNonNull;
  * @param <T> the value type of the argument
  * @since 1.5.0
  */
-public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
+public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, BlockingSuggestionProvider.Strings<C> {
 
     public static final String COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER = "_cloud_brigadier_native_sender";
 
@@ -114,7 +114,7 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
      *
      * @param nativeType            the native command type provider, calculated lazily
      * @param expectedArgumentCount the number of arguments the brigadier type is expected to consume
-     * @param parse special function to replace {@link ArgumentType#parse(StringReader)} (for CraftBukkit weirdness)
+     * @param parse                 special function to replace {@link ArgumentType#parse(StringReader)} (for CraftBukkit weirdness)
      * @since 1.8.0
      */
     @API(status = API.Status.STABLE, since = "1.8.0")
@@ -198,11 +198,6 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
     }
 
     @Override
-    public final boolean isContextFree() {
-        return true;
-    }
-
-    @Override
     public final int getRequestedArgumentCount() {
         return this.expectedArgumentCount;
     }
@@ -216,10 +211,11 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
     @API(status = API.Status.STABLE, since = "1.8.0")
     @FunctionalInterface
     public interface ParseFunction<T> {
+
         /**
          * Apply the parse function.
          *
-         * @param type argument type
+         * @param type   argument type
          * @param reader string reader
          * @return result
          * @throws CommandSyntaxException on failure

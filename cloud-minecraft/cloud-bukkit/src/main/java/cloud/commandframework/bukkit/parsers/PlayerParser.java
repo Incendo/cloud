@@ -27,8 +27,8 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.captions.CaptionVariable;
@@ -44,7 +44,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public final class PlayerParser<C> implements ArgumentParser<C, Player>, SuggestionProvider.BlockingSuggestionProvider<C> {
+public final class PlayerParser<C> implements ArgumentParser<C, Player>, BlockingSuggestionProvider<C> {
 
     /**
      * Creates a new player parser.

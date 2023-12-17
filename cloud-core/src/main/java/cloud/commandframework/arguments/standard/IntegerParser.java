@@ -27,7 +27,7 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
@@ -41,7 +41,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class IntegerParser<C> implements ArgumentParser<C, Integer>, SuggestionProvider.BlockingSuggestionProvider.Strings<C> {
+public final class IntegerParser<C> implements ArgumentParser<C, Integer>, BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Constant for the default/unset minimum value.
@@ -229,11 +229,6 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Sugge
      */
     public boolean hasMin() {
         return this.min != DEFAULT_MINIMUM;
-    }
-
-    @Override
-    public boolean isContextFree() {
-        return true;
     }
 
     @Override

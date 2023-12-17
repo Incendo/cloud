@@ -21,41 +21,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.bukkit.arguments.selector;
+package cloud.commandframework.state;
 
-import java.util.List;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.apiguardian.api.API;
 
-public final class SinglePlayerSelector extends MultiplePlayerSelector {
-
-    /**
-     * Construct a new selector
-     *
-     * @param selector The input string used to create this selector
-     * @param entities The List of Bukkit {@link Entity entities} to construct the {@link EntitySelector} from
-     */
-    public SinglePlayerSelector(
-            final @NonNull String selector,
-            final @NonNull List<@NonNull Entity> entities
-    ) {
-        super(selector, entities);
-        if (getPlayers().size() > 1) {
-            throw new IllegalArgumentException("More than 1 player selected in single player selector.");
-        }
-    }
+/**
+ * The point in the registration lifecycle for this commands manager
+ *
+ * @since 2.0.0
+ */
+@API(status = API.Status.STABLE, since = "2.0.0")
+public enum RegistrationState implements State {
 
     /**
-     * Get the selected player or null if no player matched
-     *
-     * @return Gets the single player parsed by the selector
+     * The point when no commands have been registered yet.
+     * <p>
+     * At this point, all configuration options can be changed.
      */
-    public @Nullable Player getPlayer() {
-        if (this.getPlayers().isEmpty()) {
-            return null;
-        }
-        return this.getPlayers().get(0);
-    }
+    BEFORE_REGISTRATION,
+    /**
+     * When at least one command has been registered, and more commands have been registered.
+     * <p>
+     * In this state, some options that affect how commands are registered with the platform are frozen. Some platforms
+     * will remain in this state for their lifetime.
+     */
+    REGISTERING,
+    /**
+     * Once registration has been completed.
+     * <p>
+     * At this point, the command manager is effectively immutable. On platforms where command registration happens via
+     * callback, this state is achieved the first time the manager's callback is executed for registration.
+     */
+    AFTER_REGISTRATION
 }

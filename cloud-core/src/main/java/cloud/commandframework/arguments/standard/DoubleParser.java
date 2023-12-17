@@ -179,11 +179,6 @@ public final class DoubleParser<C> implements ArgumentParser<C, Double> {
         return this.min != DEFAULT_MINIMUM;
     }
 
-    @Override
-    public boolean isContextFree() {
-        return true;
-    }
-
 
     @API(status = API.Status.STABLE)
     public static final class DoubleParseException extends NumberParseException {

@@ -21,22 +21,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.bukkit.arguments.selector;
+package cloud.commandframework.state;
 
-import java.util.List;
-import org.bukkit.entity.Entity;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.apiguardian.api.API;
 
-public class MultipleEntitySelector extends EntitySelector {
-
-    /**
-     * @param selector The input string used to create this selector
-     * @param entities The List of Bukkit {@link Entity}s to construct the {@link EntitySelector} from
-     */
-    public MultipleEntitySelector(
-            final @NonNull String selector,
-            final @NonNull List<@NonNull Entity> entities
-    ) {
-        super(selector, entities);
-    }
+/**
+ * Something that represents a state in a state machine.
+ *
+ * @since 2.0.0
+ */
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface State {
 }

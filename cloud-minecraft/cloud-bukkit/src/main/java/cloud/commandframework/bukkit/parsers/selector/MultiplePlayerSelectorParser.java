@@ -25,12 +25,12 @@ package cloud.commandframework.bukkit.parsers.selector;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
+import cloud.commandframework.bukkit.data.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.parsers.PlayerParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
@@ -107,6 +107,7 @@ public final class MultiplePlayerSelectorParser<C> extends SelectorUtils.PlayerS
         this(true);
     }
 
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     @Override
     public MultiplePlayerSelector mapResult(
             final @NonNull String input,
@@ -116,7 +117,17 @@ public final class MultiplePlayerSelectorParser<C> extends SelectorUtils.PlayerS
         if (players.isEmpty() && !this.allowEmpty) {
             new Thrower(NO_PLAYERS_EXCEPTION_TYPE.get()).throwIt();
         }
-        return new MultiplePlayerSelector(input, new ArrayList<>(players));
+        return new MultiplePlayerSelector() {
+            @Override
+            public @NonNull String inputString() {
+                return input;
+            }
+
+            @Override
+            public @NonNull Collection<Player> values() {
+                return Collections.unmodifiableCollection(players);
+            }
+        };
     }
 
     @Override
@@ -132,7 +143,18 @@ public final class MultiplePlayerSelectorParser<C> extends SelectorUtils.PlayerS
         if (player == null) {
             result.completeExceptionally(new PlayerParser.PlayerParseException(input, commandContext));
         } else {
-            result.complete(new MultiplePlayerSelector(commandInput.readString(), ImmutableList.of(player)));
+            final String pop = commandInput.readString();
+            result.complete(new MultiplePlayerSelector() {
+                @Override
+                public @NonNull String inputString() {
+                    return pop;
+                }
+
+                @Override
+                public @NonNull Collection<Player> values() {
+                    return Collections.singletonList(player);
+                }
+            });
         }
 
         return result;

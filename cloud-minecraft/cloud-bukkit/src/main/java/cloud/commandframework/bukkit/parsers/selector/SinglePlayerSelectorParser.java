@@ -25,12 +25,10 @@ package cloud.commandframework.bukkit.parsers.selector;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
+import cloud.commandframework.bukkit.data.SinglePlayerSelector;
 import cloud.commandframework.bukkit.parsers.PlayerParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import com.google.common.collect.ImmutableList;
-import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
@@ -79,12 +77,24 @@ public final class SinglePlayerSelectorParser<C> extends SelectorUtils.PlayerSel
         super(true);
     }
 
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     @Override
     public SinglePlayerSelector mapResult(
             final @NonNull String input,
             final SelectorUtils.@NonNull EntitySelectorWrapper wrapper
     ) {
-        return new SinglePlayerSelector(input, Collections.singletonList(wrapper.singlePlayer()));
+        final Player player = wrapper.singlePlayer();
+        return new SinglePlayerSelector() {
+            @Override
+            public @NonNull Player single() {
+                return player;
+            }
+
+            @Override
+            public @NonNull String inputString() {
+                return input;
+            }
+        };
     }
 
     @Override
@@ -99,7 +109,18 @@ public final class SinglePlayerSelectorParser<C> extends SelectorUtils.PlayerSel
         if (player == null) {
             result.completeExceptionally(new PlayerParser.PlayerParseException(input, commandContext));
         } else {
-            result.complete(new SinglePlayerSelector(commandInput.readString(), ImmutableList.of(player)));
+            final String pop = commandInput.readString();
+            result.complete(new SinglePlayerSelector() {
+                @Override
+                public @NonNull Player single() {
+                    return player;
+                }
+
+                @Override
+                public @NonNull String inputString() {
+                    return pop;
+                }
+            });
         }
 
         return result;

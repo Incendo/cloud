@@ -87,11 +87,6 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser.Futur
     }
 
     @Override
-    public boolean isContextFree() {
-        return this.base.isContextFree();
-    }
-
-    @Override
     public int getRequestedArgumentCount() {
         return this.base.getRequestedArgumentCount();
     }

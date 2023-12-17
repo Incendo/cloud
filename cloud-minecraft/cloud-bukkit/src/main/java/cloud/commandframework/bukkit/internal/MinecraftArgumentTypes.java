@@ -47,7 +47,6 @@
  */
 package cloud.commandframework.bukkit.internal;
 
-import com.google.common.annotations.Beta;
 import com.mojang.brigadier.arguments.ArgumentType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -57,15 +56,14 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Map;
+import org.apiguardian.api.API;
 import org.bukkit.NamespacedKey;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A registry of the {@link ArgumentType}s provided by Minecraft.
- *
- * <p>This is not API, and as such, may break, change, or be removed without any notice.</p>
  */
-@Beta
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class MinecraftArgumentTypes {
 
     private MinecraftArgumentTypes() {

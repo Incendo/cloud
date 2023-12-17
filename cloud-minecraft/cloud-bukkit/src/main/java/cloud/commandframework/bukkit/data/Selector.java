@@ -21,46 +21,57 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.bukkit.arguments.selector;
+package cloud.commandframework.bukkit.data;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class MultiplePlayerSelector extends MultipleEntitySelector {
-
-    private final List<Player> players = new ArrayList<>();
-
-    /**
-     * Construct a new selector
-     *
-     * @param selector The input string used to create this selector
-     * @param entities The List of Bukkit {@link Entity}s to construct the {@link EntitySelector} from
-     */
-    public MultiplePlayerSelector(
-            final @NonNull String selector,
-            final @NonNull List<@NonNull Entity> entities
-    ) {
-        super(selector, entities);
-        entities.forEach(e -> {
-            if (e.getType() != EntityType.PLAYER) {
-                throw new IllegalArgumentException("Non-players selected in player selector.");
-            } else {
-                this.players.add((Player) e);
-            }
-        });
-    }
+/**
+ * A selector string to query multiple entity-like values.
+ *
+ * @param <V> value type
+ * @since 2.0.0
+ */
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface Selector<V> {
 
     /**
-     * Get the resulting players
+     * Get the raw string associated with the selector.
      *
-     * @return Immutable views of the list of Bukkit {@link Player players} parsed from the selector
+     * @return the input
      */
-    public final @NonNull List<@NonNull Player> getPlayers() {
-        return Collections.unmodifiableList(this.players);
+    @NonNull String inputString();
+
+    /**
+     * Get the value of this selector.
+     *
+     * @return all matched entities
+     */
+    @NonNull Collection<V> values();
+
+    /**
+     * A specialized {@link Selector} that can only return one value.
+     *
+     * @param <V> value type
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    interface Single<V> extends Selector<V> {
+
+        @Override
+        default @NonNull Collection<V> values() {
+            return Collections.singletonList(this.single());
+        }
+
+        /**
+         * Get the single value from this selector.
+         *
+         * <p>A successfully parsed {@link Single} must match a value.</p>
+         *
+         * @return the value
+         */
+        @NonNull V single();
     }
 }

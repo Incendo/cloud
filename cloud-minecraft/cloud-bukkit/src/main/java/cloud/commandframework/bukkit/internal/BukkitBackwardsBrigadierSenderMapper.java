@@ -24,16 +24,16 @@
 package cloud.commandframework.bukkit.internal;
 
 import cloud.commandframework.bukkit.BukkitCommandManager;
-import com.google.common.annotations.Beta;
 import java.lang.reflect.Method;
 import java.util.function.Function;
+import org.apiguardian.api.API;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * This is not API, and as such, may break, change, or be removed without any notice.
  */
-@Beta
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class BukkitBackwardsBrigadierSenderMapper<C, S> implements Function<C, S> {
 
     private static final Class<?> VANILLA_COMMAND_WRAPPER_CLASS =

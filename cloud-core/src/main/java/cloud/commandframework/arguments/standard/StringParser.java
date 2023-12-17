@@ -252,11 +252,6 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
         return ArgumentParseResult.success(stringJoiner.toString());
     }
 
-    @Override
-    public boolean isContextFree() {
-        return true;
-    }
-
     /**
      * Get the string mode
      *
