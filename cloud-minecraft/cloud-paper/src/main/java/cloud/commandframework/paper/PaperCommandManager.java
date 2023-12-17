@@ -31,6 +31,7 @@ import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.paper.suggestions.SuggestionListener;
 import cloud.commandframework.paper.suggestions.SuggestionListenerFactory;
+import cloud.commandframework.state.RegistrationState;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import org.bukkit.Bukkit;

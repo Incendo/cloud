@@ -24,6 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import cloud.commandframework.state.RegistrationState;
 import org.junit.jupiter.api.Test;
 
 import static cloud.commandframework.util.TestUtils.createManager;
@@ -35,7 +36,7 @@ public class CommandRegistrationStateTest {
     @Test
     void testInitialState() {
         final CommandManager<TestCommandSender> manager = createManager();
-        assertEquals(CommandManager.RegistrationState.BEFORE_REGISTRATION, manager.registrationState());
+        assertEquals(RegistrationState.BEFORE_REGISTRATION, manager.state());
     }
 
     @Test
@@ -45,7 +46,7 @@ public class CommandRegistrationStateTest {
         manager.command(manager.commandBuilder("test").handler(ctx -> {
         }));
 
-        assertEquals(CommandManager.RegistrationState.REGISTERING, manager.registrationState());
+        assertEquals(RegistrationState.REGISTERING, manager.state());
     }
 
     @Test
@@ -57,7 +58,7 @@ public class CommandRegistrationStateTest {
         manager.command(manager.commandBuilder("test2").handler(ctx -> {
         }));
 
-        assertEquals(CommandManager.RegistrationState.REGISTERING, manager.registrationState());
+        assertEquals(RegistrationState.REGISTERING, manager.state());
     }
 
     @Test
@@ -78,8 +79,8 @@ public class CommandRegistrationStateTest {
         }));
 
         manager.transitionOrThrow(
-                CommandManager.RegistrationState.REGISTERING,
-                CommandManager.RegistrationState.AFTER_REGISTRATION
+                RegistrationState.REGISTERING,
+                RegistrationState.AFTER_REGISTRATION
         );
         assertThrows(IllegalStateException.class, () -> manager.command(manager.commandBuilder("test2").handler(ctx -> {
         })));
@@ -92,8 +93,8 @@ public class CommandRegistrationStateTest {
         manager.command(manager.commandBuilder("test").handler(ctx -> {
         }));
         manager.transitionOrThrow(
-                CommandManager.RegistrationState.REGISTERING,
-                CommandManager.RegistrationState.AFTER_REGISTRATION
+                RegistrationState.REGISTERING,
+                RegistrationState.AFTER_REGISTRATION
         );
         manager.command(manager.commandBuilder("unsafe").handler(ctx -> {
         }));

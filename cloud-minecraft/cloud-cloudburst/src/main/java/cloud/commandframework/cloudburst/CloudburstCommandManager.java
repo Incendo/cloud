@@ -35,6 +35,7 @@ import cloud.commandframework.exceptions.handling.ExceptionContext;
 import cloud.commandframework.exceptions.handling.ExceptionHandler;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
+import cloud.commandframework.state.RegistrationState;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.cloudburstmc.server.command.CommandSender;
@@ -112,7 +113,7 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
 
     @Override
     public final boolean isCommandRegistrationAllowed() {
-        return this.registrationState() != RegistrationState.AFTER_REGISTRATION;
+        return this.state() != RegistrationState.AFTER_REGISTRATION;
     }
 
     final @NonNull Function<@NonNull CommandSender, @NonNull C> getCommandSenderMapper() {

@@ -65,6 +65,7 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
+import cloud.commandframework.state.RegistrationState;
 import cloud.commandframework.tasks.TaskFactory;
 import cloud.commandframework.tasks.TaskRecipe;
 import io.leangen.geantyref.TypeToken;
