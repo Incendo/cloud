@@ -32,7 +32,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Processor that formats command suggestions
  *
- * @param <C> the command sender type
+ * @param <C> command sender type
  * @since 2.0.0
  */
 @FunctionalInterface
@@ -40,14 +40,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public interface CommandSuggestionProcessor<C> {
 
     /**
-     * Create a pass through {@link CommandSuggestionProcessor} that simply returns
-     * the input.
+     * Creates a {@link CommandSuggestionProcessor} that simply returns the input suggestion.
      *
-     * @param <C> sender type
-     * @return new processor
-     * @since 1.8.0
+     * @param <C> command sender type
+     * @return the processor
      */
-    @API(status = API.Status.STABLE, since = "1.8.0")
     static <C> @NonNull CommandSuggestionProcessor<C> passThrough() {
         return (ctx, suggestion) -> suggestion;
     }
@@ -57,9 +54,9 @@ public interface CommandSuggestionProcessor<C> {
      * <p>
      * If {@code null} is returned, the suggestion will be dropped.
      *
-     * @param context    the context
-     * @param suggestion the suggestion
-     * @return the result
+     * @param context    command preprocessing context which can be used to access the command context and command input
+     * @param suggestion the suggestion to process
+     * @return the processed suggestion, or {@code null}
      */
     @Nullable Suggestion process(@NonNull CommandPreprocessingContext<C> context, @NonNull Suggestion suggestion);
 }
