@@ -33,7 +33,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * A selector string to query multiple entity-like values.
  *
- * @param <V> Value type
+ * @param <V> value type
  * @since 1.5.0
  */
 public interface Selector<V> {
@@ -68,7 +68,7 @@ public interface Selector<V> {
     /**
      * A specialized {@link Selector} that can only return one value.
      *
-     * @param <V> the value type
+     * @param <V> value type
      * @since 1.5.0
      */
     interface Single<V> extends Selector<V> {
