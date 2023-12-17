@@ -66,8 +66,6 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.state.RegistrationState;
-import cloud.commandframework.tasks.TaskFactory;
-import cloud.commandframework.tasks.TaskRecipe;
 import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Method;
 import java.util.Locale;
@@ -107,8 +105,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     private final Function<CommandSender, C> commandSenderMapper;
     private final Function<C, CommandSender> backwardsCommandSenderMapper;
 
-    private final TaskFactory taskFactory;
-
     private boolean splitAliases = false;
 
     /**
@@ -124,14 +120,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
      *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
      *                                     {@link cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator}.
-     *                                     <p>
-     *                                     A word of caution: When using the asynchronous command executor in Bukkit, it is very
-     *                                     likely that you will have to perform manual synchronization when executing the commands
-     *                                     in many cases, as Bukkit makes no guarantees of thread safety in common classes. To
-     *                                     make this easier, {@link #taskRecipe()} is provided. Furthermore, it may be unwise to
-     *                                     use asynchronous command parsing, especially when dealing with things such as players
-     *                                     and entities. To make this more safe, the asynchronous command execution allows you
-     *                                     to state that you want synchronous command parsing.
      * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
@@ -150,9 +138,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         this.owningPlugin = owningPlugin;
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
-
-        final BukkitSynchronizer bukkitSynchronizer = new BukkitSynchronizer(owningPlugin);
-        this.taskFactory = new TaskFactory(bukkitSynchronizer);
 
         this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
                 FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
@@ -190,7 +175,10 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
                 new SinglePlayerSelectorParser<>());
         this.parserRegistry().registerAnnotationMapper(
                 AllowEmptySelection.class,
-                (annotation, type) -> ParserParameters.single(BukkitParserParameters.ALLOW_EMPTY_SELECTOR_RESULT, annotation.value())
+                (annotation, type) -> ParserParameters.single(
+                        BukkitParserParameters.ALLOW_EMPTY_SELECTOR_RESULT,
+                        annotation.value()
+                )
         );
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(MultipleEntitySelector.class),
@@ -254,15 +242,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
                 UnaryOperator.identity(),
                 UnaryOperator.identity()
         );
-    }
-
-    /**
-     * Create a new task recipe. This can be used to create chains of synchronous/asynchronous method calls
-     *
-     * @return Task recipe
-     */
-    public @NonNull TaskRecipe taskRecipe() {
-        return this.taskFactory.recipe();
     }
 
     /**
