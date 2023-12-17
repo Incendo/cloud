@@ -86,4 +86,6 @@ dependencies {
     errorprone(libs.errorproneCore)
     // Silences compiler warnings from guava using errorprone
     compileOnly(libs.errorproneAnnotations)
+
+    checkstyle(libs.stylecheck)
 }
