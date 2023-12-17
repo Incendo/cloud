@@ -27,6 +27,7 @@ import cloud.commandframework.captions.Caption;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -102,10 +103,12 @@ public final class BukkitCaptionKeys {
     }
 
     /**
-     * Get an immutable collection containing all standard caption keys
+     * Get an immutable collection containing all standard caption keys.
      *
-     * @return Immutable collection of keys
+     * @return immutable collection of keys
+     * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public static @NonNull Collection<@NonNull Caption> bukkitCaptionKeys() {
         return Collections.unmodifiableCollection(RECOGNIZED_CAPTIONS);
     }
