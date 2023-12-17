@@ -105,7 +105,7 @@ public interface SuggestionProvider<C> {
      * @return suggestion provider
      */
     static <C> @NonNull SuggestionProvider<C> suggesting(
-            final @NonNull Suggestion @NonNull ... suggestions
+            final @NonNull Suggestion @NonNull... suggestions
     ) {
         return suggesting(Arrays.asList(suggestions));
     }
@@ -118,7 +118,7 @@ public interface SuggestionProvider<C> {
      * @return suggestion provider
      */
     static <C> @NonNull SuggestionProvider<C> suggestingStrings(
-            final @NonNull String @NonNull ... suggestions
+            final @NonNull String @NonNull... suggestions
     ) {
         return suggestingStrings(Arrays.asList(suggestions));
     }
