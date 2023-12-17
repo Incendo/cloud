@@ -37,8 +37,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 
-@API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
-public interface CommandInput extends Cloneable {
+@API(status = API.Status.EXPERIMENTAL, since = "2.0.0")
+public interface CommandInput {
 
     List<String> BOOLEAN_STRICT = Collections.unmodifiableList(Arrays.asList("TRUE", "FALSE"));
     List<String> BOOLEAN_LIBERAL = Collections.unmodifiableList(Arrays.asList("TRUE", "YES", "ON", "FALSE", "NO", "OFF"));
@@ -639,8 +639,8 @@ public interface CommandInput extends Cloneable {
         }
     }
 
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @SuppressWarnings("serial")
-    @API(status = API.Status.STABLE, since = "1.7.0")
     class CursorOutOfBoundsException extends NoSuchElementException {
 
         CursorOutOfBoundsException(

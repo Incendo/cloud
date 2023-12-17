@@ -23,27 +23,16 @@
 //
 package cloud.commandframework.arguments.suggestion;
 
-import cloud.commandframework.context.CommandContext;
-import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-final class DelegatingSuggestionProvider<C> implements SuggestionProvider<C> {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface SuggestionProviderHolder<C> {
 
-    private final SuggestionProvider<C> suggestionProvider;
-
-    DelegatingSuggestionProvider(final @NonNull SuggestionProvider<C> suggestionProvider) {
-        this.suggestionProvider = suggestionProvider;
-    }
-
-    @Override
-    public @NonNull List<@NonNull Suggestion> suggestions(final @NonNull CommandContext<C> context, final @NonNull String s) {
-        return this.suggestionProvider.suggestions(context, s);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("DelegatingSuggestionProvider{parser='%s'}", this.suggestionProvider.getClass().getCanonicalName());
-    }
+    /**
+     * Returns the suggestion provider.
+     *
+     * @return the suggestion provider
+     */
+    @NonNull SuggestionProvider<C> suggestionProvider();
 }

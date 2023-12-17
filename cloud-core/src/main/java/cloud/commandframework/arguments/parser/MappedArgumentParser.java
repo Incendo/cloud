@@ -23,10 +23,9 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -65,19 +64,16 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser.Futur
 
     @Override
     public @NonNull CompletableFuture<@NonNull O> parseFuture(
-            @NonNull final CommandContext<@NonNull C> commandContext,
-            @NonNull final CommandInput commandInput
+            final @NonNull CommandContext<@NonNull C> commandContext,
+            final @NonNull CommandInput commandInput
     ) {
        return this.base.parseFuture(commandContext, commandInput)
                .thenCompose(result -> this.mapper.map(commandContext, result));
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> suggestions(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
-    ) {
-        return this.base.suggestions(commandContext, input);
+    public @NonNull SuggestionProvider<C> suggestionProvider() {
+        return this.base.suggestionProvider();
     }
 
     @Override

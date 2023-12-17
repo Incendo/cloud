@@ -27,6 +27,7 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.bungee.BungeeCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
@@ -46,7 +47,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 2.0.0
  */
-public final class PlayerParser<C> implements ArgumentParser<C, ProxiedPlayer> {
+public final class PlayerParser<C> implements ArgumentParser<C, ProxiedPlayer>, BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new player parser.

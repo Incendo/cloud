@@ -27,6 +27,7 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -56,7 +57,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <V> the registry entry type
  * @since 2.0.0
  */
-public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V> {
+public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V>, BlockingSuggestionProvider.Strings<C> {
 
     private static final String NAMESPACE_MINECRAFT = "minecraft";
 

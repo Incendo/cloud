@@ -27,6 +27,7 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.BukkitParserParameters;
@@ -49,7 +50,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> sender type
  * @since 1.7.0
  */
-public final class NamespacedKeyParser<C> implements ArgumentParser<C, NamespacedKey> {
+public final class NamespacedKeyParser<C> implements ArgumentParser<C, NamespacedKey>,
+        BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new namespaced key parser that does not require a specific namespace,

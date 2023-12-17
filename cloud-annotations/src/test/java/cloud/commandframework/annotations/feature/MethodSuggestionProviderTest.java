@@ -74,7 +74,8 @@ class MethodSuggestionProviderTest {
                 this.commandManager.parserRegistry()
                         .getSuggestionProvider("suggestions")
                         .orElseThrow(NullPointerException::new)
-                        .suggestions(context, "");
+                        .suggestionsFuture(context, "")
+                        .join();
 
         // Assert
         assertThat(suggestions).containsExactly(Suggestion.simple("foo"));

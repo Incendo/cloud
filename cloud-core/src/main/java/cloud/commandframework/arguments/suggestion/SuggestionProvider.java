@@ -24,9 +24,11 @@
 package cloud.commandframework.arguments.suggestion;
 
 import cloud.commandframework.context.CommandContext;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -34,6 +36,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Provider of suggestions
  *
  * @param <C> command sender type
+ * @see BlockingSuggestionProvider
+ * @see BlockingSuggestionProvider.Strings
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
@@ -41,73 +45,114 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface SuggestionProvider<C> {
 
     /**
-     * Returns a suggestion provider that delegates to the {@code other} provider.
+     * Returns a future that completes with the suggestions for the given {@code input}.
      *
-     * @param <C>   the command sender type
-     * @param other the other provider
-     * @return the returned provider
-     */
-    static <C> @NonNull SuggestionProvider<C> delegating(final @NonNull SuggestionProvider<C> other) {
-        return new DelegatingSuggestionProvider<>(other);
-    }
-
-    /**
-     * Returns the suggestions for the given {@code input}.
+     * <p>If you don't need to return a future, you can implement {@link BlockingSuggestionProvider} instead.</p>
      *
      * @param context the context of the suggestion lookup
      * @param input   the current input
      * @return the suggestions
      */
-    @NonNull List<@NonNull Suggestion> suggestions(@NonNull CommandContext<C> context, @NonNull String input);
-
-    /**
-     * Returns a future that completes with the suggestions for the given {@code input}. By default, this delegates to
-     * {@link #suggestions(CommandContext, String)}.
-     * <p>
-     * If you want to implement this method for your parser it is recommended to implement
-     * {@link FutureSuggestionProvider} rather than {@link SuggestionProvider}.
-     *
-     * @param context the context of the suggestion lookup
-     * @param input   the current input
-     * @return the suggestions
-     */
-    default @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
+    @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
             @NonNull CommandContext<C> context,
             @NonNull String input
-    ) {
-        return CompletableFuture.completedFuture(this.suggestions(context, input));
-    }
-
+    );
 
     /**
-     * Utility interface extending {@link SuggestionProvider} to make it easier to implement
-     * {@link #suggestionsFuture(CommandContext, String)}.
+     * Get a suggestion provider that provides no suggestions.
      *
-     * @param <C> the command sender type
+     * @param <C> command sender type
+     * @return suggestion provider
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    interface FutureSuggestionProvider<C> extends SuggestionProvider<C> {
+    static <C> SuggestionProvider<C> noSuggestions() {
+        return (ctx, in) -> CompletableFuture.completedFuture(Collections.emptyList());
+    }
 
-        @Override
-        default @NonNull List<@NonNull Suggestion> suggestions(
-                @NonNull CommandContext<C> context,
-                @NonNull String input
-        ) {
-            try {
-                return this.suggestionsFuture(context, input).join();
-            } catch (final CompletionException exception) {
-                final Throwable cause = exception.getCause();
-                if (cause instanceof RuntimeException) {
-                    throw (RuntimeException) cause;
-                }
-                throw exception;
-            }
+    /**
+     * Utility method to simplify implementing {@link BlockingSuggestionProvider}
+     * using a lambda, for methods that accept a {@link SuggestionProvider}.
+     *
+     * @param blockingSuggestionProvider suggestion provider
+     * @param <C>                        command sender type
+     * @return suggestion provider
+     */
+    static <C> @NonNull SuggestionProvider<C> blocking(
+            final @NonNull BlockingSuggestionProvider<C> blockingSuggestionProvider
+    ) {
+        return blockingSuggestionProvider;
+    }
+
+    /**
+     * Utility method to simplify implementing {@link BlockingSuggestionProvider.Strings}
+     * using a lambda, for methods that accept a {@link SuggestionProvider}.
+     *
+     * @param blockingStringsSuggestionProvider suggestion provider
+     * @param <C>                               command sender type
+     * @return suggestion provider
+     */
+    static <C> @NonNull SuggestionProvider<C> blockingStrings(
+            final BlockingSuggestionProvider.@NonNull Strings<C> blockingStringsSuggestionProvider
+    ) {
+        return blockingStringsSuggestionProvider;
+    }
+
+    /**
+     * Create a {@link SuggestionProvider} that provides constant suggestions.
+     *
+     * @param suggestions list of strings to suggest
+     * @param <C>         command sender type
+     * @return suggestion provider
+     */
+    static <C> @NonNull SuggestionProvider<C> suggesting(
+            final @NonNull Suggestion @NonNull... suggestions
+    ) {
+        return suggesting(Arrays.asList(suggestions));
+    }
+
+    /**
+     * Create a {@link SuggestionProvider} that provides constant string suggestions.
+     *
+     * @param suggestions list of strings to suggest
+     * @param <C>         command sender type
+     * @return suggestion provider
+     */
+    static <C> @NonNull SuggestionProvider<C> suggestingStrings(
+            final @NonNull String @NonNull... suggestions
+    ) {
+        return suggestingStrings(Arrays.asList(suggestions));
+    }
+
+    /**
+     * Create a {@link SuggestionProvider} that provides constant suggestions.
+     *
+     * @param suggestions list of strings to suggest
+     * @param <C>         command sender type
+     * @return suggestion provider
+     */
+    static <C> @NonNull SuggestionProvider<C> suggesting(
+            final @NonNull Iterable<@NonNull Suggestion> suggestions
+    ) {
+        final List<Suggestion> result = new ArrayList<>();
+        for (final Suggestion suggestion : suggestions) {
+            result.add(suggestion);
         }
+        return blocking((ctx, input) -> result);
+    }
 
-        @Override
-        @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
-                @NonNull CommandContext<C> context,
-                @NonNull String input
-        );
+    /**
+     * Create a {@link SuggestionProvider} that provides constant string suggestions.
+     *
+     * @param suggestions list of strings to suggest
+     * @param <C>         command sender type
+     * @return suggestion provider
+     */
+    static <C> @NonNull SuggestionProvider<C> suggestingStrings(
+            final @NonNull Iterable<@NonNull String> suggestions
+    ) {
+        final List<String> result = new ArrayList<>();
+        for (final String suggestion : suggestions) {
+            result.add(suggestion);
+        }
+        return blockingStrings((ctx, input) -> result);
     }
 }

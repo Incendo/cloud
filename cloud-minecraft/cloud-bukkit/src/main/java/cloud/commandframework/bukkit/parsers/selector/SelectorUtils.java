@@ -26,6 +26,7 @@ package cloud.commandframework.bukkit.parsers.selector;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
@@ -135,7 +136,8 @@ final class SelectorUtils {
     }
 
     @SuppressWarnings("unused") // errorprone false positive
-    private abstract static class SelectorParser<C, T> implements ArgumentParser.FutureArgumentParser<C, T>, SelectorMapper<T> {
+    private abstract static class SelectorParser<C, T> implements ArgumentParser.FutureArgumentParser<C, T>, SelectorMapper<T>,
+            SuggestionProvider<C> {
 
         protected static final Supplier<Object> NO_PLAYERS_EXCEPTION_TYPE =
                 Suppliers.memoize(() -> findExceptionType("argument.entity.notfound.player"));
@@ -194,14 +196,14 @@ final class SelectorUtils {
         }
 
         @Override
-        public List<@NonNull Suggestion> suggestions(
+        public CompletableFuture<List<@NonNull Suggestion>> suggestionsFuture(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
             if (this.modernParser != null) {
-                return this.modernParser.suggestions(commandContext, input);
+                this.modernParser.suggestionProvider().suggestionsFuture(commandContext, input);
             }
-            return this.legacySuggestions(commandContext, input);
+            return CompletableFuture.completedFuture(this.legacySuggestions(commandContext, input));
         }
 
         // returns SimpleCommandExceptionType, does not reference in signature for ABI with pre-1.13
@@ -263,7 +265,7 @@ final class SelectorUtils {
         }
     }
 
-    private static class ModernSelectorParser<C, T> implements ArgumentParser.FutureArgumentParser<C, T> {
+    private static class ModernSelectorParser<C, T> implements ArgumentParser.FutureArgumentParser<C, T>, SuggestionProvider<C> {
 
         private final ArgumentParser<C, Object> wrappedBrigadierParser;
         private final SelectorMapper<T> mapper;
@@ -299,7 +301,7 @@ final class SelectorUtils {
         }
 
         @Override
-        public List<@NonNull Suggestion> suggestions(
+        public CompletableFuture<List<@NonNull Suggestion>> suggestionsFuture(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
@@ -313,7 +315,10 @@ final class SelectorUtils {
                         prev = bypassField.getBoolean(commandSourceStack);
                         bypassField.setBoolean(commandSourceStack, true);
                     }
-                    return this.wrappedBrigadierParser.suggestions(commandContext, input);
+                    // stupid hack
+                    return CompletableFuture.completedFuture(
+                            this.wrappedBrigadierParser.suggestionProvider().suggestionsFuture(commandContext, input).join()
+                    );
                 } finally {
                     if (bypassField != null) {
                         bypassField.setBoolean(commandSourceStack, prev);

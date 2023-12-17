@@ -29,7 +29,6 @@ import cloud.commandframework.annotations.suggestions.MethodSuggestionProvider
 import cloud.commandframework.annotations.suggestions.SuggestionProviderFactory
 import cloud.commandframework.arguments.suggestion.Suggestion
 import cloud.commandframework.arguments.suggestion.SuggestionProvider
-import cloud.commandframework.arguments.suggestion.SuggestionProvider.FutureSuggestionProvider
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.execution.CommandExecutionCoordinator
 import io.leangen.geantyref.GenericTypeReflector
@@ -185,7 +184,7 @@ private class KotlinSuggestionProvider<C>(
     private val coroutineContext: CoroutineContext,
     private val kFunction: KFunction<*>,
     private val instance: Any
-) : FutureSuggestionProvider<C> {
+) : SuggestionProvider<C> {
 
     override fun suggestionsFuture(context: CommandContext<C>, input: String): CompletableFuture<List<Suggestion>> {
         return coroutineScope.future(coroutineContext) {

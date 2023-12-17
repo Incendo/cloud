@@ -796,7 +796,7 @@ public final class AnnotationParser<C> {
                 final String suggestions = this.processString(parser.suggestions());
                 final SuggestionProvider<C> suggestionProvider;
                 if (suggestions.isEmpty()) {
-                    suggestionProvider = (context, input) -> Collections.emptyList();
+                    suggestionProvider = SuggestionProvider.noSuggestions();
                 } else {
                     suggestionProvider = this.manager.parserRegistry().getSuggestionProvider(suggestions)
                             .orElseThrow(() -> new NullPointerException(
@@ -864,7 +864,10 @@ public final class AnnotationParser<C> {
             builder = decorator.decorate(builder);
         }
 
-        final Collection<ArgumentDescriptor> arguments = this.argumentExtractor.extractArguments(commandDescriptor.syntax(), method);
+        final Collection<ArgumentDescriptor> arguments = this.argumentExtractor.extractArguments(
+                commandDescriptor.syntax(),
+                method
+        );
         final Collection<FlagDescriptor> flagDescriptors = this.flagExtractor.extractFlags(method);
         final Collection<CommandFlag<?>> flags = flagDescriptors.stream()
                 .map(this.flagAssembler()::assembleFlag)
@@ -953,8 +956,7 @@ public final class AnnotationParser<C> {
         /* Apply builder modifiers */
         for (final Annotation annotation
                 : AnnotationAccessor.of(classAnnotations, AnnotationAccessor.of(method)).annotations()) {
-            @SuppressWarnings("rawtypes")
-            final BuilderModifier builderModifier = this.builderModifiers.get(
+            @SuppressWarnings("rawtypes") final BuilderModifier builderModifier = this.builderModifiers.get(
                     annotation.annotationType()
             );
             if (builderModifier == null) {

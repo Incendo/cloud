@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.parsers.WorldParser;
 import cloud.commandframework.context.CommandContext;
@@ -35,6 +36,7 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -50,7 +52,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 1.6.0
  */
-public final class KeyedWorldParser<C> implements ArgumentParser<C, World> {
+public final class KeyedWorldParser<C> implements ArgumentParser<C, World>, SuggestionProvider<C> {
 
     /**
      * Creates a new keyed world parser.
@@ -121,12 +123,12 @@ public final class KeyedWorldParser<C> implements ArgumentParser<C, World> {
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> suggestions(
+    public @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
         if (this.parser != null) {
-            return this.parser.suggestions(commandContext, input);
+            return this.parser.suggestionProvider().suggestionsFuture(commandContext, input);
         }
 
         final List<World> worlds = Bukkit.getWorlds();
@@ -138,6 +140,6 @@ public final class KeyedWorldParser<C> implements ArgumentParser<C, World> {
             }
             completions.add(Suggestion.simple(key.getNamespace() + ':' + key.getKey()));
         }
-        return completions;
+        return CompletableFuture.completedFuture(completions);
     }
 }

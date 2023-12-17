@@ -25,8 +25,8 @@ package cloud.commandframework.examples.bukkit.builder.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
@@ -116,14 +116,14 @@ public final class AggregateCommandExample implements BuilderFeature {
         );
     }
 
-    private @NonNull SuggestionProvider<CommandSender> slotSuggestions() {
+    private @NonNull BlockingSuggestionProvider<CommandSender> slotSuggestions() {
         return (context, input) -> IntStream.rangeClosed(1, 9)
                 .mapToObj(Integer::toString)
                 .map(Suggestion::simple)
                 .collect(Collectors.toList());
     }
 
-    private @NonNull SuggestionProvider<CommandSender> nameSuggestions() {
+    private @NonNull BlockingSuggestionProvider<CommandSender> nameSuggestions() {
         return (context, input) -> Stream.of(context.<Integer>get("slot"), context.sender().getName())
                 .map(Object::toString)
                 .map(Suggestion::simple)

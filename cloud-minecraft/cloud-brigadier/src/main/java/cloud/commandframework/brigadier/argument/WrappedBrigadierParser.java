@@ -25,6 +25,7 @@ package cloud.commandframework.brigadier.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import com.mojang.brigadier.StringReader;
@@ -52,7 +53,7 @@ import static java.util.Objects.requireNonNull;
  * @param <T> the value type of the argument
  * @since 1.5.0
  */
-public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> {
+public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, BlockingSuggestionProvider.Strings<C> {
 
     public static final String COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER = "_cloud_brigadier_native_sender";
 

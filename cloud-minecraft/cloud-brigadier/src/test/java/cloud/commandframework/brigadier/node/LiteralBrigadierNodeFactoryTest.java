@@ -82,10 +82,12 @@ class LiteralBrigadierNodeFactoryTest {
         final Command<Object> command = this.commandManager.commandBuilder("command")
                 .literal("literal")
                 .required("integer", integerParser(0, 10))
-                .optional("string", greedyStringParser(), (ctx, in) -> Arrays.asList(
-                        Suggestion.simple("some"),
-                        Suggestion.simple("suggestions")
-                )).build();
+                .optional("string", greedyStringParser(),
+                        cloud.commandframework.arguments.suggestion.SuggestionProvider.suggesting(Arrays.asList(
+                                Suggestion.simple("some"),
+                                Suggestion.simple("suggestions")
+                        ))
+                ).build();
         this.commandManager.command(command);
         final com.mojang.brigadier.Command<Object> brigadierCommand = ctx -> 0;
 
@@ -153,7 +155,8 @@ class LiteralBrigadierNodeFactoryTest {
                                 .withComponent("integer", integerParser(0, 10))
                                 .withComponent("string", greedyStringParser())
                                 .withDirectMapper(
-                                        new TypeToken<Pair<Integer, String>>() {},
+                                        new TypeToken<Pair<Integer, String>>() {
+                                        },
                                         (cmdCtx, ctx) -> Pair.of(ctx.<Integer>get("integer"), ctx.<String>get("string"))
                                 ).build()
                 )

@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
 import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
@@ -199,14 +200,20 @@ public final class FabricExample implements ModInitializer {
             ctx.sender().sendSuccess(text, false);
         }));
 
-        final TypedCommandComponent<CommandSourceStack, ModMetadata> modMetadata = manager.componentBuilder(ModMetadata.class, "mod")
-                .suggestionProvider((ctx, input) -> FabricLoader.getInstance().getAllMods().stream()
+        final TypedCommandComponent<CommandSourceStack, ModMetadata> modMetadata = manager.componentBuilder(
+                        ModMetadata.class,
+                        "mod"
+                )
+                .suggestionProvider(SuggestionProvider.blocking((ctx, input) -> FabricLoader
+                        .getInstance()
+                        .getAllMods()
+                        .stream()
                         .map(ModContainer::getMetadata)
                         .map(ModMetadata::getId)
                         .map(Suggestion::simple)
-                        .collect(Collectors.toList()))
-                .parser((ctx, inputQueue) -> {
-                    final ModMetadata meta = FabricLoader.getInstance().getModContainer(inputQueue.readString())
+                        .collect(Collectors.toList())))
+                .parser((commandContext, commandInput) -> {
+                    final ModMetadata meta = FabricLoader.getInstance().getModContainer(commandInput.readString())
                             .map(ModContainer::getMetadata)
                             .orElse(null);
                     if (meta != null) {
@@ -214,7 +221,7 @@ public final class FabricExample implements ModInitializer {
                     }
                     return ArgumentParseResult.failure(new IllegalArgumentException(String.format(
                             "No mod with id '%s'",
-                            inputQueue.peek()
+                            commandInput.peek()
                     )));
                 })
                 .build();
