@@ -51,8 +51,8 @@ public interface CommandSuggestionProcessor<C> {
 
     /**
      * Processes the given {@code suggestion} and returns the result.
-     * <p>
-     * If {@code null} is returned, the suggestion will be dropped.
+     *
+     * <p>If {@code null} is returned, the suggestion will be dropped.</p>
      *
      * @param context    command preprocessing context which can be used to access the command context and command input
      * @param suggestion the suggestion to process
