@@ -62,7 +62,7 @@ public interface SuggestionProvider<C> {
     /**
      * Get a suggestion provider that provides no suggestions.
      *
-     * @param <C> sender type
+     * @param <C> command sender type
      * @return suggestion provider
      */
     static <C> SuggestionProvider<C> noSuggestions() {
@@ -74,7 +74,7 @@ public interface SuggestionProvider<C> {
      * using a lambda, for methods that accept a {@link SuggestionProvider}.
      *
      * @param blockingSuggestionProvider suggestion provider
-     * @param <C>                        sender type
+     * @param <C>                        command sender type
      * @return suggestion provider
      */
     static <C> @NonNull SuggestionProvider<C> blocking(
@@ -88,7 +88,7 @@ public interface SuggestionProvider<C> {
      * using a lambda, for methods that accept a {@link SuggestionProvider}.
      *
      * @param blockingStringsSuggestionProvider suggestion provider
-     * @param <C>                               sender type
+     * @param <C>                               command sender type
      * @return suggestion provider
      */
     static <C> @NonNull SuggestionProvider<C> blockingStrings(
@@ -101,7 +101,7 @@ public interface SuggestionProvider<C> {
      * Create a {@link SuggestionProvider} that provides constant suggestions.
      *
      * @param suggestions list of strings to suggest
-     * @param <C>         sender type
+     * @param <C>         command sender type
      * @return suggestion provider
      */
     static <C> @NonNull SuggestionProvider<C> suggesting(
@@ -114,7 +114,7 @@ public interface SuggestionProvider<C> {
      * Create a {@link SuggestionProvider} that provides constant string suggestions.
      *
      * @param suggestions list of strings to suggest
-     * @param <C>         sender type
+     * @param <C>         command sender type
      * @return suggestion provider
      */
     static <C> @NonNull SuggestionProvider<C> suggestingStrings(
@@ -127,7 +127,7 @@ public interface SuggestionProvider<C> {
      * Create a {@link SuggestionProvider} that provides constant suggestions.
      *
      * @param suggestions list of strings to suggest
-     * @param <C>         sender type
+     * @param <C>         command sender type
      * @return suggestion provider
      */
     static <C> @NonNull SuggestionProvider<C> suggesting(
@@ -144,7 +144,7 @@ public interface SuggestionProvider<C> {
      * Create a {@link SuggestionProvider} that provides constant string suggestions.
      *
      * @param suggestions list of strings to suggest
-     * @param <C>         sender type
+     * @param <C>         command sender type
      * @return suggestion provider
      */
     static <C> @NonNull SuggestionProvider<C> suggestingStrings(
