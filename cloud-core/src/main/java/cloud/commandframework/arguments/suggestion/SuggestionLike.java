@@ -25,43 +25,19 @@ package cloud.commandframework.arguments.suggestion;
 
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.common.returnsreceiver.qual.This;
 
+/**
+ * Something that behaves like a {@link Suggestion}.
+ *
+ * @since 2.0.0
+ */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface Suggestion extends SuggestionLike {
+public interface SuggestionLike {
 
     /**
-     * Returns a simple suggestion that returns the given {@code suggestion}
+     * Returns the suggestion that is represented by this instance.
      *
-     * @param suggestion the suggestion string
-     * @return the created suggestion
+     * @return the suggestion
      */
-    static @NonNull Suggestion simple(final @NonNull String suggestion) {
-        return new SimpleSuggestion(suggestion);
-    }
-
-    /**
-     * Returns a string representation of this suggestion, which can be parsed by the parser that suggested it
-     *
-     * @return the suggestions
-     */
-    @NonNull String suggestion();
-
-    /**
-     * Returns a copy of this suggestion instance using the given {@code suggestion}
-     *
-     * @param suggestion the suggestion string
-     * @return the new suggestion
-     */
-    @NonNull Suggestion withSuggestion(@NonNull String suggestion);
-
-    /**
-     * Returns {@code this}.
-     *
-     * @return {@code this}
-     */
-    @Override
-    default @This @NonNull Suggestion asSuggestion() {
-        return this;
-    }
+    @NonNull Suggestion asSuggestion();
 }

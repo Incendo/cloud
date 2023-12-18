@@ -24,6 +24,7 @@
 package cloud.commandframework.internal;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionLike;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.execution.CommandSuggestionProcessor;
@@ -82,7 +83,7 @@ public final class SuggestionContext<C> {
      *
      * @param suggestions the suggestions to add
      */
-    public void addSuggestions(final @NonNull Iterable<@NonNull Suggestion> suggestions) {
+    public void addSuggestions(final @NonNull Iterable<? extends @NonNull SuggestionLike> suggestions) {
         suggestions.forEach(this::addSuggestion);
     }
 
@@ -91,8 +92,8 @@ public final class SuggestionContext<C> {
      *
      * @param suggestion the suggestion to add
      */
-    public void addSuggestion(final @NonNull Suggestion suggestion) {
-        final Suggestion result = this.processor.process(this.preprocessingContext, suggestion);
+    public void addSuggestion(final @NonNull SuggestionLike suggestion) {
+        final Suggestion result = this.processor.process(this.preprocessingContext, suggestion.asSuggestion());
         if (result == null) {
             return;
         }

@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionLike;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.ParsingContext;
@@ -729,7 +730,8 @@ public final class CommandTree<C> {
         return component.suggestionProvider()
                 .suggestionsFuture(context.commandContext(), input)
                 .thenApply(suggestionsToAdd -> {
-                    for (Suggestion suggestion : suggestionsToAdd) {
+                    for (SuggestionLike suggestionLike : suggestionsToAdd) {
+                        final Suggestion suggestion = suggestionLike.asSuggestion();
                         if (suggestion.suggestion().equals(input) || !suggestion.suggestion().startsWith(input)) {
                             continue;
                         }

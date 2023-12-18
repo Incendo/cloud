@@ -26,6 +26,7 @@ package cloud.commandframework.arguments.standard;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionLike;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import java.util.List;
@@ -141,7 +142,7 @@ class BooleanParserTest {
         final BooleanParser<TestCommandSender> parser = new BooleanParser<>(liberal);
 
         // Act
-        final Iterable<Suggestion> suggestions = parser.suggestions(
+        final Iterable<? extends SuggestionLike> suggestions = parser.suggestions(
                 this.context,
                 ""
         );

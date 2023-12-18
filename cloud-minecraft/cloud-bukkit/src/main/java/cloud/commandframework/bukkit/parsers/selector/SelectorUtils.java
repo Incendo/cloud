@@ -26,6 +26,7 @@ package cloud.commandframework.bukkit.parsers.selector;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionLike;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.BukkitCommandContextKeys;
@@ -196,7 +197,7 @@ final class SelectorUtils {
         }
 
         @Override
-        public CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
+        public CompletableFuture<Iterable<? extends @NonNull SuggestionLike>> suggestionsFuture(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
@@ -301,7 +302,7 @@ final class SelectorUtils {
         }
 
         @Override
-        public CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
+        public CompletableFuture<Iterable<? extends @NonNull SuggestionLike>> suggestionsFuture(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

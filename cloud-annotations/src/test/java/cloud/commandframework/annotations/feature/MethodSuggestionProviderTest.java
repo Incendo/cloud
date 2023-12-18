@@ -29,6 +29,7 @@ import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionLike;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.StandardCommandContextFactory;
@@ -70,7 +71,7 @@ class MethodSuggestionProviderTest {
         );
 
         // Act
-        final Iterable<Suggestion> suggestions =
+        final Iterable<? extends SuggestionLike> suggestions =
                 this.commandManager.parserRegistry()
                         .getSuggestionProvider("suggestions")
                         .orElseThrow(NullPointerException::new)

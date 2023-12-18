@@ -24,6 +24,7 @@
 package cloud.commandframework.annotations.suggestions;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionLike;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import java.lang.invoke.MethodHandle;
@@ -66,7 +67,7 @@ public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> 
     }
 
     @Override
-    public @NonNull CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
+    public @NonNull CompletableFuture<Iterable<? extends @NonNull SuggestionLike>> suggestionsFuture(
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {
@@ -86,7 +87,9 @@ public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> 
      * @since 2.0.0
      */
     @SuppressWarnings("rawtypes")
-    public static @NonNull CompletableFuture<Iterable<@NonNull Suggestion>> mapSuggestions(final @NonNull Object input) {
+    public static @NonNull CompletableFuture<Iterable<? extends @NonNull SuggestionLike>> mapSuggestions(
+            final @NonNull Object input
+    ) {
         if (input instanceof CompletableFuture) {
             return mapSuggestions((CompletableFuture) input);
         }
@@ -113,7 +116,7 @@ public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> 
      * @since 2.0.0
      */
     @SuppressWarnings("unchecked")
-    public static @NonNull Iterable<@NonNull Suggestion> mapCompleted(final @NonNull Object input) {
+    public static @NonNull Iterable<? extends @NonNull SuggestionLike> mapCompleted(final @NonNull Object input) {
         final List<?> suggestions;
         if (input instanceof List) {
             suggestions = (List<?>) input;
@@ -138,8 +141,8 @@ public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> 
         }
 
         final Object suggestion = suggestions.get(0);
-        if (suggestion instanceof Suggestion) {
-            return (List<Suggestion>) suggestions;
+        if (suggestion instanceof SuggestionLike) {
+            return (List<SuggestionLike>) suggestions;
         } else if (suggestion instanceof String) {
             return suggestions.stream().map(Object::toString).map(Suggestion::simple).collect(Collectors.toList());
         } else {

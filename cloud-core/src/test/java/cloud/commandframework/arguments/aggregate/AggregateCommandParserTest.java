@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.aggregate;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionLike;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -110,7 +111,7 @@ class AggregateCommandParserTest {
                 .build();
 
         // Act
-        final Iterable<Suggestion> suggestions = parser.suggestionsFuture(this.commandContext, "").join();
+        final Iterable<? extends SuggestionLike> suggestions = parser.suggestionsFuture(this.commandContext, "").join();
 
         // Assert
         assertThat(suggestions).containsExactly(
@@ -138,7 +139,7 @@ class AggregateCommandParserTest {
         when(this.commandContext.contains("number")).thenReturn(true);
 
         // Act
-        final Iterable<Suggestion> suggestions = parser.suggestionsFuture(this.commandContext, "").join();
+        final Iterable<? extends SuggestionLike> suggestions = parser.suggestionsFuture(this.commandContext, "").join();
 
         // Assert
         assertThat(suggestions).containsExactly(

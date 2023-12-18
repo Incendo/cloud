@@ -29,6 +29,7 @@ import cloud.commandframework.annotations.Argument
 import cloud.commandframework.annotations.CommandMethod
 import cloud.commandframework.annotations.suggestions.Suggestions
 import cloud.commandframework.arguments.suggestion.Suggestion
+import cloud.commandframework.arguments.suggestion.SuggestionLike
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.context.StandardCommandContextFactory
 import cloud.commandframework.exceptions.CommandExecutionException
@@ -107,6 +108,7 @@ class KotlinAnnotatedMethodsTest {
         val suggestions = commandManager.parserRegistry().getSuggestionProvider("suspending-suggestions").get()
             .suggestionsFuture(commandContext, "")
             .await()
+            .map(SuggestionLike::asSuggestion)
             .map(Suggestion::suggestion)
             .map(String::toInt)
         assertThat(suggestions).containsExactlyElementsIn(1..10)
@@ -125,6 +127,7 @@ class KotlinAnnotatedMethodsTest {
         val suggestions = commandManager.parserRegistry().getSuggestionProvider("non-suspending-suggestions").get()
             .suggestionsFuture(commandContext, "")
             .await()
+            .map(SuggestionLike::asSuggestion)
             .map(Suggestion::suggestion)
             .map(String::toInt)
         assertThat(suggestions).containsExactlyElementsIn(1..10)

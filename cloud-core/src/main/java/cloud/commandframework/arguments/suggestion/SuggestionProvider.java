@@ -49,7 +49,7 @@ public interface SuggestionProvider<C> {
      * @param input   the current input
      * @return the suggestions
      */
-    @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
+    @NonNull CompletableFuture<@NonNull Iterable<? extends @NonNull SuggestionLike>> suggestionsFuture(
             @NonNull CommandContext<C> context,
             @NonNull String input
     );
@@ -100,7 +100,7 @@ public interface SuggestionProvider<C> {
      * @return suggestion provider
      */
     static <C> @NonNull SuggestionProvider<C> suggesting(
-            final @NonNull Suggestion @NonNull... suggestions
+            final @NonNull SuggestionLike @NonNull... suggestions
     ) {
         return suggesting(Arrays.asList(suggestions));
     }
@@ -126,7 +126,7 @@ public interface SuggestionProvider<C> {
      * @return suggestion provider
      */
     static <C> @NonNull SuggestionProvider<C> suggesting(
-            final @NonNull Iterable<@NonNull Suggestion> suggestions
+            final @NonNull Iterable<@NonNull ? extends SuggestionLike> suggestions
     ) {
         return blocking((ctx, input) -> suggestions);
     }

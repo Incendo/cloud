@@ -26,6 +26,7 @@ package cloud.commandframework.arguments.flags;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionLike;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionVariable;
@@ -143,7 +144,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public @NonNull CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
+    public @NonNull CompletableFuture<Iterable<? extends @NonNull SuggestionLike>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

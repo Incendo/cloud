@@ -25,7 +25,7 @@ package cloud.commandframework.brigadier.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionLike;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -161,7 +161,7 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
     }
 
     @Override
-    public final @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
+    public final @NonNull CompletableFuture<@NonNull Iterable<? extends @NonNull SuggestionLike>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
