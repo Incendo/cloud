@@ -28,7 +28,6 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandDescription;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.internal.CommandNode;
-import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
 import java.util.Collections;
 import java.util.List;
@@ -143,7 +142,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
             return false;
         }
 
-        final CommandPermission permission = (CommandPermission) node
+        final Permission permission = (Permission) node
                 .nodeMeta()
                 .getOrDefault("permission", Permission.empty());
 

@@ -24,7 +24,6 @@
 package cloud.commandframework.brigadier.permission;
 
 import cloud.commandframework.internal.CommandNode;
-import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
 import java.util.function.Predicate;
 import org.apiguardian.api.API;
@@ -53,7 +52,7 @@ public final class BrigadierPermissionPredicate<S> implements Predicate<S> {
 
     @Override
     public boolean test(final @NonNull S sender) {
-        final CommandPermission permission = (CommandPermission) this.node.nodeMeta().getOrDefault(
+        final Permission permission = (Permission) this.node.nodeMeta().getOrDefault(
                 "permission",
                 Permission.empty()
         );

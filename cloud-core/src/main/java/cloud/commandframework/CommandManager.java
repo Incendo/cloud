@@ -59,7 +59,6 @@ import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.permission.AndPermission;
-import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PredicatePermission;
@@ -459,32 +458,27 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
     @SuppressWarnings("unchecked")
     public boolean hasPermission(
             final @NonNull C sender,
-            final @NonNull CommandPermission permission
+            final @NonNull Permission permission
     ) {
-        if (permission instanceof Permission) {
-            if (permission.toString().isEmpty()) {
-                return true;
-            }
-            return this.hasPermission(sender, permission.toString());
-        } else if (permission instanceof PredicatePermission) {
+        if (permission instanceof PredicatePermission) {
             return ((PredicatePermission<C>) permission).hasPermission(sender);
         } else if (permission instanceof OrPermission) {
-            for (final CommandPermission innerPermission : permission.getPermissions()) {
+            for (final Permission innerPermission : permission.permissions()) {
                 if (this.hasPermission(sender, innerPermission)) {
                     return true;
                 }
             }
             return false;
         } else if (permission instanceof AndPermission) {
-            for (final CommandPermission innerPermission : permission.getPermissions()) {
+            for (final Permission innerPermission : permission.permissions()) {
                 if (!this.hasPermission(sender, innerPermission)) {
                     return false;
                 }
             }
             return true;
         }
-
-        throw new IllegalArgumentException("Unknown permission type " + permission.getClass());
+        return permission.permissionString().isEmpty()
+                || this.hasPermission(sender, permission.permissionString());
     }
 
     /**

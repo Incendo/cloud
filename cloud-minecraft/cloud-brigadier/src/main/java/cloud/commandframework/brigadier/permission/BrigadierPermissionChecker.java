@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.brigadier.permission;
 
-import cloud.commandframework.permission.CommandPermission;
+import cloud.commandframework.permission.Permission;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -38,5 +38,5 @@ public interface BrigadierPermissionChecker<S> {
      * @param permission the permission
      * @return {@code true} if the {@code sender} has the {@code permission}, else {@code false}
      */
-    boolean hasPermission(@NonNull S sender, @NonNull CommandPermission permission);
+    boolean hasPermission(@NonNull S sender, @NonNull Permission permission);
 }

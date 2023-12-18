@@ -25,9 +25,6 @@ package cloud.commandframework;
 
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.permission.AndPermission;
-import cloud.commandframework.permission.CommandPermission;
-import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PredicatePermission;
 import java.util.Arrays;
@@ -43,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class CommandPermissionTest {
+class PermissionTest {
 
     private final static CommandManager<TestCommandSender> manager = new PermissionOutputtingCommandManager();
 
@@ -78,7 +75,7 @@ class CommandPermissionTest {
 
     @Test
     void testAndPermissions() {
-        final CommandPermission test = Permission.of("one").and(Permission.of("two"));
+        final Permission test = Permission.of("one").and(Permission.of("two"));
         final TestCommandSender sender = new TestCommandSender("one");
 
         assertThat(manager.hasPermission(sender, test)).isFalse();
@@ -90,7 +87,7 @@ class CommandPermissionTest {
 
     @Test
     void testOrPermissions() {
-        final CommandPermission test = Permission.of("one").or(Permission.of("two"));
+        final Permission test = Permission.of("one").or(Permission.of("two"));
         assertFalse(manager.hasPermission(new TestCommandSender(), test));
         assertTrue(manager.hasPermission(new TestCommandSender("one"), test));
         assertTrue(manager.hasPermission(new TestCommandSender("two"), test));
@@ -99,15 +96,15 @@ class CommandPermissionTest {
 
     @Test
     void testComplexOrPermissions() {
-        final CommandPermission andOne = AndPermission.of(Arrays.asList(
+        final Permission andOne = Permission.andPermission(Arrays.asList(
                 Permission.of("perm.one"),
                 Permission.of("perm.two")
         ));
-        final CommandPermission andTwo = AndPermission.of(Arrays.asList(
+        final Permission andTwo = Permission.andPermission(Arrays.asList(
                 Permission.of("perm.three"),
                 (PredicatePermission<?>) (s) -> false
         ));
-        final CommandPermission orPermission = OrPermission.of(Arrays.asList(andOne, andTwo));
+        final Permission orPermission = Permission.orPermission(Arrays.asList(andOne, andTwo));
         assertFalse(manager.hasPermission(new TestCommandSender("does.have", "also.does.have"), orPermission));
         assertFalse(manager.hasPermission(new TestCommandSender("perm.one", "perm.three"), orPermission));
         assertTrue(manager.hasPermission(new TestCommandSender("perm.one", "perm.two"), orPermission));
@@ -115,15 +112,15 @@ class CommandPermissionTest {
 
     @Test
     void testComplexAndPermissions() {
-        final CommandPermission orOne = OrPermission.of(Arrays.asList(
+        final Permission orOne = Permission.orPermission(Arrays.asList(
                 Permission.of("perm.one"),
                 (PredicatePermission<?>) (s) -> false
         ));
-        final CommandPermission orTwo = OrPermission.of(Arrays.asList(
+        final Permission orTwo = Permission.orPermission(Arrays.asList(
                 Permission.of("perm.two"),
                 Permission.of("perm.three")
         ));
-        final CommandPermission andPermission = AndPermission.of(Arrays.asList(orOne, orTwo));
+        final Permission andPermission = Permission.andPermission(Arrays.asList(orOne, orTwo));
         assertFalse(manager.hasPermission(new TestCommandSender("perm.one"), andPermission));
         assertTrue(manager.hasPermission(new TestCommandSender("perm.one", "perm.two"), andPermission));
         assertTrue(manager.hasPermission(new TestCommandSender("perm.one", "perm.three"), andPermission));

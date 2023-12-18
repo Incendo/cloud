@@ -42,8 +42,7 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.SuggestionContext;
-import cloud.commandframework.permission.CommandPermission;
-import cloud.commandframework.permission.OrPermission;
+import cloud.commandframework.permission.Permission;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -214,7 +213,7 @@ public final class CommandTree<C> {
             final @NonNull CommandInput commandInput,
             final @NonNull CommandNode<C> root
     ) {
-        final CommandPermission permission = this.findMissingPermission(commandContext.sender(), root);
+        final Permission permission = this.findMissingPermission(commandContext.sender(), root);
         if (permission != null) {
             return this.failedCompletable(
                     new NoPermissionException(
@@ -382,7 +381,7 @@ public final class CommandTree<C> {
         final CommandNode<C> child = argumentNodes.get(0);
 
         // Check if we're allowed to execute the child command. If not, exit
-        final CommandPermission permission = this.findMissingPermission(commandContext.sender(), child);
+        final Permission permission = this.findMissingPermission(commandContext.sender(), child);
         if (!commandInput.isEmpty() && permission != null) {
             return this.failedCompletable(
                     new NoPermissionException(
@@ -1051,11 +1050,11 @@ public final class CommandTree<C> {
      * @param node   the command node
      * @return the missing permission, or {@code null}
      */
-    private @Nullable CommandPermission findMissingPermission(
+    private @Nullable Permission findMissingPermission(
             final @NonNull C sender,
             final @NonNull CommandNode<C> node
     ) {
-        final CommandPermission permission = (CommandPermission) node.nodeMeta().get("permission");
+        final Permission permission = (Permission) node.nodeMeta().get("permission");
         if (permission != null) {
             return this.commandManager.hasPermission(sender, permission) ? null : permission;
         }
@@ -1071,9 +1070,9 @@ public final class CommandTree<C> {
           if any of the children would permit the execution, then the sender has a valid
            chain to execute, and so we allow them to execute the root
          */
-        final List<CommandPermission> missingPermissions = new LinkedList<>();
+        final List<Permission> missingPermissions = new LinkedList<>();
         for (final CommandNode<C> child : node.children()) {
-            final CommandPermission check = this.findMissingPermission(sender, child);
+            final Permission check = this.findMissingPermission(sender, child);
             if (check == null) {
                 return null;
             } else {
@@ -1081,7 +1080,7 @@ public final class CommandTree<C> {
             }
         }
 
-        return OrPermission.of(missingPermissions);
+        return Permission.orPermission(missingPermissions);
     }
 
     /**
@@ -1117,7 +1116,7 @@ public final class CommandTree<C> {
      */
     private void updatePermission(final @NonNull CommandNode<C> node) {
         // noinspection all
-        final CommandPermission commandPermission = node.component().owningCommand().commandPermission();
+        final Permission commandPermission = node.component().owningCommand().commandPermission();
         /* All leaves must necessarily have an owning command */
         node.nodeMeta().put("permission", commandPermission);
         // Get chain and order it tail->head then skip the tail (leaf node)
@@ -1126,12 +1125,12 @@ public final class CommandTree<C> {
         chain = chain.subList(1, chain.size());
         // Go through all nodes from the tail upwards until a collision occurs
         for (final CommandNode<C> commandArgumentNode : chain) {
-            final CommandPermission existingPermission = (CommandPermission) commandArgumentNode.nodeMeta()
+            final Permission existingPermission = (Permission) commandArgumentNode.nodeMeta()
                     .get("permission");
 
-            CommandPermission permission;
+            Permission permission;
             if (existingPermission != null) {
-                permission = OrPermission.of(Arrays.asList(commandPermission, existingPermission));
+                permission = Permission.orPermission(Arrays.asList(commandPermission, existingPermission));
             } else {
                 permission = commandPermission;
             }
@@ -1144,7 +1143,7 @@ public final class CommandTree<C> {
                         .getSetting(CommandManager.ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS)) {
                     permission = command.commandPermission();
                 } else {
-                    permission = OrPermission.of(Arrays.asList(permission, command.commandPermission()));
+                    permission = Permission.orPermission(Arrays.asList(permission, command.commandPermission()));
                 }
             }
 
