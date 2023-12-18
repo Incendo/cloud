@@ -44,7 +44,6 @@ import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.SuggestionContext;
 import cloud.commandframework.permission.Permission;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -1080,7 +1079,7 @@ public final class CommandTree<C> {
             }
         }
 
-        return Permission.orPermission(missingPermissions);
+        return Permission.anyOf(missingPermissions);
     }
 
     /**
@@ -1130,7 +1129,7 @@ public final class CommandTree<C> {
 
             Permission permission;
             if (existingPermission != null) {
-                permission = Permission.orPermission(Arrays.asList(commandPermission, existingPermission));
+                permission = Permission.anyOf(commandPermission, existingPermission);
             } else {
                 permission = commandPermission;
             }
@@ -1143,7 +1142,7 @@ public final class CommandTree<C> {
                         .getSetting(CommandManager.ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS)) {
                     permission = command.commandPermission();
                 } else {
-                    permission = Permission.orPermission(Arrays.asList(permission, command.commandPermission()));
+                    permission = Permission.anyOf(permission, command.commandPermission());
                 }
             }
 

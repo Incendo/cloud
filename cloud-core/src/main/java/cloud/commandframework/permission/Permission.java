@@ -86,7 +86,7 @@ public interface Permission {
      * @param permissions permissions to join
      * @return the permission
      */
-    static @NonNull Permission andPermission(final @NonNull Collection<@NonNull Permission> permissions) {
+    static @NonNull Permission allOf(final @NonNull Collection<@NonNull Permission> permissions) {
         final Set<Permission> objects = new HashSet<>();
         for (final Permission permission : permissions) {
             if (permission instanceof AndPermission) {
@@ -99,13 +99,23 @@ public interface Permission {
     }
 
     /**
+     * Creates a new AND permission that evaluates to {@code true} if all the given {@code permissions} evaluate to {@code true}.
+     *
+     * @param permissions permissions to join
+     * @return the permission
+     */
+    static @NonNull Permission allOf(final @NonNull Permission @NonNull... permissions) {
+        return allOf(Arrays.asList(permissions));
+    }
+
+    /**
      * Create a new OR permission that evaluates to {@code true} if any of the given {@code permissions}
      * evaluates to {@code true}.
      *
      * @param permissions permissions to join
      * @return the permission
      */
-    static @NonNull Permission orPermission(final @NonNull Collection<@NonNull Permission> permissions) {
+    static @NonNull Permission anyOf(final @NonNull Collection<@NonNull Permission> permissions) {
         final Set<Permission> objects = new HashSet<>();
         for (final Permission permission : permissions) {
             if (permission instanceof OrPermission) {
@@ -115,6 +125,17 @@ public interface Permission {
             }
         }
         return new OrPermission(objects);
+    }
+
+    /**
+     * Create a new OR permission that evaluates to {@code true} if any of the given {@code permissions}
+     * evaluates to {@code true}.
+     *
+     * @param permissions permissions to join
+     * @return the permission
+     */
+    static @NonNull Permission anyOf(final @NonNull Permission @NonNull... permissions) {
+        return anyOf(Arrays.asList(permissions));
     }
 
     /**
@@ -146,7 +167,7 @@ public interface Permission {
         final Set<Permission> permission = new HashSet<>(2);
         permission.add(this);
         permission.add(other);
-        return Permission.orPermission(permission);
+        return Permission.anyOf(permission);
     }
 
     /**
@@ -162,7 +183,7 @@ public interface Permission {
         final Set<Permission> permission = new HashSet<>(other.length + 1);
         permission.add(this);
         permission.addAll(Arrays.asList(other));
-        return Permission.orPermission(permission);
+        return Permission.anyOf(permission);
     }
 
     /**
@@ -178,7 +199,7 @@ public interface Permission {
         final Set<Permission> permission = new HashSet<>(2);
         permission.add(this);
         permission.add(other);
-        return Permission.andPermission(permission);
+        return Permission.allOf(permission);
     }
 
     /**
@@ -194,6 +215,6 @@ public interface Permission {
         final Set<Permission> permission = new HashSet<>(other.length + 1);
         permission.add(this);
         permission.addAll(Arrays.asList(other));
-        return Permission.andPermission(permission);
+        return Permission.allOf(permission);
     }
 }

@@ -172,16 +172,16 @@ class PermissionTest {
     @Test
     void testComplexAndPermissionsMissingOne() {
         // Arrange
-        final Permission orOne = Permission.orPermission(Arrays.asList(
+        final Permission orOne = Permission.anyOf(
                 Permission.of("perm.one"),
                 (PredicatePermission<?>) (s) -> false
-        ));
-        final Permission orTwo = Permission.orPermission(Arrays.asList(
+        );
+        final Permission orTwo = Permission.anyOf(
                 Permission.of("perm.two"),
                 Permission.of("perm.three")
-        ));
+        );
 
-        final Permission andPermission = Permission.andPermission(Arrays.asList(orOne, orTwo));
+        final Permission andPermission = Permission.allOf(Arrays.asList(orOne, orTwo));
 
         when(this.permissionFunction.apply("perm.one")).thenReturn(true);
 
@@ -195,16 +195,16 @@ class PermissionTest {
     @Test
     void testComplexAndPermissions() {
         // Arrange
-        final Permission orOne = Permission.orPermission(Arrays.asList(
+        final Permission orOne = Permission.anyOf(
                 Permission.of("perm.one"),
                 (PredicatePermission<?>) (s) -> false
-        ));
-        final Permission orTwo = Permission.orPermission(Arrays.asList(
+        );
+        final Permission orTwo = Permission.anyOf(
                 Permission.of("perm.two"),
                 Permission.of("perm.three")
-        ));
+        );
 
-        final Permission andPermission = Permission.andPermission(Arrays.asList(orOne, orTwo));
+        final Permission andPermission = Permission.allOf(orOne, orTwo);
 
         when(this.permissionFunction.apply("perm.one")).thenReturn(true);
         when(this.permissionFunction.apply("perm.three")).thenReturn(true);
