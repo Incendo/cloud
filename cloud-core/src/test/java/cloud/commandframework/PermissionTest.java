@@ -23,95 +23,155 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PredicatePermission;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class PermissionTest {
 
-    private final static CommandManager<TestCommandSender> manager = new PermissionOutputtingCommandManager();
+    @Mock(strictness = Mock.Strictness.LENIENT) private Function<String, Boolean> permissionFunction;
 
-    @BeforeAll
-    static void setup() {
-        manager.command(manager.commandBuilder("test").literal("foo").permission("test.permission.one").build());
-        manager.command(manager.commandBuilder("test").literal("bar").permission("test.permission.two").build());
-        manager.command(manager.commandBuilder("test").literal("fizz").permission("test.permission.three").build());
-        manager.command(manager.commandBuilder("test").literal("buzz").permission("test.permission.four").build());
+    private CommandManager<TestCommandSender> manager;
+
+    @BeforeEach
+    void setup() {
+        this.manager = new MockPermissionManager(permissionFunction);
+        when(this.permissionFunction.apply(anyString())).thenReturn(false);
     }
 
     @Test
-    void testCompoundPermission() {
-        assertThat(manager.suggestionFactory().suggestImmediately(new TestCommandSender(), "t")).isEmpty();
-        assertThat(manager.suggestionFactory().suggestImmediately(
-                new TestCommandSender("test.permission.four"), "t")
-        ).isNotEmpty();
+    void testRootCommandPermissionLackingPermission() {
+        // Arrange
+        this.manager.command(this.manager.commandBuilder("test").literal("foo").permission("test.permission.one").build());
+        this.manager.command(this.manager.commandBuilder("test").literal("bar").permission("test.permission.two").build());
+        this.manager.command(this.manager.commandBuilder("test").literal("fizz").permission("test.permission.three").build());
+        this.manager.command(this.manager.commandBuilder("test").literal("buzz").permission("test.permission.four").build());
+
+        // Act
+        final List<? extends Suggestion> suggestions = this.manager.suggestionFactory()
+                .suggestImmediately(new TestCommandSender(), "t");
+
+        // Assert
+        assertThat(suggestions).isEmpty();
     }
 
     @Test
-    void testComplexPermissions() {
-        manager.command(manager.commandBuilder("first").permission("first"));
-        manager.command(manager.commandBuilder("first").required("second", integerParser()).permission("second"));
+    void testRootCommandPermission() {
+        // Arrange
+        this.manager.command(this.manager.commandBuilder("test").literal("foo").permission("test.permission.one").build());
+        this.manager.command(this.manager.commandBuilder("test").literal("bar").permission("test.permission.two").build());
+        this.manager.command(this.manager.commandBuilder("test").literal("fizz").permission("test.permission.three").build());
+        this.manager.command(this.manager.commandBuilder("test").literal("buzz").permission("test.permission.four").build());
 
-        manager.executeCommand(new TestCommandSender(), "first").join();
+        when(this.permissionFunction.apply("test.permission.four")).thenReturn(true);
 
-        assertThrows(
+        // Act
+        final List<? extends Suggestion> suggestions = this.manager.suggestionFactory()
+                .suggestImmediately(new TestCommandSender(), "t");
+
+        // Assert
+        assertThat(suggestions).isNotEmpty();
+    }
+
+    @Test
+    void testSubCommandPermission() {
+        // Arrange
+        this.manager.command(this.manager.commandBuilder("first").permission("first"));
+        this.manager.command(this.manager.commandBuilder("first").required("second", integerParser()).permission("second"));
+
+        when(this.permissionFunction.apply("first")).thenReturn(true);
+
+        // Act
+        this.manager.executeCommand(new TestCommandSender(), "first").join();
+        final CompletionException exception = assertThrows(
                 CompletionException.class,
-                () -> manager.executeCommand(new TestCommandSender(), "first 10").join()
+                () -> this.manager.executeCommand(new TestCommandSender(), "first 10").join()
         );
+
+        // Assert
+        assertThat(exception).hasCauseThat().isInstanceOf(NoPermissionException.class);
     }
 
     @Test
-    void testAndPermissions() {
+    void testAndPermissionsMissingOne() {
+        // Arrange
         final Permission test = Permission.of("one").and(Permission.of("two"));
-        final TestCommandSender sender = new TestCommandSender("one");
 
-        assertThat(manager.hasPermission(sender, test)).isFalse();
-        assertThat(manager.hasPermission(new TestCommandSender("two"), test)).isFalse();
+        when(this.permissionFunction.apply("two")).thenReturn(true);
 
-        sender.addPermission("two");
-        assertThat(manager.hasPermission(sender, test)).isTrue();
+        // Act
+        final boolean result = this.manager.hasPermission(new TestCommandSender(), test);
+
+        // Assert
+        assertThat(result).isFalse();
+    }
+
+
+    @Test
+    void testAndPermissionsHasAll() {
+        // Arrange
+        final Permission test = Permission.of("one").and(Permission.of("two"));
+
+        when(this.permissionFunction.apply("one")).thenReturn(true);
+        when(this.permissionFunction.apply("two")).thenReturn(true);
+
+        // Act
+        final boolean result = this.manager.hasPermission(new TestCommandSender(), test);
+
+        // Assert
+        assertThat(result).isTrue();
     }
 
     @Test
-    void testOrPermissions() {
+    void testOrPermissionHasNone() {
+        // Arrange
         final Permission test = Permission.of("one").or(Permission.of("two"));
-        assertFalse(manager.hasPermission(new TestCommandSender(), test));
-        assertTrue(manager.hasPermission(new TestCommandSender("one"), test));
-        assertTrue(manager.hasPermission(new TestCommandSender("two"), test));
-        assertTrue(manager.hasPermission(new TestCommandSender("one", "two"), test));
+
+        // Act
+        final boolean result = this.manager.hasPermission(new TestCommandSender(), test);
+
+        // Assert
+        assertThat(result).isFalse();
     }
 
     @Test
-    void testComplexOrPermissions() {
-        final Permission andOne = Permission.andPermission(Arrays.asList(
-                Permission.of("perm.one"),
-                Permission.of("perm.two")
-        ));
-        final Permission andTwo = Permission.andPermission(Arrays.asList(
-                Permission.of("perm.three"),
-                (PredicatePermission<?>) (s) -> false
-        ));
-        final Permission orPermission = Permission.orPermission(Arrays.asList(andOne, andTwo));
-        assertFalse(manager.hasPermission(new TestCommandSender("does.have", "also.does.have"), orPermission));
-        assertFalse(manager.hasPermission(new TestCommandSender("perm.one", "perm.three"), orPermission));
-        assertTrue(manager.hasPermission(new TestCommandSender("perm.one", "perm.two"), orPermission));
+    void testOrPermissionHasOne() {
+        // Arrange
+        final Permission test = Permission.of("one").or(Permission.of("two"));
+
+        when(this.permissionFunction.apply("two")).thenReturn(true);
+
+        // Act
+        final boolean result = this.manager.hasPermission(new TestCommandSender(), test);
+
+        // Assert
+        assertThat(result).isTrue();
     }
 
     @Test
-    void testComplexAndPermissions() {
+    void testComplexAndPermissionsMissingOne() {
+        // Arrange
         final Permission orOne = Permission.orPermission(Arrays.asList(
                 Permission.of("perm.one"),
                 (PredicatePermission<?>) (s) -> false
@@ -120,10 +180,40 @@ class PermissionTest {
                 Permission.of("perm.two"),
                 Permission.of("perm.three")
         ));
+
         final Permission andPermission = Permission.andPermission(Arrays.asList(orOne, orTwo));
-        assertFalse(manager.hasPermission(new TestCommandSender("perm.one"), andPermission));
-        assertTrue(manager.hasPermission(new TestCommandSender("perm.one", "perm.two"), andPermission));
-        assertTrue(manager.hasPermission(new TestCommandSender("perm.one", "perm.three"), andPermission));
+
+        when(this.permissionFunction.apply("perm.one")).thenReturn(true);
+
+        // Act
+        final boolean result = this.manager.hasPermission(new TestCommandSender(), andPermission);
+
+        // Assert
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void testComplexAndPermissions() {
+        // Arrange
+        final Permission orOne = Permission.orPermission(Arrays.asList(
+                Permission.of("perm.one"),
+                (PredicatePermission<?>) (s) -> false
+        ));
+        final Permission orTwo = Permission.orPermission(Arrays.asList(
+                Permission.of("perm.two"),
+                Permission.of("perm.three")
+        ));
+
+        final Permission andPermission = Permission.andPermission(Arrays.asList(orOne, orTwo));
+
+        when(this.permissionFunction.apply("perm.one")).thenReturn(true);
+        when(this.permissionFunction.apply("perm.three")).thenReturn(true);
+
+        // Act
+        final boolean result = this.manager.hasPermission(new TestCommandSender(), andPermission);
+
+        // Assert
+        assertThat(result).isTrue();
     }
 
     @Test
@@ -143,10 +233,13 @@ class PermissionTest {
     }
 
 
-    private static final class PermissionOutputtingCommandManager extends CommandManager<TestCommandSender> {
+    private static final class MockPermissionManager extends CommandManager<TestCommandSender> {
 
-        private PermissionOutputtingCommandManager() {
+        private final Function<String, Boolean> permissionFunction;
+
+        private MockPermissionManager(final @NonNull Function<String, Boolean> permissionFunction) {
             super(CommandExecutionCoordinator.simpleCoordinator(), cmd -> true);
+            this.permissionFunction = permissionFunction;
         }
 
         @Override
@@ -154,13 +247,7 @@ class PermissionTest {
                 final @NonNull TestCommandSender sender,
                 final @NonNull String permission
         ) {
-            if (permission.equalsIgnoreCase("first")) {
-                return true;
-            }
-            if (permission.equalsIgnoreCase("second")) {
-                return false;
-            }
-            return sender.hasPermisison(permission);
+            return this.permissionFunction.apply(permission);
         }
     }
 }
