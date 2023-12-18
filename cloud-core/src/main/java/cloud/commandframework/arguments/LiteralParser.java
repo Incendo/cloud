@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import org.apiguardian.api.API;
@@ -91,7 +90,7 @@ public final class LiteralParser<C> implements ArgumentParser<C, String>, Blocki
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

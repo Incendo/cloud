@@ -123,7 +123,7 @@ public final class KeyedWorldParser<C> implements ArgumentParser<C, World>, Sugg
     }
 
     @Override
-    public @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
+    public @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

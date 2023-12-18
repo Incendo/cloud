@@ -161,7 +161,7 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
     }
 
     @Override
-    public final @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
+    public final @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

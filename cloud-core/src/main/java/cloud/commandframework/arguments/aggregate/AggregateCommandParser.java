@@ -109,7 +109,7 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
     }
 
     @Override
-    default @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
+    default @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {

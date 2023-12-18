@@ -34,7 +34,6 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
-import java.util.List;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
@@ -89,7 +88,7 @@ public final class WorldParser<C> implements ArgumentParser<C, World>, BlockingS
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

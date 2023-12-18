@@ -28,7 +28,6 @@ import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Test;
@@ -111,7 +110,7 @@ class AggregateCommandParserTest {
                 .build();
 
         // Act
-        final List<Suggestion> suggestions = parser.suggestionsFuture(this.commandContext, "").join();
+        final Iterable<Suggestion> suggestions = parser.suggestionsFuture(this.commandContext, "").join();
 
         // Assert
         assertThat(suggestions).containsExactly(
@@ -139,7 +138,7 @@ class AggregateCommandParserTest {
         when(this.commandContext.contains("number")).thenReturn(true);
 
         // Act
-        final List<Suggestion> suggestions = parser.suggestionsFuture(this.commandContext, "").join();
+        final Iterable<Suggestion> suggestions = parser.suggestionsFuture(this.commandContext, "").join();
 
         // Assert
         assertThat(suggestions).containsExactly(

@@ -177,7 +177,7 @@ final class SelectorUtils {
             )).asFuture();
         }
 
-        protected @NonNull List<@NonNull Suggestion> legacySuggestions(
+        protected @NonNull Iterable<@NonNull Suggestion> legacySuggestions(
                 final CommandContext<C> commandContext,
                 final String input
         ) {
@@ -196,7 +196,7 @@ final class SelectorUtils {
         }
 
         @Override
-        public CompletableFuture<List<@NonNull Suggestion>> suggestionsFuture(
+        public CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
@@ -247,7 +247,7 @@ final class SelectorUtils {
         }
 
         @Override
-        protected @NonNull List<@NonNull Suggestion> legacySuggestions(
+        protected @NonNull Iterable<@NonNull Suggestion> legacySuggestions(
                 final CommandContext<C> commandContext,
                 final String input
         ) {
@@ -301,7 +301,7 @@ final class SelectorUtils {
         }
 
         @Override
-        public CompletableFuture<List<@NonNull Suggestion>> suggestionsFuture(
+        public CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

@@ -473,7 +473,7 @@ class CommandSuggestionsTest {
 
     @ParameterizedTest
     @MethodSource("testDurationsSource")
-    void testDurations(final @NonNull String input, final @NonNull List<@NonNull Suggestion> expectedSuggestions) {
+    void testDurations(final @NonNull String input, final @NonNull Iterable<@NonNull Suggestion> expectedSuggestions) {
         // Arrange
         this.manager = createManager();
         this.manager.command(manager.commandBuilder("duration").required("duration", durationParser()));
@@ -665,7 +665,7 @@ class CommandSuggestionsTest {
     @MethodSource("testGreedyArgumentSuggestsAfterSpaceSource")
     void testGreedyArgumentSuggestsAfterSpace(
             final @NonNull String input,
-            final @NonNull List<@NonNull Suggestion> expectedSuggestions
+            final @NonNull Iterable<@NonNull Suggestion> expectedSuggestions
     ) {
         // Arrange
         this.manager = createManager();
@@ -757,7 +757,7 @@ class CommandSuggestionsTest {
 
     @ParameterizedTest
     @MethodSource("testTextFlagCompletionSource")
-    void testTextFlagCompletion(final @NonNull String input, final @NonNull List<@NonNull Suggestion> expectedSuggestions) {
+    void testTextFlagCompletion(final @NonNull String input, final @NonNull Iterable<@NonNull Suggestion> expectedSuggestions) {
         // Arrange
         this.manager = createManager();
         this.manager.setSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING, true);

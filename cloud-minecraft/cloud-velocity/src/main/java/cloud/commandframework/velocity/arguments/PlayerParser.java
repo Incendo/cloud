@@ -37,7 +37,6 @@ import cloud.commandframework.velocity.VelocityCaptionKeys;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import java.util.List;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -101,7 +100,7 @@ public final class PlayerParser<C> implements ArgumentParser<C, Player>, Blockin
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

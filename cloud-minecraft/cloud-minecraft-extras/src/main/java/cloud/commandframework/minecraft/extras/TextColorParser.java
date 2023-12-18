@@ -145,7 +145,7 @@ public final class TextColorParser<C> implements ArgumentParser<C, TextColor>, B
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext, final @NonNull String input
     ) {
         final List<String> suggestions = new LinkedList<>();

@@ -159,11 +159,10 @@ class AnnotationParserTest {
     void testAnnotatedSuggestionProviders() {
         final SuggestionProvider<TestCommandSender> suggestionProvider =
                 this.manager.parserRegistry().getSuggestionProvider("cows").orElse(null);
-        Assertions.assertNotNull(suggestionProvider);
-        Assertions.assertTrue(suggestionProvider
-                .suggestionsFuture(new CommandContext<>(new TestCommandSender(), manager), "")
-                .join()
-                .contains(Suggestion.simple("Stella")));
+
+        assertThat(suggestionProvider).isNotNull();
+        assertThat(suggestionProvider.suggestionsFuture(new CommandContext<>(new TestCommandSender(), manager), "").join())
+                .contains(Suggestion.simple("Stella"));
     }
 
     @Test
@@ -176,14 +175,9 @@ class AnnotationParserTest {
                 new TestCommandSender(),
                 this.manager
         );
-        Assertions.assertEquals("yay", parser.parse(
-                context,
-                CommandInput.empty()
-        ).getParsedValue().orElse(new CustomType("")).toString());
-        Assertions.assertTrue(parser.suggestionProvider().suggestionsFuture(
-                context,
-                ""
-        ).join().contains(Suggestion.simple("Stella")));
+        assertThat(parser.parse(context, CommandInput.empty()).getParsedValue().orElse(new CustomType("")).toString())
+                .isEqualTo("yay");
+        assertThat(parser.suggestionProvider().suggestionsFuture(context, "").join()).contains(Suggestion.simple("Stella"));
     }
 
     @Test

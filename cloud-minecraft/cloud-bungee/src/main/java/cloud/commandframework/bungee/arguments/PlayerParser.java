@@ -34,7 +34,6 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
-import java.util.List;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -98,7 +97,7 @@ public final class PlayerParser<C> implements ArgumentParser<C, ProxiedPlayer>, 
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

@@ -66,7 +66,7 @@ public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> 
     }
 
     @Override
-    public @NonNull CompletableFuture<List<@NonNull Suggestion>> suggestionsFuture(
+    public @NonNull CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {
@@ -86,7 +86,7 @@ public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> 
      * @since 2.0.0
      */
     @SuppressWarnings("rawtypes")
-    public static @NonNull CompletableFuture<List<@NonNull Suggestion>> mapSuggestions(final @NonNull Object input) {
+    public static @NonNull CompletableFuture<Iterable<@NonNull Suggestion>> mapSuggestions(final @NonNull Object input) {
         if (input instanceof CompletableFuture) {
             return mapSuggestions((CompletableFuture) input);
         }
@@ -101,7 +101,7 @@ public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> 
      * @since 2.0.0
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static @NonNull CompletableFuture<List<@NonNull Suggestion>> mapFuture(final @NonNull CompletableFuture future) {
+    public static @NonNull CompletableFuture<Iterable<@NonNull Suggestion>> mapFuture(final @NonNull CompletableFuture future) {
         return future.thenApply(MethodSuggestionProvider::mapCompleted);
     }
 
@@ -113,7 +113,7 @@ public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> 
      * @since 2.0.0
      */
     @SuppressWarnings("unchecked")
-    public static @NonNull List<@NonNull Suggestion> mapCompleted(final @NonNull Object input) {
+    public static @NonNull Iterable<@NonNull Suggestion> mapCompleted(final @NonNull Object input) {
         final List<?> suggestions;
         if (input instanceof List) {
             suggestions = (List<?>) input;

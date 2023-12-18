@@ -141,7 +141,7 @@ class BooleanParserTest {
         final BooleanParser<TestCommandSender> parser = new BooleanParser<>(liberal);
 
         // Act
-        final List<Suggestion> suggestions = parser.suggestions(
+        final Iterable<Suggestion> suggestions = parser.suggestions(
                 this.context,
                 ""
         );

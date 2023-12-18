@@ -82,7 +82,7 @@ public final class SuggestionContext<C> {
      *
      * @param suggestions the suggestions to add
      */
-    public void addSuggestions(final @NonNull List<@NonNull Suggestion> suggestions) {
+    public void addSuggestions(final @NonNull Iterable<@NonNull Suggestion> suggestions) {
         suggestions.forEach(this::addSuggestion);
     }
 

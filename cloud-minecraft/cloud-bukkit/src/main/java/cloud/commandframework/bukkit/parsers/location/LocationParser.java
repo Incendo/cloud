@@ -194,7 +194,7 @@ public final class LocationParser<C> implements ArgumentParser<C, Location>, Blo
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
