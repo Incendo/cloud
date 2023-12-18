@@ -24,6 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import cloud.commandframework.setting.ManagerSetting;
 import cloud.commandframework.state.RegistrationState;
 import org.junit.jupiter.api.Test;
 
@@ -89,7 +90,7 @@ public class CommandRegistrationStateTest {
     @Test
     void testAllowUnsafeRegistration() {
         final CommandManager<TestCommandSender> manager = createManager();
-        manager.setSetting(CommandManager.ManagerSettings.ALLOW_UNSAFE_REGISTRATION, true);
+        manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
         manager.command(manager.commandBuilder("test").handler(ctx -> {
         }));
         manager.transitionOrThrow(
