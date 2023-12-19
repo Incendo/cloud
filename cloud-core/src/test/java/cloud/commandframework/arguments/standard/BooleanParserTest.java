@@ -40,8 +40,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static cloud.commandframework.truth.ArgumentParseResultSubject.assertThat;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class BooleanParserTest {
@@ -66,9 +66,7 @@ class BooleanParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(expectedResult);
-
+        assertThat(result).hasParsedValue(expectedResult);
         assertThat(commandInput.isEmpty()).isTrue();
     }
 
@@ -96,9 +94,7 @@ class BooleanParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(expectedResult);
-
+        assertThat(result).hasParsedValue(expectedResult);
         assertThat(commandInput.isEmpty()).isTrue();
     }
 
@@ -126,12 +122,13 @@ class BooleanParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new BooleanParser.BooleanParseException(
-                "not-a-boolean",
-                liberal,
-                this.context
-        ));
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result).hasFailure(
+                new BooleanParser.BooleanParseException(
+                        "not-a-boolean",
+                        liberal,
+                        this.context
+                )
+        );
     }
 
     @ParameterizedTest

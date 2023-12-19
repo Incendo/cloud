@@ -35,8 +35,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static cloud.commandframework.truth.ArgumentParseResultSubject.assertThat;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class EnumParserTest {
@@ -60,8 +60,7 @@ class EnumParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(value);
+        assertThat(result).hasParsedValue(value);
         assertThat(commandInput.isEmpty()).isTrue();
     }
 
@@ -79,12 +78,11 @@ class EnumParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new EnumParser.EnumParseException(
+        assertThat(result).hasFailure(new EnumParser.EnumParseException(
                 "not-an-enum-value",
                 TestEnum.class,
                 this.context
         ));
-        assertThat(result.getParsedValue()).isEmpty();
     }
 
     @Test

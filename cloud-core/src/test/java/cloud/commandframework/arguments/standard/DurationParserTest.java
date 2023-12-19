@@ -25,9 +25,10 @@ package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
+import cloud.commandframework.execution.CommandResult;
+import cloud.commandframework.keys.CloudKey;
 import java.time.Duration;
 import java.util.concurrent.CompletionException;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -38,58 +39,51 @@ import static com.google.common.truth.Truth.assertThat;
 
 class DurationParserTest {
 
-    private static final Duration[] storage = new Duration[1];
+    private static final CloudKey<Duration> DURATION_KEY = CloudKey.of(
+            "duration",
+            Duration.class
+    );
+
     private static CommandManager<TestCommandSender> manager;
 
     @BeforeAll
     static void setup() {
         manager = createManager();
         manager.command(manager.commandBuilder("duration")
-                .required("duration", durationParser())
-                .handler(c -> {
-                    final Duration duration = c.get("duration");
-                    storage[0] = duration;
-                })
+                .required(DURATION_KEY, durationParser())
                 .build());
-    }
-
-    @AfterEach
-    void reset() {
-        storage[0] = null;
     }
 
     @Test
     void single_single_unit() {
-        manager.executeCommand(new TestCommandSender(), "duration 2d").join();
+        final CommandResult<?> result1 = manager.executeCommand(new TestCommandSender(), "duration 2d").join();
+        assertThat(result1.getCommandContext().get(DURATION_KEY)).isEqualTo(Duration.ofDays(2));
 
-        assertThat(storage[0]).isEqualTo(Duration.ofDays(2));
-
-        manager.executeCommand(new TestCommandSender(), "duration 999s").join();
-
-        assertThat(storage[0]).isEqualTo(Duration.ofSeconds(999));
+        final CommandResult<?> result2 = manager.executeCommand(new TestCommandSender(), "duration 999s").join();
+        assertThat(result2.getCommandContext().get(DURATION_KEY)).isEqualTo(Duration.ofSeconds(999));
     }
 
     @Test
     void single_multiple_units() {
-        manager.executeCommand(new TestCommandSender(), "duration 2d12h7m34s").join();
+        final CommandResult<?> result1 = manager.executeCommand(new TestCommandSender(), "duration 2d12h7m34s").join();
+        assertThat(result1.getCommandContext().get(DURATION_KEY)).
+                isEqualTo(Duration.ofDays(2).plusHours(12).plusMinutes(7).plusSeconds(34));
 
-        assertThat(storage[0]).isEqualTo(Duration.ofDays(2).plusHours(12).plusMinutes(7).plusSeconds(34));
-
-        manager.executeCommand(new TestCommandSender(), "duration 700h75m1d999s").join();
-
-        assertThat(storage[0]).isEqualTo(Duration.ofDays(1).plusHours(700).plusMinutes(75).plusSeconds(999));
+        final CommandResult<?> result2 = manager.executeCommand(new TestCommandSender(), "duration 700h75m1d999s").join();
+        assertThat(result2.getCommandContext().get(DURATION_KEY))
+                .isEqualTo(Duration.ofDays(1).plusHours(700).plusMinutes(75).plusSeconds(999));
     }
 
     @Test
     void invalid_format_failing() {
-        Assertions.assertThrows(CompletionException.class, () -> manager.executeCommand(
-                new TestCommandSender(),
-                "duration d"
-        ).join());
+        Assertions.assertThrows(
+                CompletionException.class,
+                () -> manager.executeCommand(new TestCommandSender(), "duration d").join()
+        );
 
-        Assertions.assertThrows(CompletionException.class, () -> manager.executeCommand(
-                new TestCommandSender(),
-                "duration 1x"
-        ).join());
+        Assertions.assertThrows(
+                CompletionException.class,
+                () -> manager.executeCommand(new TestCommandSender(), "duration 1x").join()
+        );
     }
 }

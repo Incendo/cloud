@@ -33,8 +33,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static cloud.commandframework.truth.ArgumentParseResultSubject.assertThat;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class CharacterParserTest {
@@ -61,9 +61,7 @@ class CharacterParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue('a');
-
+        assertThat(result).hasParsedValue('a');
         assertThat(commandInput.isEmpty()).isTrue();
     }
 
@@ -79,10 +77,11 @@ class CharacterParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new CharacterParser.CharParseException(
-                "aa",
-                this.context
-        ));
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result).hasFailure(
+                new CharacterParser.CharParseException(
+                        "aa",
+                        this.context
+                )
+        );
     }
 }
