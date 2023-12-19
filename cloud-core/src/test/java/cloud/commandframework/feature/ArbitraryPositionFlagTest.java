@@ -28,6 +28,7 @@ import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.execution.CommandResult;
+import cloud.commandframework.setting.ManagerSetting;
 import com.google.common.truth.ThrowableSubject;
 import java.util.Arrays;
 import java.util.List;
@@ -48,7 +49,7 @@ class ArbitraryPositionFlagTest {
     @BeforeEach
     void setup() {
         this.commandManager = createManager();
-        this.commandManager.setSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING, true);
+        this.commandManager.settings().set(ManagerSetting.LIBERAL_FLAG_PARSING, true);
 
         this.commandManager.command(
                 this.commandManager.commandBuilder("test")

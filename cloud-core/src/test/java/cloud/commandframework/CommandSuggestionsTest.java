@@ -30,6 +30,7 @@ import cloud.commandframework.arguments.standard.StringParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
+import cloud.commandframework.setting.ManagerSetting;
 import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
 import java.util.Collections;
@@ -700,7 +701,7 @@ class CommandSuggestionsTest {
     void testFlagYieldingGreedyStringWithLiberalFlagArgument() {
         // Arrange
         this.manager = createManager();
-        this.manager.setSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING, true);
+        this.manager.settings().set(ManagerSetting.LIBERAL_FLAG_PARSING, true);
         this.manager.command(
                 this.manager.commandBuilder("command")
                         .required("string", greedyFlagYieldingStringParser(),
@@ -730,7 +731,7 @@ class CommandSuggestionsTest {
     void testFlagYieldingStringArrayWithLiberalFlagArgument() {
         // Arrange
         this.manager = createManager();
-        this.manager.setSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING, true);
+        this.manager.settings().set(ManagerSetting.LIBERAL_FLAG_PARSING, true);
         this.manager.command(
                 this.manager.commandBuilder("command")
                         .required("array", flagYieldingStringArrayParser())
@@ -760,7 +761,7 @@ class CommandSuggestionsTest {
     void testTextFlagCompletion(final @NonNull String input, final @NonNull Iterable<@NonNull Suggestion> expectedSuggestions) {
         // Arrange
         this.manager = createManager();
-        this.manager.setSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING, true);
+        this.manager.settings().set(ManagerSetting.LIBERAL_FLAG_PARSING, true);
         this.manager.command(
                 this.manager.commandBuilder("command")
                         .flag(manager.flagBuilder("flag").withAliases("f").withComponent(enumParser(TestEnum.class)).build())

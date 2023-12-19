@@ -44,6 +44,7 @@ import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.SuggestionContext;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
+import cloud.commandframework.setting.ManagerSetting;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1031,7 +1032,7 @@ public final class CommandTree<C> {
      */
     private int flagStartIndex(final @NonNull List<CommandComponent<C>> components) {
         // Append flags after the last static argument
-        if (this.commandManager.getSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING)) {
+        if (this.commandManager.settings().get(ManagerSetting.LIBERAL_FLAG_PARSING)) {
             for (int i = components.size() - 1; i >= 0; i--) {
                 if (components.get(i).type() == CommandComponent.ComponentType.LITERAL) {
                     return i;
@@ -1139,9 +1140,7 @@ public final class CommandTree<C> {
             /* Now also check if there's a command handler attached to an upper level node */
             if (commandArgumentNode.component() != null && commandArgumentNode.component().owningCommand() != null) {
                 final Command<C> command = commandArgumentNode.component().owningCommand();
-                if (this
-                        .commandManager()
-                        .getSetting(CommandManager.ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS)) {
+                if (this.commandManager().settings().get(ManagerSetting.ENFORCE_INTERMEDIARY_PERMISSIONS)) {
                     permission = command.commandPermission();
                 } else {
                     permission = OrPermission.of(Arrays.asList(permission, command.commandPermission()));

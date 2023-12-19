@@ -25,8 +25,8 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.CommandManager;
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import cloud.commandframework.setting.ManagerSetting;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -92,7 +92,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
                 this.bukkitCommandManager
         );
 
-        if (this.bukkitCommandManager.getSetting(CommandManager.ManagerSettings.OVERRIDE_EXISTING_COMMANDS)) {
+        if (this.bukkitCommandManager.settings().get(ManagerSetting.OVERRIDE_EXISTING_COMMANDS)) {
             this.bukkitCommands.remove(label);
             aliases.forEach(this.bukkitCommands::remove);
         }
