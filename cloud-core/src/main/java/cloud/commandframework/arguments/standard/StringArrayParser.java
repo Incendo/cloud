@@ -106,7 +106,7 @@ public final class StringArrayParser<C> implements ArgumentParser<C, String[]> {
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final int size = commandInput.tokenize().size();
+        final int size = commandInput.remainingTokens();
 
         if (this.flagYielding) {
             final List<String> result = new LinkedList<>();

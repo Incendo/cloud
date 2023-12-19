@@ -64,7 +64,7 @@ class StringParserTest {
 
         // Assert
         assertThat(result).hasParsedValue("this is a string");
-        assertThat(commandInput.tokenize()).containsExactly("--flag", "more", "flag", "content");
+        assertThat(commandInput.remainingInput()).isEqualTo("--flag more flag content");
     }
 
     @Test
@@ -90,6 +90,6 @@ class StringParserTest {
 
         // Assert
         assertThat(result).hasParsedValue("this is a string");
-        assertThat(commandInput.tokenize()).containsExactly("-f", "-l", "-a", "-g");
+        assertThat(commandInput.remainingInput()).isEqualTo("-f -l -a -g");
     }
 }
