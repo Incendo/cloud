@@ -25,10 +25,11 @@ package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
+import cloud.commandframework.execution.CommandResult;
+import cloud.commandframework.keys.CloudKey;
 import java.util.concurrent.CompletionException;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static cloud.commandframework.arguments.standard.StringParser.greedyStringParser;
@@ -39,86 +40,113 @@ import static com.google.common.truth.Truth.assertThat;
 
 class StringArgumentTest {
 
-    private static final String[] storage = new String[2];
-    private static CommandManager<TestCommandSender> manager;
+    private static final CloudKey<String> MESSAGE1_KEY = CloudKey.of(
+            "message1",
+            String.class
+    );
+    private static final CloudKey<String> MESSAGE2_KEY = CloudKey.of(
+            "message2",
+            String.class
+    );
 
-    @BeforeAll
-    static void setup() {
-        manager = createManager();
-        manager.command(manager.commandBuilder("quoted")
-                .required("message1", quotedStringParser())
-                .required("message2", stringParser())
-                .handler(c -> {
-                    final String message1 = c.get("message1");
-                    final String message2 = c.get("message2");
-                    storage[0] = message1;
-                    storage[1] = message2;
-                })
-                .build());
-        manager.command(manager.commandBuilder("single")
-                .required("message", stringParser())
-                .handler(c -> {
-                    final String message = c.get("message");
-                    storage[0] = message;
-                })
-                .build());
-        manager.command(manager.commandBuilder("greedy")
-                .required("message", greedyStringParser())
-                .handler(c -> {
-                    final String message = c.get("message");
-                    storage[0] = message;
-                })
-                .build());
-    }
+    private CommandManager<TestCommandSender> manager;
 
-    @AfterEach
-    void reset() {
-        storage[0] = storage[1] = null;
+    @BeforeEach
+    void setup() {
+        this.manager = createManager();
     }
 
     @Test
     void single_single() {
-        manager.executeCommand(new TestCommandSender(), "single string").join();
+        // Arrange
+        this.manager.command(this.manager.commandBuilder("single")
+                .required(MESSAGE1_KEY, stringParser())
+                .build());
 
-        assertThat(storage[0]).isEqualTo("string");
+        // Act
+        final CommandResult<?> result = this.manager.executeCommand(new TestCommandSender(), "single string").join();
+
+        // Assert
+        assertThat(result.getCommandContext().get(MESSAGE1_KEY)).isEqualTo("string");
     }
 
     @Test
     void quoted_single_quoted_string_containing_double_quote_followed_by_unquoted() {
-        manager.executeCommand(new TestCommandSender(), "quoted 'quoted \" string' unquoted").join();
+        // Arrange
+        this.manager.command(this.manager.commandBuilder("quoted")
+                .required(MESSAGE1_KEY, quotedStringParser())
+                .required(MESSAGE2_KEY, stringParser())
+                .build());
 
-        assertThat(storage[0]).isEqualTo("quoted \" string");
-        assertThat(storage[1]).isEqualTo("unquoted");
+        // Act
+        final CommandResult<?> result = this.manager.executeCommand(new TestCommandSender(),
+                "quoted 'quoted \" string' unquoted").join();
+
+        // Assert
+        assertThat(result.getCommandContext().get(MESSAGE1_KEY)).isEqualTo("quoted \" string");
+        assertThat(result.getCommandContext().get(MESSAGE2_KEY)).isEqualTo("unquoted");
     }
 
     @Test
     void quoted_unquoted_strings() {
-        manager.executeCommand(new TestCommandSender(), "quoted quoted unquoted").join();
+        // Arrange
+        this.manager.command(this.manager.commandBuilder("quoted")
+                .required(MESSAGE1_KEY, quotedStringParser())
+                .required(MESSAGE2_KEY, stringParser())
+                .build());
 
-        assertThat(storage[0]).isEqualTo("quoted");
-        assertThat(storage[1]).isEqualTo("unquoted");
+        // Act
+        final CommandResult<?> result = this.manager.executeCommand(new TestCommandSender(), "quoted quoted unquoted").join();
+
+        // Assert
+        assertThat(result.getCommandContext().get(MESSAGE1_KEY)).isEqualTo("quoted");
+        assertThat(result.getCommandContext().get(MESSAGE2_KEY)).isEqualTo("unquoted");
     }
 
     @Test
     void quoted_quoted_string_containing_escaped_quote_followed_by_unquoted() {
-        manager.executeCommand(new TestCommandSender(), "quoted \"quoted \\\" string\" unquoted").join();
+        // Arrange
+        this.manager.command(this.manager.commandBuilder("quoted")
+                .required(MESSAGE1_KEY, quotedStringParser())
+                .required(MESSAGE2_KEY, stringParser())
+                .build());
 
-        assertThat(storage[0]).isEqualTo("quoted \" string");
-        assertThat(storage[1]).isEqualTo("unquoted");
+        // Act
+        final CommandResult<?> result = this.manager.executeCommand(new TestCommandSender(),
+                "quoted \"quoted \\\" string\" unquoted").join();
+
+        // Assert
+        assertThat(result.getCommandContext().get(MESSAGE1_KEY)).isEqualTo("quoted \" string");
+        assertThat(result.getCommandContext().get(MESSAGE2_KEY)).isEqualTo("unquoted");
     }
 
     @Test
     void quoted_unmatched_quotes_failing() {
-        Assertions.assertThrows(CompletionException.class, () -> manager.executeCommand(
-                new TestCommandSender(),
-                "'quoted quoted unquoted"
-        ).join());
+        // Arrange
+        this.manager.command(this.manager.commandBuilder("quoted")
+                .required(MESSAGE1_KEY, quotedStringParser())
+                .required(MESSAGE2_KEY, stringParser())
+                .build());
+
+        // Act & Assert
+        Assertions.assertThrows(
+                CompletionException.class,
+                () -> manager.executeCommand(new TestCommandSender(), "'quoted quoted unquoted").join()
+        );
     }
 
     @Test
     void greedy_consumes_all() {
-        manager.executeCommand(new TestCommandSender(), "greedy greedy string content").join();
+        // Arrange
+        this.manager.command(this.manager.commandBuilder("greedy")
+                .required(MESSAGE1_KEY, greedyStringParser())
+                .build());
 
-        assertThat(storage[0]).isEqualTo("greedy string content");
+        // Act
+        final CommandResult<?> result =
+                this.manager.executeCommand(new TestCommandSender(), "greedy greedy string content").join();
+
+        // Assert
+        assertThat(result.getCommandContext().get(MESSAGE1_KEY)).isEqualTo("greedy string content");
     }
 }

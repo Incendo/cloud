@@ -36,8 +36,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static cloud.commandframework.truth.ArgumentParseResultSubject.assertThat;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class StringArrayParserTest {
@@ -75,9 +75,7 @@ class StringArrayParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(inputCopy.toArray(new String[0]));
-
+        assertThat(result).hasParsedValue(inputCopy.toArray(new String[0]));
         assertThat(commandInput.isEmpty()).isTrue();
     }
 
@@ -103,10 +101,8 @@ class StringArrayParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(new String[]{"this", "is", "a", "string"});
-
-        assertThat(commandInput.tokenize()).containsExactly("--flag", "more", "flag", "content");
+        assertThat(result).hasParsedValue(new String[] { "this", "is", "a", "string" });
+        assertThat(commandInput.remainingInput()).isEqualTo("--flag more flag content");
     }
 
     @Test
@@ -131,9 +127,7 @@ class StringArrayParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(new String[]{"this", "is", "a", "string"});
-
-        assertThat(commandInput.tokenize()).containsExactly("-f", "-l", "-a", "-g");
+        assertThat(result).hasParsedValue(new String[] { "this", "is", "a", "string" });
+        assertThat(commandInput.remainingInput()).isEqualTo("-f -l -a -g");
     }
 }

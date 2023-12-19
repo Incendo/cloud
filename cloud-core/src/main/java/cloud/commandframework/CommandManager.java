@@ -64,12 +64,13 @@ import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PredicatePermission;
 import cloud.commandframework.services.ServicePipeline;
 import cloud.commandframework.services.State;
+import cloud.commandframework.setting.Configurable;
+import cloud.commandframework.setting.ManagerSetting;
 import cloud.commandframework.state.RegistrationState;
 import cloud.commandframework.state.Stateful;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -97,9 +98,9 @@ import org.checkerframework.common.returnsreceiver.qual.This;
 public abstract class CommandManager<C> implements Stateful<RegistrationState> {
 
     private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = new HashMap<>();
-    private final EnumSet<ManagerSettings> managerSettings = EnumSet.of(
-            ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS);
 
+    private final Configurable<ManagerSetting> settings = Configurable.enumConfigurable(ManagerSetting.class)
+            .set(ManagerSetting.ENFORCE_INTERMEDIARY_PERMISSIONS, true);
     private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>(this);
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private final ParserRegistry<C> parserRegistry = new StandardParserRegistry<>();
@@ -1043,34 +1044,14 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
     }
 
     /**
-     * Get a command manager setting
+     * Returns a {@link Configurable} instance that can be used to modify the settings for this command manager instance.
      *
-     * @param setting Setting
-     * @return {@code true} if the setting is activated or {@code false} if it's not
-     * @see #setSetting(ManagerSettings, boolean) Update a manager setting
+     * @return settings instance
+     * @since 2.0.0
      */
-    public boolean getSetting(final @NonNull ManagerSettings setting) {
-        return this.managerSettings.contains(setting);
-    }
-
-    /**
-     * Update a command manager setting
-     *
-     * @param setting Setting to update
-     * @param value   Value. In most cases {@code true} will enable a feature, whereas {@code false} will disable it.
-     *                The value passed to the method will be reflected in {@link #getSetting(ManagerSettings)}
-     * @see #getSetting(ManagerSettings) Get a manager setting
-     */
-    @SuppressWarnings("unused")
-    public void setSetting(
-            final @NonNull ManagerSettings setting,
-            final boolean value
-    ) {
-        if (value) {
-            this.managerSettings.add(setting);
-        } else {
-            this.managerSettings.remove(setting);
-        }
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull Configurable<ManagerSetting> settings() {
+        return this.settings;
     }
 
     /**
@@ -1114,66 +1095,14 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
      * Check if command registration is allowed.
      * <p>
      * On platforms where unsafe registration is possible, this can be overridden by enabling the
-     * {@link ManagerSettings#ALLOW_UNSAFE_REGISTRATION} setting.
+     * {@link ManagerSetting#ALLOW_UNSAFE_REGISTRATION} setting.
      *
      * @return {@code true} if the registration is allowed, else {@code false}
      * @since 1.2.0
      */
     @API(status = API.Status.STABLE, since = "1.2.0")
     public boolean isCommandRegistrationAllowed() {
-        return this.getSetting(ManagerSettings.ALLOW_UNSAFE_REGISTRATION) || this.state.get() != RegistrationState.AFTER_REGISTRATION;
-    }
-
-
-    /**
-     * Configurable command related settings
-     *
-     * @see CommandManager#setSetting(ManagerSettings, boolean) Set a manager setting
-     * @see CommandManager#getSetting(ManagerSettings) Get a manager setting
-     */
-    @API(status = API.Status.STABLE)
-    public enum ManagerSettings {
-        /**
-         * Do not create a compound permission and do not look greedily
-         * for child permission values, if a preceding command in the tree path
-         * has a command handler attached
-         */
-        ENFORCE_INTERMEDIARY_PERMISSIONS,
-
-        /**
-         * Force sending of an empty suggestion (i.e. a singleton list containing an empty string)
-         * when no suggestions are present
-         */
-        FORCE_SUGGESTION,
-
-        /**
-         * Allow registering commands even when doing so has the potential to produce inconsistent results.
-         * <p>
-         * For example, if a platform serializes the command tree and sends it to clients,
-         * this will allow modifying the command tree after it has been sent, as long as these modifications are not blocked by
-         * the underlying platform
-         *
-         * @since 1.2.0
-         */
-        @API(status = API.Status.STABLE, since = "1.2.0")
-        ALLOW_UNSAFE_REGISTRATION,
-
-        /**
-         * Enables overriding of existing commands on supported platforms.
-         *
-         * @since 1.2.0
-         */
-        @API(status = API.Status.STABLE, since = "1.2.0")
-        OVERRIDE_EXISTING_COMMANDS,
-
-        /**
-         * Allows parsing flags at any position after the last literal by appending flag argument nodes between each command node.
-         * It can have some conflicts when integrating with other command systems like Brigadier,
-         * and code inspecting the command tree may need to be adjusted.
-         *
-         * @since 1.8.0
-         */
-        @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
-        LIBERAL_FLAG_PARSING
+        return this.settings().get(ManagerSetting.ALLOW_UNSAFE_REGISTRATION)
+                || this.state.get() != RegistrationState.AFTER_REGISTRATION;
     }
 }

@@ -30,6 +30,7 @@ import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.parser.StandardParserRegistry;
 import cloud.commandframework.arguments.standard.IntegerParser;
+import cloud.commandframework.setting.ManagerSetting;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
@@ -136,7 +137,7 @@ public class ParserRegistryTest {
 
         // When
         final Optional<?> parserOptional = parserRegistry.createParser(
-                TypeToken.get(CommandManager.ManagerSettings.class),
+                TypeToken.get(ManagerSetting.class),
                 ParserParameters.empty()
         );
 

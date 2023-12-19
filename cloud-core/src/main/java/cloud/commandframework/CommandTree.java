@@ -40,9 +40,11 @@ import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoCommandInLeafException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.SuggestionContext;
 import cloud.commandframework.permission.Permission;
+import cloud.commandframework.setting.ManagerSetting;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -283,8 +285,8 @@ public final class CommandTree<C> {
                             parsingContext.markEnd();
                             parsingContext.success(!result.getFailure().isPresent());
 
-                            final List<String> consumedTokens = currentInput.tokenize();
-                            consumedTokens.removeAll(commandInput.tokenize());
+                            final List<String> consumedTokens = tokenize(currentInput);
+                            consumedTokens.removeAll(tokenize(commandInput));
                             parsingContext.consumedInput(consumedTokens);
 
                             if (result.getParsedValue().isPresent()) {
@@ -581,8 +583,8 @@ public final class CommandTree<C> {
                 .parseFuture(commandContext, commandInput))
                 .thenCompose(result -> {
                     // We remove all remaining queue, and then we'll have a list of the captured input.
-                    final List<String> consumedInput = currentInput.tokenize();
-                    consumedInput.removeAll(commandInput.tokenize());
+                    final List<String> consumedInput = tokenize(currentInput);
+                    consumedInput.removeAll(tokenize(commandInput));
                     parsingContext.consumedInput(consumedInput);
 
                     parsingContext.markEnd();
@@ -783,7 +785,7 @@ public final class CommandTree<C> {
             } else if (commandInput.remainingTokens() == 1) {
                 return this.addArgumentSuggestions(context, child, commandInput.peekString());
             } else if (child.isLeaf() && child.component().parser() instanceof AggregateCommandParser) {
-                return this.addArgumentSuggestions(context, child, commandInput.tokenize().getLast());
+                return this.addArgumentSuggestions(context, child, commandInput.lastRemainingToken());
             }
 
             // Store original input command queue before the parsers below modify it
@@ -1029,7 +1031,7 @@ public final class CommandTree<C> {
      */
     private int flagStartIndex(final @NonNull List<CommandComponent<C>> components) {
         // Append flags after the last static argument
-        if (this.commandManager.getSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING)) {
+        if (this.commandManager.settings().get(ManagerSetting.LIBERAL_FLAG_PARSING)) {
             for (int i = components.size() - 1; i >= 0; i--) {
                 if (components.get(i).type() == CommandComponent.ComponentType.LITERAL) {
                     return i;
@@ -1137,9 +1139,7 @@ public final class CommandTree<C> {
             /* Now also check if there's a command handler attached to an upper level node */
             if (commandArgumentNode.component() != null && commandArgumentNode.component().owningCommand() != null) {
                 final Command<C> command = commandArgumentNode.component().owningCommand();
-                if (this
-                        .commandManager()
-                        .getSetting(CommandManager.ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS)) {
+                if (this.commandManager().settings().get(ManagerSetting.ENFORCE_INTERMEDIARY_PERMISSIONS)) {
                     permission = command.commandPermission();
                 } else {
                     permission = Permission.anyOf(permission, command.commandPermission());
@@ -1306,5 +1306,9 @@ public final class CommandTree<C> {
         } else {
             Objects.requireNonNull(node.parent(), "parent").removeChild(node);
         }
+    }
+
+    private static @NonNull List<@NonNull String> tokenize(final @NonNull CommandInput commandInput) {
+        return new CommandInputTokenizer(commandInput.remainingInput()).tokenize();
     }
 }

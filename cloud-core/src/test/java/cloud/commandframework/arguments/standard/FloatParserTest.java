@@ -33,8 +33,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static cloud.commandframework.truth.ArgumentParseResultSubject.assertThat;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class FloatParserTest {
@@ -60,9 +60,7 @@ class FloatParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(floatInput);
-
+        assertThat(result).hasParsedValue(floatInput);
         assertThat(commandInput.isEmpty()).isTrue();
     }
 
@@ -81,12 +79,11 @@ class FloatParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new FloatParser.FloatParseException(
+        assertThat(result).hasFailure(new FloatParser.FloatParseException(
                 "4.0",
                 parser,
                 this.context
         ));
-        assertThat(result.getParsedValue()).isEmpty();
     }
 
     @Test
@@ -104,12 +101,11 @@ class FloatParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new FloatParser.FloatParseException(
+        assertThat(result).hasFailure(new FloatParser.FloatParseException(
                 "6.0",
                 parser,
                 this.context
         ));
-        assertThat(result.getParsedValue()).isEmpty();
     }
 
     @Test
@@ -127,11 +123,10 @@ class FloatParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new FloatParser.FloatParseException(
+        assertThat(result).hasFailure(new FloatParser.FloatParseException(
                 "cow",
                 parser,
                 this.context
         ));
-        assertThat(result.getParsedValue()).isEmpty();
     }
 }
