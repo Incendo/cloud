@@ -123,7 +123,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
         }
 
         /* Before parsing, retrieve the last known input of the queue */
-        final String lastInputValue = commandInput.tokenize().getLast();
+        final String lastInputValue = commandInput.lastRemainingToken();
 
         /* Parse, but ignore the result of parsing */
         final FlagParser parser = new FlagParser();

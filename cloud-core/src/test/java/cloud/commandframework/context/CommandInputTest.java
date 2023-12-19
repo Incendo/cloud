@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.context;
 
-import java.util.List;
+import cloud.commandframework.internal.CommandInputTokenizer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -306,42 +306,6 @@ class CommandInputTest {
     }
 
     @Test
-    void Tokenize_EmptyString_ReturnsEmptyList() {
-        // Arrange
-        final CommandInput commandInput = CommandInput.empty();
-
-        // Act
-        final List<String> result = commandInput.tokenize();
-
-        // Assert
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    void Tokenize_SingleToken_ReturnsSingleToken() {
-        // Arrange
-        final CommandInput commandInput = CommandInput.of("hello");
-
-        // Act
-        final List<String> result = commandInput.tokenize();
-
-        // Assert
-        assertThat(result).containsExactly("hello");
-    }
-
-    @Test
-    void Tokenize_MultipleTokens_ReturnsAllTokens() {
-        // Arrange
-        final CommandInput commandInput = CommandInput.of("hello cruel world");
-
-        // Act
-        final List<String> result = commandInput.tokenize();
-
-        // Assert
-        assertThat(result).containsExactly("hello", "cruel", "world");
-    }
-
-    @Test
     void ReadUntilAndSkip_EmptyString_ReturnsEmptyString() {
         // Arrange
         final CommandInput commandInput = CommandInput.empty();
@@ -427,5 +391,45 @@ class CommandInputTest {
 
         // Assert
         assertThat(result).isEqualTo("hello");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            " ",
+            "string",
+            " string",
+            "a couple of strings",
+            "a couple of strings ",
+            "a couple of strings  "
+    })
+    void LastRemainingToken_MatchesCommandInputTokenizer(final @NonNull String input) {
+        // Arrange
+        final String expected = new CommandInputTokenizer(input).tokenize().getLast();
+
+        // Act
+        final String actual = CommandInput.of(input).lastRemainingToken();
+
+        // Assert
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            " ",
+            "string",
+            " string",
+            "a couple of strings",
+            "a couple of strings ",
+            "a couple of strings  "
+    })
+    void RemainingTokens_MatchesCommandInputTokenizer(final @NonNull String input) {
+        // Arrange
+        final int expected = new CommandInputTokenizer(input).tokenize().size();
+
+        // Act
+        final int actual = CommandInput.of(input).remainingTokens();
+
+        // Assert
+        assertThat(actual).isEqualTo(expected);
     }
 }

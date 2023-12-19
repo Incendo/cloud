@@ -229,7 +229,7 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
     private @NonNull ArgumentParseResult<String> parseGreedy(
             final @NonNull CommandInput commandInput
     ) {
-        final int size = commandInput.tokenize().size();
+        final int size = commandInput.remainingTokens();
         final StringJoiner stringJoiner = new StringJoiner(" ");
 
         for (int i = 0; i < size; i++) {

@@ -47,6 +47,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
+import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.CommandMetaBuilder;
 import cloud.commandframework.types.tuples.Pair;
@@ -204,7 +205,7 @@ public final class AnnotationParser<C> {
                 String[].class,
                 (context, annotations) -> annotations.annotation(RawArgs.class) == null
                         ? null
-                        : context.rawInput().tokenize().toArray(new String[0])
+                        : new CommandInputTokenizer(context.rawInput().remainingInput()).tokenize().toArray(new String[0])
         );
         this.stringProcessor = StringProcessor.noOp();
     }
