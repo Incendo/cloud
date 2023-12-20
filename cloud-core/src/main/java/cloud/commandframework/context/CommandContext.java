@@ -33,7 +33,7 @@ import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.MutableCloudKeyContainer;
-import cloud.commandframework.permission.CommandPermission;
+import cloud.commandframework.permission.Permission;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -151,7 +151,7 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * @since 1.6.0
      */
     @API(status = API.Status.STABLE, since = "1.6.0")
-    public boolean hasPermission(final @NonNull CommandPermission permission) {
+    public boolean hasPermission(final @NonNull Permission permission) {
         return this.commandManager.hasPermission(this.commandSender, permission);
     }
 

@@ -30,7 +30,6 @@ import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
-import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
@@ -57,7 +56,7 @@ final class FlagAssemblerImpl implements FlagAssembler {
             description = descriptor.description();
         }
 
-        final CommandPermission permission;
+        final Permission permission;
         if (descriptor.permission() == null) {
             permission = Permission.empty();
         } else {

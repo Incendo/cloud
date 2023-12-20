@@ -25,7 +25,7 @@ package cloud.commandframework.exceptions;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.permission.CommandPermission;
+import cloud.commandframework.permission.Permission;
 import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -39,7 +39,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public class NoPermissionException extends CommandParseException {
 
     private static final long serialVersionUID = 7103413337750692843L;
-    private final CommandPermission missingPermission;
+    private final Permission missingPermission;
 
     /**
      * Construct a new no permission exception
@@ -50,7 +50,7 @@ public class NoPermissionException extends CommandParseException {
      */
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public NoPermissionException(
-            final @NonNull CommandPermission missingPermission,
+            final @NonNull Permission missingPermission,
             final @NonNull Object commandSender,
             final @NonNull List<@NonNull CommandComponent<?>> currentChain
     ) {
@@ -64,13 +64,13 @@ public class NoPermissionException extends CommandParseException {
     }
 
     /**
-     * Returns the missing {@link CommandPermission}
+     * Returns the missing {@link Permission}
      *
      * @return the missing permission
      * @since 1.9.0
      */
     @API(status = API.Status.STABLE, since = "1.9.0")
-    public @NonNull CommandPermission missingPermission() {
+    public @NonNull Permission missingPermission() {
         return this.missingPermission;
     }
 

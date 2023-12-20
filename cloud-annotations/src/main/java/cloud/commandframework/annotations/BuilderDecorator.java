@@ -25,7 +25,7 @@ package cloud.commandframework.annotations;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandDescription;
-import cloud.commandframework.permission.CommandPermission;
+import cloud.commandframework.permission.Permission;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -51,14 +51,14 @@ public interface BuilderDecorator<C> {
     }
 
     /**
-     * Returns a {@link BuilderDecorator} that sets the default {@link Command.Builder#permission(CommandPermission) permission}
+     * Returns a {@link BuilderDecorator} that sets the default {@link Command.Builder#permission(Permission) permission}
      * of a command.
      *
      * @param <C>        the command sender type
      * @param permission the permission
      * @return the decorator
      */
-    static <C> @NonNull BuilderDecorator<C> defaultPermission(final @NonNull CommandPermission permission) {
+    static <C> @NonNull BuilderDecorator<C> defaultPermission(final @NonNull Permission permission) {
         return builder -> builder.permission(permission);
     }
 

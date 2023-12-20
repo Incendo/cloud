@@ -25,7 +25,6 @@ package cloud.commandframework.permission;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
@@ -36,44 +35,26 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Accepts if every single permission is accepted.
  */
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-public final class AndPermission implements CommandPermission {
+public final class AndPermission implements Permission {
 
-    private final Set<CommandPermission> permissions;
+    private final Set<Permission> permissions;
 
-    AndPermission(final @NonNull Set<CommandPermission> permissions) {
+    AndPermission(final @NonNull Set<Permission> permissions) {
         this.permissions = Collections.unmodifiableSet(permissions);
     }
 
-    /**
-     * Create a new OR permission
-     *
-     * @param permissions Permissions to join
-     * @return Constructed permission
-     */
-    public static @NonNull CommandPermission of(final @NonNull Collection<CommandPermission> permissions) {
-        final Set<CommandPermission> objects = new HashSet<>();
-        for (final CommandPermission permission : permissions) {
-            if (permission instanceof AndPermission) {
-                objects.addAll(permission.getPermissions());
-            } else {
-                objects.add(permission);
-            }
-        }
-        return new AndPermission(objects);
-    }
-
     @Override
-    public @NonNull Collection<@NonNull CommandPermission> getPermissions() {
+    public @NonNull Collection<@NonNull Permission> permissions() {
         return this.permissions;
     }
 
     @Override
-    public String toString() {
+    public @NonNull String permissionString() {
         final StringBuilder stringBuilder = new StringBuilder();
-        final Iterator<CommandPermission> iterator = this.permissions.iterator();
+        final Iterator<Permission> iterator = this.permissions.iterator();
         while (iterator.hasNext()) {
-            final CommandPermission permission = iterator.next();
-            stringBuilder.append('(').append(permission.toString()).append(')');
+            final Permission permission = iterator.next();
+            stringBuilder.append('(').append(permission.permissionString()).append(')');
             if (iterator.hasNext()) {
                 stringBuilder.append(" & ");
             }
@@ -95,6 +76,6 @@ public final class AndPermission implements CommandPermission {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.getPermissions());
+        return Objects.hash(this.permissions());
     }
 }

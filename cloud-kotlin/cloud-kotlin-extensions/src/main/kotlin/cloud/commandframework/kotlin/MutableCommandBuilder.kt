@@ -35,7 +35,7 @@ import cloud.commandframework.keys.CloudKey
 import cloud.commandframework.kotlin.extension.command
 import cloud.commandframework.kotlin.extension.senderType
 import cloud.commandframework.meta.CommandMeta
-import cloud.commandframework.permission.CommandPermission
+import cloud.commandframework.permission.Permission
 import kotlin.reflect.KClass
 
 /**
@@ -353,7 +353,7 @@ public class MutableCommandBuilder<C : Any>(
      * @return this mutable builder
      * @since 1.3.0
      */
-    public fun permission(permission: CommandPermission): MutableCommandBuilder<C> = mutate {
+    public fun permission(permission: Permission): MutableCommandBuilder<C> = mutate {
         it.permission(permission)
     }
 
@@ -371,7 +371,7 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @since 1.3.0
      */
-    public var commandPermission: CommandPermission
+    public var commandPermission: Permission
         get() = this.commandBuilder.commandPermission()
         set(permission) = onlyMutate { it.permission(permission) }
 

@@ -26,7 +26,7 @@ package cloud.commandframework.annotations;
 import cloud.commandframework.Description;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.internal.ImmutableBuilder;
-import cloud.commandframework.permission.CommandPermission;
+import cloud.commandframework.permission.Permission;
 import java.lang.reflect.Parameter;
 import java.util.Collection;
 import org.apiguardian.api.API;
@@ -96,7 +96,7 @@ public interface FlagDescriptor extends Descriptor {
      *
      * @return the flag permission, or {@code null}
      */
-    @Nullable CommandPermission permission();
+    @Nullable Permission permission();
 
     /**
      * Returns the description of the flag.
