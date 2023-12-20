@@ -65,7 +65,7 @@ final class CommandPerformanceTest {
         long elapsedTime = 0L;
         int amount = 0;
         for (int i = 0; i < 100000; i++) {
-            for (final ParsingContext<?> parsingContext : result.getCommandContext().parsingContexts()) {
+            for (final ParsingContext<?> parsingContext : result.commandContext().parsingContexts()) {
                 elapsedTime += parsingContext.parseDuration().toNanos();
                 amount += 1;
             }

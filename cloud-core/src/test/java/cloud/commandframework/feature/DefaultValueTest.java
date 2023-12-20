@@ -57,7 +57,7 @@ class DefaultValueTest {
         final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(new TestCommandSender(), "test").get();
 
         // Assert
-        assertThat(result.getCommandContext().get(key)).isEqualTo(5);
+        assertThat(result.commandContext().get(key)).isEqualTo(5);
     }
 
     @Test
@@ -73,7 +73,7 @@ class DefaultValueTest {
         final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(new TestCommandSender(), "test").get();
 
         // Assert
-        assertThat(result.getCommandContext().get(key)).isNotNull();
+        assertThat(result.commandContext().get(key)).isNotNull();
     }
 
     @Test
@@ -88,6 +88,6 @@ class DefaultValueTest {
         final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(new TestCommandSender(), "test").get();
 
         // Assert
-        assertThat(result.getCommandContext().get(key)).isEqualTo(5);
+        assertThat(result.commandContext().get(key)).isEqualTo(5);
     }
 }

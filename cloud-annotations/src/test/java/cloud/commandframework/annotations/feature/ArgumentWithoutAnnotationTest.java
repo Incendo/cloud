@@ -66,7 +66,7 @@ class ArgumentWithoutAnnotationTest {
         // Assert
         final CommandResult<?> result = this.commandManager.executeCommand(new TestCommandSender(),
                 "command abc 123 true").join();
-        final CommandContext<?> context = result.getCommandContext();
+        final CommandContext<?> context = result.commandContext();
         assertThat(context.<String>get("required")).isEqualTo("abc");
         assertThat(context.<Integer>get("optional")).isEqualTo(123);
         assertThat(context.<Boolean>get("optional_but_weird")).isEqualTo(true);

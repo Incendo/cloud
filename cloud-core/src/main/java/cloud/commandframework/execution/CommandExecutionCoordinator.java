@@ -112,9 +112,9 @@ public abstract class CommandExecutionCoordinator<C> {
                 if (this.getCommandTree().commandManager().postprocessContext(commandContext, command) == State.ACCEPTED) {
                     return command.commandExecutionHandler()
                             .executeFuture(commandContext)
-                            .thenApply(v -> new CommandResult<>(commandContext));
+                            .thenApply(v -> CommandResult.of(commandContext));
                 }
-                return CompletableFuture.completedFuture(new CommandResult<>(commandContext));
+                return CompletableFuture.completedFuture(CommandResult.of(commandContext));
             }).exceptionally(exception -> {
                 final Throwable workingException;
                 if (exception instanceof CompletionException) {

@@ -61,7 +61,7 @@ class ParsingContextTest {
         ).get();
 
         // Assert
-        final CommandContext<TestCommandSender> context = result.getCommandContext();
+        final CommandContext<TestCommandSender> context = result.commandContext();
         assertThat(context.parsingContext("test").consumedInput()).containsExactly("t");
         assertThat(context.parsingContext("int").consumedInput()).containsExactly("1337");
         assertThat(context.parsingContext("string").consumedInput()).containsExactly("roflmao", "xd");
@@ -84,7 +84,7 @@ class ParsingContextTest {
         ).get();
 
         // Assert
-        final CommandContext<TestCommandSender> context = result.getCommandContext();
+        final CommandContext<TestCommandSender> context = result.commandContext();
         assertThat(context.parsingContext("test").exactAlias()).isEqualTo("t");
         assertThat(context.parsingContext("foo").exactAlias()).isEqualTo("f");
         assertThat(context.parsingContext("bar").exactAlias()).isEqualTo("bar");

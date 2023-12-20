@@ -63,8 +63,8 @@ class RepeatableCommandMethodTest {
         final CommandResult<?> result2 = this.commandManager.executeCommand(new TestCommandSender(), "test foo").join();
 
         // Assert
-        assertThat(result1.getCommandContext().<Boolean>get("handled")).isTrue();
-        assertThat(result2.getCommandContext().<Boolean>get("handled")).isTrue();
+        assertThat(result1.commandContext().<Boolean>get("handled")).isTrue();
+        assertThat(result2.commandContext().<Boolean>get("handled")).isTrue();
     }
 
     final static class TestClass {

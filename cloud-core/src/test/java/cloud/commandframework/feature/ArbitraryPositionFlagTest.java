@@ -68,7 +68,7 @@ class ArbitraryPositionFlagTest {
 
         for (String cmd : passing) {
             CommandResult<TestCommandSender> result = this.commandManager.executeCommand(new TestCommandSender(), cmd).join();
-            assertThat(result.getCommandContext().flags().isPresent("flag")).isEqualTo(true);
+            assertThat(result.commandContext().flags().isPresent("flag")).isEqualTo(true);
         }
     }
 

@@ -59,7 +59,7 @@ class RepeatableFlagTest {
         ).join();
 
         // Assert
-        assertThat(result.getCommandContext().flags().getAll("flag")).containsExactly("one", "two", "three");
+        assertThat(result.commandContext().flags().getAll("flag")).containsExactly("one", "two", "three");
     }
 
 

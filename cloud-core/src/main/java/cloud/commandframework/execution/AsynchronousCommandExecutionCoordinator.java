@@ -92,7 +92,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
         return parseResult.thenCompose(f -> f)
                 .thenComposeAsync(command -> {
                     if (this.commandManager.postprocessContext(commandContext, command) != State.ACCEPTED) {
-                        return CompletableFuture.completedFuture(new CommandResult<>(commandContext));
+                        return CompletableFuture.completedFuture(CommandResult.of(commandContext));
                     }
 
                     return command.commandExecutionHandler()
@@ -105,7 +105,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
                                         throw new CommandExecutionException(throwable, commandContext);
                                     }
                                 }
-                                return new CommandResult<>(commandContext);
+                                return CommandResult.of(commandContext);
                             });
                 }, this.executor)
                 .exceptionally(exception -> {

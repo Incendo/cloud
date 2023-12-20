@@ -57,20 +57,20 @@ class DurationParserTest {
     @Test
     void single_single_unit() {
         final CommandResult<?> result1 = manager.executeCommand(new TestCommandSender(), "duration 2d").join();
-        assertThat(result1.getCommandContext().get(DURATION_KEY)).isEqualTo(Duration.ofDays(2));
+        assertThat(result1.commandContext().get(DURATION_KEY)).isEqualTo(Duration.ofDays(2));
 
         final CommandResult<?> result2 = manager.executeCommand(new TestCommandSender(), "duration 999s").join();
-        assertThat(result2.getCommandContext().get(DURATION_KEY)).isEqualTo(Duration.ofSeconds(999));
+        assertThat(result2.commandContext().get(DURATION_KEY)).isEqualTo(Duration.ofSeconds(999));
     }
 
     @Test
     void single_multiple_units() {
         final CommandResult<?> result1 = manager.executeCommand(new TestCommandSender(), "duration 2d12h7m34s").join();
-        assertThat(result1.getCommandContext().get(DURATION_KEY)).
+        assertThat(result1.commandContext().get(DURATION_KEY)).
                 isEqualTo(Duration.ofDays(2).plusHours(12).plusMinutes(7).plusSeconds(34));
 
         final CommandResult<?> result2 = manager.executeCommand(new TestCommandSender(), "duration 700h75m1d999s").join();
-        assertThat(result2.getCommandContext().get(DURATION_KEY))
+        assertThat(result2.commandContext().get(DURATION_KEY))
                 .isEqualTo(Duration.ofDays(1).plusHours(700).plusMinutes(75).plusSeconds(999));
     }
 

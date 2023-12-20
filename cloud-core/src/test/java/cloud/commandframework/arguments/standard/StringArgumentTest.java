@@ -67,7 +67,7 @@ class StringArgumentTest {
         final CommandResult<?> result = this.manager.executeCommand(new TestCommandSender(), "single string").join();
 
         // Assert
-        assertThat(result.getCommandContext().get(MESSAGE1_KEY)).isEqualTo("string");
+        assertThat(result.commandContext().get(MESSAGE1_KEY)).isEqualTo("string");
     }
 
     @Test
@@ -83,8 +83,8 @@ class StringArgumentTest {
                 "quoted 'quoted \" string' unquoted").join();
 
         // Assert
-        assertThat(result.getCommandContext().get(MESSAGE1_KEY)).isEqualTo("quoted \" string");
-        assertThat(result.getCommandContext().get(MESSAGE2_KEY)).isEqualTo("unquoted");
+        assertThat(result.commandContext().get(MESSAGE1_KEY)).isEqualTo("quoted \" string");
+        assertThat(result.commandContext().get(MESSAGE2_KEY)).isEqualTo("unquoted");
     }
 
     @Test
@@ -99,8 +99,8 @@ class StringArgumentTest {
         final CommandResult<?> result = this.manager.executeCommand(new TestCommandSender(), "quoted quoted unquoted").join();
 
         // Assert
-        assertThat(result.getCommandContext().get(MESSAGE1_KEY)).isEqualTo("quoted");
-        assertThat(result.getCommandContext().get(MESSAGE2_KEY)).isEqualTo("unquoted");
+        assertThat(result.commandContext().get(MESSAGE1_KEY)).isEqualTo("quoted");
+        assertThat(result.commandContext().get(MESSAGE2_KEY)).isEqualTo("unquoted");
     }
 
     @Test
@@ -116,8 +116,8 @@ class StringArgumentTest {
                 "quoted \"quoted \\\" string\" unquoted").join();
 
         // Assert
-        assertThat(result.getCommandContext().get(MESSAGE1_KEY)).isEqualTo("quoted \" string");
-        assertThat(result.getCommandContext().get(MESSAGE2_KEY)).isEqualTo("unquoted");
+        assertThat(result.commandContext().get(MESSAGE1_KEY)).isEqualTo("quoted \" string");
+        assertThat(result.commandContext().get(MESSAGE2_KEY)).isEqualTo("unquoted");
     }
 
     @Test
@@ -147,6 +147,6 @@ class StringArgumentTest {
                 this.manager.executeCommand(new TestCommandSender(), "greedy greedy string content").join();
 
         // Assert
-        assertThat(result.getCommandContext().get(MESSAGE1_KEY)).isEqualTo("greedy string content");
+        assertThat(result.commandContext().get(MESSAGE1_KEY)).isEqualTo("greedy string content");
     }
 }

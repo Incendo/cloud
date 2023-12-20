@@ -91,7 +91,7 @@ class KotlinAnnotatedMethodsTest {
             .parse(CommandMethods())
 
         val result = commandManager.executeCommand(TestCommandSender(), "with-default").await()
-        assertThat(result.commandContext.get<Int>("the-value")).isEqualTo(5)
+        assertThat(result.commandContext().get<Int>("the-value")).isEqualTo(5)
     }
 
     @Test

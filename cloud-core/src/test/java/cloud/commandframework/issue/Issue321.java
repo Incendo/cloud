@@ -56,7 +56,7 @@ class Issue321 {
         ).join();
 
         // Assert
-        final CommandContext<TestCommandSender> context = result.getCommandContext();
+        final CommandContext<TestCommandSender> context = result.commandContext();
         final FlagContext flags = context.flags();
 
         assertThat(flags.<String[]>getValue("flag1")).hasValue(new String[]{"one", "two", "three"});
