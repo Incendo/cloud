@@ -93,9 +93,9 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  *
  * @param <C> the command sender type used to execute commands
  */
-@SuppressWarnings({"unchecked", "rawtypes", "unused"})
+@SuppressWarnings({"unchecked", "unused"})
 @API(status = API.Status.STABLE)
-public abstract class CommandManager<C> implements Stateful<RegistrationState> {
+public abstract class CommandManager<C> implements Stateful<RegistrationState>, CommandBuilderSource<C> {
 
     private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = new HashMap<>();
 
@@ -586,192 +586,14 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
     }
 
     /**
-     * Create a new command builder. This will also register the creating manager in the command
-     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
-     * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
-     * <p>
-     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
-     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
+     * Invokes {@link Command.Builder#manager(CommandManager)} with {@code this} instance and returns the updated builder.
      *
-     * @param name        Command name
-     * @param aliases     Command aliases
-     * @param description Description for the root literal
-     * @param meta        Command meta
-     * @return Builder instance
-     * @since 1.4.0
+     * @param builder builder to decorate
+     * @return the decorated builder
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public Command.@NonNull Builder<C> commandBuilder(
-            final @NonNull String name,
-            final @NonNull Collection<String> aliases,
-            final @NonNull Description description,
-            final @NonNull CommandMeta meta
-    ) {
-        return Command.<C>newBuilder(
-                name,
-                meta,
-                description,
-                aliases.toArray(new String[0])
-        ).manager(this);
-    }
-
-    /**
-     * Create a new command builder with an empty description.
-     * <p>
-     * This will also register the creating manager in the command
-     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
-     * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
-     * <p>
-     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
-     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
-     *
-     * @param name    Command name
-     * @param aliases Command aliases
-     * @param meta    Command meta
-     * @return Builder instance
-     */
-    public Command.@NonNull Builder<C> commandBuilder(
-            final @NonNull String name,
-            final @NonNull Collection<String> aliases,
-            final @NonNull CommandMeta meta
-    ) {
-        return Command.<C>newBuilder(
-                name,
-                meta,
-                Description.empty(),
-                aliases.toArray(new String[0])
-        ).manager(this);
-    }
-
-    /**
-     * Create a new command builder. This will also register the creating manager in the command
-     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
-     * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
-     * <p>
-     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
-     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
-     *
-     * @param name        Command name
-     * @param meta        Command meta
-     * @param description Description for the root literal
-     * @param aliases     Command aliases
-     * @return Builder instance
-     * @since 1.4.0
-     */
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public Command.@NonNull Builder<C> commandBuilder(
-            final @NonNull String name,
-            final @NonNull CommandMeta meta,
-            final @NonNull Description description,
-            final @NonNull String... aliases
-    ) {
-        return Command.<C>newBuilder(
-                name,
-                meta,
-                description,
-                aliases
-        ).manager(this);
-    }
-
-    /**
-     * Create a new command builder with an empty description.
-     * <p>
-     * This will also register the creating manager in the command
-     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
-     * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
-     * <p>
-     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
-     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
-     *
-     * @param name    Command name
-     * @param meta    Command meta
-     * @param aliases Command aliases
-     * @return Builder instance
-     */
-    public Command.@NonNull Builder<C> commandBuilder(
-            final @NonNull String name,
-            final @NonNull CommandMeta meta,
-            final @NonNull String... aliases
-    ) {
-        return Command.<C>newBuilder(
-                name,
-                meta,
-                Description.empty(),
-                aliases
-        ).manager(this);
-    }
-
-    /**
-     * Create a new command builder using default command meta created by {@link #createDefaultCommandMeta()}.
-     * <p>
-     * This will also register the creating manager in the command
-     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
-     * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
-     * <p>
-     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
-     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
-     *
-     * @param name        Command name
-     * @param description Description for the root literal
-     * @param aliases     Command aliases
-     * @return Builder instance
-     * @throws UnsupportedOperationException If the command manager does not support default command meta creation
-     * @see #createDefaultCommandMeta() Default command meta creation
-     * @since 1.4.0
-     */
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public Command.@NonNull Builder<C> commandBuilder(
-            final @NonNull String name,
-            final @NonNull Description description,
-            final @NonNull String... aliases
-    ) {
-        return Command.<C>newBuilder(
-                name,
-                this.createDefaultCommandMeta(),
-                description,
-                aliases
-        ).manager(this);
-    }
-
-    /**
-     * Create a new command builder using default command meta created by {@link #createDefaultCommandMeta()}, and
-     * an empty description.
-     * <p>
-     * This will also register the creating manager in the command
-     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
-     * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
-     * <p>
-     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
-     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
-     *
-     * @param name    Command name
-     * @param aliases Command aliases
-     * @return Builder instance
-     * @throws UnsupportedOperationException If the command manager does not support default command meta creation
-     * @see #createDefaultCommandMeta() Default command meta creation
-     */
-    public Command.@NonNull Builder<C> commandBuilder(
-            final @NonNull String name,
-            final @NonNull String... aliases
-    ) {
-        return Command.<C>newBuilder(
-                name,
-                this.createDefaultCommandMeta(),
-                Description.empty(),
-                aliases
-        ).manager(this);
+    @Override
+    public final Command.@NonNull Builder<C> decorateBuilder(final Command.@NonNull Builder<C> builder) {
+        return builder.manager(this);
     }
 
     /**
@@ -821,11 +643,10 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
 
     /**
      * Constructs a default {@link CommandMeta} instance.
-     * <p>
-     * Returns {@link CommandMeta#empty()} by default.
      *
      * @return default command meta
      */
+    @Override
     public @NonNull CommandMeta createDefaultCommandMeta() {
         return CommandMeta.empty();
     }
