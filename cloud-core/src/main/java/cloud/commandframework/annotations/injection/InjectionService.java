@@ -23,23 +23,21 @@
 //
 package cloud.commandframework.annotations.injection;
 
-import cloud.commandframework.annotations.AnnotationAccessor;
-import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.services.types.Service;
-import cloud.commandframework.types.tuples.Triplet;
 import org.apiguardian.api.API;
 
 /**
  * Service that can be registered to the {@link ParameterInjectorRegistry} in order to provide
- * custom injection support. This can be used to integrate the Cloud with existing dependency
- * injection frameworks.
+ * custom injection support.
  *
- * @param <C> Command sender type
- * @since 1.4.0
+ * <p>This can be used to integrate the Cloud with existing dependency
+ * injection frameworks.</p>
+ *
+ * @param <C> command sender type
+ * @since 2.0.0
  */
 @FunctionalInterface
-@API(status = API.Status.STABLE, since = "1.4.0")
-public interface InjectionService<C> extends
-        Service<Triplet<CommandContext<C>, Class<?>, AnnotationAccessor>, Object> {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface InjectionService<C> extends Service<InjectionRequest<C>, Object> {
 
 }

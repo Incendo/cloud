@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.flags.FlagContext;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.execution.CommandExecutionHandler;
+import io.leangen.geantyref.TypeToken;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
@@ -166,7 +167,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
                     arguments.add(new ParameterValue(parameter, null, commandContext.sender()));
                 } else {
                     final Optional<?> value = this.context.injectorRegistry.getInjectable(
-                            parameter.getType(),
+                            TypeToken.get(parameter.getParameterizedType()),
                             commandContext,
                             AnnotationAccessor.of(AnnotationAccessor.of(parameter), this.annotationAccessor)
                     );

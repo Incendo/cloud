@@ -25,6 +25,7 @@ package cloud.commandframework.annotations.injection;
 
 import cloud.commandframework.annotations.AnnotationAccessor;
 import cloud.commandframework.context.CommandContext;
+import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -44,25 +45,67 @@ public interface ParameterInjector<C, T> {
     /**
      * Returns a parameter injector that always injects {@code value}.
      *
-     * @param <C>   the command sender type
-     * @param <T>   the type of the value
-     * @param value the value to inject
+     * @param <C>   command sender type
+     * @param <T>   type of the value
+     * @param value value to inject
      * @return the injector
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    static <C, T> @NonNull ParameterInjector<C, T> constantInjector(@NonNull T value) {
-        return (context, annotationAccessor) -> value;
+    static <C, T> @NonNull ParameterInjector<C, T> constantInjector(final @NonNull T value) {
+        return new ConstantInjector<>(value);
     }
 
     /**
-     * Attempt to create a value that should then be injected into the CommandMethod
-     * annotated method. If the injector cannot (or shouldn't) create a value, it is free to return {@code null}.
+     * Attempts to create a value that should then be injected into the CommandMethod
+     * annotated method.
      *
-     * @param context            Command context that is requesting the injection
-     * @param annotationAccessor Annotation accessor proxying the method and parameter which the value is being injected into
-     * @return The value, if it could be created. Else {@code null}, in which case no value will be injected
+     * <p>If the injector cannot (or shouldn't) create a value, it is free to return {@code null}.</p>
+     *
+     * @param context            command context that is requesting the injection
+     * @param annotationAccessor annotation accessor proxying the method and parameter which the value is being injected into
+     * @return the value if it could be created, else {@code null} in which case no value will be injected
      *         by this particular injector
      */
     @Nullable T create(@NonNull CommandContext<C> context, @NonNull AnnotationAccessor annotationAccessor);
+
+
+    final class ConstantInjector<C, T> implements ParameterInjector<C, T> {
+
+        private final T value;
+
+        private ConstantInjector(final @NonNull T value) {
+            this.value = value;
+        }
+
+        @Override
+        public @NonNull T create(
+                final @NonNull CommandContext<C> context,
+                final @NonNull AnnotationAccessor annotationAccessor
+        ) {
+            return this.value;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || this.getClass() != o.getClass()) {
+                return false;
+            }
+            final ConstantInjector<?, ?> that = (ConstantInjector<?, ?>) o;
+            return Objects.equals(this.value, that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.value);
+        }
+
+        @Override
+        public String toString() {
+            return "ConstantInjector{value=" + this.value + '}';
+        }
+    }
 }

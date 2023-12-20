@@ -34,6 +34,7 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.MutableCloudKeyContainer;
 import cloud.commandframework.permission.Permission;
+import io.leangen.geantyref.TypeToken;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -367,8 +368,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * Attempts to retrieve a value that has been registered to the associated command manager's
      * {@link cloud.commandframework.annotations.injection.ParameterInjectorRegistry}.
      *
-     * @param clazz class of type to inject
      * @param <T>   type to inject
+     * @param clazz class of type to inject
      * @return optional that may contain the created value
      * @since 1.3.0
      */
@@ -380,6 +381,25 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
             );
         }
         return this.commandManager.parameterInjectorRegistry().getInjectable(clazz, this, AnnotationAccessor.empty());
+    }
+
+    /**
+     * Attempts to retrieve a value that has been registered to the associated command manager's
+     * {@link cloud.commandframework.annotations.injection.ParameterInjectorRegistry}.
+     *
+     * @param <T>  type to inject
+     * @param type type to inject
+     * @return optional that may contain the created value
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public <@NonNull T> @NonNull Optional<T> inject(final @NonNull TypeToken<T> type) {
+        if (this.commandManager == null) {
+            throw new UnsupportedOperationException(
+                    "Cannot retrieve injectable values from a command context that is not associated with a command manager"
+            );
+        }
+        return this.commandManager.parameterInjectorRegistry().getInjectable(type, this, AnnotationAccessor.empty());
     }
 
     @Override
