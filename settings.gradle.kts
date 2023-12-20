@@ -76,7 +76,6 @@ include(":cloud-bom")
 // Core Modules
 include(":cloud-core")
 include(":cloud-services")
-include(":cloud-tasks")
 include(":cloud-annotations")
 
 // Kotlin Extensions

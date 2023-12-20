@@ -27,6 +27,7 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -56,7 +57,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <V> the registry entry type
  * @since 2.0.0
  */
-public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V> {
+public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V>, BlockingSuggestionProvider.Strings<C> {
 
     private static final String NAMESPACE_MINECRAFT = "minecraft";
 
@@ -129,8 +130,8 @@ public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V> {
 
     @Override
     public @NonNull ArgumentParseResult<@NonNull V> parse(
-            @NonNull final CommandContext<@NonNull C> commandContext,
-            @NonNull final CommandInput commandInput
+            final @NonNull CommandContext<@NonNull C> commandContext,
+            final @NonNull CommandInput commandInput
     ) {
         final String possibleIdentifier = commandInput.peekString();
         if (possibleIdentifier.isEmpty()) {
@@ -163,7 +164,7 @@ public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V> {
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

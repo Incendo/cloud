@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletionException;
 import java.util.function.Predicate;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -48,6 +49,19 @@ public final class ExceptionController<C> {
 
     private final ExceptionContextFactory<C> exceptionContextFactory = new ExceptionContextFactory<>(this);
     private final Map<@NonNull Type, @NonNull LinkedList<@NonNull ExceptionHandlerRegistration<C, ?>>> registrations;
+
+    /**
+     * Unwraps a {@link CompletionException} recursively until a cause is encountered that is not a completion exception.
+     *
+     * @param throwable the throwable
+     * @return the original cause
+     */
+    public static @NonNull Throwable unwrapCompletionException(final @NonNull Throwable throwable) {
+        if (throwable instanceof CompletionException) {
+            return unwrapCompletionException(throwable.getCause());
+        }
+        return throwable;
+    }
 
     /**
      * Creates a new exception controller.
@@ -114,7 +128,7 @@ public final class ExceptionController<C> {
      * @param registration the exception handler registration
      * @return {@code this} exception controller
      */
-    public synchronized <T extends Throwable> @NonNull @This ExceptionController<C> register(
+    public synchronized <T extends Throwable> @This @NonNull ExceptionController<C> register(
             final @NonNull ExceptionHandlerRegistration<C, ? extends T> registration
     ) {
         this.registrations.computeIfAbsent(registration.exceptionType().getType(), t -> new LinkedList<>())
@@ -133,7 +147,7 @@ public final class ExceptionController<C> {
      * @param decorator     the builder decorator
      * @return {@code this} exception controller
      */
-    public <T extends Throwable> @NonNull @This ExceptionController<C> register(
+    public <T extends Throwable> @This @NonNull ExceptionController<C> register(
             final @NonNull TypeToken<T> exceptionType,
             final ExceptionHandlerRegistration.@NonNull BuilderDecorator<C, T> decorator
     ) {
@@ -151,7 +165,7 @@ public final class ExceptionController<C> {
      * @param decorator     the builder decorator
      * @return {@code this} exception controller
      */
-    public <T extends Throwable> @NonNull @This ExceptionController<C> register(
+    public <T extends Throwable> @This @NonNull ExceptionController<C> register(
             final @NonNull Class<T> exceptionType,
             final ExceptionHandlerRegistration.@NonNull BuilderDecorator<C, T> decorator
     ) {
@@ -169,7 +183,7 @@ public final class ExceptionController<C> {
      * @param exceptionHandler the exception handler
      * @return {@code this} exception controller
      */
-    public <T extends Throwable> @NonNull @This ExceptionController<C> registerHandler(
+    public <T extends Throwable> @This @NonNull ExceptionController<C> registerHandler(
             final @NonNull TypeToken<T> exceptionType,
             final @NonNull ExceptionHandler<C, ? extends T> exceptionHandler
     ) {
@@ -187,7 +201,7 @@ public final class ExceptionController<C> {
      * @param exceptionHandler the exception handler
      * @return {@code this} exception controller
      */
-    public <T extends Throwable> @NonNull @This ExceptionController<C> registerHandler(
+    public <T extends Throwable> @This @NonNull ExceptionController<C> registerHandler(
             final @NonNull Class<T> exceptionType,
             final @NonNull ExceptionHandler<C, ? extends T> exceptionHandler
     ) {

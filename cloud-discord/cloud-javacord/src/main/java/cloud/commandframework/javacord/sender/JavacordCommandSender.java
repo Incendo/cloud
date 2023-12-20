@@ -49,8 +49,7 @@ public class JavacordCommandSender {
      *
      * @return The author of the message
      */
-    @NonNull
-    public MessageAuthor getAuthor() {
+    public @NonNull MessageAuthor getAuthor() {
         return this.event.getMessageAuthor();
     }
 
@@ -59,8 +58,7 @@ public class JavacordCommandSender {
      *
      * @return The message of the event.
      */
-    @NonNull
-    public Message getMessage() {
+    public @NonNull Message getMessage() {
         return this.event.getMessage();
     }
 
@@ -69,8 +67,7 @@ public class JavacordCommandSender {
      *
      * @return The textchannel of the event
      */
-    @NonNull
-    public TextChannel getTextChannel() {
+    public @NonNull TextChannel getTextChannel() {
         return this.event.getChannel();
     }
 
@@ -79,8 +76,7 @@ public class JavacordCommandSender {
      *
      * @return The event of the command
      */
-    @NonNull
-    public MessageCreateEvent getEvent() {
+    public @NonNull MessageCreateEvent getEvent() {
         return this.event;
     }
 
@@ -90,8 +86,7 @@ public class JavacordCommandSender {
      * @param message message which should be sent
      * @return The sent message
      */
-    @NonNull
-    public CompletableFuture<Message> sendMessage(final @Nullable String message) {
+    public @NonNull CompletableFuture<Message> sendMessage(final @Nullable String message) {
         return this.event.getChannel().sendMessage(message);
     }
 
@@ -101,8 +96,7 @@ public class JavacordCommandSender {
      * @param message message which should be sent
      * @return The sent message
      */
-    @NonNull
-    public CompletableFuture<Message> sendErrorMessage(final @Nullable String message) {
+    public @NonNull CompletableFuture<Message> sendErrorMessage(final @Nullable String message) {
         return this.sendMessage(":x: " + message);
     }
 
@@ -112,8 +106,7 @@ public class JavacordCommandSender {
      * @param message message which should be sent
      * @return The sent message
      */
-    @NonNull
-    public CompletableFuture<Message> sendSuccessMessage(final @Nullable String message) {
+    public @NonNull CompletableFuture<Message> sendSuccessMessage(final @Nullable String message) {
         return this.sendMessage(":white_check_mark: " + message);
     }
 }

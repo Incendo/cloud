@@ -26,7 +26,7 @@ package cloud.commandframework.examples.bukkit.annotations.feature.minecraft;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
+import cloud.commandframework.bukkit.data.SingleEntitySelector;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
 import org.bukkit.ChatColor;
@@ -54,11 +54,7 @@ public final class SelectorExample implements AnnotationFeature {
             @Argument(value = "entity", description = "The entity to teleport")
             final @NonNull SingleEntitySelector singleEntitySelector
     ) {
-        if (singleEntitySelector.hasAny()) {
-            singleEntitySelector.getEntity().teleport(player);
-            player.sendMessage(ChatColor.GREEN + "The entity was teleported to you!");
-        } else {
-            player.sendMessage(ChatColor.RED + "No entity matched your query.");
-        }
+        singleEntitySelector.single().teleport(player);
+        player.sendMessage(ChatColor.GREEN + "The entity was teleported to you!");
     }
 }

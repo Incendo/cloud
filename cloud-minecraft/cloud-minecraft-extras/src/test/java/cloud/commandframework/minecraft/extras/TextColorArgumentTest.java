@@ -26,6 +26,7 @@ package cloud.commandframework.minecraft.extras;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import java.util.Locale;
 import java.util.stream.Stream;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -102,7 +103,7 @@ class TextColorArgumentTest {
     }
 
     static @NonNull Stream<@NonNull Arguments> Parse_NamedColor_Success_Source() {
-        return NamedTextColor.NAMES.values().stream().map(color -> arguments(color.toString().toLowerCase(), color));
+        return NamedTextColor.NAMES.values().stream().map(color -> arguments(color.toString().toLowerCase(Locale.ROOT), color));
     }
 
     @ParameterizedTest

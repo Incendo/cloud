@@ -30,6 +30,7 @@ import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
+import java.util.Locale;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -57,17 +58,17 @@ public final class FlagExample implements AnnotationFeature {
     @CommandDescription("Give yourself an item")
     public void commandGive(
             final @NonNull Player player,
-            final @NonNull @Argument("material") Material material,
+            final @Argument("material") @NonNull Material material,
             final @Argument("amount") int number,
-            final @Nullable @Flag("color") ChatColor nameColor,
-            final @Nullable @Flag("enchant") Enchantment enchant
+            final @Flag("color") @Nullable ChatColor nameColor,
+            final @Flag("enchant") @Nullable Enchantment enchant
     ) {
         final ItemStack itemStack = new ItemStack(material, number);
         String itemName = String.format(
                 "%s's %s",
                 player.getName(),
                 material.name()
-                        .toLowerCase()
+                        .toLowerCase(Locale.ROOT)
                         .replace('_', ' ')
         );
         if (nameColor != null) {

@@ -35,7 +35,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public class SimplePermissionResult implements PermissionResult {
 
     private final boolean result;
-    private final CommandPermission permission;
+    private final Permission permission;
 
     /**
      * Creates a result that wraps the given boolean result
@@ -43,7 +43,7 @@ public class SimplePermissionResult implements PermissionResult {
      * @param result true if the command may be executed, false otherwise
      * @param permission the permission that this result came from
      */
-    protected SimplePermissionResult(final boolean result, final @NonNull CommandPermission permission) {
+    protected SimplePermissionResult(final boolean result, final @NonNull Permission permission) {
         this.result = result;
         this.permission = Objects.requireNonNull(permission, "permission");
     }
@@ -60,7 +60,7 @@ public class SimplePermissionResult implements PermissionResult {
     }
 
     @Override
-    public final @NonNull CommandPermission permission() {
+    public final @NonNull Permission permission() {
         return this.permission;
     }
 

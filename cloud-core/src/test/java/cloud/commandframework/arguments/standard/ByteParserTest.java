@@ -36,8 +36,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static cloud.commandframework.truth.ArgumentParseResultSubject.assertThat;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class ByteParserTest {
@@ -63,9 +63,7 @@ class ByteParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(byteInput);
-
+        assertThat(result).hasParsedValue(byteInput);
         assertThat(commandInput.isEmpty()).isTrue();
     }
 
@@ -84,12 +82,13 @@ class ByteParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new ByteParser.ByteParseException(
-                "4",
-                parser,
-                this.context
-        ));
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result).hasFailure(
+                new ByteParser.ByteParseException(
+                        "4",
+                        parser,
+                        this.context
+                )
+        );
     }
 
     @Test
@@ -107,12 +106,13 @@ class ByteParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new ByteParser.ByteParseException(
-                "6",
-                parser,
-                this.context
-        ));
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result).hasFailure(
+                new ByteParser.ByteParseException(
+                        "6",
+                        parser,
+                        this.context
+                )
+        );
     }
 
     @Test
@@ -130,12 +130,13 @@ class ByteParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new ByteParser.ByteParseException(
-                "cow",
-                parser,
-                this.context
-        ));
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result).hasFailure(
+                new ByteParser.ByteParseException(
+                        "cow",
+                        parser,
+                        this.context
+                )
+        );
     }
 
     @Test
@@ -152,7 +153,7 @@ class ByteParserTest {
         }
 
         // Act
-        final List<Suggestion> suggestions = parser.suggestions(
+        final Iterable<Suggestion> suggestions = parser.suggestions(
                 this.context,
                 ""
         );
@@ -175,7 +176,7 @@ class ByteParserTest {
         }
 
         // Act
-        final List<Suggestion> suggestions = parser.suggestions(
+        final Iterable<Suggestion> suggestions = parser.suggestions(
                 this.context,
                 "-"
         );

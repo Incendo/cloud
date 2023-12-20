@@ -38,7 +38,6 @@ import cloud.commandframework.examples.bukkit.builder.feature.HelpExample;
 import cloud.commandframework.examples.bukkit.builder.feature.PermissionExample;
 import cloud.commandframework.examples.bukkit.builder.feature.RegexExample;
 import cloud.commandframework.examples.bukkit.builder.feature.StringArrayExample;
-import cloud.commandframework.examples.bukkit.builder.feature.TaskRecipeExample;
 import cloud.commandframework.examples.bukkit.builder.feature.minecraft.BlockPredicateExample;
 import cloud.commandframework.examples.bukkit.builder.feature.minecraft.ItemStackExample;
 import cloud.commandframework.examples.bukkit.builder.feature.minecraft.ItemStackPredicateExample;
@@ -68,7 +67,6 @@ public final class BuilderExample {
             new PermissionExample(),
             new RegexExample(),
             new StringArrayExample(),
-            new TaskRecipeExample(),
             // Minecraft-specific features
             new ItemStackExample(),
             new SelectorExample(),

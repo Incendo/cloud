@@ -104,29 +104,30 @@ public final class ExamplePlugin extends JavaPlugin {
         //
         // Override the default exception handlers and use the exception handlers from cloud-minecraft-extras instead.
         //
-        new MinecraftExceptionHandler<CommandSender>()
-                .withInvalidSyntaxHandler()
-                .withInvalidSenderHandler()
-                .withNoPermissionHandler()
-                .withArgumentParsingHandler()
-                .withCommandExecutionHandler()
-                .withDecorator(
+        MinecraftExceptionHandler.create(this.bukkitAudiences::sender)
+                .defaultInvalidSyntaxHandler()
+                .defaultInvalidSenderHandler()
+                .defaultNoPermissionHandler()
+                .defaultArgumentParsingHandler()
+                .defaultCommandExecutionHandler()
+                .decorator(
                         component -> text()
                                 .append(text("[", NamedTextColor.DARK_GRAY))
                                 .append(text("Example", NamedTextColor.GOLD))
                                 .append(text("] ", NamedTextColor.DARK_GRAY))
                                 .append(component).build()
-                ).apply(manager, this.bukkitAudiences::sender);
+                )
+                .registerTo(manager);
         //
         // Create a help instance which is used in TextColorExample and HelpExample.
         //
-        this.minecraftHelp = new MinecraftHelp<>(
+        this.minecraftHelp = MinecraftHelp.create(
                 // The help command. This gets prefixed onto all the clickable queries.
                 "/builder help",
-                // Tells the help manager how to map command senders to adventure audiences.
-                this.bukkitAudiences()::sender,
                 // The command manager instance that is used to look up the commands.
-                manager
+                manager,
+                // Tells the help manager how to map command senders to adventure audiences.
+                this.bukkitAudiences()::sender
         );
         //
         // Create the annotation examples.
@@ -154,5 +155,14 @@ public final class ExamplePlugin extends JavaPlugin {
      */
     public @NonNull MinecraftHelp<CommandSender> minecraftHelp() {
         return this.minecraftHelp;
+    }
+
+    /**
+     * Replaces the {@link MinecraftHelp} instance.
+     *
+     * @param minecraftHelp the new instance
+     */
+    public void minecraftHelp(final @NonNull MinecraftHelp<CommandSender> minecraftHelp) {
+        this.minecraftHelp = minecraftHelp;
     }
 }

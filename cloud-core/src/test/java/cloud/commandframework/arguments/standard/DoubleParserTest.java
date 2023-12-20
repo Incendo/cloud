@@ -33,8 +33,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static cloud.commandframework.truth.ArgumentParseResultSubject.assertThat;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class DoubleParserTest {
@@ -60,9 +60,7 @@ class DoubleParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(doubleInput);
-
+        assertThat(result).hasParsedValue(doubleInput);
         assertThat(commandInput.isEmpty()).isTrue();
     }
 
@@ -81,12 +79,13 @@ class DoubleParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new DoubleParser.DoubleParseException(
-                "4.0",
-                parser,
-                this.context
-        ));
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result).hasFailure(
+                new DoubleParser.DoubleParseException(
+                        "4.0",
+                        parser,
+                        this.context
+                )
+        );
     }
 
     @Test
@@ -104,12 +103,13 @@ class DoubleParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new DoubleParser.DoubleParseException(
-                "6.0",
-                parser,
-                this.context
-        ));
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result).hasFailure(
+                new DoubleParser.DoubleParseException(
+                        "6.0",
+                        parser,
+                        this.context
+                )
+        );
     }
 
     @Test
@@ -127,11 +127,12 @@ class DoubleParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new DoubleParser.DoubleParseException(
-                "cow",
-                parser,
-                this.context
-        ));
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result).hasFailure(
+                new DoubleParser.DoubleParseException(
+                        "cow",
+                        parser,
+                        this.context
+                )
+        );
     }
 }

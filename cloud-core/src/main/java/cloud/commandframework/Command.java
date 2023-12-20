@@ -36,7 +36,6 @@ import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
 import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PredicatePermission;
 import cloud.commandframework.types.tuples.Pair;
@@ -87,7 +86,7 @@ public class Command<C> {
     private final @Nullable CommandComponent<C> flagComponent;
     private final CommandExecutionHandler<C> commandExecutionHandler;
     private final Class<? extends C> senderType;
-    private final CommandPermission commandPermission;
+    private final Permission permission;
     private final CommandMeta commandMeta;
     private final CommandDescription commandDescription;
 
@@ -97,7 +96,7 @@ public class Command<C> {
      * @param commandComponents       command component argument and description
      * @param commandExecutionHandler execution handler
      * @param senderType              required sender type. May be {@code null}
-     * @param commandPermission       command permission
+     * @param permission       command permission
      * @param commandMeta             command meta instance
      * @param commandDescription      description of the command
      * @since 2.0.0
@@ -107,7 +106,7 @@ public class Command<C> {
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
             final @Nullable Class<? extends C> senderType,
-            final @NonNull CommandPermission commandPermission,
+            final @NonNull Permission permission,
             final @NonNull CommandMeta commandMeta,
             final @NonNull CommandDescription commandDescription
     ) {
@@ -140,7 +139,7 @@ public class Command<C> {
         }
         this.commandExecutionHandler = commandExecutionHandler;
         this.senderType = senderType;
-        this.commandPermission = commandPermission;
+        this.permission = permission;
         this.commandMeta = commandMeta;
         this.commandDescription = commandDescription;
     }
@@ -169,7 +168,7 @@ public class Command<C> {
      *
      * @param commandComponents       command components
      * @param commandExecutionHandler execution handler
-     * @param commandPermission       command permission
+     * @param permission       command permission
      * @param commandMeta             command meta instance
      * @since 1.3.0
      */
@@ -177,10 +176,10 @@ public class Command<C> {
     public Command(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
-            final @NonNull CommandPermission commandPermission,
+            final @NonNull Permission permission,
             final @NonNull CommandMeta commandMeta
     ) {
-        this(commandComponents, commandExecutionHandler, null, commandPermission, commandMeta, CommandDescription.empty());
+        this(commandComponents, commandExecutionHandler, null, permission, commandMeta, CommandDescription.empty());
     }
 
     /**
@@ -364,8 +363,8 @@ public class Command<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull CommandPermission commandPermission() {
-        return this.commandPermission;
+    public @NonNull Permission commandPermission() {
+        return this.permission;
     }
 
     /**
@@ -428,7 +427,7 @@ public class Command<C> {
         private final List<CommandComponent<C>> commandComponents;
         private final CommandExecutionHandler<C> commandExecutionHandler;
         private final Class<? extends C> senderType;
-        private final CommandPermission commandPermission;
+        private final Permission permission;
         private final CommandManager<C> commandManager;
         private final Collection<CommandFlag<?>> flags;
         private final CommandDescription commandDescription;
@@ -439,7 +438,7 @@ public class Command<C> {
                 final @Nullable Class<? extends C> senderType,
                 final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
                 final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
-                final @NonNull CommandPermission commandPermission,
+                final @NonNull Permission permission,
                 final @NonNull Collection<CommandFlag<?>> flags,
                 final @NonNull CommandDescription commandDescription
         ) {
@@ -447,7 +446,7 @@ public class Command<C> {
             this.senderType = senderType;
             this.commandComponents = Objects.requireNonNull(commandComponents, "Components may not be null");
             this.commandExecutionHandler = Objects.requireNonNull(commandExecutionHandler, "Execution handler may not be null");
-            this.commandPermission = Objects.requireNonNull(commandPermission, "Permission may not be null");
+            this.permission = Objects.requireNonNull(permission, "Permission may not be null");
             this.commandMeta = Objects.requireNonNull(commandMeta, "Meta may not be null");
             this.flags = Objects.requireNonNull(flags, "Flags may not be null");
             this.commandDescription = Objects.requireNonNull(commandDescription, "Command description may not be null");
@@ -475,8 +474,8 @@ public class Command<C> {
          * @since 1.3.0
          */
         @API(status = API.Status.STABLE, since = "1.3.0")
-        public @NonNull CommandPermission commandPermission() {
-            return this.commandPermission;
+        public @NonNull Permission commandPermission() {
+            return this.permission;
         }
 
         /**
@@ -511,7 +510,7 @@ public class Command<C> {
                     this.senderType,
                     this.commandComponents,
                     this.commandExecutionHandler,
-                    this.commandPermission,
+                    this.permission,
                     this.flags,
                     this.commandDescription
             );
@@ -535,7 +534,7 @@ public class Command<C> {
                     this.senderType,
                     this.commandComponents,
                     this.commandExecutionHandler,
-                    this.commandPermission,
+                    this.permission,
                     this.flags,
                     this.commandDescription
             );
@@ -557,7 +556,7 @@ public class Command<C> {
                     this.senderType,
                     this.commandComponents,
                     this.commandExecutionHandler,
-                    this.commandPermission,
+                    this.permission,
                     this.flags,
                     commandDescription
             );
@@ -615,7 +614,7 @@ public class Command<C> {
                     .parser(argument)
                     .description(description);
             if (argument instanceof SuggestionProvider) {
-                builder.suggestionProvider((SuggestionProvider<C>) argument);
+                builder.suggestionProvider((SuggestionProvider<? super C>) argument);
             }
             if (argument instanceof PreprocessorHolder) {
                 builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
@@ -704,7 +703,7 @@ public class Command<C> {
                     .optional()
                     .description(description);
             if (argument instanceof SuggestionProvider) {
-                builder.suggestionProvider((SuggestionProvider<C>) argument);
+                builder.suggestionProvider((SuggestionProvider<? super C>) argument);
             }
             if (argument instanceof PreprocessorHolder) {
                 builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
@@ -729,7 +728,7 @@ public class Command<C> {
                     .key(argument.key())
                     .parser(argument);
             if (argument instanceof SuggestionProvider) {
-                builder.suggestionProvider((SuggestionProvider<C>) argument);
+                builder.suggestionProvider((SuggestionProvider<? super C>) argument);
             }
             if (argument instanceof PreprocessorHolder) {
                 builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
@@ -755,7 +754,7 @@ public class Command<C> {
                     .parser(argument)
                     .optional();
             if (argument instanceof SuggestionProvider) {
-                builder.suggestionProvider((SuggestionProvider<C>) argument);
+                builder.suggestionProvider((SuggestionProvider<? super C>) argument);
             }
             if (argument instanceof PreprocessorHolder) {
                 builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
@@ -775,7 +774,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser
+                final @NonNull ParserDescriptor<? super C, T> parser
         ) {
             return this.argument(CommandComponent.<C, T>builder().name(name).parser(parser).build());
         }
@@ -793,8 +792,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -817,7 +816,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser
+                final @NonNull ParserDescriptor<? super C, T> parser
         ) {
             return this.argument(CommandComponent.<C, T>builder().key(name).parser(parser).build());
         }
@@ -835,8 +834,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -860,7 +859,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description
         ) {
             return this.argument(CommandComponent.<C, T>builder().key(name).parser(parser).description(description).build());
@@ -880,9 +879,9 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -907,7 +906,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description
         ) {
             return this.argument(CommandComponent.<C, T>builder().name(name).parser(parser).description(description).build());
@@ -927,9 +926,9 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -954,7 +953,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser
+                final @NonNull ParserDescriptor<? super C, T> parser
         ) {
             return this.argument(CommandComponent.<C, T>builder().name(name).parser(parser).optional().build());
         }
@@ -972,8 +971,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -997,7 +996,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser
+                final @NonNull ParserDescriptor<? super C, T> parser
         ) {
             return this.argument(CommandComponent.<C, T>builder().key(name).parser(parser).optional().build());
         }
@@ -1015,8 +1014,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1041,7 +1040,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description
         ) {
             return this.argument(
@@ -1068,9 +1067,9 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1096,7 +1095,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description
         ) {
             return this.argument(
@@ -1123,9 +1122,9 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1151,8 +1150,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1177,9 +1176,9 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue,
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1204,8 +1203,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1230,9 +1229,9 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue,
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1258,8 +1257,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue,
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue,
                 final @NonNull Description description
         ) {
             return this.argument(
@@ -1287,10 +1286,10 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue,
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue,
                 final @NonNull Description description,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1317,8 +1316,8 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue,
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue,
                 final @NonNull Description description
         ) {
             return this.argument(
@@ -1346,10 +1345,10 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
-                final @NonNull ParserDescriptor<C, T> parser,
-                final @NonNull DefaultValue<C, T> defaultValue,
+                final @NonNull ParserDescriptor<? super C, T> parser,
+                final @NonNull DefaultValue<? super C, T> defaultValue,
                 final @NonNull Description description,
-                final @NonNull SuggestionProvider<C> suggestions
+                final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
                     CommandComponent.<C, T>builder()
@@ -1425,7 +1424,7 @@ public class Command<C> {
                     this.senderType,
                     commandComponents,
                     this.commandExecutionHandler,
-                    this.commandPermission,
+                    this.permission,
                     this.flags,
                     this.commandDescription
             );
@@ -2077,7 +2076,7 @@ public class Command<C> {
                     this.senderType,
                     this.commandComponents,
                     commandExecutionHandler,
-                    this.commandPermission,
+                    this.permission,
                     this.flags,
                     this.commandDescription
             );
@@ -2135,7 +2134,7 @@ public class Command<C> {
                     senderType,
                     this.commandComponents,
                     this.commandExecutionHandler,
-                    this.commandPermission,
+                    this.permission,
                     this.flags,
                     this.commandDescription
             );
@@ -2147,7 +2146,7 @@ public class Command<C> {
          * @param permission the command permission
          * @return new builder instance using the command permission
          */
-        public @NonNull Builder<C> permission(final @NonNull CommandPermission permission) {
+        public @NonNull Builder<C> permission(final @NonNull Permission permission) {
             return new Builder<>(
                     this.commandManager,
                     this.commandMeta,
@@ -2219,7 +2218,7 @@ public class Command<C> {
                 final CommandComponent<C> componentCopy = component.copy();
                 builder = builder.argument(componentCopy);
             }
-            if (this.commandPermission.toString().isEmpty()) {
+            if (this.permission.permissionString().isEmpty()) {
                 builder = builder.permission(command.commandPermission());
             }
             return builder.handler(command.commandExecutionHandler);
@@ -2251,7 +2250,7 @@ public class Command<C> {
                     this.senderType,
                     this.commandComponents,
                     this.commandExecutionHandler,
-                    this.commandPermission,
+                    this.permission,
                     Collections.unmodifiableList(flags),
                     this.commandDescription
             );
@@ -2291,7 +2290,7 @@ public class Command<C> {
                     Collections.unmodifiableList(commandComponents),
                     this.commandExecutionHandler,
                     this.senderType,
-                    this.commandPermission,
+                    this.permission,
                     this.commandMeta,
                     this.commandDescription
             );

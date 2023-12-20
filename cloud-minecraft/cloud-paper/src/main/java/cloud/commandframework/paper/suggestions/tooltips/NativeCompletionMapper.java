@@ -32,7 +32,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 final class NativeCompletionMapper implements CompletionMapper {
 
     @Override
-    public AsyncTabCompleteEvent.@NonNull Completion map(@NonNull final TooltipSuggestion suggestion) {
+    public AsyncTabCompleteEvent.@NonNull Completion map(final @NonNull TooltipSuggestion suggestion) {
         final Message tooltip = suggestion.tooltip();
         if (tooltip == null) {
             return AsyncTabCompleteEvent.Completion.completion(suggestion.suggestion());

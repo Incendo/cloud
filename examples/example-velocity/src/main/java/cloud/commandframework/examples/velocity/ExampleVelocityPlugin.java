@@ -24,7 +24,6 @@
 package cloud.commandframework.examples.velocity;
 
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.minecraft.extras.AudienceProvider;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.velocity.CloudInjectionModule;
 import cloud.commandframework.velocity.VelocityCommandManager;
@@ -41,7 +40,6 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import java.util.function.Function;
-import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -77,22 +75,21 @@ public final class ExampleVelocityPlugin {
                 Key.get(new TypeLiteral<VelocityCommandManager<CommandSource>>() {
                 })
         );
-        new MinecraftExceptionHandler<CommandSource>()
-                .withDefaultHandlers()
-                .withDecorator(component -> Component.text()
+        MinecraftExceptionHandler.<CommandSource>createNative()
+                .defaultHandlers()
+                .decorator(component -> Component.text()
                         .append(Component.text('['))
                         .append(Component.text("cloud-velocity-example", TextColor.color(0x1CBAE0)))
                         .append(Component.text("] "))
                         .append(component)
                         .build())
-                .apply(commandManager, AudienceProvider.nativeAudience());
+                .registerTo(commandManager);
         commandManager.command(
                 commandManager.commandBuilder("example")
                         .required("player", PlayerParser.playerParser())
                         .handler(context -> {
                                     final Player player = context.get("player");
                                     context.sender().sendMessage(
-                                            Identity.nil(),
                                             Component.text().append(
                                                     Component.text("Selected ", NamedTextColor.GOLD)
                                             ).append(
@@ -108,7 +105,6 @@ public final class ExampleVelocityPlugin {
                         .handler(context -> {
                             final RegisteredServer server = context.get("server");
                             context.sender().sendMessage(
-                                    Identity.nil(),
                                     Component.text().append(
                                             Component.text("Selected ", NamedTextColor.GOLD)
                                     ).append(

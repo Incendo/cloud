@@ -27,13 +27,13 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.bungee.BungeeCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
-import java.util.List;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -46,7 +46,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 2.0.0
  */
-public final class PlayerParser<C> implements ArgumentParser<C, ProxiedPlayer> {
+public final class PlayerParser<C> implements ArgumentParser<C, ProxiedPlayer>, BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new player parser.
@@ -97,7 +97,7 @@ public final class PlayerParser<C> implements ArgumentParser<C, ProxiedPlayer> {
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

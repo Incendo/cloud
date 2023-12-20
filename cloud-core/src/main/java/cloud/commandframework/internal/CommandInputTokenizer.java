@@ -56,6 +56,7 @@ public final class CommandInputTokenizer {
      *
      * @return Linked list containing the tokenized input
      */
+    @SuppressWarnings("NonApiType")
     public @NonNull LinkedList<@NonNull String> tokenize() {
         final StringTokenizer stringTokenizer = this.stringTokenizerFactory.createStringTokenizer();
         final LinkedList<String> tokens = new LinkedList<>();

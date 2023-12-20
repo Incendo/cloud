@@ -67,8 +67,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Parsers for Vanilla command argument types.
@@ -456,7 +456,7 @@ public final class FabricVanillaArgumentParsers {
         }
 
         @Override
-        public @NonNull Entity getSingle() {
+        public @NonNull Entity single() {
             return this.selectedEntity;
         }
     }
@@ -488,7 +488,7 @@ public final class FabricVanillaArgumentParsers {
         }
 
         @Override
-        public @NonNull Collection<Entity> get() {
+        public @NonNull Collection<Entity> values() {
             return this.selectedEntities;
         }
     }
@@ -520,7 +520,7 @@ public final class FabricVanillaArgumentParsers {
         }
 
         @Override
-        public @NonNull ServerPlayer getSingle() {
+        public @NonNull ServerPlayer single() {
             return this.selectedPlayer;
         }
     }
@@ -552,12 +552,12 @@ public final class FabricVanillaArgumentParsers {
         }
 
         @Override
-        public @NonNull Collection<ServerPlayer> get() {
+        public @NonNull Collection<ServerPlayer> values() {
             return this.selectedPlayers;
         }
     }
 
-    @ApiStatus.Internal
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public static final class ContextualArgumentTypeProvider<V> implements Supplier<ArgumentType<V>> {
 
         private static final ThreadLocal<ThreadLocalContext> CONTEXT = new ThreadLocal<>();

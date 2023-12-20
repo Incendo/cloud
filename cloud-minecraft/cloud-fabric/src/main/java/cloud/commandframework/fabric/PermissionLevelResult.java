@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.fabric;
 
-import cloud.commandframework.permission.CommandPermission;
+import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PermissionResult;
 import cloud.commandframework.permission.SimplePermissionResult;
 import org.apiguardian.api.API;
@@ -45,7 +45,7 @@ public class PermissionLevelResult extends SimplePermissionResult {
      * @param permission the permission that this result came from
      * @param requiredPermissionLevel the minecraft permission level that was required for the permission check to pass
      */
-    public PermissionLevelResult(final boolean result, @NonNull final CommandPermission permission, final int requiredPermissionLevel) {
+    public PermissionLevelResult(final boolean result, final @NonNull Permission permission, final int requiredPermissionLevel) {
         super(result, permission);
         this.requiredPermissionLevel = requiredPermissionLevel;
     }

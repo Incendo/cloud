@@ -25,14 +25,14 @@ package cloud.commandframework.brigadier.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.Suggestion;
-import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,6 +43,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import static cloud.commandframework.brigadier.suggestion.TooltipSuggestion.tooltipSuggestion;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -52,7 +53,7 @@ import static java.util.Objects.requireNonNull;
  * @param <T> the value type of the argument
  * @since 1.5.0
  */
-public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> {
+public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, SuggestionProvider<C> {
 
     public static final String COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER = "_cloud_brigadier_native_sender";
 
@@ -113,7 +114,7 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> {
      *
      * @param nativeType            the native command type provider, calculated lazily
      * @param expectedArgumentCount the number of arguments the brigadier type is expected to consume
-     * @param parse special function to replace {@link ArgumentType#parse(StringReader)} (for CraftBukkit weirdness)
+     * @param parse                 special function to replace {@link ArgumentType#parse(StringReader)} (for CraftBukkit weirdness)
      * @since 1.8.0
      */
     @API(status = API.Status.STABLE, since = "1.8.0")
@@ -160,7 +161,7 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> {
     }
 
     @Override
-    public final @NonNull List<@NonNull String> stringSuggestions(
+    public final @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
@@ -182,23 +183,19 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> {
                 false
         );
 
-        final CompletableFuture<Suggestions> result = this.nativeType.get().listSuggestions(
+        return this.nativeType.get().listSuggestions(
                 reverseMappedContext,
                 new SuggestionsBuilder(input, 0)
-        );
-
-        /* again, avert your eyes */
-        final List<Suggestion> suggestions = result.join().getList();
-        final List<String> out = new ArrayList<>(suggestions.size());
-        for (final Suggestion suggestion : suggestions) {
-            out.add(suggestion.getText());
-        }
-        return out;
-    }
-
-    @Override
-    public final boolean isContextFree() {
-        return true;
+        ).thenApply(suggestions -> {
+            final List<cloud.commandframework.arguments.suggestion.Suggestion> cloud = new ArrayList<>();
+            for (final com.mojang.brigadier.suggestion.Suggestion suggestion : suggestions.getList()) {
+                cloud.add(tooltipSuggestion(
+                        suggestion.getText(),
+                        suggestion.getTooltip()
+                ));
+            }
+            return cloud;
+        });
     }
 
     @Override
@@ -215,10 +212,11 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> {
     @API(status = API.Status.STABLE, since = "1.8.0")
     @FunctionalInterface
     public interface ParseFunction<T> {
+
         /**
          * Apply the parse function.
          *
-         * @param type argument type
+         * @param type   argument type
          * @param reader string reader
          * @return result
          * @throws CommandSyntaxException on failure

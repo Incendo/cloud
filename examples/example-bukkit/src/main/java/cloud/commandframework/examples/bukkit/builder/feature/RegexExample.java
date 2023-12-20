@@ -31,6 +31,7 @@ import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.builder.BuilderFeature;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static net.kyori.adventure.text.Component.text;
@@ -55,6 +56,7 @@ public final class RegexExample implements BuilderFeature {
 
         manager.command(
                 manager.commandBuilder("builder")
+                        .senderType(ConsoleCommandSender.class)
                         .literal("pay")
                         .required(
                                 manager.componentBuilder(String.class, "money")

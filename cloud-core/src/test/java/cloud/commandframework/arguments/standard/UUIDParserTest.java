@@ -34,8 +34,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static cloud.commandframework.truth.ArgumentParseResultSubject.assertThat;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class UUIDParserTest {
@@ -63,9 +63,7 @@ class UUIDParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(inputUUID);
-
+        assertThat(result).hasParsedValue(inputUUID);
         assertThat(commandInput.isEmpty()).isTrue();
     }
 
@@ -81,10 +79,9 @@ class UUIDParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new UUIDParser.UUIDParseException(
+        assertThat(result).hasFailure(new UUIDParser.UUIDParseException(
                 "non-uuid",
                 this.context
         ));
-        assertThat(result.getParsedValue()).isEmpty();
     }
 }

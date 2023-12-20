@@ -166,7 +166,7 @@ public class StandardCaptionRegistry<C> implements CaptionRegistry<C> {
     }
 
     @Override
-    public final @NonNull @This StandardCaptionRegistry<C> registerProvider(
+    public final @This @NonNull StandardCaptionRegistry<C> registerProvider(
             final @NonNull CaptionProvider<C> provider
     ) {
         this.providers.addFirst(provider);

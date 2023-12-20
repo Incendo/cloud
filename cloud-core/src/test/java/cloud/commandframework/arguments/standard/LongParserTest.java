@@ -36,8 +36,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static cloud.commandframework.truth.ArgumentParseResultSubject.assertThat;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class LongParserTest {
@@ -63,9 +63,7 @@ class LongParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(longInput);
-
+        assertThat(result).hasParsedValue(longInput);
         assertThat(commandInput.isEmpty()).isTrue();
     }
 
@@ -84,12 +82,11 @@ class LongParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new LongParser.LongParseException(
+        assertThat(result).hasFailure(new LongParser.LongParseException(
                 "4",
                 parser,
                 this.context
         ));
-        assertThat(result.getParsedValue()).isEmpty();
     }
 
     @Test
@@ -107,12 +104,11 @@ class LongParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new LongParser.LongParseException(
+        assertThat(result).hasFailure(new LongParser.LongParseException(
                 "6",
                 parser,
                 this.context
         ));
-        assertThat(result.getParsedValue()).isEmpty();
     }
 
     @Test
@@ -130,12 +126,11 @@ class LongParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new LongParser.LongParseException(
+        assertThat(result).hasFailure(new LongParser.LongParseException(
                 "cow",
                 parser,
                 this.context
         ));
-        assertThat(result.getParsedValue()).isEmpty();
     }
 
     @Test
@@ -152,7 +147,7 @@ class LongParserTest {
         }
 
         // Act
-        final List<Suggestion> suggestions = parser.suggestions(
+        final Iterable<Suggestion> suggestions = parser.suggestions(
                 this.context,
                 ""
         );
@@ -175,7 +170,7 @@ class LongParserTest {
         }
 
         // Act
-        final List<Suggestion> suggestions = parser.suggestions(
+        final Iterable<Suggestion> suggestions = parser.suggestions(
                 this.context,
                 "-"
         );

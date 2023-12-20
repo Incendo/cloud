@@ -28,7 +28,6 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,8 +35,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static cloud.commandframework.truth.ArgumentParseResultSubject.assertThat;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class EnumParserTest {
@@ -61,8 +60,7 @@ class EnumParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(value);
+        assertThat(result).hasParsedValue(value);
         assertThat(commandInput.isEmpty()).isTrue();
     }
 
@@ -80,12 +78,11 @@ class EnumParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new EnumParser.EnumParseException(
+        assertThat(result).hasFailure(new EnumParser.EnumParseException(
                 "not-an-enum-value",
                 TestEnum.class,
                 this.context
         ));
-        assertThat(result.getParsedValue()).isEmpty();
     }
 
     @Test
@@ -96,7 +93,7 @@ class EnumParserTest {
         );
 
         // Act
-        final List<Suggestion> suggestions = parser.suggestions(
+        final Iterable<Suggestion> suggestions = parser.suggestions(
                 this.context,
                 ""
         );

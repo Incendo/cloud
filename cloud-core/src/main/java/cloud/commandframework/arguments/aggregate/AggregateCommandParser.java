@@ -27,6 +27,7 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.keys.CloudKey;
@@ -56,7 +57,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgumentParser<C, O>, ParserDescriptor<C, O> {
+public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgumentParser<C, O>, ParserDescriptor<C, O>,
+        SuggestionProvider<C> {
 
     /**
      * Returns a new aggregate command parser builder. The builder is immutable, and each method returns
@@ -107,8 +109,7 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
     }
 
     @Override
-    @NonNull
-    default CompletableFuture<@NonNull List<@NonNull Suggestion>> suggestionsFuture(
+    default @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {

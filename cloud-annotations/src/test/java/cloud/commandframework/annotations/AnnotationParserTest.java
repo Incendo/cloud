@@ -47,7 +47,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
@@ -62,7 +61,8 @@ import static com.google.common.truth.Truth.assertThat;
 class AnnotationParserTest {
 
     private static final List<Suggestion> NAMED_SUGGESTIONS = Arrays.asList("Dancing-Queen", "Gimme!-Gimme!-Gimme!",
-            "Waterloo").stream().map(Suggestion::simple).collect(Collectors.toList());
+            "Waterloo"
+    ).stream().map(Suggestion::simple).collect(Collectors.toList());
 
     private CommandManager<TestCommandSender> manager;
     private AnnotationParser<TestCommandSender> annotationParser;
@@ -76,7 +76,7 @@ class AnnotationParserTest {
         /* Register a suggestion provider */
         manager.parserRegistry().registerSuggestionProvider(
                 "some-name",
-                (context, input) -> NAMED_SUGGESTIONS
+                SuggestionProvider.suggesting(NAMED_SUGGESTIONS)
         );
         /* Register a parameter injector */
         annotationParser.getParameterInjectorRegistry().registerInjector(
@@ -159,9 +159,10 @@ class AnnotationParserTest {
     void testAnnotatedSuggestionProviders() {
         final SuggestionProvider<TestCommandSender> suggestionProvider =
                 this.manager.parserRegistry().getSuggestionProvider("cows").orElse(null);
-        Assertions.assertNotNull(suggestionProvider);
-        Assertions.assertTrue(suggestionProvider.suggestions(new CommandContext<>(new TestCommandSender(), manager), "")
-                .contains(Suggestion.simple("Stella")));
+
+        assertThat(suggestionProvider).isNotNull();
+        assertThat(suggestionProvider.suggestionsFuture(new CommandContext<>(new TestCommandSender(), manager), "").join())
+                .contains(Suggestion.simple("Stella"));
     }
 
     @Test
@@ -174,14 +175,9 @@ class AnnotationParserTest {
                 new TestCommandSender(),
                 this.manager
         );
-        Assertions.assertEquals("yay", parser.parse(
-                context,
-                CommandInput.empty()
-        ).getParsedValue().orElse(new CustomType("")).toString());
-        Assertions.assertTrue(parser.suggestions(
-                context,
-                ""
-        ).contains(Suggestion.simple("Stella")));
+        assertThat(parser.parse(context, CommandInput.empty()).getParsedValue().orElse(new CustomType("")).toString())
+                .isEqualTo("yay");
+        assertThat(parser.suggestionProvider().suggestionsFuture(context, "").join()).contains(Suggestion.simple("Stella"));
     }
 
     @Test

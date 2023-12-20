@@ -47,6 +47,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
+import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.CommandMetaBuilder;
 import cloud.commandframework.types.tuples.Pair;
@@ -98,6 +99,7 @@ public final class AnnotationParser<C> {
     private final Map<Class<? extends Annotation>, AnnotationMapper<?>> annotationMappers;
     private final Map<Class<? extends Annotation>, PreprocessorMapper<?, C>> preprocessorMappers;
     private final Map<Class<? extends Annotation>, BuilderModifier<?, C>> builderModifiers;
+    private final List<BuilderDecorator<C>> builderDecorators;
     private final Map<Predicate<Method>, CommandMethodExecutionHandlerFactory<C>> commandMethodFactories;
     private final TypeToken<C> commandSenderType;
     private final MetaFactory metaFactory;
@@ -190,6 +192,7 @@ public final class AnnotationParser<C> {
         this.commandExtractor = new CommandExtractorImpl(this);
         this.suggestionProviderFactory = SuggestionProviderFactory.defaultFactory();
         this.exceptionHandlerFactory = ExceptionHandlerFactory.defaultFactory();
+        this.builderDecorators = new ArrayList<>();
         this.registerBuilderModifier(
                 CommandDescription.class,
                 (description, builder) -> builder.commandDescription(commandDescription(this.mapDescription(description.value())))
@@ -202,7 +205,7 @@ public final class AnnotationParser<C> {
                 String[].class,
                 (context, annotations) -> annotations.annotation(RawArgs.class) == null
                         ? null
-                        : context.rawInput().tokenize().toArray(new String[0])
+                        : new CommandInputTokenizer(context.rawInput().remainingInput()).tokenize().toArray(new String[0])
         );
         this.stringProcessor = StringProcessor.noOp();
     }
@@ -305,6 +308,20 @@ public final class AnnotationParser<C> {
             final @NonNull BuilderModifier<A, C> builderModifier
     ) {
         this.builderModifiers.put(annotation, builderModifier);
+    }
+
+    /**
+     * Registers the given {@code decorator}.
+     * <p>
+     * The decorators are allowed to modify the command builders to set up default values.
+     * All other steps of the command construction process take priority over the decorators.
+     *
+     * @param decorator the decorator
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void registerBuilderDecorator(final @NonNull BuilderDecorator<C> decorator) {
+        this.builderDecorators.add(decorator);
     }
 
     /**
@@ -780,7 +797,7 @@ public final class AnnotationParser<C> {
                 final String suggestions = this.processString(parser.suggestions());
                 final SuggestionProvider<C> suggestionProvider;
                 if (suggestions.isEmpty()) {
-                    suggestionProvider = (context, input) -> Collections.emptyList();
+                    suggestionProvider = SuggestionProvider.noSuggestions();
                 } else {
                     suggestionProvider = this.manager.parserRegistry().getSuggestionProvider(suggestions)
                             .orElseThrow(() -> new NullPointerException(
@@ -844,7 +861,14 @@ public final class AnnotationParser<C> {
                 commandDescriptor.syntax().get(0).getMinor(),
                 metaBuilder.build()
         );
-        final Collection<ArgumentDescriptor> arguments = this.argumentExtractor.extractArguments(commandDescriptor.syntax(), method);
+        for (final BuilderDecorator<C> decorator : this.builderDecorators) {
+            builder = decorator.decorate(builder);
+        }
+
+        final Collection<ArgumentDescriptor> arguments = this.argumentExtractor.extractArguments(
+                commandDescriptor.syntax(),
+                method
+        );
         final Collection<FlagDescriptor> flagDescriptors = this.flagExtractor.extractFlags(method);
         final Collection<CommandFlag<?>> flags = flagDescriptors.stream()
                 .map(this.flagAssembler()::assembleFlag)
@@ -933,8 +957,7 @@ public final class AnnotationParser<C> {
         /* Apply builder modifiers */
         for (final Annotation annotation
                 : AnnotationAccessor.of(classAnnotations, AnnotationAccessor.of(method)).annotations()) {
-            @SuppressWarnings("rawtypes")
-            final BuilderModifier builderModifier = this.builderModifiers.get(
+            @SuppressWarnings("rawtypes") final BuilderModifier builderModifier = this.builderModifiers.get(
                     annotation.annotationType()
             );
             if (builderModifier == null) {

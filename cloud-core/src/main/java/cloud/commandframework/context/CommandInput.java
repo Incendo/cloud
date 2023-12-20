@@ -23,22 +23,20 @@
 //
 package cloud.commandframework.context;
 
-import cloud.commandframework.internal.CommandInputTokenizer;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
-import java.util.Queue;
+import java.util.StringTokenizer;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 
-@API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
-public interface CommandInput extends Cloneable {
+@API(status = API.Status.EXPERIMENTAL, since = "2.0.0")
+public interface CommandInput {
 
     List<String> BOOLEAN_STRICT = Collections.unmodifiableList(Arrays.asList("TRUE", "FALSE"));
     List<String> BOOLEAN_LIBERAL = Collections.unmodifiableList(Arrays.asList("TRUE", "YES", "ON", "FALSE", "NO", "OFF"));
@@ -82,8 +80,8 @@ public interface CommandInput extends Cloneable {
 
     /**
      * Returns the cursor position.
-     * <p>
-     * This must always be non-negative, and less than {@link #length()}.
+     *
+     * <p>This must always be non-negative, and less than {@link #length()}.</p>
      *
      * @return the cursor position
      */
@@ -91,8 +89,8 @@ public interface CommandInput extends Cloneable {
 
     /**
      * Returns the length of the input string.
-     * <p>
-     * This should always be equal to the length of {@link #input()}.
+     *
+     * <p>This should always be equal to the length of {@link #input()}.</p>
      *
      * @return the length of the input string
      */
@@ -115,7 +113,12 @@ public interface CommandInput extends Cloneable {
      * @return the number of remaining tokens
      */
     default @SideEffectFree @NonNegative int remainingTokens() {
-        return this.tokenize().size();
+        final int count = new StringTokenizer(this.remainingInput(), " ").countTokens();
+        // Mirrors the behavior of the old CommandInputTokenizer.
+        if (this.remainingInput().endsWith(" ")) {
+            return count + 1;
+        }
+        return count;
     }
 
     /**
@@ -138,7 +141,9 @@ public interface CommandInput extends Cloneable {
 
     /**
      * Suffixes the {@link #input() input} with the given {@code string} and return a new command input containing the updated
-     * string. This does not modify {@code this} instance.
+     * string.
+     *
+     * <p>This does not modify {@code this} instance.</p>
      *
      * @param string the string
      * @return the command input with the appended string
@@ -375,7 +380,6 @@ public interface CommandInput extends Cloneable {
         }
     }
 
-
     /**
      * Skips any whitespace characters at the head of the input.
      */
@@ -599,17 +603,23 @@ public interface CommandInput extends Cloneable {
     }
 
     /**
-     * Returns a {@link Queue} that wraps this instance.
-     * <p>
-     * Modifying the queue will also modify this instance.
+     * Returns the last remaining token.
      *
-     * @return the wrapping queue
+     * <p>If the string ends with a blank space, then an empty string is returned.</p>.
+     *
+     * @return the last remaining token, or an empty string if none remains
      */
-    default @NonNull LinkedList<@NonNull String> tokenize() {
-        if (this.isEmpty()) {
-            return new LinkedList<>();
+    default @NonNull String lastRemainingToken() {
+        final String remainingInput = this.remainingInput();
+        if (remainingInput.isEmpty() || remainingInput.endsWith(" ")) {
+            return "";
         }
-        return new CommandInputTokenizer(this.remainingInput()).tokenize();
+
+        final int lastSpace = remainingInput.lastIndexOf(' ');
+        if (lastSpace == -1) {
+            return remainingInput;
+        }
+        return remainingInput.substring(lastSpace + 1);
     }
 
     /**
@@ -638,8 +648,8 @@ public interface CommandInput extends Cloneable {
         }
     }
 
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @SuppressWarnings("serial")
-    @API(status = API.Status.STABLE, since = "1.7.0")
     class CursorOutOfBoundsException extends NoSuchElementException {
 
         CursorOutOfBoundsException(

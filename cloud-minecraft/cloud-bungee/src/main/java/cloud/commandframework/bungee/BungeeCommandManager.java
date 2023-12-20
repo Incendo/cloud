@@ -28,17 +28,32 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.bungee.arguments.PlayerParser;
 import cloud.commandframework.bungee.arguments.ServerParser;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
+import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
+import cloud.commandframework.exceptions.InvalidCommandSenderException;
+import cloud.commandframework.exceptions.InvalidSyntaxException;
+import cloud.commandframework.exceptions.NoPermissionException;
+import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.Function;
+import java.util.logging.Level;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class BungeeCommandManager<C> extends CommandManager<C> {
+
+    private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
+    private static final String MESSAGE_NO_PERMS =
+            "I'm sorry, but you do not have permission to perform this command. "
+                    + "Please contact the server administrators if you believe that this is in error.";
+    private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
     /**
      * Default caption for {@link BungeeCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
@@ -102,6 +117,8 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
                     (context, key) -> ARGUMENT_PARSE_FAILURE_SERVER
             );
         }
+
+        this.registerDefaultExceptionHandlers();
     }
 
     @Override
@@ -126,5 +143,42 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
      */
     public @NonNull Plugin getOwningPlugin() {
         return this.owningPlugin;
+    }
+
+    private void registerDefaultExceptionHandlers() {
+        this.exceptionController().registerHandler(Throwable.class, context -> {
+            this.backwardsCommandSenderMapper.apply(context.context().sender())
+                    .sendMessage(new ComponentBuilder(MESSAGE_INTERNAL_ERROR).color(ChatColor.RED).create());
+            this.owningPlugin.getLogger().log(
+                    Level.SEVERE,
+                    "An unhandled exception was thrown during command execution",
+                    context.exception());
+        }).registerHandler(CommandExecutionException.class, context -> {
+            this.backwardsCommandSenderMapper.apply(context.context().sender())
+                    .sendMessage(new ComponentBuilder(MESSAGE_INTERNAL_ERROR)
+                    .color(ChatColor.RED)
+                    .create());
+            this.owningPlugin.getLogger().log(
+                    Level.SEVERE,
+                    "Exception executing command handler",
+                    context.exception().getCause()
+            );
+        }).registerHandler(ArgumentParseException.class, context -> this.backwardsCommandSenderMapper.apply(
+                context.context().sender()).sendMessage(new ComponentBuilder("Invalid Command Argument: ")
+                .color(ChatColor.GRAY).append(context.exception().getCause().getMessage()).create())
+        ).registerHandler(NoSuchCommandException.class, context -> this.backwardsCommandSenderMapper.apply(
+                context.context().sender()).sendMessage(new ComponentBuilder(MESSAGE_UNKNOWN_COMMAND)
+                .color(ChatColor.WHITE).create())
+        ).registerHandler(NoPermissionException.class, context -> this.backwardsCommandSenderMapper.apply(
+                context.context().sender()).sendMessage(new ComponentBuilder(MESSAGE_NO_PERMS)
+                .color(ChatColor.WHITE).create())
+        ).registerHandler(InvalidCommandSenderException.class, context -> this.backwardsCommandSenderMapper.apply(
+                context.context().sender()).sendMessage(new ComponentBuilder(context.exception().getMessage())
+                .color(ChatColor.RED).create())
+        ).registerHandler(InvalidSyntaxException.class, context -> this.backwardsCommandSenderMapper.apply(
+                context.context().sender()).sendMessage(new ComponentBuilder(
+                        "Invalid Command Syntax. Correct command syntax is: ").color(ChatColor.RED).append("/")
+                        .color(ChatColor.GRAY).append(context.exception().getCorrectSyntax()).color(ChatColor.GRAY).create()
+        ));
     }
 }

@@ -27,7 +27,6 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.Description;
 import cloud.commandframework.TypedCommandComponent;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
 import java.util.Arrays;
 import java.util.Collection;
@@ -52,7 +51,7 @@ public final class CommandFlag<T> {
     private final @NonNull String name;
     private final @NonNull String @NonNull [] aliases;
     private final @NonNull Description description;
-    private final @NonNull CommandPermission permission;
+    private final @NonNull Permission permission;
     private final @NonNull FlagMode mode;
 
     private final @Nullable TypedCommandComponent<?, T> commandComponent;
@@ -61,7 +60,7 @@ public final class CommandFlag<T> {
             final @NonNull String name,
             final @NonNull String @NonNull [] aliases,
             final @NonNull Description description,
-            final @NonNull CommandPermission permission,
+            final @NonNull Permission permission,
             final @Nullable TypedCommandComponent<?, T> commandComponent,
             final @NonNull FlagMode mode
     ) {
@@ -142,7 +141,7 @@ public final class CommandFlag<T> {
      * @since 1.6.0
      */
     @API(status = API.Status.STABLE, since = "1.6.0")
-    public CommandPermission permission() {
+    public Permission permission() {
         return this.permission;
     }
 
@@ -175,7 +174,7 @@ public final class CommandFlag<T> {
         private final String name;
         private final String[] aliases;
         private final Description description;
-        private final CommandPermission permission;
+        private final Permission permission;
         private final TypedCommandComponent<?, T> commandComponent;
         private final FlagMode mode;
 
@@ -183,7 +182,7 @@ public final class CommandFlag<T> {
                 final @NonNull String name,
                 final @NonNull String[] aliases,
                 final @NonNull Description description,
-                final @NonNull CommandPermission permission,
+                final @NonNull Permission permission,
                 final @Nullable TypedCommandComponent<?, T> commandComponent,
                 final @NonNull FlagMode mode
         ) {
@@ -307,7 +306,7 @@ public final class CommandFlag<T> {
          * @since 1.6.0
          */
         @API(status = API.Status.STABLE, since = "1.6.0")
-        public @NonNull Builder<T> withPermission(final @NonNull CommandPermission permission) {
+        public @NonNull Builder<T> withPermission(final @NonNull Permission permission) {
             return new Builder<>(this.name, this.aliases, this.description, permission, this.commandComponent, this.mode);
         }
 

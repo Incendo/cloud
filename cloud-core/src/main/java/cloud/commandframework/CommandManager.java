@@ -59,32 +59,34 @@ import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.permission.AndPermission;
-import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PermissionResult;
 import cloud.commandframework.permission.PredicatePermission;
 import cloud.commandframework.services.ServicePipeline;
 import cloud.commandframework.services.State;
+import cloud.commandframework.setting.Configurable;
+import cloud.commandframework.setting.ManagerSetting;
+import cloud.commandframework.state.RegistrationState;
+import cloud.commandframework.state.Stateful;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
@@ -92,13 +94,14 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  *
  * @param <C> the command sender type used to execute commands
  */
+@SuppressWarnings({"unchecked", "rawtypes", "unused"})
 @API(status = API.Status.STABLE)
-public abstract class CommandManager<C> {
+public abstract class CommandManager<C> implements Stateful<RegistrationState> {
 
     private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = new HashMap<>();
-    private final EnumSet<ManagerSettings> managerSettings = EnumSet.of(
-            ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS);
 
+    private final Configurable<ManagerSetting> settings = Configurable.enumConfigurable(ManagerSetting.class)
+            .set(ManagerSetting.ENFORCE_INTERMEDIARY_PERMISSIONS, true);
     private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>(this);
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private final ParserRegistry<C> parserRegistry = new StandardParserRegistry<>();
@@ -167,7 +170,9 @@ public abstract class CommandManager<C> {
      * execution stages, the future will complete with {@code null}.
      * <p>
      * The future may also complete exceptionally.
-     * These exceptions may be handled using exception handlers registered in the {@link #exceptionController()}.
+     * These exceptions will be handled using exception handlers registered in the {@link #exceptionController()}.
+     * The exceptions will be forwarded to the future, if the exception was transformed during the exception handling, then the
+     * new exception will be present in the completed future.
      *
      * @param commandSender Sender of the command
      * @param input         Input provided by the sender. Prefixes should be removed before the method is being called, and
@@ -179,11 +184,61 @@ public abstract class CommandManager<C> {
             final @NonNull C commandSender,
             final @NonNull String input
     ) {
+        return this.executeCommand(commandSender, input, context -> {});
+    }
+
+    /**
+     * Executes a command and get a future that completes with the result. The command may be executed immediately
+     * or at some point in the future, depending on the {@link CommandExecutionCoordinator} used in the command manager.
+     * <p>
+     * The command may also be filtered out by preprocessors (see {@link CommandPreprocessor}) before they are parsed,
+     * or by the {@link CommandComponent} command components during parsing. The execution may also be filtered out
+     * after parsing by a {@link CommandPostprocessor}. In the case that a command was filtered out at any of the
+     * execution stages, the future will complete with {@code null}.
+     * <p>
+     * The future may also complete exceptionally.
+     * These exceptions will be handled using exception handlers registered in the {@link #exceptionController()}.
+     * The exceptions will be forwarded to the future, if the exception was transformed during the exception handling, then the
+     * new exception will be present in the completed future.
+     *
+     * @param commandSender   the sender of the command
+     * @param input           the input provided by the sender. Prefixes should be removed before the method is being called, and
+     *                        the input here will be passed directly to the command parsing pipeline, after having been tokenized.
+     * @param contextConsumer consumer that accepts the context before the command is executed
+     * @return future that completes with the command result, or {@code null} if the execution was cancelled at any of the
+     *         processing stages.
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CompletableFuture<CommandResult<C>> executeCommand(
+            final @NonNull C commandSender,
+            final @NonNull String input,
+            final @NonNull Consumer<CommandContext<C>> contextConsumer
+    ) {
         final CommandContext<C> context = this.commandContextFactory.create(
                 false,
                 commandSender
         );
+        contextConsumer.accept(context);
         final CommandInput commandInput = CommandInput.of(input);
+        return this.executeCommand(context, commandInput).whenComplete((result, throwable) -> {
+            if (throwable == null) {
+                return;
+            }
+            try {
+                this.exceptionController.handleException(context, ExceptionController.unwrapCompletionException(throwable));
+            } catch (final RuntimeException runtimeException) {
+                throw runtimeException;
+            } catch (final Throwable e) {
+                throw new CompletionException(e);
+            }
+        });
+    }
+
+    private @NonNull CompletableFuture<CommandResult<C>> executeCommand(
+            final @NonNull CommandContext<C> context,
+            final @NonNull CommandInput commandInput
+    ) {
         /* Store a copy of the input queue in the context */
         context.store("__raw_input__", commandInput.copy());
         try {
@@ -231,7 +286,7 @@ public abstract class CommandManager<C> {
      *         return {@code this}.
      */
     @SuppressWarnings("unchecked")
-    public @NonNull @This CommandManager<C> command(final @NonNull Command<? extends C> command) {
+    public @This @NonNull CommandManager<C> command(final @NonNull Command<? extends C> command) {
         if (!(this.transitionIfPossible(RegistrationState.BEFORE_REGISTRATION, RegistrationState.REGISTERING)
                 || this.isCommandRegistrationAllowed())) {
             throw new IllegalStateException("Unable to register commands because the manager is no longer in a registration "
@@ -257,7 +312,7 @@ public abstract class CommandManager<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull @This CommandManager<C> command(final @NonNull CommandFactory<C> commandFactory) {
+    public @This @NonNull CommandManager<C> command(final @NonNull CommandFactory<C> commandFactory) {
         commandFactory.createCommands(this).forEach(this::command);
         return this;
     }
@@ -405,33 +460,28 @@ public abstract class CommandManager<C> {
     @SuppressWarnings("unchecked")
     public boolean hasPermission(
             final @NonNull C sender,
-            final @NonNull CommandPermission permission
+            final @NonNull Permission permission
     ) {
         if (permission.isEmpty()) {
             return true;
-        } else if (permission instanceof Permission) {
-            return this.hasPermission(sender, permission.toString());
         } else if (permission instanceof PredicatePermission) {
             return ((PredicatePermission<C>) permission).hasPermission(sender);
-        }
-
-        if (permission instanceof OrPermission) {
-            for (final CommandPermission innerPermission : permission.getPermissions()) {
+        } else if (permission instanceof OrPermission) {
+            for (final Permission innerPermission : permission.permissions()) {
                 if (this.hasPermission(sender, innerPermission)) {
                     return true; // short circuit the first true result
                 }
             }
             return false; // none returned true
         } else if (permission instanceof AndPermission) {
-            for (final CommandPermission innerPermission : permission.getPermissions()) {
+            for (final Permission innerPermission : permission.permissions()) {
                 if (!this.hasPermission(sender, innerPermission)) {
                     return false; // short circuit the first false result
                 }
             }
             return true; // all returned true
         }
-
-        throw new IllegalArgumentException("Unknown permission type " + permission.getClass());
+        return this.hasPermission(sender, permission.permissionString());
     }
 
     /**
@@ -447,18 +497,14 @@ public abstract class CommandManager<C> {
     @SuppressWarnings("unchecked")
     public @NonNull PermissionResult testPermission(
             final @NonNull C sender,
-            final @NonNull CommandPermission permission
+            final @NonNull Permission permission
     ) {
         if (permission.isEmpty()) {
             return PermissionResult.succeeded(permission);
-        } else if (permission instanceof Permission) {
-            return PermissionResult.of(this.hasPermission(sender, permission.toString()), permission);
         } else if (permission instanceof PredicatePermission) {
             return ((PredicatePermission<C>) permission).testPermission(sender);
-        }
-
-        if (permission instanceof OrPermission) {
-            for (final CommandPermission innerPermission : permission.getPermissions()) {
+        } else if (permission instanceof OrPermission) {
+            for (final Permission innerPermission : permission.permissions()) {
                 final PermissionResult result = this.testPermission(sender, innerPermission);
                 if (result.succeeded()) {
                     return result; // short circuit the first true result
@@ -466,7 +512,7 @@ public abstract class CommandManager<C> {
             }
             return PermissionResult.failed(permission); // none returned true
         } else if (permission instanceof AndPermission) {
-            for (final CommandPermission innerPermission : permission.getPermissions()) {
+            for (final Permission innerPermission : permission.permissions()) {
                 final PermissionResult result = this.testPermission(sender, innerPermission);
                 if (!result.succeeded()) {
                     return result; // short circuit the first false result
@@ -475,7 +521,7 @@ public abstract class CommandManager<C> {
             return PermissionResult.succeeded(permission); // all returned true
         }
 
-        throw new IllegalArgumentException("Unknown permission type " + permission.getClass());
+        return PermissionResult.of(this.hasPermission(sender, permission.permissionString()), permission);
     }
 
     /**
@@ -570,7 +616,6 @@ public abstract class CommandManager<C> {
      * @return Root command names.
      * @since 1.7.0
      */
-    @SuppressWarnings("unchecked")
     @API(status = API.Status.STABLE, since = "1.7.0")
     public @NonNull Collection<@NonNull String> rootCommands() {
         return this.commandTree.rootNodes()
@@ -959,24 +1004,6 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get the exception handler for an exception type, if one has been registered
-     *
-     * @param clazz Exception class
-     * @param <E>   Exception type
-     * @return Exception handler, or {@code null}
-     * @see #registerCommandPreProcessor(CommandPreprocessor) Registering an exception handler
-     */
-    @SuppressWarnings("unchecked")
-    public final <E extends Exception> @Nullable BiConsumer<@NonNull C, @NonNull E>
-    getExceptionHandler(final @NonNull Class<E> clazz) {
-        final BiConsumer<C, ? extends Exception> consumer = this.exceptionHandlers.get(clazz);
-        if (consumer == null) {
-            return null;
-        }
-        return (BiConsumer<C, E>) consumer;
-    }
-
-    /**
      * Returns the exception controller.
      * <p>
      * The exception controller is responsible for exception handler registration.
@@ -987,42 +1014,6 @@ public abstract class CommandManager<C> {
     @API(status = API.Status.STABLE, since = "2.0.0")
     public final @NonNull ExceptionController<C> exceptionController() {
         return this.exceptionController;
-    }
-
-    /**
-     * Register an exception handler for an exception type. This will then be used
-     * when {@link #handleException(Object, Class, Exception, BiConsumer)} is called
-     * for the particular exception type
-     *
-     * @param clazz   Exception class
-     * @param handler Exception handler
-     * @param <E>     Exception type
-     */
-    public final <E extends Exception> void registerExceptionHandler(
-            final @NonNull Class<E> clazz,
-            final @NonNull BiConsumer<@NonNull C, @NonNull E> handler
-    ) {
-        this.exceptionHandlers.put(clazz, handler);
-    }
-
-    /**
-     * Handle an exception using the registered exception handler for the exception type, or using the
-     * provided default handler if no exception handler has been registered for the exception type
-     *
-     * @param sender         Executing command sender
-     * @param clazz          Exception class
-     * @param exception      Exception instance
-     * @param defaultHandler Default exception handler. Will be called if there is no exception
-     *                       handler stored for the exception type
-     * @param <E>            Exception type
-     */
-    public final <E extends Exception> void handleException(
-            final @NonNull C sender,
-            final @NonNull Class<E> clazz,
-            final @NonNull E exception,
-            final @NonNull BiConsumer<C, E> defaultHandler
-    ) {
-        Optional.ofNullable(this.getExceptionHandler(clazz)).orElse(defaultHandler).accept(sender, exception);
     }
 
     /**
@@ -1095,34 +1086,14 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get a command manager setting
+     * Returns a {@link Configurable} instance that can be used to modify the settings for this command manager instance.
      *
-     * @param setting Setting
-     * @return {@code true} if the setting is activated or {@code false} if it's not
-     * @see #setSetting(ManagerSettings, boolean) Update a manager setting
+     * @return settings instance
+     * @since 2.0.0
      */
-    public boolean getSetting(final @NonNull ManagerSettings setting) {
-        return this.managerSettings.contains(setting);
-    }
-
-    /**
-     * Update a command manager setting
-     *
-     * @param setting Setting to update
-     * @param value   Value. In most cases {@code true} will enable a feature, whereas {@code false} will disable it.
-     *                The value passed to the method will be reflected in {@link #getSetting(ManagerSettings)}
-     * @see #getSetting(ManagerSettings) Get a manager setting
-     */
-    @SuppressWarnings("unused")
-    public void setSetting(
-            final @NonNull ManagerSettings setting,
-            final boolean value
-    ) {
-        if (value) {
-            this.managerSettings.add(setting);
-        } else {
-            this.managerSettings.remove(setting);
-        }
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull Configurable<ManagerSetting> settings() {
+        return this.settings;
     }
 
     /**
@@ -1136,48 +1107,14 @@ public abstract class CommandManager<C> {
         return this.commandExecutionCoordinator;
     }
 
-    /**
-     * Transition from the {@code in} state to the {@code out} state, if the manager is not already in that state.
-     *
-     * @param in  The starting state
-     * @param out The ending state
-     * @throws IllegalStateException if the manager is in any state but {@code in} or {@code out}
-     * @since 1.2.0
-     */
-    @API(status = API.Status.STABLE, since = "1.2.0")
-    protected final void transitionOrThrow(final @NonNull RegistrationState in, final @NonNull RegistrationState out) {
-        if (!this.transitionIfPossible(in, out)) {
-            throw new IllegalStateException("Command manager was in state " + this.state.get() + ", while we were expecting a state "
-                    + "of " + in + " or " + out + "!");
-        }
+    @Override
+    public final @NonNull RegistrationState state() {
+        return this.state.get();
     }
 
-    /**
-     * Transition from the {@code in} state to the {@code out} state, if the manager is not already in that state.
-     *
-     * @param in  The starting state
-     * @param out The ending state
-     * @return {@code true} if the state transition was successful, or the manager was already in the desired state
-     * @since 1.2.0
-     */
-    @API(status = API.Status.STABLE, since = "1.2.0")
-    protected final boolean transitionIfPossible(final @NonNull RegistrationState in, final @NonNull RegistrationState out) {
+    @Override
+    public final boolean transitionIfPossible(final @NonNull RegistrationState in, final @NonNull RegistrationState out) {
         return this.state.compareAndSet(in, out) || this.state.get() == out;
-    }
-
-    /**
-     * Require that the commands manager is in a certain state.
-     *
-     * @param expected The required state
-     * @throws IllegalStateException if the manager is not in the expected state
-     * @since 1.2.0
-     */
-    @API(status = API.Status.STABLE, since = "1.2.0")
-    protected final void requireState(final @NonNull RegistrationState expected) {
-        if (this.state.get() != expected) {
-            throw new IllegalStateException("This operation required the commands manager to be in state " + expected + ", but it "
-                    + "was in " + this.state.get() + " instead!");
-        }
     }
 
     /**
@@ -1189,7 +1126,7 @@ public abstract class CommandManager<C> {
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     protected final void lockRegistration() {
-        if (this.registrationState() == RegistrationState.BEFORE_REGISTRATION) {
+        if (this.state() == RegistrationState.BEFORE_REGISTRATION) {
             this.transitionOrThrow(RegistrationState.BEFORE_REGISTRATION, RegistrationState.AFTER_REGISTRATION);
             return;
         }
@@ -1197,114 +1134,17 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Returns the active registration state for this manager.
-     * <p>
-     * If the state is {@link RegistrationState#AFTER_REGISTRATION}, commands can no longer be registered.
-     *
-     * @return the current state
-     * @since 1.7.0
-     */
-    @API(status = API.Status.STABLE, since = "1.7.0")
-    public final @NonNull RegistrationState registrationState() {
-        return this.state.get();
-    }
-
-    /**
      * Check if command registration is allowed.
      * <p>
      * On platforms where unsafe registration is possible, this can be overridden by enabling the
-     * {@link ManagerSettings#ALLOW_UNSAFE_REGISTRATION} setting.
+     * {@link ManagerSetting#ALLOW_UNSAFE_REGISTRATION} setting.
      *
      * @return {@code true} if the registration is allowed, else {@code false}
      * @since 1.2.0
      */
     @API(status = API.Status.STABLE, since = "1.2.0")
     public boolean isCommandRegistrationAllowed() {
-        return this.getSetting(ManagerSettings.ALLOW_UNSAFE_REGISTRATION) || this.state.get() != RegistrationState.AFTER_REGISTRATION;
-    }
-
-
-    /**
-     * Configurable command related settings
-     *
-     * @see CommandManager#setSetting(ManagerSettings, boolean) Set a manager setting
-     * @see CommandManager#getSetting(ManagerSettings) Get a manager setting
-     */
-    @API(status = API.Status.STABLE)
-    public enum ManagerSettings {
-        /**
-         * Do not create a compound permission and do not look greedily
-         * for child permission values, if a preceding command in the tree path
-         * has a command handler attached
-         */
-        ENFORCE_INTERMEDIARY_PERMISSIONS,
-
-        /**
-         * Force sending of an empty suggestion (i.e. a singleton list containing an empty string)
-         * when no suggestions are present
-         */
-        FORCE_SUGGESTION,
-
-        /**
-         * Allow registering commands even when doing so has the potential to produce inconsistent results.
-         * <p>
-         * For example, if a platform serializes the command tree and sends it to clients,
-         * this will allow modifying the command tree after it has been sent, as long as these modifications are not blocked by
-         * the underlying platform
-         *
-         * @since 1.2.0
-         */
-        @API(status = API.Status.STABLE, since = "1.2.0")
-        ALLOW_UNSAFE_REGISTRATION,
-
-        /**
-         * Enables overriding of existing commands on supported platforms.
-         *
-         * @since 1.2.0
-         */
-        @API(status = API.Status.STABLE, since = "1.2.0")
-        OVERRIDE_EXISTING_COMMANDS,
-
-        /**
-         * Allows parsing flags at any position after the last literal by appending flag argument nodes between each command node.
-         * It can have some conflicts when integrating with other command systems like Brigadier,
-         * and code inspecting the command tree may need to be adjusted.
-         *
-         * @since 1.8.0
-         */
-        @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
-        LIBERAL_FLAG_PARSING
-    }
-
-
-    /**
-     * The point in the registration lifecycle for this commands manager
-     *
-     * @since 1.2.0
-     */
-    @API(status = API.Status.STABLE, since = "1.2.0")
-    public enum RegistrationState {
-        /**
-         * The point when no commands have been registered yet.
-         *
-         * <p>At this point, all configuration options can be changed.</p>
-         */
-        BEFORE_REGISTRATION,
-
-        /**
-         * When at least one command has been registered, and more commands have been registered.
-         *
-         * <p>In this state, some options that affect how commands are registered with the platform are frozen. Some platforms
-         * will remain in this state for their lifetime.</p>
-         */
-        REGISTERING,
-
-        /**
-         * Once registration has been completed.
-         *
-         * <p>At this point, the command manager is effectively immutable. On platforms where command registration happens via
-         * callback, this state is achieved the first time the manager's callback is executed for registration.</p>
-         */
-        AFTER_REGISTRATION
+        return this.settings().get(ManagerSetting.ALLOW_UNSAFE_REGISTRATION)
+                || this.state.get() != RegistrationState.AFTER_REGISTRATION;
     }
 }

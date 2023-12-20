@@ -26,6 +26,7 @@ package cloud.commandframework.arguments;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
@@ -33,13 +34,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public final class LiteralParser<C> implements ArgumentParser<C, String> {
+public final class LiteralParser<C> implements ArgumentParser<C, String>, BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new literal parser that accepts the given {@code name} and {@code aliases}.
@@ -54,7 +54,7 @@ public final class LiteralParser<C> implements ArgumentParser<C, String> {
     public static <C> @NonNull ParserDescriptor<C, String> literal(
             final @NonNull String name,
             final @NonNull String @NonNull... aliases
-    )  {
+    ) {
         return ParserDescriptor.of(new LiteralParser<>(name, aliases), String.class);
     }
 
@@ -90,7 +90,7 @@ public final class LiteralParser<C> implements ArgumentParser<C, String> {
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

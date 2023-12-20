@@ -27,7 +27,7 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.data.ItemStackPredicate;
@@ -42,7 +42,6 @@ import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
@@ -191,18 +190,15 @@ public final class ItemStackPredicateParser<C> implements ArgumentParser<C, Item
 
     @Override
     public @NonNull ArgumentParseResult<@NonNull ItemStackPredicate> parse(
-            @NonNull final CommandContext<@NonNull C> commandContext,
-            @NonNull final CommandInput commandInput
+            final @NonNull CommandContext<@NonNull C> commandContext,
+            final @NonNull CommandInput commandInput
     ) {
         return this.parser.parse(commandContext, commandInput);
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> suggestions(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
-    ) {
-        return this.parser.suggestions(commandContext, input);
+    public @NonNull SuggestionProvider<C> suggestionProvider() {
+        return this.parser.suggestionProvider();
     }
 
 

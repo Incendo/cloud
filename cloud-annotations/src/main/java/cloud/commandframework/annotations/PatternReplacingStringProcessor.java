@@ -59,7 +59,7 @@ public class PatternReplacingStringProcessor implements StringProcessor {
      */
     @Override
     public @NonNull String processString(
-            @NonNull final String input
+            final @NonNull String input
     ) {
         final Matcher matcher = this.pattern.matcher(input);
 

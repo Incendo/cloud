@@ -27,8 +27,8 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.services.State;
+import cloud.commandframework.setting.ManagerSetting;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -64,8 +64,8 @@ final class DelegatingSuggestionFactory<C, S extends Suggestion> implements Sugg
 
     @Override
     public @NonNull CompletableFuture<List<@NonNull S>> suggest(
-            @NonNull final CommandContext<C> context,
-            @NonNull final String input
+            final @NonNull CommandContext<C> context,
+            final @NonNull String input
     ) {
         return this.suggestFromTree(context, input).thenApply(suggestions -> suggestions.stream()
                 .map(this.suggestionMapper::map)
@@ -74,7 +74,7 @@ final class DelegatingSuggestionFactory<C, S extends Suggestion> implements Sugg
     }
 
     @Override
-    public @NonNull CompletableFuture<List<@NonNull S>> suggest(@NonNull final C sender, @NonNull final String input) {
+    public @NonNull CompletableFuture<List<@NonNull S>> suggest(final @NonNull C sender, final @NonNull String input) {
         return this.suggest(
                 this.commandManager.commandContextFactory().create(true /* suggestions */, sender),
                 input
@@ -90,19 +90,14 @@ final class DelegatingSuggestionFactory<C, S extends Suggestion> implements Sugg
         context.store("__raw_input__", commandInput.copy());
 
         if (this.commandManager.preprocessContext(context, commandInput) != State.ACCEPTED) {
-            if (this.commandManager.getSetting(CommandManager.ManagerSettings.FORCE_SUGGESTION)) {
+            if (this.commandManager.settings().get(ManagerSetting.FORCE_SUGGESTION)) {
                 return CompletableFuture.completedFuture(SINGLE_EMPTY_SUGGESTION);
             }
             return CompletableFuture.completedFuture(Collections.emptyList());
         }
 
-        return this.commandTree.getSuggestions(context, commandInput).thenApply(suggestions ->
-                this.commandManager.commandSuggestionProcessor().apply(
-                        new CommandPreprocessingContext<>(context, commandInput),
-                        suggestions
-                )
-        ).thenApply(suggestions -> {
-            if (this.commandManager.getSetting(CommandManager.ManagerSettings.FORCE_SUGGESTION) && suggestions.isEmpty()) {
+        return this.commandTree.getSuggestions(context, commandInput).thenApply(suggestions -> {
+            if (this.commandManager.settings().get(ManagerSetting.FORCE_SUGGESTION) && suggestions.isEmpty()) {
                 return SINGLE_EMPTY_SUGGESTION;
             }
             return suggestions;

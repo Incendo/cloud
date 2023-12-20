@@ -30,6 +30,14 @@ import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
+import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
+import cloud.commandframework.exceptions.InvalidCommandSenderException;
+import cloud.commandframework.exceptions.InvalidSyntaxException;
+import cloud.commandframework.exceptions.NoPermissionException;
+import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.exceptions.handling.ExceptionContext;
+import cloud.commandframework.exceptions.handling.ExceptionHandler;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.velocity.arguments.PlayerParser;
@@ -45,6 +53,9 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.Function;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -62,6 +73,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 @Singleton
 public class VelocityCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C> {
+
+    private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
+    private static final String MESSAGE_NO_PERMS =
+            "I'm sorry, but you do not have permission to perform this command. "
+                    + "Please contact the server administrators if you believe that this is in error.";
+    private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
     /**
      * Default caption for {@link VelocityCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
@@ -133,6 +150,12 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
         this.proxyServer.getEventManager().register(plugin, ServerPreConnectEvent.class, ev -> {
             this.lockRegistration();
         });
+        this.parameterInjectorRegistry().registerInjector(
+                CommandSource.class,
+                (context, annotations) -> this.backwardsCommandSenderMapper.apply(context.sender())
+        );
+
+        this.registerDefaultExceptionHandlers();
     }
 
     @Override
@@ -169,5 +192,73 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
 
     final @NonNull Function<@NonNull C, @NonNull CommandSource> backwardsCommandSenderMapper() {
         return this.backwardsCommandSenderMapper;
+    }
+
+    private void registerDefaultExceptionHandlers() {
+        this.registerHandler(Throwable.class, (source, exception) -> {
+                source.sendMessage(
+                        Identity.nil(),
+                        Component.text(MESSAGE_INTERNAL_ERROR, NamedTextColor.RED)
+                );
+                exception.printStackTrace();
+        });
+        this.registerHandler(CommandExecutionException.class, (source, exception) -> {
+                source.sendMessage(
+                        Identity.nil(),
+                        Component.text(
+                                MESSAGE_INTERNAL_ERROR,
+                                NamedTextColor.RED
+                        )
+                );
+                exception.getCause().printStackTrace();
+        });
+        this.registerHandler(ArgumentParseException.class, (source, exception) ->
+                source.sendMessage(
+                        Identity.nil(),
+                        Component.text()
+                                .append(Component.text("Invalid Command Argument: ", NamedTextColor.RED))
+                                .append(Component.text(exception.getCause().getMessage(), NamedTextColor.GRAY))
+                                .build()
+                )
+        );
+        this.registerHandler(NoSuchCommandException.class, (source, exception) ->
+                source.sendMessage(Identity.nil(), Component.text(MESSAGE_UNKNOWN_COMMAND))
+        );
+        this.registerHandler(NoPermissionException.class, (source, exception) ->
+                source.sendMessage(Identity.nil(), Component.text(MESSAGE_NO_PERMS))
+        );
+        this.registerHandler(InvalidCommandSenderException.class, (source, exception) ->
+                source.sendMessage(Identity.nil(), Component.text(exception.getMessage(), NamedTextColor.RED))
+        );
+        this.registerHandler(InvalidSyntaxException.class, (source, exception) ->
+                source.sendMessage(
+                        Identity.nil(),
+                        Component.text()
+                                .append(Component.text("Invalid Command Syntax. Correct command syntax is: ", NamedTextColor.RED))
+                                .append(Component.text(exception.getCorrectSyntax(), NamedTextColor.GRAY))
+                                .build()
+                )
+        );
+    }
+
+    private <T extends Throwable> void registerHandler(
+            final @NonNull Class<T> exceptionType,
+            final @NonNull VelocityExceptionHandler<C, T> handler
+    ) {
+        this.exceptionController().registerHandler(exceptionType, handler);
+    }
+
+
+    @FunctionalInterface
+    @SuppressWarnings("FunctionalInterfaceMethodChanged")
+    private interface VelocityExceptionHandler<C, T extends Throwable> extends ExceptionHandler<C, T> {
+
+        @Override
+        default void handle(@NonNull ExceptionContext<C, T> context) throws Throwable {
+            final CommandSource source = context.context().inject(CommandSource.class).orElseThrow(NullPointerException::new);
+            this.handle(source, context.exception());
+        }
+
+        void handle(@NonNull CommandSource source, @NonNull T exception) throws Throwable;
     }
 }

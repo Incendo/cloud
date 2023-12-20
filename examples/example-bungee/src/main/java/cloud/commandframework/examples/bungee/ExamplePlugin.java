@@ -86,17 +86,18 @@ public final class ExamplePlugin extends Plugin {
 
         this.confirmationManager.registerConfirmationProcessor(this.manager);
 
-        new MinecraftExceptionHandler<CommandSender>()
-                .withInvalidSyntaxHandler()
-                .withInvalidSenderHandler()
-                .withNoPermissionHandler()
-                .withArgumentParsingHandler()
-                .withDecorator(component -> text()
+        MinecraftExceptionHandler.create(this.bungeeAudiences::sender)
+                .defaultInvalidSyntaxHandler()
+                .defaultInvalidSenderHandler()
+                .defaultNoPermissionHandler()
+                .defaultArgumentParsingHandler()
+                .decorator(component -> text()
                         .append(text("[", NamedTextColor.DARK_GRAY))
                         .append(text("Example", NamedTextColor.GOLD))
                         .append(text("] ", NamedTextColor.DARK_GRAY))
                         .append(component).build()
-                ).apply(this.manager, this.bungeeAudiences::sender);
+                )
+                .registerTo(this.manager);
         this.constructCommands();
     }
 

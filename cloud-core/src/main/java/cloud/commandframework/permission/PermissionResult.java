@@ -61,7 +61,7 @@ public interface PermissionResult {
      *
      * @return the permission that this result came from
      */
-    @NonNull CommandPermission permission();
+    @NonNull Permission permission();
 
     /**
      * Creates a result that wraps the given boolean result
@@ -70,7 +70,7 @@ public interface PermissionResult {
      * @param permission the permission that this result came from
      * @return a PermissionResult of the boolean result
      */
-    static @NonNull PermissionResult of(final boolean result, final @NonNull CommandPermission permission) {
+    static @NonNull PermissionResult of(final boolean result, final @NonNull Permission permission) {
         return new SimplePermissionResult(result, permission);
     }
 
@@ -80,7 +80,7 @@ public interface PermissionResult {
      * @param permission the permission that this result came from
      * @return a successful PermissionResult
      */
-    static @NonNull PermissionResult succeeded(final @NonNull CommandPermission permission) {
+    static @NonNull PermissionResult succeeded(final @NonNull Permission permission) {
         return new SimplePermissionResult(true, permission);
     }
 
@@ -90,7 +90,7 @@ public interface PermissionResult {
      * @param permission the permission that this result came from
      * @return a failed PermissionResult
      */
-    static @NonNull PermissionResult failed(final @NonNull CommandPermission permission) {
+    static @NonNull PermissionResult failed(final @NonNull Permission permission) {
         return new SimplePermissionResult(false, permission);
     }
 

@@ -26,13 +26,14 @@ package cloud.commandframework.fabric.data;
 import java.util.Collection;
 import java.util.Collections;
 import net.minecraft.commands.arguments.selector.EntitySelector;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * A selector string to query multiple entity-like values
+ * A selector string to query multiple entity-like values.
  *
- * @param <V> Value type
+ * @param <V> value type
  * @since 1.5.0
  */
 public interface Selector<V> {
@@ -54,34 +55,36 @@ public interface Selector<V> {
     @Nullable EntitySelector selector();
 
     /**
-     * Resolve the value of this selector.
+     * Get the value of this selector.
      *
-     * <p>A successfully parsed selector must match one or more values</p>
+     * <p>A successfully parsed selector must match one or more values.</p>
      *
      * @return all matched entities
-     * @since 1.5.0
+     * @since 2.0.0
      */
-    @NonNull Collection<V> get();
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    @NonNull Collection<V> values();
 
     /**
-     * A specialized selector that can only return one value.
+     * A specialized {@link Selector} that can only return one value.
      *
-     * @param <V> the value type
+     * @param <V> value type
      * @since 1.5.0
      */
     interface Single<V> extends Selector<V> {
 
         @Override
-        default @NonNull Collection<V> get() {
-            return Collections.singletonList(this.getSingle());
+        default @NonNull Collection<V> values() {
+            return Collections.singletonList(this.single());
         }
 
         /**
          * Get the single value from this selector.
          *
          * @return the value
-         * @since 1.5.0
+         * @since 2.0.0
          */
-        @NonNull V getSingle();
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        @NonNull V single();
     }
 }

@@ -52,7 +52,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "2.0.0")
-public final class CommandFlagParser<C> implements ArgumentParser.FutureArgumentParser<C, Object> {
+public final class CommandFlagParser<C> implements ArgumentParser.FutureArgumentParser<C, Object>, SuggestionProvider<C> {
 
     /**
      * Dummy object that indicates that flags were parsed successfully
@@ -123,7 +123,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
         }
 
         /* Before parsing, retrieve the last known input of the queue */
-        final String lastInputValue = commandInput.tokenize().getLast();
+        final String lastInputValue = commandInput.lastRemainingToken();
 
         /* Parse, but ignore the result of parsing */
         final FlagParser parser = new FlagParser();
@@ -143,7 +143,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public @NonNull CompletableFuture<List<@NonNull Suggestion>> suggestionsFuture(
+    public @NonNull CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

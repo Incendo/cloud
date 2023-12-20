@@ -27,10 +27,10 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import java.util.List;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -47,7 +47,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 1.4.0
  */
-public final class Location2DParser<C> implements ArgumentParser<C, Location2D> {
+public final class Location2DParser<C> implements ArgumentParser<C, Location2D>, BlockingSuggestionProvider.Strings<C> {
 
     private static final int EXPECTED_PARAMETER_COUNT = 2;
 
@@ -157,7 +157,7 @@ public final class Location2DParser<C> implements ArgumentParser<C, Location2D> 
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

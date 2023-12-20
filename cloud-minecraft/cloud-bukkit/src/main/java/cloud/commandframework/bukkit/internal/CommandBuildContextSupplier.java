@@ -23,17 +23,17 @@
 //
 package cloud.commandframework.bukkit.internal;
 
-import com.google.common.annotations.Beta;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * This is not API, and as such, may break, change, or be removed without any notice.
  */
-@Beta
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class CommandBuildContextSupplier {
 
     private static final Class<?> COMMAND_BUILD_CONTEXT_CLASS = CraftBukkitReflection.needMCClass("commands.CommandBuildContext");

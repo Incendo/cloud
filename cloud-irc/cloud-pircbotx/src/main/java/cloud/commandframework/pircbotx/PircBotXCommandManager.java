@@ -28,16 +28,27 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
+import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
+import cloud.commandframework.exceptions.InvalidCommandSenderException;
+import cloud.commandframework.exceptions.InvalidSyntaxException;
+import cloud.commandframework.exceptions.NoPermissionException;
+import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.exceptions.handling.ExceptionContext;
+import cloud.commandframework.exceptions.handling.ExceptionHandler;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.pircbotx.arguments.UserParser;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
+import org.pircbotx.hooks.types.GenericMessageEvent;
 
 /**
  * Command manager implementation for PircBotX 2.0
@@ -47,6 +58,21 @@ import org.pircbotx.User;
  */
 public class PircBotXCommandManager<C> extends CommandManager<C> {
 
+    private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
+    private static final String MESSAGE_INVALID_SYNTAX = "Invalid Command Syntax. Correct command syntax is: ";
+    private static final String MESSAGE_NO_PERMS = "I'm sorry, but you do not have permission to perform this command. "
+            + "Please contact the server administrators if you believe that this is in error.";
+    private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command";
+
+    /**
+     * Key used to access the generic message event from the command context.
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static final CloudKey<GenericMessageEvent> PIRCBOTX_MESSAGE_EVENT_KEY = CloudKey.of(
+            "__internal_generic_message_event__",
+            GenericMessageEvent.class
+    );
     /**
      * Meta key for accessing the {@link org.pircbotx.PircBotX} instance from a
      * {@link cloud.commandframework.context.CommandContext} instance
@@ -117,6 +143,8 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
 
         // No "native" command system means that we can delete commands just fine.
         this.registerCapability(CloudCapability.StandardCapabilities.ROOT_COMMAND_DELETION);
+
+        this.registerDefaultExceptionHandlers();
     }
 
     @Override
@@ -139,5 +167,45 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
 
     final @NonNull Function<User, C> getUserMapper() {
         return this.userMapper;
+    }
+
+    private void registerDefaultExceptionHandlers() {
+        this.registerHandler(Throwable.class, (event, throwable) -> event.respondWith(throwable.getMessage()));
+        this.registerHandler(CommandExecutionException.class, (event, throwable) -> {
+                event.respondWith(MESSAGE_INTERNAL_ERROR);
+                throwable.getCause().printStackTrace();
+        });
+        this.registerHandler(ArgumentParseException.class, (event, throwable) ->
+                event.respondWith("Invalid Command Argument" + throwable.getCause().getMessage())
+        );
+        this.registerHandler(NoSuchCommandException.class, (event, throwable) -> event.respondWith(MESSAGE_UNKNOWN_COMMAND));
+        this.registerHandler(NoPermissionException.class, (event, throwable) -> event.respondWith(MESSAGE_NO_PERMS));
+        this.registerHandler(InvalidCommandSenderException.class, (event, throwable) ->
+                event.respondWith(throwable.getMessage())
+        );
+        this.registerHandler(InvalidSyntaxException.class, (event, throwable) ->
+                event.respondWith(MESSAGE_INVALID_SYNTAX + this.getCommandPrefix() + throwable.getCorrectSyntax())
+        );
+    }
+
+    private <T extends Throwable> void registerHandler(
+            final @NonNull Class<T> exceptionType,
+            final @NonNull PircBotXExceptionHandler<C, T> handler
+    ) {
+        this.exceptionController().registerHandler(exceptionType, handler);
+    }
+
+
+    @FunctionalInterface
+    @SuppressWarnings("FunctionalInterfaceMethodChanged")
+    private interface PircBotXExceptionHandler<C, T extends Throwable> extends ExceptionHandler<C, T> {
+
+        @Override
+        default void handle(@NonNull ExceptionContext<C, T> context) throws Throwable {
+            final GenericMessageEvent event = context.context().get(PIRCBOTX_MESSAGE_EVENT_KEY);
+            this.handle(event, context.exception());
+        }
+
+        void handle(@NonNull GenericMessageEvent event, @NonNull T throwable);
     }
 }

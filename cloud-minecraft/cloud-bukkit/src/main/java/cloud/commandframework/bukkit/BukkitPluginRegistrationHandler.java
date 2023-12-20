@@ -25,14 +25,15 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.CommandManager;
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import cloud.commandframework.setting.ManagerSetting;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -91,7 +92,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
                 this.bukkitCommandManager
         );
 
-        if (this.bukkitCommandManager.getSetting(CommandManager.ManagerSettings.OVERRIDE_EXISTING_COMMANDS)) {
+        if (this.bukkitCommandManager.settings().get(ManagerSetting.OVERRIDE_EXISTING_COMMANDS)) {
             this.bukkitCommands.remove(label);
             aliases.forEach(this.bukkitCommands::remove);
         }
@@ -113,7 +114,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
 
         this.commandMap.register(
                 label,
-                this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
+                this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(Locale.ROOT),
                 bukkitCommand
         );
 
@@ -169,7 +170,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
     }
 
     private @NonNull String getNamespacedLabel(final @NonNull String label) {
-        return String.format("%s:%s", this.bukkitCommandManager.getOwningPlugin().getName(), label).toLowerCase();
+        return String.format("%s:%s", this.bukkitCommandManager.getOwningPlugin().getName(), label).toLowerCase(Locale.ROOT);
     }
 
     /**

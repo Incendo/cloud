@@ -53,7 +53,7 @@ class CommandExecutionCoordinatorTest {
                 registrationHandler
         ) {
             @Override
-            public boolean hasPermission(@NonNull final TestCommandSender sender, @NonNull final String permission) {
+            public boolean hasPermission(final @NonNull TestCommandSender sender, final @NonNull String permission) {
                 return true;
             }
         };
@@ -61,7 +61,7 @@ class CommandExecutionCoordinatorTest {
                 commandManager.commandBuilder("test")
                         .required(
                                 "arg",
-                                ParserDescriptor.of((ctx, in) -> ArgumentParseResult.failure(exception), Integer.class)
+                                ParserDescriptor.of(failingParser(exception), Integer.class)
                         )
         );
 
@@ -91,18 +91,15 @@ class CommandExecutionCoordinatorTest {
                 registrationHandler
         ) {
             @Override
-            public boolean hasPermission(@NonNull final TestCommandSender sender, @NonNull final String permission) {
+            public boolean hasPermission(final @NonNull TestCommandSender sender, final @NonNull String permission) {
                 return true;
             }
         };
-        final CompletableFuture<Integer> result = new CompletableFuture<>();
-        result.completeExceptionally(exception);
         commandManager.command(
                 commandManager.commandBuilder("test")
                         .required(
                                 "arg",
-                                ParserDescriptor.of((ArgumentParser.FutureArgumentParser<TestCommandSender, Integer>) (ctx, in) ->
-                                        result, Integer.class)
+                                ParserDescriptor.of(failingFutureParser(exception), Integer.class)
                         )
         );
 
@@ -132,15 +129,16 @@ class CommandExecutionCoordinatorTest {
                 registrationHandler
         ) {
             @Override
-            public boolean hasPermission(@NonNull final TestCommandSender sender, @NonNull final String permission) {
+            public boolean hasPermission(final @NonNull TestCommandSender sender, final @NonNull String permission) {
                 return true;
             }
         };
+        final ArgumentParser<TestCommandSender, Integer> parser = failingParser(exception);
         commandManager.command(
                 commandManager.commandBuilder("test")
                         .required(
                                 "arg",
-                                ParserDescriptor.of((ctx, in) -> ArgumentParseResult.failure(exception), Integer.class)
+                                ParserDescriptor.of(parser, Integer.class)
                         )
         );
 
@@ -160,6 +158,18 @@ class CommandExecutionCoordinatorTest {
         }
     }
 
+    private static ArgumentParser<TestCommandSender, Integer> failingParser(final Exception exception) {
+        return (commandContext, commandInput) -> ArgumentParseResult.failure(exception);
+    }
+
+    private static ArgumentParser<TestCommandSender, Integer> failingFutureParser(final Exception exception) {
+        return (ArgumentParser.FutureArgumentParser<TestCommandSender, Integer>) (commandContext, commandInput) -> {
+            final CompletableFuture<Integer> result = new CompletableFuture<>();
+            result.completeExceptionally(exception);
+            return result;
+        };
+    }
+
     @ParameterizedTest
     @MethodSource("testErrorMappingSource")
     void testErrorMappingFutureParserAsyncExecutor(final @NonNull Exception exception) {
@@ -170,18 +180,15 @@ class CommandExecutionCoordinatorTest {
                 registrationHandler
         ) {
             @Override
-            public boolean hasPermission(@NonNull final TestCommandSender sender, @NonNull final String permission) {
+            public boolean hasPermission(final @NonNull TestCommandSender sender, final @NonNull String permission) {
                 return true;
             }
         };
-        final CompletableFuture<Integer> result = new CompletableFuture<>();
-        result.completeExceptionally(exception);
         commandManager.command(
                 commandManager.commandBuilder("test")
                         .required(
                                 "arg",
-                                ParserDescriptor.of((ArgumentParser.FutureArgumentParser<TestCommandSender, Integer>) (ctx, in) ->
-                                        result, Integer.class)
+                                ParserDescriptor.of(failingFutureParser(exception), Integer.class)
                         )
         );
 
@@ -205,6 +212,7 @@ class CommandExecutionCoordinatorTest {
         return Stream.of(
                 new CompletionException(new RuntimeException()),
                 new RuntimeException(),
-                new CommandExecutionException(new RuntimeException()));
+                new CommandExecutionException(new RuntimeException())
+        );
     }
 }

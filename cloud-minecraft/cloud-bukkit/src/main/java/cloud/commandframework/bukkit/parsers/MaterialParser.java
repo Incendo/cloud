@@ -27,6 +27,7 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
@@ -35,13 +36,13 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.bukkit.Material;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public final class MaterialParser<C> implements ArgumentParser<C, Material> {
+public final class MaterialParser<C> implements ArgumentParser<C, Material>, BlockingSuggestionProvider<C> {
 
     /**
      * Creates a new material parser.
@@ -81,7 +82,7 @@ public final class MaterialParser<C> implements ArgumentParser<C, Material> {
 
         final String input = commandInput.readString();
         try {
-            final Material material = Material.valueOf(input.toUpperCase());
+            final Material material = Material.valueOf(input.toUpperCase(Locale.ROOT));
             return ArgumentParseResult.success(material);
         } catch (final IllegalArgumentException exception) {
             return ArgumentParseResult.failure(new MaterialParseException(input, commandContext));
@@ -89,7 +90,7 @@ public final class MaterialParser<C> implements ArgumentParser<C, Material> {
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> suggestions(
+    public @NonNull Iterable<@NonNull Suggestion> suggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

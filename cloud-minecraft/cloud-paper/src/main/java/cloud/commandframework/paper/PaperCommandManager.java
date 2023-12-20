@@ -31,6 +31,7 @@ import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.paper.suggestions.SuggestionListener;
 import cloud.commandframework.paper.suggestions.SuggestionListenerFactory;
+import cloud.commandframework.state.RegistrationState;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import org.bukkit.Bukkit;
@@ -61,14 +62,6 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
      *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
      *                                     {@link cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator}.
-     *                                     <p>
-     *                                     A word of caution: When using the asynchronous command executor in Bukkit, it is very
-     *                                     likely that you will have to perform manual synchronization when executing the commands
-     *                                     in many cases, as Bukkit makes no guarantees of thread safety in common classes. To
-     *                                     make this easier, {@link #taskRecipe()} is provided. Furthermore, it may be unwise to
-     *                                     use asynchronous command parsing, especially when dealing with things such as players
-     *                                     and entities. To make this more safe, the asynchronous command execution allows you
-     *                                     to state that you want synchronous command parsing.
      *                                     <p>
      *                                     The execution coordinator will not have an impact on command suggestions. More
      *                                     specifically, using an asynchronous command executor does not mean that command

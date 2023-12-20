@@ -224,6 +224,9 @@
             <property name="optional" value="true"/>
         </module>
 
+        <!-- https://gitlab.com/stellardrift/stylecheck/-/blob/trunk/src/main/java/ca/stellardrift/stylecheck/AnnotationsCloseToType.java -->
+        <module name="AnnotationsCloseToType"/>
+
     </module>
 
 </module>

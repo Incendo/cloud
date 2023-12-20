@@ -25,6 +25,7 @@ package cloud.commandframework.examples.jda;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -41,7 +42,7 @@ public final class PermissionRegistry {
      * @param permission Permission to add
      */
     public void add(final @NonNull Long userId, final @NonNull String permission) {
-        this.getPermissions(userId).add(permission.toLowerCase());
+        this.getPermissions(userId).add(permission.toLowerCase(Locale.ROOT));
     }
 
     /**
@@ -51,7 +52,7 @@ public final class PermissionRegistry {
      * @param permission Permission to remove
      */
     public void remove(final @NonNull Long userId, final @NonNull String permission) {
-        this.getPermissions(userId).remove(permission.toLowerCase());
+        this.getPermissions(userId).remove(permission.toLowerCase(Locale.ROOT));
     }
 
     /**
@@ -66,7 +67,7 @@ public final class PermissionRegistry {
             return true;
         }
 
-        return this.getPermissions(userId).contains(permission.toLowerCase());
+        return this.getPermissions(userId).contains(permission.toLowerCase(Locale.ROOT));
     }
 
     private Set<String> getPermissions(final @NonNull Long userId) {

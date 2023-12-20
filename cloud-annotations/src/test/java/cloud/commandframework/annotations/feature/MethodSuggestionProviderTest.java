@@ -70,11 +70,12 @@ class MethodSuggestionProviderTest {
         );
 
         // Act
-        final List<Suggestion> suggestions =
+        final Iterable<Suggestion> suggestions =
                 this.commandManager.parserRegistry()
                         .getSuggestionProvider("suggestions")
                         .orElseThrow(NullPointerException::new)
-                        .suggestions(context, "");
+                        .suggestionsFuture(context, "")
+                        .join();
 
         // Assert
         assertThat(suggestions).containsExactly(Suggestion.simple("foo"));
@@ -94,7 +95,7 @@ class MethodSuggestionProviderTest {
     public static final class TestClassList {
 
         @Suggestions("suggestions")
-        public @NonNull List<@NonNull Suggestion> suggestions(
+        public @NonNull Iterable<@NonNull Suggestion> suggestions(
                 final @NonNull CommandContext<TestCommandSender> context,
                 final @NonNull String input
         ) {

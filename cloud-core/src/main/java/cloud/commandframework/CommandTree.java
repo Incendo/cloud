@@ -40,13 +40,13 @@ import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoCommandInLeafException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.SuggestionContext;
-import cloud.commandframework.permission.CommandPermission;
-import cloud.commandframework.permission.OrPermission;
+import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PermissionResult;
+import cloud.commandframework.setting.ManagerSetting;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -187,9 +187,9 @@ public final class CommandTree<C> {
                 commandInput,
                 this.internalTree
         ).thenCompose(command -> {
-            if (command != null && command.senderType().isPresent() && !command.senderType().get()
-                    .isAssignableFrom(commandContext.sender().getClass())
-            ) {
+            if (command != null
+                    && command.senderType().isPresent()
+                    && !command.senderType().get().isInstance(commandContext.sender())) {
                 return this.failedCompletable(
                         new InvalidCommandSenderException(
                                 commandContext.sender(),
@@ -286,8 +286,8 @@ public final class CommandTree<C> {
                             parsingContext.markEnd();
                             parsingContext.success(!result.getFailure().isPresent());
 
-                            final List<String> consumedTokens = currentInput.tokenize();
-                            consumedTokens.removeAll(commandInput.tokenize());
+                            final List<String> consumedTokens = tokenize(currentInput);
+                            consumedTokens.removeAll(tokenize(commandInput));
                             parsingContext.consumedInput(consumedTokens);
 
                             if (result.getParsedValue().isPresent()) {
@@ -588,8 +588,8 @@ public final class CommandTree<C> {
                 .parseFuture(commandContext, commandInput))
                 .thenCompose(result -> {
                     // We remove all remaining queue, and then we'll have a list of the captured input.
-                    final List<String> consumedInput = currentInput.tokenize();
-                    consumedInput.removeAll(commandInput.tokenize());
+                    final List<String> consumedInput = tokenize(currentInput);
+                    consumedInput.removeAll(tokenize(commandInput));
                     parsingContext.consumedInput(consumedInput);
 
                     parsingContext.markEnd();
@@ -630,7 +630,11 @@ public final class CommandTree<C> {
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput
     ) {
-        final SuggestionContext<C> suggestionContext = new SuggestionContext<>(context);
+        final SuggestionContext<C> suggestionContext = new SuggestionContext<>(
+                this.commandManager.commandSuggestionProcessor(),
+                context,
+                commandInput
+        );
         return this.getSuggestions(suggestionContext, commandInput, this.internalTree).thenApply(SuggestionContext::suggestions);
     }
 
@@ -786,7 +790,7 @@ public final class CommandTree<C> {
             } else if (commandInput.remainingTokens() == 1) {
                 return this.addArgumentSuggestions(context, child, commandInput.peekString());
             } else if (child.isLeaf() && child.component().parser() instanceof AggregateCommandParser) {
-                return this.addArgumentSuggestions(context, child, commandInput.tokenize().getLast());
+                return this.addArgumentSuggestions(context, child, commandInput.lastRemainingToken());
             }
 
             // Store original input command queue before the parsers below modify it
@@ -1032,7 +1036,7 @@ public final class CommandTree<C> {
      */
     private int flagStartIndex(final @NonNull List<CommandComponent<C>> components) {
         // Append flags after the last static argument
-        if (this.commandManager.getSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING)) {
+        if (this.commandManager.settings().get(ManagerSetting.LIBERAL_FLAG_PARSING)) {
             for (int i = components.size() - 1; i >= 0; i--) {
                 if (components.get(i).type() == CommandComponent.ComponentType.LITERAL) {
                     return i;
@@ -1056,7 +1060,7 @@ public final class CommandTree<C> {
             final @NonNull C sender,
             final @NonNull CommandNode<C> node
     ) {
-        final CommandPermission permission = (CommandPermission) node.nodeMeta().get("permission");
+        final Permission permission = (Permission) node.nodeMeta().get("permission");
         if (permission != null) {
             return this.commandManager.hasPermission(sender, permission);
         }
@@ -1090,7 +1094,7 @@ public final class CommandTree<C> {
             final @NonNull C sender,
             final @NonNull CommandNode<C> node
     ) {
-        final CommandPermission permission = (CommandPermission) node.nodeMeta().get("permission");
+        final Permission permission = (Permission) node.nodeMeta().get("permission");
         if (permission != null) {
             return this.commandManager.testPermission(sender, permission);
         }
@@ -1103,7 +1107,7 @@ public final class CommandTree<C> {
           if any of the children would permit the execution, then the sender has a valid
            chain to execute, and so we allow them to execute the root
          */
-        final List<CommandPermission> missingPermissions = new LinkedList<>();
+        final List<Permission> missingPermissions = new LinkedList<>();
         for (final CommandNode<C> child : node.children()) {
             final PermissionResult result = this.determinePermissionResult(sender, child);
             if (result.succeeded()) {
@@ -1113,7 +1117,7 @@ public final class CommandTree<C> {
             }
         }
         // none of the children were permissible
-        return PermissionResult.failed(OrPermission.of(missingPermissions));
+        return PermissionResult.failed(Permission.anyOf(missingPermissions));
     }
 
     /**
@@ -1149,7 +1153,7 @@ public final class CommandTree<C> {
      */
     private void updatePermission(final @NonNull CommandNode<C> node) {
         // noinspection all
-        final CommandPermission commandPermission = node.component().owningCommand().commandPermission();
+        final Permission commandPermission = node.component().owningCommand().commandPermission();
         /* All leaves must necessarily have an owning command */
         node.nodeMeta().put("permission", commandPermission);
         // Get chain and order it tail->head then skip the tail (leaf node)
@@ -1158,12 +1162,12 @@ public final class CommandTree<C> {
         chain = chain.subList(1, chain.size());
         // Go through all nodes from the tail upwards until a collision occurs
         for (final CommandNode<C> commandArgumentNode : chain) {
-            final CommandPermission existingPermission = (CommandPermission) commandArgumentNode.nodeMeta()
+            final Permission existingPermission = (Permission) commandArgumentNode.nodeMeta()
                     .get("permission");
 
-            CommandPermission permission;
+            Permission permission;
             if (existingPermission != null) {
-                permission = OrPermission.of(Arrays.asList(commandPermission, existingPermission));
+                permission = Permission.anyOf(commandPermission, existingPermission);
             } else {
                 permission = commandPermission;
             }
@@ -1171,12 +1175,10 @@ public final class CommandTree<C> {
             /* Now also check if there's a command handler attached to an upper level node */
             if (commandArgumentNode.component() != null && commandArgumentNode.component().owningCommand() != null) {
                 final Command<C> command = commandArgumentNode.component().owningCommand();
-                if (this
-                        .commandManager()
-                        .getSetting(CommandManager.ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS)) {
+                if (this.commandManager().settings().get(ManagerSetting.ENFORCE_INTERMEDIARY_PERMISSIONS)) {
                     permission = command.commandPermission();
                 } else {
-                    permission = OrPermission.of(Arrays.asList(permission, command.commandPermission()));
+                    permission = Permission.anyOf(permission, command.commandPermission());
                 }
             }
 
@@ -1340,5 +1342,9 @@ public final class CommandTree<C> {
         } else {
             Objects.requireNonNull(node.parent(), "parent").removeChild(node);
         }
+    }
+
+    private static @NonNull List<@NonNull String> tokenize(final @NonNull CommandInput commandInput) {
+        return new CommandInputTokenizer(commandInput.remainingInput()).tokenize();
     }
 }

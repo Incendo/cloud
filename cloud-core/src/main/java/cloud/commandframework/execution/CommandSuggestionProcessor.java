@@ -25,30 +25,38 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
-import java.util.List;
-import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Processor that formats command suggestions
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
+ * @since 2.0.0
  */
-@API(status = API.Status.STABLE)
-public interface CommandSuggestionProcessor<C> extends
-        BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<Suggestion>, @NonNull List<Suggestion>> {
+@FunctionalInterface
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface CommandSuggestionProcessor<C> {
 
     /**
-     * Create a pass through {@link CommandSuggestionProcessor} that simply returns
-     * the input.
+     * Creates a {@link CommandSuggestionProcessor} that simply returns the input suggestion.
      *
-     * @param <C> sender type
-     * @return new processor
-     * @since 1.8.0
+     * @param <C> command sender type
+     * @return the processor
      */
-    @API(status = API.Status.STABLE, since = "1.8.0")
     static <C> @NonNull CommandSuggestionProcessor<C> passThrough() {
-        return (ctx, suggestions) -> suggestions;
+        return (ctx, suggestion) -> suggestion;
     }
+
+    /**
+     * Processes the given {@code suggestion} and returns the result.
+     *
+     * <p>If {@code null} is returned, the suggestion will be dropped.</p>
+     *
+     * @param context    command preprocessing context which can be used to access the command context and command input
+     * @param suggestion the suggestion to process
+     * @return the processed suggestion, or {@code null}
+     */
+    @Nullable Suggestion process(@NonNull CommandPreprocessingContext<C> context, @NonNull Suggestion suggestion);
 }

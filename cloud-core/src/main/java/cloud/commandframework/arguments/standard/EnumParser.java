@@ -27,6 +27,7 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
@@ -34,14 +35,15 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.EnumSet;
-import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C, E> {
+public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C, E>,
+        BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new enum parser.
@@ -110,16 +112,11 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
-        return EnumSet.allOf(this.enumClass).stream().map(e -> e.name().toLowerCase()).collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean isContextFree() {
-        return true;
+        return EnumSet.allOf(this.enumClass).stream().map(e -> e.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
     }
 
 
@@ -157,7 +154,7 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
         private static @NonNull String join(final @NonNull Class<? extends Enum> clazz) {
             final EnumSet<?> enumSet = EnumSet.allOf(clazz);
             return enumSet.stream()
-                    .map(e -> e.toString().toLowerCase())
+                    .map(e -> e.toString().toLowerCase(Locale.ROOT))
                     .collect(Collectors.joining(", "));
         }
 

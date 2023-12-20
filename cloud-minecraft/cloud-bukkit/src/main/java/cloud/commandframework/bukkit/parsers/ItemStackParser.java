@@ -27,7 +27,8 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
@@ -43,7 +44,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -130,11 +130,8 @@ public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
     }
 
     @Override
-    public final @NonNull List<@NonNull Suggestion> suggestions(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
-    ) {
-        return this.parser.suggestions(commandContext, input);
+    public final @NonNull SuggestionProvider<C> suggestionProvider() {
+        return this.parser.suggestionProvider();
     }
 
 
@@ -209,20 +206,18 @@ public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull ProtoItemStack> parse(
-                @NonNull final CommandContext<@NonNull C> commandContext,
-                @NonNull final CommandInput commandInput
+                final @NonNull CommandContext<@NonNull C> commandContext,
+                final @NonNull CommandInput commandInput
         ) {
             // Minecraft has a parser for this - just use it
             return this.parser.parse(commandContext, commandInput);
         }
 
         @Override
-        public @NonNull List<@NonNull Suggestion> suggestions(
-                final @NonNull CommandContext<C> commandContext,
-                final @NonNull String input
-        ) {
-            return this.parser.suggestions(commandContext, input);
+        public @NonNull SuggestionProvider<C> suggestionProvider() {
+            return this.parser.suggestionProvider();
         }
+
 
         private static final class ModernProtoItemStack implements ProtoItemStack {
 
@@ -279,21 +274,22 @@ public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
         }
     }
 
-    private static final class LegacyParser<C> implements ArgumentParser<C, ProtoItemStack> {
+    private static final class LegacyParser<C> implements ArgumentParser<C, ProtoItemStack>,
+            BlockingSuggestionProvider.Strings<C> {
 
         private final ArgumentParser<C, ProtoItemStack> parser = new MaterialParser<C>()
                 .map((ctx, material) -> CompletableFuture.completedFuture(new LegacyProtoItemStack(material)));
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull ProtoItemStack> parse(
-                @NonNull final CommandContext<@NonNull C> commandContext,
-                @NonNull final CommandInput commandInput
+                final @NonNull CommandContext<@NonNull C> commandContext,
+                final @NonNull CommandInput commandInput
         ) {
             return this.parser.parse(commandContext, commandInput);
         }
 
         @Override
-        public @NonNull List<@NonNull String> stringSuggestions(
+        public @NonNull Iterable<@NonNull String> stringSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

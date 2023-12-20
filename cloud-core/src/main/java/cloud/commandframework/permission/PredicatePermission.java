@@ -25,21 +25,19 @@ package cloud.commandframework.permission;
 
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.function.Predicate;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * A functional {@link CommandPermission} implementation
+ * A functional {@link Permission} implementation
  *
  * @param <C> Command sender type
  * @since 1.4.0
  */
 @FunctionalInterface
 @API(status = API.Status.STABLE, since = "1.4.0")
-public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolder<Void> {
+public interface PredicatePermission<C> extends Permission, CloudKeyHolder<Void> {
 
     /**
      * Create a new predicate permission
@@ -70,6 +68,11 @@ public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolde
         return CloudKey.of(this.getClass().getSimpleName());
     }
 
+    @Override
+    default @NonNull String permissionString() {
+        return this.key().name();
+    }
+
     /**
      * Checks whether the given sender has this permission
      *
@@ -91,11 +94,6 @@ public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolde
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     boolean hasPermission(@NonNull C sender);
-
-    @Override
-    default @NonNull Collection<@NonNull CommandPermission> getPermissions() {
-        return Collections.singleton(this);
-    }
 
     @Override
     default boolean isEmpty() {

@@ -103,6 +103,6 @@ public abstract class CommandBean<C> implements CommandExecutionHandler<C>, Comm
      * @param commandContext Command context
      */
     @Override
-    public void execute(@NonNull final CommandContext<C> commandContext) {
+    public void execute(final @NonNull CommandContext<C> commandContext) {
     }
 }

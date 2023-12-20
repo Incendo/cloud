@@ -49,7 +49,7 @@ public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
      * @return this builder
      * @since 1.5.0
      */
-    @NonNull @This BrigadierMappingBuilder<K, S> toConstant(ArgumentType<?> constant);
+    @This @NonNull BrigadierMappingBuilder<K, S> toConstant(ArgumentType<?> constant);
 
     /**
      * Map the cloud argument parser to a variable Brigadier {@link ArgumentType}.
@@ -58,7 +58,7 @@ public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
      * @return this builder
      * @since 1.5.0
      */
-    @NonNull @This BrigadierMappingBuilder<K, S> to(Function<K, ? extends ArgumentType<?>> mapper);
+    @This @NonNull BrigadierMappingBuilder<K, S> to(Function<K, ? extends ArgumentType<?>> mapper);
 
     /**
      * Use the default brigadier suggestions for this argument type.
@@ -68,7 +68,7 @@ public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
      * @return this builder
      * @since 1.5.0
      */
-    @NonNull @This BrigadierMappingBuilder<K, S> nativeSuggestions();
+    @This @NonNull BrigadierMappingBuilder<K, S> nativeSuggestions();
 
     /**
      * Use the suggestions from Cloud's parser for this argument type.
@@ -80,7 +80,7 @@ public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
      * @return this builder
      * @since 1.5.0
      */
-    @NonNull @This BrigadierMappingBuilder<K, S> cloudSuggestions();
+    @This @NonNull BrigadierMappingBuilder<K, S> cloudSuggestions();
 
     /**
      * Use a custom Brigadier suggestion provider for this parser.
@@ -89,7 +89,7 @@ public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
      * @return this builder
      * @since 1.5.0
      */
-    default @NonNull @This BrigadierMappingBuilder<K, S> suggestedByConstant(final SuggestionProvider<S> provider) {
+    default @This @NonNull BrigadierMappingBuilder<K, S> suggestedByConstant(final SuggestionProvider<S> provider) {
         requireNonNull(provider, "provider");
         return this.suggestedBy((argument, useCloud) -> provider);
     }
@@ -101,7 +101,7 @@ public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
      * @return this builder
      * @since 1.5.0
      */
-    @NonNull @This BrigadierMappingBuilder<K, S> suggestedBy(SuggestionProviderSupplier<K, S> provider);
+    @This @NonNull BrigadierMappingBuilder<K, S> suggestedBy(SuggestionProviderSupplier<K, S> provider);
 
     /**
      * Builds the mapping.

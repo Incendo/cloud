@@ -52,8 +52,8 @@ final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
 
     @Override
     public @NonNull CommandComponent<C> assembleArgument(
-            @NonNull final SyntaxFragment syntaxFragment,
-            @NonNull final ArgumentDescriptor descriptor
+            final @NonNull SyntaxFragment syntaxFragment,
+            final @NonNull ArgumentDescriptor descriptor
     ) {
         final Parameter parameter = descriptor.parameter();
         final Collection<Annotation> annotations = Arrays.asList(parameter.getAnnotations());
@@ -66,7 +66,8 @@ final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
             parser = this.annotationParser.manager().parserRegistry()
                     .createParser(token, parameters)
                     .orElseThrow(() -> new IllegalArgumentException(
-                            String.format("Parameter '%s' "
+                            String.format(
+                                    "Parameter '%s' "
                                             + "has parser '%s' but no parser exists "
                                             + "for that type",
                                     parameter.getName(),
@@ -76,7 +77,8 @@ final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
             parser = this.annotationParser.manager().parserRegistry()
                     .createParser(this.annotationParser.processString(descriptor.parserName()), parameters)
                     .orElseThrow(() -> new IllegalArgumentException(
-                            String.format("Parameter '%s' "
+                            String.format(
+                                    "Parameter '%s' "
                                             + "has parser '%s' but no parser exists "
                                             + "for that type",
                                     parameter.getName(),
@@ -90,8 +92,7 @@ final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
                     "Invalid command argument '%s': Missing syntax mapping", argumentName));
         }
 
-        @SuppressWarnings("rawtypes")
-        final CommandComponent.Builder componentBuilder = CommandComponent.builder();
+        @SuppressWarnings("rawtypes") final CommandComponent.Builder componentBuilder = CommandComponent.builder();
         componentBuilder.commandManager(this.annotationParser.manager())
                 .valueType(parameter.getType())
                 .name(argumentName)
@@ -104,7 +105,7 @@ final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
             final List<Suggestion> suggestions = Arrays.stream(
                     completions.value().replace(" ", "").split(",")
             ).map(Suggestion::simple).collect(Collectors.toList());
-            componentBuilder.suggestionProvider((commandContext, input) -> suggestions);
+            componentBuilder.suggestionProvider(SuggestionProvider.suggesting(suggestions));
         } else if (descriptor.suggestions() != null) {
             final String suggestionProviderName = this.annotationParser.processString(descriptor.suggestions());
             final Optional<SuggestionProvider<C>> suggestionsFunction =

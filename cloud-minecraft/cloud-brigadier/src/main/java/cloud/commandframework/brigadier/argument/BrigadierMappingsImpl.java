@@ -35,7 +35,7 @@ final class BrigadierMappingsImpl<C, S> implements BrigadierMappings<C, S> {
     private final Map<Class<?>, BrigadierMapping<?, ?, S>> mappers = new HashMap<>();
 
     @Override
-    public @Nullable <T, K extends ArgumentParser<C, T>> BrigadierMapping<C, K, S> mapping(@NonNull final Class<K> parserType) {
+    public @Nullable <T, K extends ArgumentParser<C, T>> BrigadierMapping<C, K, S> mapping(final @NonNull Class<K> parserType) {
         final BrigadierMapping<?, ?, S> mapper = this.mappers.get(parserType);
         if (mapper == null) {
             return null;
@@ -45,8 +45,8 @@ final class BrigadierMappingsImpl<C, S> implements BrigadierMappings<C, S> {
 
     @Override
     public <K extends ArgumentParser<C, ?>> void registerMappingUnsafe(
-            @NonNull final Class<K> parserType,
-            @NonNull final BrigadierMapping<?, ?, S> mapping
+            final @NonNull Class<K> parserType,
+            final @NonNull BrigadierMapping<?, ?, S> mapping
     ) {
         this.mappers.put(parserType, mapping);
     }

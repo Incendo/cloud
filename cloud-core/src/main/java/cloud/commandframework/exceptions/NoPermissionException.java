@@ -25,7 +25,7 @@ package cloud.commandframework.exceptions;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.permission.CommandPermission;
+import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PermissionResult;
 import java.util.List;
 import org.apiguardian.api.API;
@@ -68,13 +68,13 @@ public class NoPermissionException extends CommandParseException {
     }
 
     /**
-     * Returns the missing {@link CommandPermission}
+     * Returns the missing {@link Permission}
      *
      * @return the missing permission
      * @since 1.9.0
      */
     @API(status = API.Status.STABLE, since = "1.9.0")
-    public @NonNull CommandPermission missingPermission() {
+    public @NonNull Permission missingPermission() {
         return this.result.permission();
     }
 

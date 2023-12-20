@@ -26,9 +26,17 @@ package cloud.commandframework.javacord;
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
+import cloud.commandframework.exceptions.InvalidCommandSenderException;
+import cloud.commandframework.exceptions.InvalidSyntaxException;
+import cloud.commandframework.exceptions.NoPermissionException;
+import cloud.commandframework.exceptions.handling.ExceptionContext;
+import cloud.commandframework.exceptions.handling.ExceptionHandler;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.javacord.sender.JavacordCommandSender;
 import cloud.commandframework.javacord.sender.JavacordServerSender;
+import cloud.commandframework.keys.CloudKey;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -39,6 +47,14 @@ import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.user.User;
 
 public class JavacordCommandManager<C> extends CommandManager<C> {
+
+    private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
+    private static final String MESSAGE_NO_PERMS = "I'm sorry, but you do not have the permission to do this :/";
+
+    public static final CloudKey<JavacordCommandSender> JAVACORD_COMMAND_SENDER_KEY = CloudKey.of(
+            "__internal_javacord_sender__",
+            JavacordCommandSender.class
+    );
 
     private final DiscordApi discordApi;
     private final Function<@NonNull JavacordCommandSender, @NonNull C> commandSenderMapper;
@@ -79,6 +95,7 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
         this.commandPermissionMapper = commandPermissionMapper;
 
         this.registerCapability(CloudCapability.StandardCapabilities.ROOT_COMMAND_DELETION);
+        this.registerDefaultExceptionHandlers();
     }
 
     @Override
@@ -128,5 +145,50 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
      */
     public @NonNull DiscordApi getDiscordApi() {
         return this.discordApi;
+    }
+
+    private void registerDefaultExceptionHandlers() {
+        this.registerHandler(Throwable.class, (commandSender, throwable) -> {
+            commandSender.sendErrorMessage(throwable.getMessage());
+            throwable.printStackTrace();
+        });
+        this.registerHandler(CommandExecutionException.class, (commandSender, throwable) -> {
+            commandSender.sendErrorMessage(MESSAGE_INTERNAL_ERROR);
+            throwable.getCause().printStackTrace();
+        });
+        this.registerHandler(ArgumentParseException.class, (commandSender, throwable) ->
+                commandSender.sendErrorMessage("Invalid Command Argument: `" + throwable.getCause().getMessage() + "`")
+        );
+        this.registerHandler(NoPermissionException.class, (commandSender, throwable) ->
+                commandSender.sendErrorMessage(MESSAGE_NO_PERMS)
+        );
+        this.registerHandler(InvalidCommandSenderException.class, (commandSender, throwable) ->
+                commandSender.sendErrorMessage(throwable.getMessage())
+        );
+        this.registerHandler(InvalidSyntaxException.class, (commandSender, throwable) ->
+                commandSender.sendErrorMessage("Invalid Command Syntax. Correct command syntax is: `"
+                        + throwable.getCorrectSyntax() + "`")
+        );
+    }
+
+    private <T extends Throwable> void registerHandler(
+            final @NonNull Class<T> exceptionClass,
+            final @NonNull JavacordExceptionHandler<C, T> handler
+    ) {
+        this.exceptionController().registerHandler(exceptionClass, handler);
+    }
+
+
+    @FunctionalInterface
+    @SuppressWarnings("FunctionalInterfaceMethodChanged")
+    private interface JavacordExceptionHandler<C, T extends Throwable> extends ExceptionHandler<C, T> {
+
+        @Override
+        default void handle(@NonNull ExceptionContext<C, T> context) throws Throwable {
+            final JavacordCommandSender commandSender = context.context().get(JAVACORD_COMMAND_SENDER_KEY);
+            this.handle(commandSender, context.exception());
+        }
+
+        void handle(@NonNull JavacordCommandSender commandSender, @NonNull T throwable) throws Throwable;
     }
 }

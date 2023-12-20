@@ -25,16 +25,16 @@ package cloud.commandframework.bukkit.parsers.selector;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
-import java.util.Collections;
+import cloud.commandframework.bukkit.data.SingleEntitySelector;
 import org.apiguardian.api.API;
+import org.bukkit.entity.Entity;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Parser for {@link SingleEntitySelector}. On Minecraft 1.13+
  * this argument uses Minecraft's built-in entity selector argument for parsing
  * and suggestions. On prior versions, this argument will suggest nothing and
- * always fail parsing with {@link SelectorParseException.FailureReason#UNSUPPORTED_VERSION}.
+ * always fail parsing with {@link SelectorUnsupportedException}.
  *
  * @param <C> sender type
  */
@@ -71,11 +71,23 @@ public final class SingleEntitySelectorParser<C> extends SelectorUtils.EntitySel
         super(true);
     }
 
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     @Override
     public SingleEntitySelector mapResult(
             final @NonNull String input,
             final SelectorUtils.@NonNull EntitySelectorWrapper wrapper
     ) {
-        return new SingleEntitySelector(input, Collections.singletonList(wrapper.singleEntity()));
+        final Entity entity = wrapper.singleEntity();
+        return new SingleEntitySelector() {
+            @Override
+            public @NonNull Entity single() {
+                return entity;
+            }
+
+            @Override
+            public @NonNull String inputString() {
+                return input;
+            }
+        };
     }
 }

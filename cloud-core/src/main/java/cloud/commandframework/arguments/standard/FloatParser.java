@@ -179,11 +179,6 @@ public final class FloatParser<C> implements ArgumentParser<C, Float> {
         return this.min != DEFAULT_MINIMUM;
     }
 
-    @Override
-    public boolean isContextFree() {
-        return true;
-    }
-
 
     @API(status = API.Status.STABLE)
     public static final class FloatParseException extends NumberParseException {

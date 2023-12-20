@@ -26,6 +26,7 @@ package cloud.commandframework.fabric.argument;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -34,7 +35,6 @@ import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.fabric.FabricCaptionKeys;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
 import java.util.ArrayList;
-import java.util.List;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.scores.PlayerTeam;
@@ -47,7 +47,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> the sender type
  * @since 2.0.0
  */
-public final class TeamParser<C> extends SidedArgumentParser<C, String, PlayerTeam> {
+public final class TeamParser<C> extends SidedArgumentParser<C, String, PlayerTeam> implements
+        BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new server parser.
@@ -74,7 +75,7 @@ public final class TeamParser<C> extends SidedArgumentParser<C, String, PlayerTe
     }
 
     @Override
-    public @NonNull List<@NonNull String> stringSuggestions(
+    public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
@@ -83,8 +84,8 @@ public final class TeamParser<C> extends SidedArgumentParser<C, String, PlayerTe
 
     @Override
     protected @NonNull ArgumentParseResult<String> parseIntermediate(
-            @NonNull final CommandContext<@NonNull C> commandContext,
-            @NonNull final CommandInput commandInput
+            final @NonNull CommandContext<@NonNull C> commandContext,
+            final @NonNull CommandInput commandInput
     ) {
         final String input = commandInput.readString();
         if (input.isEmpty()) {

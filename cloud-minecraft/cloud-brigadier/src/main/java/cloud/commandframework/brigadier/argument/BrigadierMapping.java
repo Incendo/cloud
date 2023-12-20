@@ -131,39 +131,39 @@ public final class BrigadierMapping<C, K extends ArgumentParser<C, ?>, S> {
         }
 
         @Override
-        public @NonNull @This BrigadierMappingBuilder<K, S> toConstant(final ArgumentType<?> constant) {
+        public @This @NonNull BrigadierMappingBuilder<K, S> toConstant(final ArgumentType<?> constant) {
             return this.to(parser -> constant);
         }
 
         @Override
-        public @NonNull @This BrigadierMappingBuilder<K, S> to(final Function<K, ? extends ArgumentType<?>> mapper) {
+        public @This @NonNull BrigadierMappingBuilder<K, S> to(final Function<K, ? extends ArgumentType<?>> mapper) {
             this.mapper = mapper;
             return this;
         }
 
         @Override
-        public @NonNull @This BrigadierMappingBuilder<K, S> nativeSuggestions() {
+        public @This @NonNull BrigadierMappingBuilder<K, S> nativeSuggestions() {
             this.cloudSuggestions = false;
             this.suggestionsOverride = null;
             return this;
         }
 
         @Override
-        public @NonNull @This BrigadierMappingBuilder<K, S> cloudSuggestions() {
+        public @This @NonNull BrigadierMappingBuilder<K, S> cloudSuggestions() {
             this.cloudSuggestions = true;
             this.suggestionsOverride = null;
             return this;
         }
 
         @Override
-        public @NonNull @This BrigadierMappingBuilder<K, S> suggestedByConstant(final SuggestionProvider<S> provider) {
+        public @This @NonNull BrigadierMappingBuilder<K, S> suggestedByConstant(final SuggestionProvider<S> provider) {
             BrigadierMappingBuilder.super.suggestedByConstant(provider);
             this.cloudSuggestions = false;
             return this;
         }
 
         @Override
-        public @NonNull @This BrigadierMappingBuilder<K, S> suggestedBy(final SuggestionProviderSupplier<K, S> provider) {
+        public @This @NonNull BrigadierMappingBuilder<K, S> suggestedBy(final SuggestionProviderSupplier<K, S> provider) {
             this.suggestionsOverride = requireNonNull(provider, "provider");
             this.cloudSuggestions = false;
             return this;

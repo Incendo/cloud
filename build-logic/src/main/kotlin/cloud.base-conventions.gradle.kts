@@ -32,7 +32,9 @@ tasks {
                 "StringSplitter",
                 "EqualsGetClass",
                 "CatchAndPrintStackTrace",
-                "InlineMeSuggester"
+                "InlineMeSuggester",
+                "InlineTrivialConstant",
+                "FunctionalInterfaceMethodChanged"
             )
             disableWarningsInGeneratedCode.set(true)
         }
@@ -84,4 +86,6 @@ dependencies {
     errorprone(libs.errorproneCore)
     // Silences compiler warnings from guava using errorprone
     compileOnly(libs.errorproneAnnotations)
+
+    checkstyle(libs.stylecheck)
 }
