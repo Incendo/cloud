@@ -59,8 +59,8 @@ class RepeatableCommandMethodTest {
         this.annotationParser.parse(new TestClass());
 
         // Act
-        final CommandResult<?> result1 = this.commandManager.executeCommand(new TestCommandSender(), "test").join();
-        final CommandResult<?> result2 = this.commandManager.executeCommand(new TestCommandSender(), "test foo").join();
+        final CommandResult<?> result1 = this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test").join();
+        final CommandResult<?> result2 = this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test foo").join();
 
         // Assert
         assertThat(result1.commandContext().<Boolean>get("handled")).isTrue();

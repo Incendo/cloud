@@ -68,7 +68,7 @@ class CommandDeletionTest {
         // Arrange
         this.commandManager.command(this.commandManager.commandBuilder("test").build());
         // Pre-assert.
-        this.commandManager.executeCommand(new TestCommandSender(), "test").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test").join();
 
         // Act
         this.commandManager.deleteRootCommand("test");
@@ -76,7 +76,7 @@ class CommandDeletionTest {
         // Assert
         final CompletionException completionException = assertThrows(
                 CompletionException.class,
-                () -> this.commandManager.executeCommand(new TestCommandSender(), "test").join()
+                () -> this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test").join()
         );
         assertThat(completionException).hasCauseThat().isInstanceOf(NoSuchCommandException.class);
 
@@ -118,19 +118,19 @@ class CommandDeletionTest {
         // Assert
         final CompletionException completionException = assertThrows(
                 CompletionException.class,
-                () -> this.commandManager.executeCommand(new TestCommandSender(), "test").join()
+                () -> this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test").join()
         );
         assertThat(completionException).hasCauseThat().isInstanceOf(NoSuchCommandException.class);
 
         final CompletionException completionException2 = assertThrows(
                 CompletionException.class,
-                () -> this.commandManager.executeCommand(new TestCommandSender(), "test literal").join()
+                () -> this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test literal").join()
         );
         assertThat(completionException2).hasCauseThat().isInstanceOf(NoSuchCommandException.class);
 
         final CompletionException completionException3 = assertThrows(
                 CompletionException.class,
-                () -> this.commandManager.executeCommand(new TestCommandSender(), "test literal hm").join()
+                () -> this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test literal hm").join()
         );
         assertThat(completionException3).hasCauseThat().isInstanceOf(NoSuchCommandException.class);
 
@@ -148,17 +148,17 @@ class CommandDeletionTest {
         this.commandManager.command(this.commandManager.commandBuilder("hello").literal("test").build());
 
         // Pre-assert.
-        this.commandManager.executeCommand(new TestCommandSender(), "test").join();
-        this.commandManager.executeCommand(new TestCommandSender(), "hello test").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "hello test").join();
 
         // Act
         this.commandManager.deleteRootCommand("hello");
 
         // Assert
-        this.commandManager.executeCommand(new TestCommandSender(), "test").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test").join();
         final CompletionException completionException = assertThrows(
                 CompletionException.class,
-                () -> this.commandManager.executeCommand(new TestCommandSender(), "hello").join()
+                () -> this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "hello").join()
         );
         assertThat(completionException).hasCauseThat().isInstanceOf(NoSuchCommandException.class);
 

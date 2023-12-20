@@ -30,6 +30,7 @@ import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.brigadier.suggestion.CloudDelegatingSuggestionProvider;
 import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
+import cloud.commandframework.context.StandardCommandContextFactory;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.types.tuples.Pair;
@@ -70,7 +71,7 @@ class LiteralBrigadierNodeFactoryTest {
         this.commandManager = new TestCommandManager();
         final CloudBrigadierManager<Object, Object> cloudBrigadierManager = new CloudBrigadierManager<>(
                 this.commandManager,
-                () -> this.commandManager.commandContextFactory().create(false, new Object()),
+                () -> new StandardCommandContextFactory<>(this.commandManager).create(false, new Object()),
                 this.commandManager.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion)
         );
         this.literalBrigadierNodeFactory = cloudBrigadierManager.literalBrigadierNodeFactory();

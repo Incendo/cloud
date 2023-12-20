@@ -67,7 +67,7 @@ class CommandPostProcessorTest {
         );
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "test").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test").join();
 
         // Assert
         verify(executionHandler, never()).executeFuture(notNull());

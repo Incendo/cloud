@@ -42,7 +42,7 @@ final class VelocityExecutor<C> implements Command<CommandSource> {
         final String input = commandContext.getInput();
         final C sender = this.manager.commandSenderMapper().apply(
                 source);
-        this.manager.executeCommand(sender, input);
+        this.manager.commandExecutor().executeCommand(sender, input);
         return com.mojang.brigadier.Command.SINGLE_SUCCESS;
     }
 }

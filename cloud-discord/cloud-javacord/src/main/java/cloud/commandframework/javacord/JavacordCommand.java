@@ -80,7 +80,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
             return;
         }
 
-        this.manager.executeCommand(sender, finalContent, ctx ->
+        this.manager.commandExecutor().executeCommand(sender, finalContent, ctx ->
                         ctx.store(JavacordCommandManager.JAVACORD_COMMAND_SENDER_KEY, commandSender));
     }
 }

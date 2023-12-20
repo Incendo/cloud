@@ -54,7 +54,7 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      * Parse command input into a command result.
      * <p>
      * This method may be called when a command chain is being parsed for execution
-     * (using {@link cloud.commandframework.CommandManager#executeCommand(Object, String)})
+     * (using {@link cloud.commandframework.CommandExecutor#executeCommand(Object, String)})
      * or when a command is being parsed to provide context for suggestions
      * (using {@link SuggestionFactory#suggest(Object, String)}).
      * It is possible to use {@link CommandContext#isSuggestions()}} to see what the purpose of the
@@ -82,7 +82,7 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      * Returns a future that completes with the result of parsing the given {@code commandInput}.
      * <p>
      * This method may be called when a command chain is being parsed for execution
-     * (using {@link cloud.commandframework.CommandManager#executeCommand(Object, String)})
+     * (using {@link cloud.commandframework.CommandExecutor#executeCommand(Object, String)})
      * or when a command is being parsed to provide context for suggestions
      * (using {@link SuggestionFactory#suggest(Object, String)}).
      * It is possible to use {@link CommandContext#isSuggestions()}} to see what the purpose of the

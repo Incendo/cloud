@@ -53,7 +53,7 @@ class RepeatableFlagTest {
     @Test
     void testRepeatableFlagParsing() {
         // Act
-        final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(
+        final CommandResult<TestCommandSender> result = this.commandManager.commandExecutor().executeCommand(
                 new TestCommandSender(),
                 "test --flag one --flag two --flag three"
         ).join();

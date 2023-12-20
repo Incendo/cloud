@@ -97,16 +97,16 @@ class AnnotationParserTest {
     @Test
     void testMethodConstruction() {
         Assertions.assertFalse(commands.isEmpty());
-        manager.executeCommand(new TestCommandSender(), "test literal 10").join();
-        manager.executeCommand(new TestCommandSender(), "t literal 10 o").join();
-        manager.executeCommand(new TestCommandSender(), "proxycommand 10").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "test literal 10").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "t literal 10 o").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "proxycommand 10").join();
         Assertions.assertThrows(CompletionException.class, () ->
-                manager.executeCommand(new TestCommandSender(), "test 101").join());
-        manager.executeCommand(new TestCommandSender(), "flagcommand -p").join();
-        manager.executeCommand(new TestCommandSender(), "flagcommand --print --word peanut").join();
-        manager.executeCommand(new TestCommandSender(), "parserflagcommand -s \"Hello World\"").join();
-        manager.executeCommand(new TestCommandSender(), "parserflagcommand -s \"Hello World\" -o This is a test").join();
-        manager.executeCommand(new TestCommandSender(), "class method").join();
+                manager.commandExecutor().executeCommand(new TestCommandSender(), "test 101").join());
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "flagcommand -p").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "flagcommand --print --word peanut").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "parserflagcommand -s \"Hello World\"").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "parserflagcommand -s \"Hello World\" -o This is a test").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "class method").join();
     }
 
     @Test
@@ -152,7 +152,7 @@ class AnnotationParserTest {
 
     @Test
     void testParameterInjection() {
-        manager.executeCommand(new TestCommandSender(), "injected 10").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "injected 10").join();
     }
 
     @Test
@@ -199,7 +199,7 @@ class AnnotationParserTest {
 
     @Test
     void testInjectedCommand() {
-        manager.executeCommand(new TestCommandSender(), "injected 10").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "injected 10").join();
     }
 
     @Suggestions("cows")

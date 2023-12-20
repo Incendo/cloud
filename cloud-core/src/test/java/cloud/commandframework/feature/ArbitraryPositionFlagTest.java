@@ -67,7 +67,7 @@ class ArbitraryPositionFlagTest {
                 "test literal foo bar --flag");
 
         for (String cmd : passing) {
-            CommandResult<TestCommandSender> result = this.commandManager.executeCommand(new TestCommandSender(), cmd).join();
+            CommandResult<TestCommandSender> result = this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), cmd).join();
             assertThat(result.commandContext().flags().isPresent("flag")).isEqualTo(true);
         }
     }
@@ -94,7 +94,7 @@ class ArbitraryPositionFlagTest {
     }
 
     private Executable commandExecutable(String cmd) {
-        return () -> this.commandManager.executeCommand(new TestCommandSender(), cmd).join();
+        return () -> this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), cmd).join();
     }
 
 }

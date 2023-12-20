@@ -103,10 +103,10 @@ class PermissionTest {
         when(this.permissionFunction.apply("first")).thenReturn(true);
 
         // Act
-        this.manager.executeCommand(new TestCommandSender(), "first").join();
+        this.manager.commandExecutor().executeCommand(new TestCommandSender(), "first").join();
         final CompletionException exception = assertThrows(
                 CompletionException.class,
-                () -> this.manager.executeCommand(new TestCommandSender(), "first 10").join()
+                () -> this.manager.commandExecutor().executeCommand(new TestCommandSender(), "first 10").join()
         );
 
         // Assert
@@ -223,12 +223,12 @@ class PermissionTest {
                 CloudKey.of("boolean"), $ -> condition.get()
         )));
         // First time should succeed
-        manager.executeCommand(new TestCommandSender(), "predicate").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "predicate").join();
         // Now we force it to fail
         condition.set(false);
         assertThrows(
                 CompletionException.class,
-                () -> manager.executeCommand(new TestCommandSender(), "predicate").join()
+                () -> manager.commandExecutor().executeCommand(new TestCommandSender(), "predicate").join()
         );
     }
 

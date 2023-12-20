@@ -26,6 +26,7 @@ package cloud.commandframework.arguments.suggestion;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.services.State;
 import cloud.commandframework.setting.ManagerSetting;
@@ -51,15 +52,18 @@ final class DelegatingSuggestionFactory<C, S extends Suggestion> implements Sugg
     private final CommandManager<C> commandManager;
     private final CommandTree<C> commandTree;
     private final SuggestionMapper<S> suggestionMapper;
+    private final CommandContextFactory<C> contextFactory;
 
     DelegatingSuggestionFactory(
             final @NonNull CommandManager<C> commandManager,
             final @NonNull CommandTree<C> commandTree,
-            final @NonNull SuggestionMapper<S> suggestionMapper
+            final @NonNull SuggestionMapper<S> suggestionMapper,
+            final @NonNull CommandContextFactory<C> contextFactory
     ) {
         this.commandManager = commandManager;
         this.commandTree = commandTree;
         this.suggestionMapper = suggestionMapper;
+        this.contextFactory = contextFactory;
     }
 
     @Override
@@ -75,10 +79,7 @@ final class DelegatingSuggestionFactory<C, S extends Suggestion> implements Sugg
 
     @Override
     public @NonNull CompletableFuture<List<@NonNull S>> suggest(final @NonNull C sender, final @NonNull String input) {
-        return this.suggest(
-                this.commandManager.commandContextFactory().create(true /* suggestions */, sender),
-                input
-        );
+        return this.suggest(this.contextFactory.create(true /* suggestions */, sender), input);
     }
 
     private @NonNull CompletableFuture<List<? extends @NonNull Suggestion>> suggestFromTree(

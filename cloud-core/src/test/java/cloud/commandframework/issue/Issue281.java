@@ -70,7 +70,7 @@ class Issue281 {
         // Act
         final CompletionException exception = assertThrows(
                 CompletionException.class,
-                () -> commandManager.executeCommand(new TestCommandSender(), "test").join()
+                () -> commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test").join()
         );
 
         // Assert
