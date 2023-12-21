@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.annotations.processing;
 
+import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.ArgumentMode;
 import cloud.commandframework.annotations.CommandMethod;
@@ -122,12 +123,16 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
                     .map(parameter -> parameter.getAnnotation(Argument.class))
                     .filter(Objects::nonNull)
                     .map(Argument::value)
+                    .filter(name -> !name.equals(AnnotationParser.INFERRED_ARGUMENT_NAME))
                     .collect(Collectors.toList());
             final List<String> parameterArgumentNames = new ArrayList<>(annotatedArgumentNames);
 
             e.getParameters()
                     .stream()
-                    .filter(parameter -> parameter.getAnnotation(Argument.class) == null)
+                    .filter(parameter -> {
+                        final Argument argument = parameter.getAnnotation(Argument.class);
+                        return argument == null || AnnotationParser.INFERRED_ARGUMENT_NAME.equals(argument.value());
+                    })
                     .map(parameter -> parameter.getSimpleName().toString())
                     .forEach(parameterArgumentNames::add);
 

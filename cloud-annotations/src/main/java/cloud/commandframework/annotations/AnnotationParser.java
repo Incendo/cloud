@@ -33,6 +33,7 @@ import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.injection.RawArgs;
 import cloud.commandframework.annotations.parsers.MethodArgumentParser;
 import cloud.commandframework.annotations.parsers.Parser;
+import cloud.commandframework.annotations.processing.CommandContainer;
 import cloud.commandframework.annotations.processing.CommandContainerProcessor;
 import cloud.commandframework.annotations.suggestions.SuggestionProviderFactory;
 import cloud.commandframework.annotations.suggestions.Suggestions;
@@ -64,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -89,6 +91,14 @@ import static cloud.commandframework.CommandDescription.commandDescription;
  */
 @SuppressWarnings("unused")
 public final class AnnotationParser<C> {
+
+    private static final Comparator<Class<?>> COMMAND_CONTAINER_COMPARATOR = Comparator.<Class<?>>comparingInt(clazz -> {
+        final CommandContainer commandContainer = clazz.getAnnotation(CommandContainer.class);
+        if (commandContainer == null) {
+            return 1;
+        }
+        return commandContainer.priority();
+    }).reversed();
 
     /**
      * The value of {@link Argument} that should be used to infer argument names from parameter names.
@@ -655,20 +665,24 @@ public final class AnnotationParser<C> {
     public @NonNull Collection<@NonNull Command<C>> parseContainers(final @NonNull ClassLoader classLoader) throws Exception {
         final List<Command<C>> commands = new LinkedList<>();
 
-        final List<String> classes;
+        final List<String> classNames;
         try (InputStream stream = classLoader.getResourceAsStream(CommandContainerProcessor.PATH)) {
             if (stream == null) {
                 return Collections.emptyList();
             }
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
-                classes = reader.lines().distinct().collect(Collectors.toList());
+                classNames = reader.lines().distinct().collect(Collectors.toList());
             }
         }
 
-        for (final String className : classes) {
-            final Class<?> commandContainer = Class.forName(className);
+        final List<Class<?>> classes = new ArrayList<>();
+        for (final String className : classNames) {
+            classes.add(Class.forName(className));
+        }
+        classes.sort(COMMAND_CONTAINER_COMPARATOR);
 
+        for (final Class<?> commandContainer : classes) {
             // We now have the class, and we now just need to decide what constructor to invoke.
             // We first try to find a constructor which takes in the parser.
             @MonotonicNonNull Object instance;

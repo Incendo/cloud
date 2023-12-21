@@ -65,10 +65,10 @@ class ParameterInjectionTest {
         final CommandResult<?> result = this.commandManager.executeCommand(new TestCommandSender(), "command").join();
 
         // Assert
-        assertThat(result.getCommandContext().<Integer>get("result-integer")).isEqualTo(5);
-        assertThat(result.getCommandContext().<String>get("result-string")).isEqualTo("abc");
-        assertThat(result.getCommandContext().<Boolean>get("result-boolean")).isEqualTo(true);
-        assertThat(result.getCommandContext().<SomeInterface>get("result-someInterface")).isInstanceOf(SomeImplementation.class);
+        assertThat(result.commandContext().<Integer>get("result-integer")).isEqualTo(5);
+        assertThat(result.commandContext().<String>get("result-string")).isEqualTo("abc");
+        assertThat(result.commandContext().<Boolean>get("result-boolean")).isEqualTo(true);
+        assertThat(result.commandContext().<SomeInterface>get("result-someInterface")).isInstanceOf(SomeImplementation.class);
     }
 
 

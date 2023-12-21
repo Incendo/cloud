@@ -23,45 +23,26 @@
 //
 package cloud.commandframework.examples.bukkit.annotations;
 
-import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.processing.CommandContainer;
+import cloud.commandframework.annotations.suggestions.Suggestions;
+import cloud.commandframework.context.CommandContext;
+import java.util.stream.Stream;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Example of a command container.
+ * Example of a command container with a higher-than-default priority.
  *
- * @see ExampleSuggestionContainer
+ * @see ExampleCommandContainer
  */
-@CommandContainer
-public final class ExampleCommandContainer {
+@CommandContainer(priority = 2)
+public final class ExampleSuggestionContainer {
 
-    /**
-     * The constructor. {@link AnnotationParser} is an optional parameter.
-     *
-     * @param parser the parser
-     */
-    public ExampleCommandContainer(final @NonNull AnnotationParser<CommandSender> parser) {
-        // Woo...
-    }
-
-    /**
-     * This one gets parsed automatically!
-     *
-     * @param sender the sender
-     * @param arg    a string
-     */
-    @CommandMethod("annotations container [arg]")
-    public void containerCommand(
-            final CommandSender sender,
-            @Argument(suggestions = "container-suggestions") final @Nullable String arg
+    @Suggestions("container-suggestions")
+    public @NonNull Stream<@NonNull String> containerSuggestions(
+            final @NonNull CommandContext<CommandSender> context,
+            final @NonNull String input
     ) {
-        sender.sendMessage("This is sent from a container!!");
-        if (arg != null) {
-            sender.sendMessage("You said: " + arg);
-        }
+        return Stream.of("Foo", "Bar");
     }
 }
