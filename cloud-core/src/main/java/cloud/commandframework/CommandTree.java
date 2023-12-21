@@ -34,7 +34,6 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.ParsingContext;
 import cloud.commandframework.exceptions.AmbiguousNodeException;
 import cloud.commandframework.exceptions.ArgumentParseException;
-import cloud.commandframework.exceptions.CommandParseException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoCommandInLeafException;
@@ -45,6 +44,7 @@ import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.SuggestionContext;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.setting.ManagerSetting;
+import cloud.commandframework.util.CompletableFutures;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -171,7 +171,7 @@ public final class CommandTree<C> {
     ) {
         // Special case for empty command trees.
         if (this.internalTree.isLeaf() && this.internalTree.component() == null) {
-            return this.failedCompletable(
+            return CompletableFutures.failedFuture(
                     new NoSuchCommandException(
                             commandContext.sender(),
                             new ArrayList<>(),
@@ -189,7 +189,7 @@ public final class CommandTree<C> {
             if (command != null
                     && command.senderType().isPresent()
                     && !command.senderType().get().isInstance(commandContext.sender())) {
-                return this.failedCompletable(
+                return CompletableFutures.failedFuture(
                         new InvalidCommandSenderException(
                                 commandContext.sender(),
                                 command.senderType().get(),
@@ -202,12 +202,6 @@ public final class CommandTree<C> {
         });
     }
 
-    private @NonNull CompletableFuture<@Nullable Command<C>> failedCompletable(final @NonNull CommandParseException exception) {
-        final CompletableFuture<Command<C>> result = new CompletableFuture<>();
-        result.completeExceptionally(exception);
-        return result;
-    }
-
     private @NonNull CompletableFuture<@Nullable Command<C>> parseCommand(
             final @NonNull List<@NonNull CommandComponent<C>> parsedArguments,
             final @NonNull CommandContext<C> commandContext,
@@ -216,7 +210,7 @@ public final class CommandTree<C> {
     ) {
         final Permission permission = this.findMissingPermission(commandContext.sender(), root);
         if (permission != null) {
-            return this.failedCompletable(
+            return CompletableFutures.failedFuture(
                     new NoPermissionException(
                             permission,
                             commandContext.sender(),
@@ -244,7 +238,7 @@ public final class CommandTree<C> {
             final CommandComponent<C> rootComponent = root.component();
             if (rootComponent == null || rootComponent.owningCommand() == null || !commandInput.isEmpty()) {
                 // Too many arguments. We have a unique path, so we can send the entire context
-                return this.failedCompletable(
+                return CompletableFutures.failedFuture(
                         new InvalidSyntaxException(
                                 this.commandManager.commandSyntaxFormatter()
                                         .apply(parsedArguments, root),
@@ -309,7 +303,7 @@ public final class CommandTree<C> {
 
                     // We could not find a match
                     if (root.equals(this.internalTree)) {
-                       return this.failedCompletable(
+                       return CompletableFutures.failedFuture(
                            new NoSuchCommandException(
                                    commandContext.sender(),
                                    this.getChain(root).stream().map(CommandNode::component).collect(Collectors.toList()),
@@ -326,7 +320,7 @@ public final class CommandTree<C> {
                                 commandContext.sender(),
                                 command.commandPermission()
                         )) {
-                            return this.failedCompletable(
+                            return CompletableFutures.failedFuture(
                                     new NoPermissionException(
                                             command.commandPermission(),
                                             commandContext.sender(),
@@ -342,7 +336,7 @@ public final class CommandTree<C> {
                     }
 
                     // We know that there's no command, and we also cannot match any of the children
-                    return this.failedCompletable(
+                    return CompletableFutures.failedFuture(
                             new InvalidSyntaxException(
                                     this.commandManager.commandSyntaxFormatter()
                                             .apply(parsedArguments, root),
@@ -384,7 +378,7 @@ public final class CommandTree<C> {
         // Check if we're allowed to execute the child command. If not, exit
         final Permission permission = this.findMissingPermission(commandContext.sender(), child);
         if (!commandInput.isEmpty() && permission != null) {
-            return this.failedCompletable(
+            return CompletableFutures.failedFuture(
                     new NoPermissionException(
                             permission,
                             commandContext.sender(),
@@ -441,7 +435,7 @@ public final class CommandTree<C> {
                     final List<CommandComponent<C>> components = Objects.requireNonNull(
                             childComponent.owningCommand()
                     ).components();
-                    return this.failedCompletable(
+                    return CompletableFutures.failedFuture(
                             new InvalidSyntaxException(
                                     this.commandManager.commandSyntaxFormatter().apply(components, child),
                                     commandContext.sender(),
@@ -458,7 +452,7 @@ public final class CommandTree<C> {
                 if (this.commandManager().hasPermission(commandContext.sender(), command.commandPermission())) {
                     return CompletableFuture.completedFuture(command);
                 }
-                return this.failedCompletable(
+                return CompletableFutures.failedFuture(
                         new NoPermissionException(
                                 command.commandPermission(),
                                 commandContext.sender(),
@@ -474,7 +468,7 @@ public final class CommandTree<C> {
                 final CommandComponent<C> rootComponent = root.component();
                 if (rootComponent == null || rootComponent.owningCommand() == null) {
                     // Child does not have a command, and so we cannot proceed
-                    return this.failedCompletable(
+                    return CompletableFutures.failedFuture(
                             new InvalidSyntaxException(
                                     this.commandManager.commandSyntaxFormatter()
                                             .apply(parsedArguments, root),
@@ -494,7 +488,7 @@ public final class CommandTree<C> {
                     return CompletableFuture.completedFuture(command);
                 }
 
-                return this.failedCompletable(
+                return CompletableFutures.failedFuture(
                         new NoPermissionException(
                                 command.commandPermission(),
                                 commandContext.sender(),
@@ -530,7 +524,7 @@ public final class CommandTree<C> {
                if (commandInput.isEmpty()) {
                    return CompletableFuture.completedFuture(component.owningCommand());
                }
-               return this.failedCompletable(
+               return CompletableFutures.failedFuture(
                        new InvalidSyntaxException(
                                this.commandManager.commandSyntaxFormatter().apply(parsedArguments, child),
                                commandContext.sender(),

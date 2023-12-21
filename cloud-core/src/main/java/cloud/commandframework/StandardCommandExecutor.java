@@ -30,6 +30,7 @@ import cloud.commandframework.exceptions.handling.ExceptionController;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandResult;
 import cloud.commandframework.services.State;
+import cloud.commandframework.util.CompletableFutures;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
@@ -88,9 +89,7 @@ final class StandardCommandExecutor<C> implements CommandExecutor<C> {
                 return this.commandExecutionCoordinator().coordinateExecution(context, commandInput);
             }
         } catch (final Exception e) {
-            final CompletableFuture<CommandResult<C>> future = new CompletableFuture<>();
-            future.completeExceptionally(e);
-            return future;
+            return CompletableFutures.failedFuture(e);
         }
         /* Wasn't allowed to execute the command */
         return CompletableFuture.completedFuture(null);

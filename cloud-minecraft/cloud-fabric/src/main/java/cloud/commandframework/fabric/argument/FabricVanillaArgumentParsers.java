@@ -40,6 +40,7 @@ import cloud.commandframework.fabric.data.SinglePlayerSelector;
 import cloud.commandframework.fabric.internal.EntitySelectorAccess;
 import cloud.commandframework.fabric.mixin.MessageArgumentMessageAccess;
 import cloud.commandframework.fabric.mixin.MessageArgumentPartAccess;
+import cloud.commandframework.util.CompletableFutures;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Collection;
@@ -331,9 +332,7 @@ public final class FabricVanillaArgumentParsers {
     ) {
         final SharedSuggestionProvider nativeSource = context.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
         if (!(nativeSource instanceof CommandSourceStack)) {
-            final CompletableFuture<O> future = new CompletableFuture<>();
-            future.completeExceptionally(serverOnly());
-            return future;
+            return CompletableFutures.failedFuture(serverOnly());
         }
         return resultFunction.apply((CommandSourceStack) nativeSource);
     }
