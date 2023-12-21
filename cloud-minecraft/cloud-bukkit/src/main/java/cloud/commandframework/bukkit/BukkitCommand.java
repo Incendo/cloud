@@ -108,7 +108,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
             final @NonNull String @NonNull [] strings
     ) {
         /* Join input */
-        final StringBuilder builder = new StringBuilder(commandLabel);
+        final StringBuilder builder = new StringBuilder(this.command.name());
         for (final String string : strings) {
             builder.append(" ").append(string);
         }
