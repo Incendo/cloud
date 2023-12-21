@@ -62,7 +62,10 @@ class ParameterInjectionTest {
         this.annotationParser.parse(new TestClass());
 
         // Act
-        final CommandResult<?> result = this.commandManager.executeCommand(new TestCommandSender(), "command").join();
+        final CommandResult<?> result = this.commandManager.commandExecutor().executeCommand(
+                new TestCommandSender(),
+                "command"
+        ).join();
 
         // Assert
         assertThat(result.commandContext().<Integer>get("result-integer")).isEqualTo(5);
