@@ -630,16 +630,33 @@ public final class AnnotationParser<C> {
     /**
      * Parses all known {@link cloud.commandframework.annotations.processing.CommandContainer command containers}.
      *
+     * <p>This will use the {@link ClassLoader class loader} of the current class to retrieve the stored information about the
+     * command containers.</p>
+     *
      * @return Collection of parsed commands
      * @throws Exception re-throws all encountered exceptions.
      * @see cloud.commandframework.annotations.processing.CommandContainer CommandContainer for more information.
      * @since 1.7.0
      */
     public @NonNull Collection<@NonNull Command<C>> parseContainers() throws Exception {
+        return this.parseContainers(this.getClass().getClassLoader());
+    }
+
+    /**
+     * Parses all known {@link cloud.commandframework.annotations.processing.CommandContainer command containers}.
+     *
+     * @param classLoader class loader to use to scan for {@link CommandContainerProcessor#PATH}
+     * @return Collection of parsed commands
+     * @throws Exception re-throws all encountered exceptions.
+     * @see cloud.commandframework.annotations.processing.CommandContainer CommandContainer for more information.
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull Collection<@NonNull Command<C>> parseContainers(final @NonNull ClassLoader classLoader) throws Exception {
         final List<Command<C>> commands = new LinkedList<>();
 
         final List<String> classes;
-        try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream(CommandContainerProcessor.PATH)) {
+        try (InputStream stream = classLoader.getResourceAsStream(CommandContainerProcessor.PATH)) {
             if (stream == null) {
                 return Collections.emptyList();
             }
