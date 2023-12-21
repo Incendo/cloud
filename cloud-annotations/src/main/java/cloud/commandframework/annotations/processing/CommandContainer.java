@@ -53,4 +53,13 @@ import java.lang.annotation.Target;
 public @interface CommandContainer {
 
     String ANNOTATION_PATH = "cloud.commandframework.annotations.processing.CommandContainer";
+
+    /**
+     * Returns the priority of the container.
+     *
+     * <p>A container with a higher priority will get parsed earlier than a container with a lower priority.</p>
+     *
+     * @return the priority
+     */
+    int priority() default 1;
 }
