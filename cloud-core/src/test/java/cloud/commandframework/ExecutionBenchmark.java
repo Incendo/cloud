@@ -69,6 +69,6 @@ public class ExecutionBenchmark {
     @Benchmark
     @Fork(3)
     public void testCommandParsing() {
-        manager.executeCommand(new TestCommandSender(), literalChain).join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), literalChain).join();
     }
 }

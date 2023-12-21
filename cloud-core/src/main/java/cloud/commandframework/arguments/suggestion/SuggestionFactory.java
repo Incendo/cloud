@@ -25,6 +25,7 @@ package cloud.commandframework.arguments.suggestion;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandContextFactory;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -45,20 +46,23 @@ public interface SuggestionFactory<C, S extends Suggestion> {
      * Returns a suggestion factory that invokes the command tree to create the suggestions, and then maps them
      * to the output type using the given {@code mapper}.
      *
-     * @param <C>     the command sender type
-     * @param <S>     the output suggestion type
-     * @param manager the command manager
-     * @param mapper  the suggestion mapper
+     * @param <C>            the command sender type
+     * @param <S>            the output suggestion type
+     * @param manager        the command manager
+     * @param mapper         the suggestion mapper
+     * @param contextFactory factory producing {@link CommandContext} instances
      * @return the factory
      */
     static <C, S extends Suggestion> @NonNull SuggestionFactory<C, S> delegating(
             final @NonNull CommandManager<C> manager,
-            final @NonNull SuggestionMapper<S> mapper
+            final @NonNull SuggestionMapper<S> mapper,
+            final @NonNull CommandContextFactory<C> contextFactory
     ) {
         return new DelegatingSuggestionFactory<>(
                 manager,
                 manager.commandTree(),
-                mapper
+                mapper,
+                contextFactory
         );
     }
 

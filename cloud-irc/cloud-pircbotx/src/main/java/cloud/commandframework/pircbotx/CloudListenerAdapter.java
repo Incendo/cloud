@@ -42,7 +42,7 @@ final class CloudListenerAdapter<C> extends ListenerAdapter {
             return;
         }
         final C sender = this.manager.getUserMapper().apply(event.getUser());
-        this.manager.executeCommand(
+        this.manager.commandExecutor().executeCommand(
                 sender,
                 message.substring(this.manager.getCommandPrefix().length()),
                 context -> context.store(PircBotXCommandManager.PIRCBOTX_MESSAGE_EVENT_KEY, event)

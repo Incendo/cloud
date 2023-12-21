@@ -75,7 +75,7 @@ class ArgumentDrivenCommandsTest {
         this.annotationParser.parse(new ArgumentDrivenCommandClass());
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "test 3 literal").get();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test 3 literal").get();
     }
 
     private static class TestArgumentExtractor implements ArgumentExtractor {

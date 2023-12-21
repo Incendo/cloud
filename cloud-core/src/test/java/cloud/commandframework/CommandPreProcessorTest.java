@@ -61,9 +61,9 @@ public class CommandPreProcessorTest {
 
     @Test
     void testPreprocessing() {
-        Assertions.assertEquals(10, manager.executeCommand(new TestCommandSender(), "10 test value1")
+        Assertions.assertEquals(10, manager.commandExecutor().executeCommand(new TestCommandSender(), "10 test value1")
                 .join().commandContext().<Integer>optional("int").orElse(0));
-        manager.executeCommand(new TestCommandSender(), "aa test value1").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "aa test value1").join();
     }
 
 

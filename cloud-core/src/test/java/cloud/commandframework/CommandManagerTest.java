@@ -98,10 +98,10 @@ class CommandManagerTest {
         this.commandManager.command(commandC);
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "test a").join();
-        this.commandManager.executeCommand(new TestCommandSender(), "test b").join();
-        this.commandManager.executeCommand(new TestCommandSender(), "test c").join();
-        this.commandManager.executeCommand(new TestCommandSender(), "test c 123").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test a").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test b").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test c").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test c 123").join();
 
         // Assert
         ArgumentCaptor<CommandContext<TestCommandSender>> contextArgumentCaptor = ArgumentCaptor.forClass(

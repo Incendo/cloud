@@ -68,7 +68,7 @@ class CommandExecutionCoordinatorTest {
         // Act
         final CompletionException completionException = assertThrows(
                 CompletionException.class,
-                () -> commandManager.executeCommand(new TestCommandSender(), "test 123").join()
+                () -> commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test 123").join()
         );
 
         // Assert
@@ -106,7 +106,7 @@ class CommandExecutionCoordinatorTest {
         // Act
         final CompletionException completionException = assertThrows(
                 CompletionException.class,
-                () -> commandManager.executeCommand(new TestCommandSender(), "test 123").join()
+                () -> commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test 123").join()
         );
 
         // Assert
@@ -145,7 +145,7 @@ class CommandExecutionCoordinatorTest {
         // Act
         final CompletionException completionException = assertThrows(
                 CompletionException.class,
-                () -> commandManager.executeCommand(new TestCommandSender(), "test 123").join()
+                () -> commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test 123").join()
         );
 
         // Assert
@@ -195,7 +195,7 @@ class CommandExecutionCoordinatorTest {
         // Act
         final CompletionException completionException = assertThrows(
                 CompletionException.class,
-                () -> commandManager.executeCommand(new TestCommandSender(), "test 123").join()
+                () -> commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test 123").join()
         );
 
         // Assert

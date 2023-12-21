@@ -52,7 +52,7 @@ class SuspendingHandlerTest {
             }
         }
 
-        manager.executeCommand(TestCommandSender(), "suspend").await()
+        manager.commandExecutor().executeCommand(TestCommandSender(), "suspend").await()
     }
 
     suspend fun someSuspendingFunction() {}

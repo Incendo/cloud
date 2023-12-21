@@ -70,7 +70,7 @@ class KotlinAnnotatedMethodsTest {
             .installCoroutineSupport()
             .parse(CommandMethods())
 
-        commandManager.executeCommand(TestCommandSender(), "test").await()
+        commandManager.commandExecutor().executeCommand(TestCommandSender(), "test").await()
     }
 
     @Test
@@ -80,7 +80,7 @@ class KotlinAnnotatedMethodsTest {
             .parse(CommandMethods())
 
         assertThrows<CommandExecutionException> {
-            commandManager.executeCommand(TestCommandSender(), "test-exception").await()
+            commandManager.commandExecutor().executeCommand(TestCommandSender(), "test-exception").await()
         }
     }
 
@@ -90,7 +90,7 @@ class KotlinAnnotatedMethodsTest {
             .installCoroutineSupport()
             .parse(CommandMethods())
 
-        val result = commandManager.executeCommand(TestCommandSender(), "with-default").await()
+        val result = commandManager.commandExecutor().executeCommand(TestCommandSender(), "with-default").await()
         assertThat(result.commandContext().get<Int>("the-value")).isEqualTo(5)
     }
 

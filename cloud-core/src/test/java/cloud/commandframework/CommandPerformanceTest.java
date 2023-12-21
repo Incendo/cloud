@@ -60,7 +60,7 @@ final class CommandPerformanceTest {
 
     @Test
     void testLiterals() {
-        final CommandResult<TestCommandSender> result = manager.executeCommand(new TestCommandSender(), literalChain).join();
+        final CommandResult<TestCommandSender> result = manager.commandExecutor().executeCommand(new TestCommandSender(), literalChain).join();
 
         long elapsedTime = 0L;
         int amount = 0;

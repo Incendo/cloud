@@ -64,7 +64,7 @@ class ArgumentWithoutAnnotationTest {
         this.annotationParser.parse(new TestClass());
 
         // Assert
-        final CommandResult<?> result = this.commandManager.executeCommand(new TestCommandSender(),
+        final CommandResult<?> result = this.commandManager.commandExecutor().executeCommand(new TestCommandSender(),
                 "command abc 123 true").join();
         final CommandContext<?> context = result.commandContext();
         assertThat(context.<String>get("required")).isEqualTo("abc");

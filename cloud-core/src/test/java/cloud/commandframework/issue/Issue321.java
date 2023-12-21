@@ -50,7 +50,7 @@ class Issue321 {
         );
 
         // Act
-        final CommandResult<TestCommandSender> result = commandManager.executeCommand(
+        final CommandResult<TestCommandSender> result = commandManager.commandExecutor().executeCommand(
                 new TestCommandSender(),
                 "command --flag1 one two three --flag2 1 2 3"
         ).join();

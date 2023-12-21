@@ -43,7 +43,6 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.StandardCommandContextFactory;
 import cloud.commandframework.exceptions.handling.ExceptionController;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.execution.CommandResult;
 import cloud.commandframework.execution.CommandSuggestionProcessor;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.execution.postprocessor.AcceptingCommandPostprocessor;
@@ -77,11 +76,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
@@ -101,16 +97,15 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
 
     private final Configurable<ManagerSetting> settings = Configurable.enumConfigurable(ManagerSetting.class)
             .set(ManagerSetting.ENFORCE_INTERMEDIARY_PERMISSIONS, true);
-    private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>(this);
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private final ParserRegistry<C> parserRegistry = new StandardParserRegistry<>();
     private final Collection<Command<C>> commands = new LinkedList<>();
     private final ParameterInjectorRegistry<C> parameterInjectorRegistry = new ParameterInjectorRegistry<>();
-    private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
     private final CommandTree<C> commandTree;
     private final SuggestionFactory<C, ? extends Suggestion> suggestionFactory;
     private final Set<CloudCapability> capabilities = new HashSet<>();
     private final ExceptionController<C> exceptionController = new ExceptionController<>();
+    private final CommandExecutor<C> commandExecutor;
 
     private CaptionFormatter<C, String> captionVariableReplacementHandler = CaptionFormatter.placeholderReplacing();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
@@ -141,10 +136,19 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
             final @NonNull CommandRegistrationHandler<C> commandRegistrationHandler
     ) {
+        final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>(this);
         this.commandTree = CommandTree.newTree(this);
-        this.commandExecutionCoordinator = commandExecutionCoordinator.apply(this.commandTree);
         this.commandRegistrationHandler = commandRegistrationHandler;
-        this.suggestionFactory = SuggestionFactory.delegating(this, (suggestion) -> this.suggestionMapper.map(suggestion));
+        this.suggestionFactory = SuggestionFactory.delegating(
+                this,
+                (suggestion) -> this.suggestionMapper.map(suggestion),
+                commandContextFactory
+        );
+        this.commandExecutor = new StandardCommandExecutor<>(
+                this,
+                commandExecutionCoordinator.apply(this.commandTree),
+                commandContextFactory
+        );
         /* Register service types */
         this.servicePipeline.registerServiceType(new TypeToken<CommandPreprocessor<C>>() {
         }, new AcceptingCommandPreprocessor<>());
@@ -160,97 +164,16 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
     }
 
     /**
-     * Execute a command and get a future that completes with the result. The command may be executed immediately
-     * or at some point in the future, depending on the {@link CommandExecutionCoordinator} used in the command manager.
-     * <p>
-     * The command may also be filtered out by preprocessors (see {@link CommandPreprocessor}) before they are parsed,
-     * or by the {@link CommandComponent} command components during parsing. The execution may also be filtered out
-     * after parsing by a {@link CommandPostprocessor}. In the case that a command was filtered out at any of the
-     * execution stages, the future will complete with {@code null}.
-     * <p>
-     * The future may also complete exceptionally.
-     * These exceptions will be handled using exception handlers registered in the {@link #exceptionController()}.
-     * The exceptions will be forwarded to the future, if the exception was transformed during the exception handling, then the
-     * new exception will be present in the completed future.
+     * Returns the command executor.
      *
-     * @param commandSender Sender of the command
-     * @param input         Input provided by the sender. Prefixes should be removed before the method is being called, and
-     *                      the input here will be passed directly to the command parsing pipeline, after having been tokenized.
-     * @return future that completes with the command result, or {@code null} if the execution was cancelled at any of the
-     *         processing stages.
-     */
-    public @NonNull CompletableFuture<CommandResult<C>> executeCommand(
-            final @NonNull C commandSender,
-            final @NonNull String input
-    ) {
-        return this.executeCommand(commandSender, input, context -> {});
-    }
-
-    /**
-     * Executes a command and get a future that completes with the result. The command may be executed immediately
-     * or at some point in the future, depending on the {@link CommandExecutionCoordinator} used in the command manager.
-     * <p>
-     * The command may also be filtered out by preprocessors (see {@link CommandPreprocessor}) before they are parsed,
-     * or by the {@link CommandComponent} command components during parsing. The execution may also be filtered out
-     * after parsing by a {@link CommandPostprocessor}. In the case that a command was filtered out at any of the
-     * execution stages, the future will complete with {@code null}.
-     * <p>
-     * The future may also complete exceptionally.
-     * These exceptions will be handled using exception handlers registered in the {@link #exceptionController()}.
-     * The exceptions will be forwarded to the future, if the exception was transformed during the exception handling, then the
-     * new exception will be present in the completed future.
+     * <p>The executor is used to parse &amp; execute commands.</p>
      *
-     * @param commandSender   the sender of the command
-     * @param input           the input provided by the sender. Prefixes should be removed before the method is being called, and
-     *                        the input here will be passed directly to the command parsing pipeline, after having been tokenized.
-     * @param contextConsumer consumer that accepts the context before the command is executed
-     * @return future that completes with the command result, or {@code null} if the execution was cancelled at any of the
-     *         processing stages.
+     * @return the command executor
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull CompletableFuture<CommandResult<C>> executeCommand(
-            final @NonNull C commandSender,
-            final @NonNull String input,
-            final @NonNull Consumer<CommandContext<C>> contextConsumer
-    ) {
-        final CommandContext<C> context = this.commandContextFactory.create(
-                false,
-                commandSender
-        );
-        contextConsumer.accept(context);
-        final CommandInput commandInput = CommandInput.of(input);
-        return this.executeCommand(context, commandInput).whenComplete((result, throwable) -> {
-            if (throwable == null) {
-                return;
-            }
-            try {
-                this.exceptionController.handleException(context, ExceptionController.unwrapCompletionException(throwable));
-            } catch (final RuntimeException runtimeException) {
-                throw runtimeException;
-            } catch (final Throwable e) {
-                throw new CompletionException(e);
-            }
-        });
-    }
-
-    private @NonNull CompletableFuture<CommandResult<C>> executeCommand(
-            final @NonNull CommandContext<C> context,
-            final @NonNull CommandInput commandInput
-    ) {
-        /* Store a copy of the input queue in the context */
-        context.store("__raw_input__", commandInput.copy());
-        try {
-            if (this.preprocessContext(context, commandInput) == State.ACCEPTED) {
-                return this.commandExecutionCoordinator.coordinateExecution(context, commandInput);
-            }
-        } catch (final Exception e) {
-            final CompletableFuture<CommandResult<C>> future = new CompletableFuture<>();
-            future.completeExceptionally(e);
-            return future;
-        }
-        /* Wasn't allowed to execute the command */
-        return CompletableFuture.completedFuture(null);
+    public @NonNull CommandExecutor<C> commandExecutor() {
+        return this.commandExecutor;
     }
 
     /**
@@ -325,17 +248,6 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
     @SuppressWarnings("unchecked")
     public @NonNull CommandManager<C> command(final Command.@NonNull Builder<? extends C> command) {
         return this.command(((Command.Builder<C>) command).manager(this).build());
-    }
-
-    /**
-     * Returns the factory used to create {@link CommandContext} instances.
-     *
-     * @return the command context factory
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull CommandContextFactory<C> commandContextFactory() {
-        return this.commandContextFactory;
     }
 
     /**
@@ -1052,17 +964,6 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
     @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull Configurable<ManagerSetting> settings() {
         return this.settings;
-    }
-
-    /**
-     * Returns the command execution coordinator used in this manager
-     *
-     * @return Command execution coordinator
-     * @since 1.6.0
-     */
-    @API(status = API.Status.STABLE, since = "1.6.0")
-    public @NonNull CommandExecutionCoordinator<C> commandExecutionCoordinator() {
-        return this.commandExecutionCoordinator;
     }
 
     @Override

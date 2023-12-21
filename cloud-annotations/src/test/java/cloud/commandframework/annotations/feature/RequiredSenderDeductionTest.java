@@ -68,7 +68,7 @@ class RequiredSenderDeductionTest {
         final SuperSender<?> sender = new StringSender();
 
         // Act
-        this.commandManager.executeCommand(sender, "teststring").join();
+        this.commandManager.commandExecutor().executeCommand(sender, "teststring").join();
     }
 
     @Test
@@ -79,7 +79,7 @@ class RequiredSenderDeductionTest {
         // Act
         assertThrows(
                 CompletionException.class,
-                () -> this.commandManager.executeCommand(sender, "teststring").join()
+                () -> this.commandManager.commandExecutor().executeCommand(sender, "teststring").join()
         );
     }
 

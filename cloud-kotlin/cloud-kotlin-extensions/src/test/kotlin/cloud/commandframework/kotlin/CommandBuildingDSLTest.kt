@@ -90,8 +90,8 @@ class CommandBuildingDSLTest {
             }
         }
 
-        manager.executeCommand(SpecificCommandSender(), "kotlin dsl time")
-        manager.executeCommand(SpecificCommandSender(), "kotlin dsl time bruh_moment")
+        manager.commandExecutor().executeCommand(SpecificCommandSender(), "kotlin dsl time")
+        manager.commandExecutor().executeCommand(SpecificCommandSender(), "kotlin dsl time bruh_moment")
 
         Assertions.assertEquals(
             manager.createHelpHandler()

@@ -64,7 +64,7 @@ class StringArgumentTest {
                 .build());
 
         // Act
-        final CommandResult<?> result = this.manager.executeCommand(new TestCommandSender(), "single string").join();
+        final CommandResult<?> result = this.manager.commandExecutor().executeCommand(new TestCommandSender(), "single string").join();
 
         // Assert
         assertThat(result.commandContext().get(MESSAGE1_KEY)).isEqualTo("string");
@@ -79,7 +79,7 @@ class StringArgumentTest {
                 .build());
 
         // Act
-        final CommandResult<?> result = this.manager.executeCommand(new TestCommandSender(),
+        final CommandResult<?> result = this.manager.commandExecutor().executeCommand(new TestCommandSender(),
                 "quoted 'quoted \" string' unquoted").join();
 
         // Assert
@@ -96,7 +96,7 @@ class StringArgumentTest {
                 .build());
 
         // Act
-        final CommandResult<?> result = this.manager.executeCommand(new TestCommandSender(), "quoted quoted unquoted").join();
+        final CommandResult<?> result = this.manager.commandExecutor().executeCommand(new TestCommandSender(), "quoted quoted unquoted").join();
 
         // Assert
         assertThat(result.commandContext().get(MESSAGE1_KEY)).isEqualTo("quoted");
@@ -112,7 +112,7 @@ class StringArgumentTest {
                 .build());
 
         // Act
-        final CommandResult<?> result = this.manager.executeCommand(new TestCommandSender(),
+        final CommandResult<?> result = this.manager.commandExecutor().executeCommand(new TestCommandSender(),
                 "quoted \"quoted \\\" string\" unquoted").join();
 
         // Assert
@@ -131,7 +131,7 @@ class StringArgumentTest {
         // Act & Assert
         Assertions.assertThrows(
                 CompletionException.class,
-                () -> manager.executeCommand(new TestCommandSender(), "'quoted quoted unquoted").join()
+                () -> manager.commandExecutor().executeCommand(new TestCommandSender(), "'quoted quoted unquoted").join()
         );
     }
 
@@ -144,7 +144,7 @@ class StringArgumentTest {
 
         // Act
         final CommandResult<?> result =
-                this.manager.executeCommand(new TestCommandSender(), "greedy greedy string content").join();
+                this.manager.commandExecutor().executeCommand(new TestCommandSender(), "greedy greedy string content").join();
 
         // Assert
         assertThat(result.commandContext().get(MESSAGE1_KEY)).isEqualTo("greedy string content");

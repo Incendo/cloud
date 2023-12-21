@@ -42,7 +42,7 @@ final class FabricExecutor<C, S extends SharedSuggestionProvider> implements Com
         final String input = ctx.getInput().substring(ctx.getLastChild().getNodes().get(0).getRange().getStart());
         final C sender = this.manager.commandSourceMapper().apply(source);
 
-        this.manager.executeCommand(sender, input);
+        this.manager.commandExecutor().executeCommand(sender, input);
         return com.mojang.brigadier.Command.SINGLE_SUCCESS;
     }
 }

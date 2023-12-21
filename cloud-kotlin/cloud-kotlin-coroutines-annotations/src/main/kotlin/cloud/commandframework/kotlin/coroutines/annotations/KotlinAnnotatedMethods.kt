@@ -65,7 +65,7 @@ public fun <C> AnnotationParser<C>.installCoroutineSupport(
     context: CoroutineContext = EmptyCoroutineContext,
     onlyForSuspending: Boolean = false
 ): AnnotationParser<C> {
-    if (manager().commandExecutionCoordinator() is CommandExecutionCoordinator.SimpleCoordinator) {
+    if (manager().commandExecutor().commandExecutionCoordinator() is CommandExecutionCoordinator.SimpleCoordinator) {
         RuntimeException(
             """You are highly advised to not use the simple command execution coordinator together
                             with coroutine support. Consider using the asynchronous command execution coordinator instead."""

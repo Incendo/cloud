@@ -63,7 +63,7 @@ class ChangedCommandSenderTypeTest {
         );
 
         // Assert
-        this.commandManager.executeCommand(new SubType(), "root literal 10").join();
+        this.commandManager.commandExecutor().executeCommand(new SubType(), "root literal 10").join();
     }
 
 

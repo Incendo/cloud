@@ -62,6 +62,6 @@ public class JDACommandListener<C> extends ListenerAdapter {
             return;
         }
 
-        this.commandManager.executeCommand(sender, content.substring(prefix.length()));
+        this.commandManager.commandExecutor().executeCommand(sender, content.substring(prefix.length()));
     }
 }

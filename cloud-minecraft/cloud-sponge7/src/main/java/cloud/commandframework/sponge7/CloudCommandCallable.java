@@ -59,7 +59,7 @@ final class CloudCommandCallable<C> implements CommandCallable {
     public CommandResult process(final @NonNull CommandSource source, final @NonNull String arguments) {
         final C cloudSender = this.manager.getCommandSourceMapper().apply(source);
 
-        this.manager.executeCommand(cloudSender, this.formatCommand(arguments), ctx ->
+        this.manager.commandExecutor().executeCommand(cloudSender, this.formatCommand(arguments), ctx ->
                         ctx.store(SpongeCommandManager.SPONGE_COMMAND_SOURCE_KEY, source));
         return CommandResult.success();
     }

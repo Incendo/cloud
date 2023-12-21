@@ -55,7 +55,7 @@ class ParsingContextTest {
         final String commandInput = "t 1337 roflmao xd";
 
         // Act
-        final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(
+        final CommandResult<TestCommandSender> result = this.commandManager.commandExecutor().executeCommand(
                 new TestCommandSender(),
                 commandInput
         ).get();
@@ -78,7 +78,7 @@ class ParsingContextTest {
         final String commandInput = "t f bar";
 
         // Act
-        final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(
+        final CommandResult<TestCommandSender> result = this.commandManager.commandExecutor().executeCommand(
                 new TestCommandSender(),
                 commandInput
         ).get();

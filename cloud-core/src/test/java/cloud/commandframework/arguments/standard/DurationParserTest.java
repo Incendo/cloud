@@ -56,20 +56,20 @@ class DurationParserTest {
 
     @Test
     void single_single_unit() {
-        final CommandResult<?> result1 = manager.executeCommand(new TestCommandSender(), "duration 2d").join();
+        final CommandResult<?> result1 = manager.commandExecutor().executeCommand(new TestCommandSender(), "duration 2d").join();
         assertThat(result1.commandContext().get(DURATION_KEY)).isEqualTo(Duration.ofDays(2));
 
-        final CommandResult<?> result2 = manager.executeCommand(new TestCommandSender(), "duration 999s").join();
+        final CommandResult<?> result2 = manager.commandExecutor().executeCommand(new TestCommandSender(), "duration 999s").join();
         assertThat(result2.commandContext().get(DURATION_KEY)).isEqualTo(Duration.ofSeconds(999));
     }
 
     @Test
     void single_multiple_units() {
-        final CommandResult<?> result1 = manager.executeCommand(new TestCommandSender(), "duration 2d12h7m34s").join();
+        final CommandResult<?> result1 = manager.commandExecutor().executeCommand(new TestCommandSender(), "duration 2d12h7m34s").join();
         assertThat(result1.commandContext().get(DURATION_KEY)).
                 isEqualTo(Duration.ofDays(2).plusHours(12).plusMinutes(7).plusSeconds(34));
 
-        final CommandResult<?> result2 = manager.executeCommand(new TestCommandSender(), "duration 700h75m1d999s").join();
+        final CommandResult<?> result2 = manager.commandExecutor().executeCommand(new TestCommandSender(), "duration 700h75m1d999s").join();
         assertThat(result2.commandContext().get(DURATION_KEY))
                 .isEqualTo(Duration.ofDays(1).plusHours(700).plusMinutes(75).plusSeconds(999));
     }
@@ -78,12 +78,12 @@ class DurationParserTest {
     void invalid_format_failing() {
         Assertions.assertThrows(
                 CompletionException.class,
-                () -> manager.executeCommand(new TestCommandSender(), "duration d").join()
+                () -> manager.commandExecutor().executeCommand(new TestCommandSender(), "duration d").join()
         );
 
         Assertions.assertThrows(
                 CompletionException.class,
-                () -> manager.executeCommand(new TestCommandSender(), "duration 1x").join()
+                () -> manager.commandExecutor().executeCommand(new TestCommandSender(), "duration 1x").join()
         );
     }
 }
