@@ -24,6 +24,7 @@
 package cloud.commandframework.bukkit.parsers.selector;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.bukkit.data.SinglePlayerSelector;
 import cloud.commandframework.bukkit.parsers.PlayerParser;
@@ -79,50 +80,52 @@ public final class SinglePlayerSelectorParser<C> extends SelectorUtils.PlayerSel
 
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     @Override
-    public SinglePlayerSelector mapResult(
+    public ArgumentParseResult<SinglePlayerSelector> mapResult(
             final @NonNull String input,
             final SelectorUtils.@NonNull EntitySelectorWrapper wrapper
     ) {
         final Player player = wrapper.singlePlayer();
-        return new SinglePlayerSelector() {
-            @Override
-            public @NonNull Player single() {
-                return player;
-            }
+        return ArgumentParseResult.success(
+                new SinglePlayerSelector() {
+                    @Override
+                    public @NonNull Player single() {
+                        return player;
+                    }
 
-            @Override
-            public @NonNull String inputString() {
-                return input;
-            }
-        };
+                    @Override
+                    public @NonNull String inputString() {
+                        return input;
+                    }
+                }
+        );
     }
 
     @Override
-    protected @NonNull CompletableFuture<SinglePlayerSelector> legacyParse(
+    protected @NonNull CompletableFuture<ArgumentParseResult<SinglePlayerSelector>> legacyParse(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final CompletableFuture<SinglePlayerSelector> result = new CompletableFuture<>();
         final String input = commandInput.peekString();
         @SuppressWarnings("deprecation") final @Nullable Player player = Bukkit.getPlayer(input);
 
         if (player == null) {
-            result.completeExceptionally(new PlayerParser.PlayerParseException(input, commandContext));
-        } else {
-            final String pop = commandInput.readString();
-            result.complete(new SinglePlayerSelector() {
-                @Override
-                public @NonNull Player single() {
-                    return player;
-                }
-
-                @Override
-                public @NonNull String inputString() {
-                    return pop;
-                }
-            });
+            return CompletableFuture.completedFuture(ArgumentParseResult.failure(
+                    new PlayerParser.PlayerParseException(input, commandContext)));
         }
 
-        return result;
+        final String pop = commandInput.readString();
+        return ArgumentParseResult.<SinglePlayerSelector>success(
+                new SinglePlayerSelector() {
+                    @Override
+                    public @NonNull Player single() {
+                        return player;
+                    }
+
+                    @Override
+                    public @NonNull String inputString() {
+                        return pop;
+                    }
+                }
+        ).asFuture();
     }
 }

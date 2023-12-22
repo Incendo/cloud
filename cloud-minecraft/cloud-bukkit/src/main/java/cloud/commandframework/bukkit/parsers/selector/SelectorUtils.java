@@ -167,7 +167,7 @@ final class SelectorUtils {
             this.modernParser = createModernParser(single, playersOnly, this);
         }
 
-        protected CompletableFuture<T> legacyParse(
+        protected CompletableFuture<ArgumentParseResult<T>> legacyParse(
                 final CommandContext<C> commandContext,
                 final CommandInput commandInput
         ) {
@@ -185,7 +185,7 @@ final class SelectorUtils {
         }
 
         @Override
-        public CompletableFuture<T> parseFuture(
+        public CompletableFuture<ArgumentParseResult<T>> parseFuture(
                 final CommandContext<C> commandContext,
                 final CommandInput commandInput
         ) {
@@ -279,14 +279,14 @@ final class SelectorUtils {
         }
 
         @Override
-        public CompletableFuture<T> parseFuture(
+        public CompletableFuture<ArgumentParseResult<T>> parseFuture(
                 final CommandContext<C> commandContext,
                 final CommandInput commandInput
         ) {
             final CommandInput originalCommandInput = commandInput.copy();
             return this.wrappedBrigadierParser.parseFuture(commandContext, commandInput)
                     .thenCompose(result -> {
-                        final CompletableFuture<T> future = new CompletableFuture<>();
+                        final CompletableFuture<ArgumentParseResult<T>> future = new CompletableFuture<>();
                         try {
                             final String input = originalCommandInput.difference(commandInput);
                             future.complete(this.mapper.mapResult(input, new EntitySelectorWrapper(commandContext, result)));
@@ -506,7 +506,7 @@ final class SelectorUtils {
     @FunctionalInterface
     interface SelectorMapper<T> {
 
-        T mapResult(String input, EntitySelectorWrapper wrapper) throws Exception; // throws CommandSyntaxException
+        ArgumentParseResult<T> mapResult(String input, EntitySelectorWrapper wrapper) throws Exception;
     }
 
     @SuppressWarnings("unchecked")

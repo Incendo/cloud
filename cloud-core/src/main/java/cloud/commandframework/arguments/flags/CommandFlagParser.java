@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.flags;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
@@ -94,7 +95,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
     }
 
     @Override
-    public @NonNull CompletableFuture<@NonNull Object> parseFuture(
+    public @NonNull CompletableFuture<@NonNull ArgumentParseResult<Object>> parseFuture(
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
@@ -342,25 +343,25 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
         private String lastParsedFlag;
 
         @SuppressWarnings({"unchecked", "rawtypes"})
-        private @NonNull CompletableFuture<@NonNull Object> parse(
+        private @NonNull CompletableFuture<@NonNull ArgumentParseResult<Object>> parse(
                 final @NonNull CommandContext<@NonNull C> commandContext,
                 final @NonNull CommandInput commandInput
         ) {
-            CompletableFuture<Boolean> result = CompletableFuture.completedFuture(false);
+            CompletableFuture<ArgumentParseResult<Object>> result = CompletableFuture.completedFuture(null);
             final Set<CommandFlag<?>> parsedFlags = commandContext.computeIfAbsent(PARSED_FLAGS, k -> new HashSet());
 
             final int remainingTokens = commandInput.remainingTokens();
             for (int i = 0; i <= remainingTokens; i++) {
-                result = result.thenCompose(done -> {
-                    if (done || commandInput.isEmpty()) {
-                        return CompletableFuture.completedFuture(true);
+                result = result.thenCompose(parseResult -> {
+                    if (parseResult != null || commandInput.isEmpty()) {
+                        return CompletableFuture.completedFuture(parseResult);
                     }
 
                     final String string = commandInput.peekString();
 
                     if (!string.startsWith("-")) {
                         // If we're not starting a new flag then we're outside the scope of this parser. We exit.
-                        return CompletableFuture.completedFuture(true);
+                        return CompletableFuture.completedFuture(ArgumentParseResult.success(FLAG_PARSE_RESULT_OBJECT));
                     }
 
                     // We're definitely not supplying anything to the flag.
@@ -442,7 +443,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                         }
 
                         // This type of flag can never have a value. We move on to the next flag.
-                        return CompletableFuture.completedFuture(false);
+                        return CompletableFuture.completedFuture(null);
                     }
 
                     if (flag == null) {
@@ -475,7 +476,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                     if (flag.commandComponent() == null) {
                         commandContext.flags().addPresenceFlag(flag);
                         parsedFlags.add(flag);
-                        return CompletableFuture.completedFuture(false);
+                        return CompletableFuture.completedFuture(null);
                     }
 
                     // If the command input ends with a space then we set lastParsedFlag before checking if the command
@@ -509,31 +510,34 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                                     commandContext,
                                     commandInput
                             ).thenApply(parsedValue -> {
+                                // Forward parsing errors.
+                                if (parsedValue.getFailure().isPresent()) {
+                                    return (ArgumentParseResult<Object>) parsedValue;
+                                }
+
                                 // We store the parsed flag in the context. We do ugly erasure here because generics :)
-                                commandContext.flags().addValueFlag(parsingFlag, (Object) parsedValue);
+                                commandContext.flags().addValueFlag(parsingFlag, (Object) parsedValue.getParsedValue().get());
                                 // At this point we know the flag parsed successfully.
                                 parsedFlags.add(parsingFlag);
 
                                 // We're no longer parsing a flag.
                                 this.lastParsedFlag = null;
 
-                                return false;
+                                return null;
                             });
                 });
             }
 
             // We've consumed everything!
-            return result.thenApply(v -> FLAG_PARSE_RESULT_OBJECT);
+            return result.thenApply(r -> r == null ? ArgumentParseResult.success(FLAG_PARSE_RESULT_OBJECT) : r);
         }
 
         private @Nullable String lastParsedFlag() {
             return this.lastParsedFlag;
         }
 
-        private @NonNull CompletableFuture<Boolean> fail(final @NonNull Throwable exception) {
-            final CompletableFuture<Boolean> future = new CompletableFuture<>();
-            future.completeExceptionally(exception);
-            return future;
+        private @NonNull CompletableFuture<ArgumentParseResult<Object>> fail(final @NonNull Throwable exception) {
+            return CompletableFuture.completedFuture(ArgumentParseResult.failure(exception));
         }
     }
 }

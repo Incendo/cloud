@@ -24,6 +24,7 @@
 package cloud.commandframework.kotlin.coroutines
 
 import cloud.commandframework.CommandManager
+import cloud.commandframework.arguments.parser.ArgumentParseResult
 import cloud.commandframework.arguments.parser.ArgumentParser
 import cloud.commandframework.arguments.parser.ParserDescriptor
 import cloud.commandframework.arguments.suggestion.SuggestionFactory
@@ -65,7 +66,7 @@ public fun interface SuspendingArgumentParser<C : Any, T : Any> {
      * @param commandInput   Command Input
      * @return the result
      */
-    public suspend operator fun invoke(commandContext: CommandContext<C>, commandInput: CommandInput): T
+    public suspend operator fun invoke(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<T>
 
     /**
      * Creates a new [ArgumentParser] backed by this [SuspendingArgumentParser].
@@ -122,7 +123,7 @@ public inline fun <C : Any, reified T : Any> SuspendingArgumentParser<C, T>.asPa
 public suspend inline fun <C : Any, reified T : Any> suspendingArgumentParser(
     scope: CoroutineScope = GlobalScope,
     context: CoroutineContext = EmptyCoroutineContext,
-    crossinline parser: suspend (CommandContext<C>, CommandInput) -> T
+    crossinline parser: suspend (CommandContext<C>, CommandInput) -> ArgumentParseResult<T>
 ): ParserDescriptor<C, T> = SuspendingArgumentParser<C, T> { commandContext, commandInput ->
     parser(commandContext, commandInput)
 }.asParserDescriptor(scope, context)

@@ -31,7 +31,6 @@ import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -163,11 +162,8 @@ class CommandExecutionCoordinatorTest {
     }
 
     private static ArgumentParser<TestCommandSender, Integer> failingFutureParser(final Exception exception) {
-        return (ArgumentParser.FutureArgumentParser<TestCommandSender, Integer>) (commandContext, commandInput) -> {
-            final CompletableFuture<Integer> result = new CompletableFuture<>();
-            result.completeExceptionally(exception);
-            return result;
-        };
+        return (ArgumentParser.FutureArgumentParser<TestCommandSender, Integer>) (commandContext, commandInput) ->
+                ArgumentParseResult.<Integer>failure(exception).asFuture();
     }
 
     @ParameterizedTest

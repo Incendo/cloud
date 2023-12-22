@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.parser;
 
+import cloud.commandframework.exceptions.handling.ExceptionController;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -43,25 +44,9 @@ public abstract class ArgumentParseResult<T> {
     }
 
     /**
-     * Maps the future to a future returning an argument parse result
-     *
-     * @param <T>    the type of the result
-     * @param future the future to map
-     * @return the mapped future
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <T> @NonNull CompletableFuture<ArgumentParseResult<T>> mapFuture(final @NonNull CompletableFuture<T> future) {
-        return future.thenApply(ArgumentParseResult::success).exceptionally(throwable -> {
-            if (throwable instanceof CompletionException) {
-                return ArgumentParseResult.failure(throwable.getCause());
-            }
-            return ArgumentParseResult.failure(throwable);
-        });
-    }
-
-    /**
      * Indicate that the parsing failed
+     *
+     * <p>If the {@code failure} is a {@link CompletionException} then it will be unwrapped.</p>
      *
      * @param failure Failure reason
      * @param <T>     Parser return type
@@ -135,7 +120,9 @@ public abstract class ArgumentParseResult<T> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public abstract @NonNull CompletableFuture<T> asFuture();
+    public final @NonNull CompletableFuture<ArgumentParseResult<T>> asFuture() {
+        return CompletableFuture.completedFuture(this);
+    }
 
 
     private static final class ParseSuccess<T> extends ArgumentParseResult<T> {
@@ -173,11 +160,6 @@ public abstract class ArgumentParseResult<T> {
         public @This @NonNull ArgumentParseResult<T> mapFailure(final Function<Throwable, Throwable> mapper) {
             return this;
         }
-
-        @Override
-        public @NonNull CompletableFuture<T> asFuture() {
-            return CompletableFuture.completedFuture(this.value);
-        }
     }
 
     private static final class ParseFailure<T> extends ArgumentParseResult<T> {
@@ -188,7 +170,7 @@ public abstract class ArgumentParseResult<T> {
         private final Throwable failure;
 
         private ParseFailure(final @NonNull Throwable failure) {
-            this.failure = failure;
+            this.failure = ExceptionController.unwrapCompletionException(failure);
         }
 
         @Override
@@ -216,17 +198,6 @@ public abstract class ArgumentParseResult<T> {
         @Override
         public @NonNull ArgumentParseResult<T> mapFailure(final Function<Throwable, Throwable> mapper) {
             return new ParseFailure<>(mapper.apply(this.failure));
-        }
-
-        @Override
-        public @NonNull CompletableFuture<T> asFuture() {
-            final CompletableFuture<T> future = new CompletableFuture<>();
-            if (this.failure instanceof CompletionException) {
-                future.completeExceptionally(this.failure.getCause());
-            } else {
-                future.completeExceptionally(this.failure);
-            }
-            return future;
         }
     }
 }

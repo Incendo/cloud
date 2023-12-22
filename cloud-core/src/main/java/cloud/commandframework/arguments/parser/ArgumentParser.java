@@ -99,11 +99,11 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    default @NonNull CompletableFuture<@NonNull T> parseFuture(
+    default @NonNull CompletableFuture<@NonNull ArgumentParseResult<T>> parseFuture(
             @NonNull CommandContext<@NonNull C> commandContext,
             @NonNull CommandInput commandInput
     ) {
-        return this.parse(commandContext, commandInput).asFuture();
+        return CompletableFuture.completedFuture(this.parse(commandContext, commandInput));
     }
 
     /**
@@ -167,7 +167,7 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
                 @NonNull CommandInput commandInput
         ) {
             try {
-                return ArgumentParseResult.mapFuture(this.parseFuture(commandContext, commandInput)).join();
+                return this.parseFuture(commandContext, commandInput).join();
             } catch (final CompletionException exception) {
                 final Throwable cause = exception.getCause();
                 if (cause instanceof RuntimeException) {
@@ -178,7 +178,7 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
         }
 
         @Override
-        @NonNull CompletableFuture<@NonNull T> parseFuture(
+        @NonNull CompletableFuture<@NonNull ArgumentParseResult<T>> parseFuture(
                 @NonNull CommandContext<@NonNull C> commandContext,
                 @NonNull CommandInput commandInput
         );

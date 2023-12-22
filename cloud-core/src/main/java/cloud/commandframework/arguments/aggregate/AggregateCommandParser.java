@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.aggregate;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.Suggestion;
@@ -87,25 +88,34 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
 
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    default @NonNull CompletableFuture<@NonNull O> parseFuture(
+    default @NonNull CompletableFuture<@NonNull ArgumentParseResult<O>> parseFuture(
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
         final AggregateCommandContext<C> aggregateCommandContext = AggregateCommandContext.argumentContext(this);
-        CompletableFuture<?> future = CompletableFuture.completedFuture(null);
+        CompletableFuture<ArgumentParseResult<Object>> future = CompletableFuture.completedFuture(null);
         for (final CommandComponent<C> component : this.components()) {
             future =
-                    future.thenCompose(result -> component.parser()
-                            .parseFuture(commandContext, commandInput)
-                            .whenComplete((value, exception) -> {
-                                if (value == null || exception != null) {
-                                    return;
-                                }
-                                final CloudKey key = CloudKey.of(component.name(), component.valueType());
-                                aggregateCommandContext.store(key, value);
-                            }));
+                    future.thenCompose(result -> {
+                        if (result != null && result.getFailure().isPresent()) {
+                            return result.asFuture();
+                        }
+                        return component.parser()
+                                .parseFuture(commandContext, commandInput)
+                                .thenApply(value ->
+                                        value.<Object>mapParsedValue(parsedValue -> {
+                                            final CloudKey key = CloudKey.of(component.name(), component.valueType());
+                                            aggregateCommandContext.store(key, value.getParsedValue().get());
+                                            return parsedValue;
+                                }));
+                    });
         }
-        return future.thenCompose(result -> this.mapper().map(commandContext, aggregateCommandContext));
+        return future.thenCompose(result -> {
+            if (result != null && result.getFailure().isPresent()) {
+                return ((ArgumentParseResult<O>) result).asFuture();
+            }
+            return this.mapper().map(commandContext, aggregateCommandContext);
+        });
     }
 
     @Override

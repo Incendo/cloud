@@ -23,12 +23,14 @@
 //
 package cloud.commandframework.arguments.aggregate;
 
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +39,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.arguments.standard.StringParser.stringParser;
+import static cloud.commandframework.truth.ArgumentParseResultSubject.assertThat;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -54,17 +57,37 @@ class AggregateCommandParserTest {
                 .withComponent("string", stringParser())
                 .withMapper(
                         OutputType.class,
-                        (commandContext, context) ->
-                                CompletableFuture.completedFuture( new OutputType(context.get("number"), context.get("string"))))
+                        (commandContext, context) -> ArgumentParseResult.success(
+                                new OutputType(context.get("number"), context.get("string"))).asFuture())
                 .build();
 
         // Act
-        final OutputType outputType = parser.parseFuture(this.commandContext, CommandInput.of("10 abc")).join();
+        final ArgumentParseResult<OutputType> outputType =
+                parser.parseFuture(this.commandContext, CommandInput.of("10 abc")).join();
 
         // Assert
         assertThat(outputType).isNotNull();
-        assertThat(outputType.number()).isEqualTo(10);
-        assertThat(outputType.string()).isEqualTo("abc");
+        assertThat(outputType).hasParsedValue(new OutputType(10, "abc"));
+    }
+
+    @Test
+    void testExceptionForwarding() {
+        // Arrange
+        final AggregateCommandParser<Object, OutputType> parser = AggregateCommandParser.builder()
+                .withComponent("number", integerParser())
+                .withComponent("string", stringParser())
+                .withMapper(
+                        OutputType.class,
+                        (commandContext, context) -> ArgumentParseResult.success(
+                                new OutputType(context.get("number"), context.get("string"))).asFuture())
+                .build();
+
+        // Act
+        final ArgumentParseResult<OutputType> outputType =
+                parser.parseFuture(this.commandContext, CommandInput.of("abc abc")).join();
+
+        // Assert
+        assertThat(outputType).hasFailureThat().isInstanceOf(IntegerParser.IntegerParseException.class);
     }
 
     @Test
@@ -76,22 +99,23 @@ class AggregateCommandParserTest {
                 .withMapper(
                         OutputType.class,
                         (commandContext, context) ->
-                                CompletableFuture.completedFuture( new OutputType(context.get("number"), context.get("string")))
+                                ArgumentParseResult.success(
+                                        new OutputType(context.get("number"), context.get("string"))).asFuture()
                 ).build();
         final AggregateCommandParser<Object, OutputType> parser = AggregateCommandParser.builder()
                 .withComponent("inner", inner)
                 .withMapper(
                         OutputType.class,
-                        (commandContext, context) -> CompletableFuture.completedFuture(context.get("inner"))
+                        (commandContext, context) -> ArgumentParseResult.success(context.<OutputType>get("inner")).asFuture()
                 ).build();
 
         // Act
-        final OutputType outputType = parser.parseFuture(this.commandContext, CommandInput.of("10 abc")).join();
+        final ArgumentParseResult<OutputType> outputType = parser.parseFuture(
+                this.commandContext, CommandInput.of("10 abc")).join();
 
         // Assert
         assertThat(outputType).isNotNull();
-        assertThat(outputType.number()).isEqualTo(10);
-        assertThat(outputType.string()).isEqualTo("abc");
+        assertThat(outputType).hasParsedValue(new OutputType(10, "abc"));
     }
 
     @Test
@@ -106,7 +130,8 @@ class AggregateCommandParserTest {
                 .withMapper(
                         OutputType.class,
                         (commandContext, context) ->
-                                CompletableFuture.completedFuture( new OutputType(context.get("number"), context.get("string"))))
+                                ArgumentParseResult.success(
+                                        new OutputType(context.get("number"), context.get("string"))).asFuture())
                 .build();
 
         // Act
@@ -133,7 +158,8 @@ class AggregateCommandParserTest {
                 .withMapper(
                         OutputType.class,
                         (commandContext, context) ->
-                                CompletableFuture.completedFuture( new OutputType(context.get("number"), context.get("string"))))
+                                ArgumentParseResult.success(
+                                        new OutputType(context.get("number"), context.get("string"))).asFuture())
                 .build();
         when(this.commandContext.contains("number")).thenReturn(true);
 
@@ -159,12 +185,21 @@ class AggregateCommandParserTest {
             this.string = string;
         }
 
-        int number() {
-            return this.number;
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || this.getClass() != o.getClass()) {
+                return false;
+            }
+            final OutputType that = (OutputType) o;
+            return this.number == that.number && Objects.equals(this.string, that.string);
         }
 
-        @NonNull String string() {
-            return this.string;
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.number, this.string);
         }
     }
 }
