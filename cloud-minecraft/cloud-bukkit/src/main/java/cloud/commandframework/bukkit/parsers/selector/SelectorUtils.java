@@ -508,7 +508,7 @@ final class SelectorUtils {
     @FunctionalInterface
     interface SelectorMapper<T> {
 
-        T mapResult(String input, EntitySelectorWrapper wrapper) throws Exception;
+        T mapResult(String input, EntitySelectorWrapper wrapper) throws Exception; // throws CommandSyntaxException
     }
 
     @SuppressWarnings("unchecked")
