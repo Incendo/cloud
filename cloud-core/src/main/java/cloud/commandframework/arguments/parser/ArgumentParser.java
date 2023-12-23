@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.suggestion.SuggestionProviderHolder;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -113,9 +114,48 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      * @return a derived parser.
      * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "1.5.0")
-    default <O> @NonNull ArgumentParser<C, O> map(final MappedArgumentParser.Mapper<C, T, O> mapper) {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    default <O> @NonNull ArgumentParser<C, O> flatMap(final MappedArgumentParser.Mapper<C, T, O> mapper) {
         return new MappedArgumentParser<>(this, requireNonNull(mapper, "mapper"));
+    }
+
+    /**
+     * Create a parser that passes through failures and flat maps
+     * successfully parsed values with {@code mapper}.
+     *
+     * @param mapper success mapper
+     * @param <O>    mapped parser value type
+     * @return mapped parser
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    default <O> @NonNull ArgumentParser<C, O> flatMapSuccess(
+            final @NonNull BiFunction<CommandContext<C>, T, CompletableFuture<ArgumentParseResult<O>>> mapper
+    ) {
+        requireNonNull(mapper, "mapper");
+        return this.flatMap((ctx, orig) -> {
+            if (orig.getFailure().isPresent()) {
+                return ArgumentParseResult.failureFuture(orig.getFailure().get());
+            }
+            return mapper.apply(ctx, orig.getParsedValue().get());
+        });
+    }
+
+    /**
+     * Create a parser that passes through failures and maps
+     * successfully parsed values with {@code mapper}.
+     *
+     * @param mapper success mapper
+     * @param <O>    mapped parser value type
+     * @return mapped parser
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    default <O> @NonNull ArgumentParser<C, O> mapSuccess(
+            final @NonNull BiFunction<CommandContext<C>, T, O> mapper
+    ) {
+        requireNonNull(mapper, "mapper");
+        return this.flatMapSuccess((ctx, orig) -> ArgumentParseResult.successFuture(mapper.apply(ctx, orig)));
     }
 
     /**

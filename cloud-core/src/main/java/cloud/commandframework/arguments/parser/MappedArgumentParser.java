@@ -67,8 +67,8 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser.Futur
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-       return this.base.parseFuture(commandContext, commandInput)
-               .thenCompose(result -> this.mapResult(commandContext, result, this.mapper));
+        return this.base.parseFuture(commandContext, commandInput)
+                .thenCompose(result -> this.mapper.map(commandContext, result));
     }
 
     @Override
@@ -77,12 +77,11 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser.Futur
     }
 
     @Override
-    public @NonNull <O1> ArgumentParser<C, O1> map(final Mapper<C, O, O1> mapper) {
-        final Mapper<C, I, O1> composedMapper = (ctx, original) -> this.mapper.map(ctx, original)
-                .thenCompose(value -> this.mapResult(ctx, value, mapper));
+    public @NonNull <O1> ArgumentParser<C, O1> flatMap(final Mapper<C, O, O1> mapper) {
         return new MappedArgumentParser<>(
                 this.base,
-                composedMapper
+                (ctx, orig) -> this.mapper.map(ctx, orig)
+                        .thenCompose(mapped -> mapper.map(ctx, mapped))
         );
     }
 
@@ -115,19 +114,6 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser.Futur
                 + "mapper=" + this.mapper + '}';
     }
 
-    private <U, V> @NonNull CompletableFuture<ArgumentParseResult<U>> mapResult(
-            final @NonNull CommandContext<C> context,
-            final @NonNull ArgumentParseResult<V> result,
-            final @NonNull Mapper<C, V, U> mapper
-    ) {
-        if (result.getFailure().isPresent()) {
-            return CompletableFuture.completedFuture(ArgumentParseResult.failure(result.getFailure().get()));
-        }
-        // We unwrap so that we can pass the value directly to mapper.
-        // It returns a future, so flat-mapping the result becomes extremely painful.
-        return mapper.map(context, result.getParsedValue().get());
-    }
-
 
     @FunctionalInterface
     @API(status = API.Status.STABLE, since = "2.0.0")
@@ -140,6 +126,9 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser.Futur
          * @param input   the input
          * @return future that completes with the output
          */
-        @NonNull CompletableFuture<ArgumentParseResult<O>> map(@NonNull CommandContext<C> context, @NonNull I input);
+        @NonNull CompletableFuture<ArgumentParseResult<O>> map(
+                @NonNull CommandContext<C> context,
+                @NonNull ArgumentParseResult<I> input
+        );
     }
 }
