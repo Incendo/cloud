@@ -114,7 +114,7 @@ public final class SinglePlayerSelectorParser<C> extends SelectorUtils.PlayerSel
         }
 
         final String pop = commandInput.readString();
-        return ArgumentParseResult.<SinglePlayerSelector>success(
+        return ArgumentParseResult.successFuture(
                 new SinglePlayerSelector() {
                     @Override
                     public @NonNull Player single() {
@@ -126,6 +126,6 @@ public final class SinglePlayerSelectorParser<C> extends SelectorUtils.PlayerSel
                         return pop;
                     }
                 }
-        ).asFuture();
+        );
     }
 }

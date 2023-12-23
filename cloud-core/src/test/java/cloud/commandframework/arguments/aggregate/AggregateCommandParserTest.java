@@ -57,8 +57,8 @@ class AggregateCommandParserTest {
                 .withComponent("string", stringParser())
                 .withMapper(
                         OutputType.class,
-                        (commandContext, context) -> ArgumentParseResult.success(
-                                new OutputType(context.get("number"), context.get("string"))).asFuture())
+                        (commandContext, context) -> ArgumentParseResult.successFuture(
+                                new OutputType(context.get("number"), context.get("string"))))
                 .build();
 
         // Act
@@ -78,8 +78,8 @@ class AggregateCommandParserTest {
                 .withComponent("string", stringParser())
                 .withMapper(
                         OutputType.class,
-                        (commandContext, context) -> ArgumentParseResult.success(
-                                new OutputType(context.get("number"), context.get("string"))).asFuture())
+                        (commandContext, context) -> ArgumentParseResult.successFuture(
+                                new OutputType(context.get("number"), context.get("string"))))
                 .build();
 
         // Act
@@ -99,14 +99,14 @@ class AggregateCommandParserTest {
                 .withMapper(
                         OutputType.class,
                         (commandContext, context) ->
-                                ArgumentParseResult.success(
-                                        new OutputType(context.get("number"), context.get("string"))).asFuture()
+                                ArgumentParseResult.successFuture(
+                                        new OutputType(context.get("number"), context.get("string")))
                 ).build();
         final AggregateCommandParser<Object, OutputType> parser = AggregateCommandParser.builder()
                 .withComponent("inner", inner)
                 .withMapper(
                         OutputType.class,
-                        (commandContext, context) -> ArgumentParseResult.success(context.<OutputType>get("inner")).asFuture()
+                        (commandContext, context) -> ArgumentParseResult.successFuture(context.get("inner"))
                 ).build();
 
         // Act
@@ -130,8 +130,8 @@ class AggregateCommandParserTest {
                 .withMapper(
                         OutputType.class,
                         (commandContext, context) ->
-                                ArgumentParseResult.success(
-                                        new OutputType(context.get("number"), context.get("string"))).asFuture())
+                                ArgumentParseResult.successFuture(
+                                        new OutputType(context.get("number"), context.get("string"))))
                 .build();
 
         // Act
@@ -158,8 +158,8 @@ class AggregateCommandParserTest {
                 .withMapper(
                         OutputType.class,
                         (commandContext, context) ->
-                                ArgumentParseResult.success(
-                                        new OutputType(context.get("number"), context.get("string"))).asFuture())
+                                ArgumentParseResult.successFuture(
+                                        new OutputType(context.get("number"), context.get("string"))))
                 .build();
         when(this.commandContext.contains("number")).thenReturn(true);
 

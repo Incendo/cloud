@@ -200,8 +200,8 @@ public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
                 inst = (ArgumentType<Object>) ctr.newInstance(CommandBuildContextSupplier.commandBuildContext());
             }
             return new WrappedBrigadierParser<C, Object>(inst)
-                    .map((ctx, itemInput) -> ArgumentParseResult.<ProtoItemStack>success(
-                            new ModernProtoItemStack(itemInput)).asFuture());
+                    .map((ctx, itemInput) -> ArgumentParseResult.successFuture(
+                            new ModernProtoItemStack(itemInput)));
         }
 
         @Override
@@ -279,7 +279,7 @@ public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
 
         private final ArgumentParser<C, ProtoItemStack> parser = new MaterialParser<C>()
                 .map((ctx, material) ->
-                        ArgumentParseResult.<ProtoItemStack>success(new LegacyProtoItemStack(material)).asFuture());
+                        ArgumentParseResult.successFuture(new LegacyProtoItemStack(material)));
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull ProtoItemStack> parse(

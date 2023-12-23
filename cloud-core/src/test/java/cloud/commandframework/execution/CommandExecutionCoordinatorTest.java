@@ -163,7 +163,7 @@ class CommandExecutionCoordinatorTest {
 
     private static ArgumentParser<TestCommandSender, Integer> failingFutureParser(final Exception exception) {
         return (ArgumentParser.FutureArgumentParser<TestCommandSender, Integer>) (commandContext, commandInput) ->
-                ArgumentParseResult.<Integer>failure(exception).asFuture();
+                ArgumentParseResult.failureFuture(exception);
     }
 
     @ParameterizedTest

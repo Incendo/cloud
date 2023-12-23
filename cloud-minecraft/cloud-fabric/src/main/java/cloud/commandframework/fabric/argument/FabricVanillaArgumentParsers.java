@@ -181,10 +181,10 @@ public final class FabricVanillaArgumentParsers {
     ) {
         return requireCommandSourceStack(
                 ctx,
-                serverCommandSource -> ArgumentParseResult.success((O) new CoordinatesImpl(
+                serverCommandSource -> ArgumentParseResult.successFuture((O) new CoordinatesImpl(
                         serverCommandSource,
                         posArgument
-                )).asFuture()
+                ))
         );
     }
 
@@ -331,7 +331,7 @@ public final class FabricVanillaArgumentParsers {
     ) {
         final SharedSuggestionProvider nativeSource = context.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
         if (!(nativeSource instanceof CommandSourceStack)) {
-            return ArgumentParseResult.<O>failure(serverOnly()).asFuture();
+            return ArgumentParseResult.failureFuture(serverOnly());
         }
         return resultFunction.apply((CommandSourceStack) nativeSource);
     }
