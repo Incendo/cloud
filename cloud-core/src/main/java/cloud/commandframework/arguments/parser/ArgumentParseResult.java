@@ -88,6 +88,7 @@ public abstract class ArgumentParseResult<T> {
      * @return completed future with successful result
      * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public static <T> @NonNull CompletableFuture<@NonNull ArgumentParseResult<T>> successFuture(final @NonNull T value) {
         return success(value).asFuture();
     }
