@@ -286,19 +286,19 @@ final class SelectorUtils {
             final CommandInput originalCommandInput = commandInput.copy();
             return this.wrappedBrigadierParser.parseFuture(commandContext, commandInput)
                     .thenCompose(result -> {
-                        final CompletableFuture<ArgumentParseResult<T>> future = new CompletableFuture<>();
                         try {
                             final String input = originalCommandInput.difference(commandInput);
-                            future.complete(ArgumentParseResult.success(
+                            return ArgumentParseResult.successFuture(
                                     this.mapper.mapResult(input, new EntitySelectorWrapper(commandContext, result))
-                            ));
+                            );
                         } catch (final CommandSyntaxException ex) {
                             commandInput.cursor(originalCommandInput.cursor());
-                            future.completeExceptionally(ex);
+                            return ArgumentParseResult.failureFuture(ex);
                         } catch (final Exception ex) {
+                            final CompletableFuture<ArgumentParseResult<T>> future = new CompletableFuture<>();
                             future.completeExceptionally(ex);
+                            return future;
                         }
-                        return future;
                     });
         }
 
