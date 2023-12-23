@@ -29,12 +29,12 @@ import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.fabric.FabricCaptionKeys;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.scores.PlayerTeam;
@@ -83,41 +83,40 @@ public final class TeamParser<C> extends SidedArgumentParser<C, String, PlayerTe
     }
 
     @Override
-    protected @NonNull ArgumentParseResult<String> parseIntermediate(
-            final @NonNull CommandContext<@NonNull C> commandContext,
-            final @NonNull CommandInput commandInput
-    ) {
-        final String input = commandInput.readString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(TeamParser.class, commandContext));
-        }
-        return ArgumentParseResult.success(input);
+    protected @NonNull FutureArgumentParser<C, String> intermediateParser() {
+        return (ctx, commandInput) -> {
+            final String input = commandInput.readString();
+            if (input.isEmpty()) {
+                return ArgumentParseResult.failureFuture(new NoInputProvidedException(TeamParser.class, ctx));
+            }
+            return ArgumentParseResult.successFuture(input);
+        };
     }
 
     @Override
-    protected @NonNull ArgumentParseResult<PlayerTeam> resolveClient(
+    protected @NonNull CompletableFuture<@NonNull ArgumentParseResult<PlayerTeam>> resolveClient(
             final @NonNull CommandContext<C> context,
             final @NonNull FabricClientCommandSource source,
             final @NonNull String value
     ) {
         final PlayerTeam result = source.getClient().getConnection().getLevel().getScoreboard().getPlayerTeam(value);
         if (result == null) {
-            return ArgumentParseResult.failure(new UnknownTeamException(context, value));
+            return ArgumentParseResult.failureFuture(new UnknownTeamException(context, value));
         }
-        return ArgumentParseResult.success(result);
+        return ArgumentParseResult.successFuture(result);
     }
 
     @Override
-    protected @NonNull ArgumentParseResult<PlayerTeam> resolveServer(
+    protected @NonNull CompletableFuture<@NonNull ArgumentParseResult<PlayerTeam>> resolveServer(
             final @NonNull CommandContext<C> context,
             final @NonNull CommandSourceStack source,
             final @NonNull String value
     ) {
         final PlayerTeam result = source.getLevel().getScoreboard().getPlayerTeam(value);
         if (result == null) {
-            return ArgumentParseResult.failure(new UnknownTeamException(context, value));
+            return ArgumentParseResult.failureFuture(new UnknownTeamException(context, value));
         }
-        return ArgumentParseResult.success(result);
+        return ArgumentParseResult.successFuture(result);
     }
 
     /**
