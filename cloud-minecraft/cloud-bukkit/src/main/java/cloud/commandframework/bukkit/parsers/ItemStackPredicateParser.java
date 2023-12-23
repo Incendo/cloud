@@ -138,7 +138,7 @@ public final class ItemStackPredicateParser<C> implements ArgumentParser<C, Item
             // 1.19+
             inst = (ArgumentType<Object>) ctr.newInstance(CommandBuildContextSupplier.commandBuildContext());
         }
-        return new WrappedBrigadierParser<C, Object>(inst).map((ctx, result) -> {
+        return new WrappedBrigadierParser<C, Object>(inst).flatMap((ctx, result) -> {
             if (result instanceof Predicate) {
                 // 1.19+
                 return ArgumentParseResult.successFuture(new ItemStackPredicateImpl((Predicate<Object>) result));
