@@ -31,6 +31,8 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * An argument parser which wraps another argument parser, converting the output type.
  *
@@ -80,6 +82,7 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser.Futur
 
     @Override
     public @NonNull <O1> ArgumentParser<C, O1> flatMap(final Mapper<C, O, O1> mapper) {
+        requireNonNull(mapper, "mapper");
         return new MappedArgumentParser<>(
                 this.base,
                 (ctx, orig) -> this.mapper.map(ctx, orig)

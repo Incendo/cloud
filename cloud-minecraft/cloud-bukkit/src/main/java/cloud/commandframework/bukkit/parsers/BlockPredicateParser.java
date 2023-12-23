@@ -189,7 +189,7 @@ public final class BlockPredicateParser<C> implements ArgumentParser<C, BlockPre
             // 1.19+
             inst = (ArgumentType<Object>) ctr.newInstance(CommandBuildContextSupplier.commandBuildContext());
         }
-        return new WrappedBrigadierParser<C, Object>(inst).flatMap((ctx, result) -> {
+        return new WrappedBrigadierParser<C, Object>(inst).flatMapSuccess((ctx, result) -> {
             if (result instanceof Predicate) {
                 // 1.19+
                 return ArgumentParseResult.successFuture(new BlockPredicateImpl((Predicate<Object>) result));
