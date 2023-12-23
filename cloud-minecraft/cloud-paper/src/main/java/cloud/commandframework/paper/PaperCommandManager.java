@@ -82,6 +82,8 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
             final @NonNull Function<C, CommandSender> backwardsCommandSenderMapper
     ) throws Exception {
         super(owningPlugin, commandExecutionCoordinator, commandSenderMapper, backwardsCommandSenderMapper);
+
+        this.registerCommandPreProcessor(new PaperCommandPreprocessor<>(this));
     }
 
     /**

@@ -42,7 +42,7 @@ bungeecord = "1.8-SNAPSHOT"
 cloudburst = "1.0.0-SNAPSHOT"
 adventureApi = "4.14.0"
 adventurePlatform = "4.3.1"
-paperApi = "1.16.5-R0.1-SNAPSHOT"
+paperApi = "1.20.4-R0.1-SNAPSHOT"
 velocityApi = "3.1.1"
 spongeApi7 = "7.3.0"
 jetbrainsAnnotations = "24.1.0"
@@ -102,8 +102,8 @@ adventureApi = { group = "net.kyori", name = "adventure-api", version.ref = "adv
 adventurePlatformBukkit = { group = "net.kyori", name = "adventure-platform-bukkit", version.ref = "adventurePlatform" }
 adventurePlatformBungeecord = { group = "net.kyori", name = "adventure-platform-bungeecord", version.ref = "adventurePlatform" }
 adventureTextSerializerPlain = { group = "net.kyori", name = "adventure-text-serializer-plain", version.ref = "adventureApi" }
-paperApi = { group = "com.destroystokyo.paper", name = "paper-api", version.ref = "paperApi" }
-paperMojangApi = { group = "com.destroystokyo.paper", name = "paper-mojangapi", version.ref = "paperApi" }
+paperApi = { group = "io.papermc.paper", name = "paper-api", version.ref = "paperApi" }
+paperMojangApi = { group = "io.papermc.paper", name = "paper-mojangapi", version.ref = "paperApi" }
 spongeApi7 = { group = "org.spongepowered", name = "spongeapi", version.ref = "spongeApi7" }
 velocityApi = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocityApi" }
 fabricMinecraft = { group = "com.mojang", name = "minecraft", version.ref = "fabricMinecraft" }

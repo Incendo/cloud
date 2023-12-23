@@ -2,6 +2,10 @@ plugins {
     id("cloud.base-conventions")
 }
 
+java {
+    disableAutoTargetJvm()
+}
+
 dependencies {
     api(projects.cloudBukkit)
     compileOnly(libs.paperApi)
