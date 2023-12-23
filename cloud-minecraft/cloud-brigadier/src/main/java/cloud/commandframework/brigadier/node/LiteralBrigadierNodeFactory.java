@@ -277,7 +277,7 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
             final @NonNull K argumentParser
     ) {
        if (argumentParser instanceof MappedArgumentParser) {
-           return this.getArgument(valueType, ((MappedArgumentParser<C, ?, ?>) argumentParser).getBaseParser());
+           return this.getArgument(valueType, ((MappedArgumentParser<C, ?, ?>) argumentParser).baseParser());
         }
 
         final BrigadierMapping<C, K, S> mapping = this.cloudBrigadierManager.mappings().mapping(argumentParser.getClass());

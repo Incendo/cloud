@@ -26,6 +26,7 @@ package cloud.commandframework.brigadier.node;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.brigadier.suggestion.CloudDelegatingSuggestionProvider;
@@ -158,7 +159,9 @@ class LiteralBrigadierNodeFactoryTest {
                                 .withDirectMapper(
                                         new TypeToken<Pair<Integer, String>>() {
                                         },
-                                        (cmdCtx, ctx) -> Pair.of(ctx.<Integer>get("integer"), ctx.<String>get("string"))
+                                        (cmdCtx, ctx) -> ArgumentParseResult.success(
+                                                Pair.of(ctx.<Integer>get("integer"), ctx.<String>get("string"))
+                                        )
                                 ).build()
                 )
                 .build();

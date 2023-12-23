@@ -28,6 +28,7 @@ import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.OptionalSubject;
 import com.google.common.truth.Subject;
+import com.google.common.truth.ThrowableSubject;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -77,5 +78,10 @@ public final class ArgumentParseResultSubject<T> extends Subject {
     public void hasFailure(final @NonNull Throwable throwable) {
         this.failure().hasValue(throwable);
         this.parsedValue().isEmpty();
+    }
+
+    public @NonNull ThrowableSubject hasFailureThat() {
+        this.failure().isPresent();
+        return this.check("getFailure().get()").that(this.actual.getFailure().get());
     }
 }

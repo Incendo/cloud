@@ -29,7 +29,7 @@ import cloud.commandframework.arguments.suggestion.SuggestionProviderHolder;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
+import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -51,23 +51,23 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
     int DEFAULT_ARGUMENT_COUNT = 1;
 
     /**
-     * Parse command input into a command result.
-     * <p>
-     * This method may be called when a command chain is being parsed for execution
+     * Attempts to parse the {@code input} into an object of type {@link T}.
+     *
+     * <p>This method may be called when a command chain is being parsed for execution
      * (using {@link cloud.commandframework.CommandExecutor#executeCommand(Object, String)})
      * or when a command is being parsed to provide context for suggestions
      * (using {@link SuggestionFactory#suggest(Object, String)}).
      * It is possible to use {@link CommandContext#isSuggestions()}} to see what the purpose of the
      * parsing is. Particular care should be taken when parsing for suggestions, as the parsing
-     * method is then likely to be called once for every character written by the command sender.
-     * <p>
-     * This method should never throw any exceptions under normal circumstances. Instead, if the
+     * method is then likely to be called once for every character written by the command sender.</p>
+     *
+     * <p>This method should never throw any exceptions under normal circumstances. Instead, if the
      * parsing for some reason cannot be done successfully {@link ArgumentParseResult#failure(Throwable)}
-     * should be returned. This then wraps any exception that should be forwarded to the command sender.
-     * <p>
-     * The parser is assumed to be completely stateless and should not store any information about
+     * should be returned. This then wraps any exception that should be forwarded to the command sender.</p>
+     *
+     * <p>The parser is assumed to be completely stateless and should not store any information about
      * the command sender or the command context. Instead, information should be stored in the
-     * {@link CommandContext}.
+     * {@link CommandContext}.</p>
      *
      * @param commandContext Command context
      * @param commandInput   Command Input
@@ -80,18 +80,23 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
 
     /**
      * Returns a future that completes with the result of parsing the given {@code commandInput}.
-     * <p>
-     * This method may be called when a command chain is being parsed for execution
+     *
+     * <p>This method may be called when a command chain is being parsed for execution
      * (using {@link cloud.commandframework.CommandExecutor#executeCommand(Object, String)})
      * or when a command is being parsed to provide context for suggestions
      * (using {@link SuggestionFactory#suggest(Object, String)}).
      * It is possible to use {@link CommandContext#isSuggestions()}} to see what the purpose of the
      * parsing is. Particular care should be taken when parsing for suggestions, as the parsing
-     * method is then likely to be called once for every character written by the command sender.
-     * <p>
-     * The parser is assumed to be completely stateless and should not store any information about
+     * method is then likely to be called once for every character written by the command sender.</p>
+     *
+     * <p>This method should never throw any exceptions under normal circumstances. Instead, if the
+     * parsing for some reason cannot be done successfully {@link ArgumentParseResult#failure(Throwable)}
+     * or {@link ArgumentParseResult#failureFuture(Throwable)} should be returned. This then wraps any exception that should be
+     * forwarded to the command sender.</p>
+     *
+     * <p>The parser is assumed to be completely stateless and should not store any information about
      * the command sender or the command context. Instead, information should be stored in the
-     * {@link CommandContext}.
+     * {@link CommandContext}.</p>
      *
      * @param commandContext Command context
      * @param commandInput   Command Input
@@ -99,11 +104,11 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    default @NonNull CompletableFuture<@NonNull T> parseFuture(
+    default @NonNull CompletableFuture<@NonNull ArgumentParseResult<T>> parseFuture(
             @NonNull CommandContext<@NonNull C> commandContext,
             @NonNull CommandInput commandInput
     ) {
-        return this.parse(commandContext, commandInput).asFuture();
+        return CompletableFuture.completedFuture(this.parse(commandContext, commandInput));
     }
 
     /**
@@ -114,9 +119,48 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      * @return a derived parser.
      * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "1.5.0")
-    default <O> @NonNull ArgumentParser<C, O> map(final MappedArgumentParser.Mapper<C, T, O> mapper) {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    default <O> ArgumentParser.@NonNull FutureArgumentParser<C, O> flatMap(final MappedArgumentParser.Mapper<C, T, O> mapper) {
         return new MappedArgumentParser<>(this, requireNonNull(mapper, "mapper"));
+    }
+
+    /**
+     * Create a parser that passes through failures and flat maps
+     * successfully parsed values with {@code mapper}.
+     *
+     * @param mapper success mapper
+     * @param <O>    mapped parser value type
+     * @return mapped parser
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    default <O> ArgumentParser.@NonNull FutureArgumentParser<C, O> flatMapSuccess(
+            final @NonNull BiFunction<CommandContext<C>, T, CompletableFuture<ArgumentParseResult<O>>> mapper
+    ) {
+        requireNonNull(mapper, "mapper");
+        return this.flatMap((ctx, orig) -> {
+            if (orig.getFailure().isPresent()) {
+                return ArgumentParseResult.failureFuture(orig.getFailure().get());
+            }
+            return mapper.apply(ctx, orig.getParsedValue().get());
+        });
+    }
+
+    /**
+     * Create a parser that passes through failures and maps
+     * successfully parsed values with {@code mapper}.
+     *
+     * @param mapper success mapper
+     * @param <O>    mapped parser value type
+     * @return mapped parser
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    default <O> ArgumentParser.@NonNull FutureArgumentParser<C, O> mapSuccess(
+            final @NonNull BiFunction<CommandContext<C>, T, CompletableFuture<O>> mapper
+    ) {
+        requireNonNull(mapper, "mapper");
+        return this.flatMapSuccess((ctx, orig) -> mapper.apply(ctx, orig).thenApply(ArgumentParseResult::success));
     }
 
     /**
@@ -166,19 +210,12 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
                 @NonNull CommandContext<@NonNull C> commandContext,
                 @NonNull CommandInput commandInput
         ) {
-            try {
-                return ArgumentParseResult.mapFuture(this.parseFuture(commandContext, commandInput)).join();
-            } catch (final CompletionException exception) {
-                final Throwable cause = exception.getCause();
-                if (cause instanceof RuntimeException) {
-                    throw (RuntimeException) cause;
-                }
-                throw exception;
-            }
+            throw new UnsupportedOperationException(
+                    "parse should not be called on a FutureArgumentParser. Call parseFuture instead.");
         }
 
         @Override
-        @NonNull CompletableFuture<@NonNull T> parseFuture(
+        @NonNull CompletableFuture<@NonNull ArgumentParseResult<T>> parseFuture(
                 @NonNull CommandContext<@NonNull C> commandContext,
                 @NonNull CommandInput commandInput
         );

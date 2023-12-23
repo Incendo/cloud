@@ -43,7 +43,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import org.apiguardian.api.API;
 import org.bukkit.NamespacedKey;
@@ -139,17 +138,17 @@ public final class ItemStackPredicateParser<C> implements ArgumentParser<C, Item
             // 1.19+
             inst = (ArgumentType<Object>) ctr.newInstance(CommandBuildContextSupplier.commandBuildContext());
         }
-        return new WrappedBrigadierParser<C, Object>(inst).map((ctx, result) -> {
+        return new WrappedBrigadierParser<C, Object>(inst).flatMapSuccess((ctx, result) -> {
             if (result instanceof Predicate) {
                 // 1.19+
-                return CompletableFuture.completedFuture(new ItemStackPredicateImpl((Predicate<Object>) result));
+                return ArgumentParseResult.successFuture(new ItemStackPredicateImpl((Predicate<Object>) result));
             }
             final Object commandSourceStack = ctx.get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER);
             final com.mojang.brigadier.context.CommandContext<Object> dummy = createDummyContext(ctx, commandSourceStack);
             Objects.requireNonNull(CREATE_PREDICATE_METHOD, "ItemPredicateArgument$Result#create");
             try {
                 final Predicate<Object> predicate = (Predicate<Object>) CREATE_PREDICATE_METHOD.invoke(result, dummy);
-                return CompletableFuture.completedFuture(new ItemStackPredicateImpl(predicate));
+                return ArgumentParseResult.successFuture(new ItemStackPredicateImpl(predicate));
             } catch (final ReflectiveOperationException ex) {
                 throw new RuntimeException(ex);
             }

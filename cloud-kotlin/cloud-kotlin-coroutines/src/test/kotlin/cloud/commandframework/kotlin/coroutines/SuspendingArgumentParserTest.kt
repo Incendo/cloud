@@ -24,6 +24,7 @@
 package cloud.commandframework.kotlin.coroutines
 
 import cloud.commandframework.CommandManager
+import cloud.commandframework.arguments.parser.ArgumentParseResult
 import cloud.commandframework.arguments.suggestion.Suggestion
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
@@ -46,7 +47,7 @@ class SuspendingArgumentParserTest {
     fun test(): Unit = runBlocking {
         val suspendingParser = suspendingArgumentParser<TestCommandSender, Int> { _, commandInput ->
             delay(1L)
-            commandInput.readInteger()
+            ArgumentParseResult.success(commandInput.readInteger())
         }
         val suspendingSuggestionProvider = suspendingSuggestionProvider<TestCommandSender> { _, _ ->
             delay(1L)

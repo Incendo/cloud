@@ -167,14 +167,14 @@ final class SelectorUtils {
             this.modernParser = createModernParser(single, playersOnly, this);
         }
 
-        protected CompletableFuture<T> legacyParse(
+        protected CompletableFuture<ArgumentParseResult<T>> legacyParse(
                 final CommandContext<C> commandContext,
                 final CommandInput commandInput
         ) {
-            return ArgumentParseResult.<T>failure(new SelectorUnsupportedException(
+            return ArgumentParseResult.failureFuture(new SelectorUnsupportedException(
                     commandContext,
                     this.getClass()
-            )).asFuture();
+            ));
         }
 
         protected @NonNull Iterable<@NonNull Suggestion> legacySuggestions(
@@ -185,7 +185,7 @@ final class SelectorUtils {
         }
 
         @Override
-        public CompletableFuture<T> parseFuture(
+        public CompletableFuture<ArgumentParseResult<T>> parseFuture(
                 final CommandContext<C> commandContext,
                 final CommandInput commandInput
         ) {
@@ -279,24 +279,26 @@ final class SelectorUtils {
         }
 
         @Override
-        public CompletableFuture<T> parseFuture(
+        public CompletableFuture<ArgumentParseResult<T>> parseFuture(
                 final CommandContext<C> commandContext,
                 final CommandInput commandInput
         ) {
             final CommandInput originalCommandInput = commandInput.copy();
             return this.wrappedBrigadierParser.parseFuture(commandContext, commandInput)
                     .thenCompose(result -> {
-                        final CompletableFuture<T> future = new CompletableFuture<>();
                         try {
                             final String input = originalCommandInput.difference(commandInput);
-                            future.complete(this.mapper.mapResult(input, new EntitySelectorWrapper(commandContext, result)));
+                            return ArgumentParseResult.successFuture(
+                                    this.mapper.mapResult(input, new EntitySelectorWrapper(commandContext, result))
+                            );
                         } catch (final CommandSyntaxException ex) {
                             commandInput.cursor(originalCommandInput.cursor());
-                            future.completeExceptionally(ex);
+                            return ArgumentParseResult.failureFuture(ex);
                         } catch (final Exception ex) {
+                            final CompletableFuture<ArgumentParseResult<T>> future = new CompletableFuture<>();
                             future.completeExceptionally(ex);
+                            return future;
                         }
-                        return future;
                     });
         }
 
