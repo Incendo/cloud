@@ -25,68 +25,48 @@ package cloud.commandframework.execution.postprocessor;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.context.CommandContext;
-import java.util.Objects;
+import cloud.commandframework.internal.ImmutableImpl;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
 /**
- * Context for {@link CommandPostprocessor command postprocessors}
+ * Context for {@link CommandPostprocessor command postprocessors}.
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
+ * @since 2.0.0
  */
-@API(status = API.Status.STABLE)
-public final class CommandPostprocessingContext<C> {
-
-    private final CommandContext<@NonNull C> commandContext;
-    private final Command<@NonNull C> command;
+@Value.Immutable
+@ImmutableImpl
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface CommandPostprocessingContext<C> {
 
     /**
-     * Construct a new command postprocessing context
+     * Returns a new postprocessing context.
      *
-     * @param commandContext Command context
-     * @param command        Command instance
+     * @param <C>            command sender type
+     * @param commandContext command context
+     * @param command        parsed command
+     * @return the context instance
      */
-    public CommandPostprocessingContext(
-            final @NonNull CommandContext<@NonNull C> commandContext,
-            final @NonNull Command<@NonNull C> command
+    static <C> @NonNull CommandPostprocessingContext<C> of(
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull Command<C> command
     ) {
-        this.commandContext = commandContext;
-        this.command = command;
+        return CommandPostprocessingContextImpl.of(commandContext, command);
     }
 
     /**
-     * Get the command context
+     * Returns the command context.
      *
-     * @return Command context
+     * @return command context
      */
-    public @NonNull CommandContext<@NonNull C> getCommandContext() {
-        return this.commandContext;
-    }
+    @NonNull CommandContext<@NonNull C> commandContext();
 
     /**
-     * Get the command instance
+     * Returns the command instance.
      *
-     * @return Command instance
+     * @return command instance
      */
-    public @NonNull Command<@NonNull C> getCommand() {
-        return this.command;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final CommandPostprocessingContext<?> that = (CommandPostprocessingContext<?>) o;
-        return Objects.equals(this.getCommandContext(), that.getCommandContext())
-                && Objects.equals(this.getCommand(), that.getCommand());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.getCommandContext(), this.getCommand());
-    }
+    @NonNull Command<@NonNull C> command();
 }

@@ -64,28 +64,28 @@ final class JDACommandPreprocessor<C> implements CommandPreprocessor<C> {
      */
     @Override
     public void accept(final @NonNull CommandPreprocessingContext<C> context) {
-        context.getCommandContext().store("JDA", this.mgr.getJDA());
+        context.commandContext().store("JDA", this.mgr.getJDA());
 
         MessageReceivedEvent event;
         try {
-            event = this.mgr.getBackwardsCommandSenderMapper().apply(context.getCommandContext().sender());
+            event = this.mgr.getBackwardsCommandSenderMapper().apply(context.commandContext().sender());
         } catch (IllegalStateException e) {
             // The event could not be resolved from the backwards command sender mapper
             return;
         }
 
-        context.getCommandContext().store("MessageReceivedEvent", event);
-        context.getCommandContext().store("MessageChannel", event.getChannel());
+        context.commandContext().store("MessageReceivedEvent", event);
+        context.commandContext().store("MessageChannel", event.getChannel());
 
         if (event.isFromGuild()) {
             Guild guild = event.getGuild();
-            context.getCommandContext().store("Guild", guild);
+            context.commandContext().store("Guild", guild);
 
             if (event.isFromType(ChannelType.TEXT)) {
-                context.getCommandContext().store("TextChannel", event.getTextChannel());
+                context.commandContext().store("TextChannel", event.getTextChannel());
             }
         } else if (event.isFromType(ChannelType.PRIVATE)) {
-            context.getCommandContext().store("PrivateChannel", event.getPrivateChannel());
+            context.commandContext().store("PrivateChannel", event.getPrivateChannel());
         }
     }
 }

@@ -607,7 +607,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput
     ) {
-        this.servicePipeline.pump(new CommandPreprocessingContext<>(context, commandInput))
+        this.servicePipeline.pump(CommandPreprocessingContext.of(context, commandInput))
                 .through(new TypeToken<CommandPreprocessor<C>>() {
                 })
                 .getResult();
@@ -628,7 +628,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
             final @NonNull CommandContext<C> context,
             final @NonNull Command<C> command
     ) {
-        this.servicePipeline.pump(new CommandPostprocessingContext<>(context, command))
+        this.servicePipeline.pump(CommandPostprocessingContext.of(context, command))
                 .through(new TypeToken<CommandPostprocessor<C>>() {
                 })
                 .getResult();

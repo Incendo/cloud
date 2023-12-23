@@ -105,9 +105,9 @@ public final class CloudBrigadierManager<C, S> {
         this.registerInternalMappings();
         commandManager.registerCommandPreProcessor(ctx -> {
             if (this.backwardsBrigadierCommandSenderMapper != null) {
-                ctx.getCommandContext().store(
+                ctx.commandContext().store(
                         WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER,
-                        this.backwardsBrigadierCommandSenderMapper.apply(ctx.getCommandContext().sender())
+                        this.backwardsBrigadierCommandSenderMapper.apply(ctx.commandContext().sender())
                 );
             }
         });
