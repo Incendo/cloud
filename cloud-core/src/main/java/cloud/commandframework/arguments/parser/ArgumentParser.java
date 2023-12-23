@@ -152,10 +152,10 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     default <O> @NonNull ArgumentParser<C, O> mapSuccess(
-            final @NonNull BiFunction<CommandContext<C>, T, O> mapper
+            final @NonNull BiFunction<CommandContext<C>, T, CompletableFuture<O>> mapper
     ) {
         requireNonNull(mapper, "mapper");
-        return this.flatMapSuccess((ctx, orig) -> ArgumentParseResult.successFuture(mapper.apply(ctx, orig)));
+        return this.flatMapSuccess((ctx, orig) -> mapper.apply(ctx, orig).thenApply(ArgumentParseResult::success));
     }
 
     /**
