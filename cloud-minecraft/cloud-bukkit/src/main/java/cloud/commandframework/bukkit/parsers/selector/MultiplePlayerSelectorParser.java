@@ -148,7 +148,7 @@ public final class MultiplePlayerSelectorParser<C> extends SelectorUtils.PlayerS
         }
 
         final String pop = commandInput.readString();
-        return ArgumentParseResult.<MultiplePlayerSelector>success(new MultiplePlayerSelector() {
+        return ArgumentParseResult.successFuture(new MultiplePlayerSelector() {
             @Override
             public @NonNull String inputString() {
                 return pop;
@@ -158,6 +158,6 @@ public final class MultiplePlayerSelectorParser<C> extends SelectorUtils.PlayerS
             public @NonNull Collection<Player> values() {
                 return Collections.singletonList(player);
             }
-        }).asFuture();
+        });
     }
 }

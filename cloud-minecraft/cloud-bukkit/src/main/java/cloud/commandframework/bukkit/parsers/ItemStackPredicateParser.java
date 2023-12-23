@@ -141,15 +141,14 @@ public final class ItemStackPredicateParser<C> implements ArgumentParser<C, Item
         return new WrappedBrigadierParser<C, Object>(inst).map((ctx, result) -> {
             if (result instanceof Predicate) {
                 // 1.19+
-                return ArgumentParseResult.<ItemStackPredicate>success(new ItemStackPredicateImpl((Predicate<Object>) result))
-                        .asFuture();
+                return ArgumentParseResult.successFuture(new ItemStackPredicateImpl((Predicate<Object>) result));
             }
             final Object commandSourceStack = ctx.get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER);
             final com.mojang.brigadier.context.CommandContext<Object> dummy = createDummyContext(ctx, commandSourceStack);
             Objects.requireNonNull(CREATE_PREDICATE_METHOD, "ItemPredicateArgument$Result#create");
             try {
                 final Predicate<Object> predicate = (Predicate<Object>) CREATE_PREDICATE_METHOD.invoke(result, dummy);
-                return ArgumentParseResult.<ItemStackPredicate>success(new ItemStackPredicateImpl(predicate)).asFuture();
+                return ArgumentParseResult.successFuture(new ItemStackPredicateImpl(predicate));
             } catch (final ReflectiveOperationException ex) {
                 throw new RuntimeException(ex);
             }

@@ -192,7 +192,7 @@ public final class BlockPredicateParser<C> implements ArgumentParser<C, BlockPre
         return new WrappedBrigadierParser<C, Object>(inst).map((ctx, result) -> {
             if (result instanceof Predicate) {
                 // 1.19+
-                return ArgumentParseResult.<BlockPredicate>success(new BlockPredicateImpl((Predicate<Object>) result)).asFuture();
+                return ArgumentParseResult.successFuture(new BlockPredicateImpl((Predicate<Object>) result));
             }
             final Object commandSourceStack = ctx.get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER);
             try {
@@ -205,7 +205,7 @@ public final class BlockPredicateParser<C> implements ArgumentParser<C, BlockPre
                 }
                 Objects.requireNonNull(CREATE_PREDICATE_METHOD, "create on BlockPredicateArgument$Result");
                 final Predicate<Object> predicate = (Predicate<Object>) CREATE_PREDICATE_METHOD.invoke(result, obj);
-                return ArgumentParseResult.<BlockPredicate>success(new BlockPredicateImpl(predicate)).asFuture();
+                return ArgumentParseResult.successFuture(new BlockPredicateImpl(predicate));
             } catch (final ReflectiveOperationException ex) {
                 throw new RuntimeException(ex);
             }

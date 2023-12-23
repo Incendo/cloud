@@ -57,6 +57,19 @@ public abstract class ArgumentParseResult<T> {
     }
 
     /**
+     * Create a {@link CompletableFuture future} completed with a failed parse result.
+     *
+     * @param failure failure reason
+     * @param <T>     parser value type
+     * @return completed future with failed result
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <T> @NonNull CompletableFuture<@NonNull ArgumentParseResult<T>> failureFuture(final @NonNull Throwable failure) {
+        return new ParseFailure<T>(failure).asFuture();
+    }
+
+    /**
      * Indicate that the parsing succeeded
      *
      * @param value Value produced by the parser
@@ -65,6 +78,18 @@ public abstract class ArgumentParseResult<T> {
      */
     public static <T> @NonNull ArgumentParseResult<T> success(final @NonNull T value) {
         return new ParseSuccess<>(value);
+    }
+
+    /**
+     * Create a {@link CompletableFuture future} completed with a successful parse result.
+     *
+     * @param value parsed value
+     * @param <T>   parser value type
+     * @return completed future with successful result
+     * @since 2.0.0
+     */
+    public static <T> @NonNull CompletableFuture<@NonNull ArgumentParseResult<T>> successFuture(final @NonNull T value) {
+        return success(value).asFuture();
     }
 
     /**

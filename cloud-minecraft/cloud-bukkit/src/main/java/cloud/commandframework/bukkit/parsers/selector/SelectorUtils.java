@@ -171,10 +171,10 @@ final class SelectorUtils {
                 final CommandContext<C> commandContext,
                 final CommandInput commandInput
         ) {
-            return ArgumentParseResult.<T>failure(new SelectorUnsupportedException(
+            return ArgumentParseResult.failureFuture(new SelectorUnsupportedException(
                     commandContext,
                     this.getClass()
-            )).asFuture();
+            ));
         }
 
         protected @NonNull Iterable<@NonNull Suggestion> legacySuggestions(
