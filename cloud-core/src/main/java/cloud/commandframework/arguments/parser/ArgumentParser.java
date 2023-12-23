@@ -51,23 +51,23 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
     int DEFAULT_ARGUMENT_COUNT = 1;
 
     /**
-     * Parse command input into a command result.
-     * <p>
-     * This method may be called when a command chain is being parsed for execution
+     * Attempts to parse the {@code input} into an object of type {@link T}.
+     *
+     * <p>This method may be called when a command chain is being parsed for execution
      * (using {@link cloud.commandframework.CommandExecutor#executeCommand(Object, String)})
      * or when a command is being parsed to provide context for suggestions
      * (using {@link SuggestionFactory#suggest(Object, String)}).
      * It is possible to use {@link CommandContext#isSuggestions()}} to see what the purpose of the
      * parsing is. Particular care should be taken when parsing for suggestions, as the parsing
-     * method is then likely to be called once for every character written by the command sender.
-     * <p>
-     * This method should never throw any exceptions under normal circumstances. Instead, if the
+     * method is then likely to be called once for every character written by the command sender.</p>
+     *
+     * <p>This method should never throw any exceptions under normal circumstances. Instead, if the
      * parsing for some reason cannot be done successfully {@link ArgumentParseResult#failure(Throwable)}
-     * should be returned. This then wraps any exception that should be forwarded to the command sender.
-     * <p>
-     * The parser is assumed to be completely stateless and should not store any information about
+     * should be returned. This then wraps any exception that should be forwarded to the command sender.</p>
+     *
+     * <p>The parser is assumed to be completely stateless and should not store any information about
      * the command sender or the command context. Instead, information should be stored in the
-     * {@link CommandContext}.
+     * {@link CommandContext}.</p>
      *
      * @param commandContext Command context
      * @param commandInput   Command Input
@@ -80,18 +80,23 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
 
     /**
      * Returns a future that completes with the result of parsing the given {@code commandInput}.
-     * <p>
-     * This method may be called when a command chain is being parsed for execution
+     *
+     * <p>This method may be called when a command chain is being parsed for execution
      * (using {@link cloud.commandframework.CommandExecutor#executeCommand(Object, String)})
      * or when a command is being parsed to provide context for suggestions
      * (using {@link SuggestionFactory#suggest(Object, String)}).
      * It is possible to use {@link CommandContext#isSuggestions()}} to see what the purpose of the
      * parsing is. Particular care should be taken when parsing for suggestions, as the parsing
-     * method is then likely to be called once for every character written by the command sender.
-     * <p>
-     * The parser is assumed to be completely stateless and should not store any information about
+     * method is then likely to be called once for every character written by the command sender.</p>
+     *
+     * <p>This method should never throw any exceptions under normal circumstances. Instead, if the
+     * parsing for some reason cannot be done successfully {@link ArgumentParseResult#failure(Throwable)}
+     * or {@link ArgumentParseResult#failureFuture(Throwable)} should be returned. This then wraps any exception that should be
+     * forwarded to the command sender.</p>
+     *
+     * <p>The parser is assumed to be completely stateless and should not store any information about
      * the command sender or the command context. Instead, information should be stored in the
-     * {@link CommandContext}.
+     * {@link CommandContext}.</p>
      *
      * @param commandContext Command context
      * @param commandInput   Command Input
