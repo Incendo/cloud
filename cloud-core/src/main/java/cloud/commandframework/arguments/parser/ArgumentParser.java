@@ -29,7 +29,6 @@ import cloud.commandframework.arguments.suggestion.SuggestionProviderHolder;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -166,15 +165,8 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
                 @NonNull CommandContext<@NonNull C> commandContext,
                 @NonNull CommandInput commandInput
         ) {
-            try {
-                return this.parseFuture(commandContext, commandInput).join();
-            } catch (final CompletionException exception) {
-                final Throwable cause = exception.getCause();
-                if (cause instanceof RuntimeException) {
-                    throw (RuntimeException) cause;
-                }
-                throw exception;
-            }
+            throw new UnsupportedOperationException(
+                    "parse should not be called on a FutureArgumentParser. Call parseFuture instead.");
         }
 
         @Override
