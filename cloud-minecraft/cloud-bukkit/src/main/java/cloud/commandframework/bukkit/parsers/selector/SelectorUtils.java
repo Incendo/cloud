@@ -289,7 +289,9 @@ final class SelectorUtils {
                         final CompletableFuture<ArgumentParseResult<T>> future = new CompletableFuture<>();
                         try {
                             final String input = originalCommandInput.difference(commandInput);
-                            future.complete(this.mapper.mapResult(input, new EntitySelectorWrapper(commandContext, result)));
+                            future.complete(ArgumentParseResult.success(
+                                    this.mapper.mapResult(input, new EntitySelectorWrapper(commandContext, result))
+                            ));
                         } catch (final CommandSyntaxException ex) {
                             commandInput.cursor(originalCommandInput.cursor());
                             future.completeExceptionally(ex);
@@ -506,7 +508,7 @@ final class SelectorUtils {
     @FunctionalInterface
     interface SelectorMapper<T> {
 
-        ArgumentParseResult<T> mapResult(String input, EntitySelectorWrapper wrapper) throws Exception;
+        T mapResult(String input, EntitySelectorWrapper wrapper) throws Exception;
     }
 
     @SuppressWarnings("unchecked")

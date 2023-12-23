@@ -110,7 +110,7 @@ public final class MultiplePlayerSelectorParser<C> extends SelectorUtils.PlayerS
 
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     @Override
-    public ArgumentParseResult<MultiplePlayerSelector> mapResult(
+    public MultiplePlayerSelector mapResult(
             final @NonNull String input,
             final SelectorUtils.@NonNull EntitySelectorWrapper wrapper
     ) {
@@ -118,19 +118,17 @@ public final class MultiplePlayerSelectorParser<C> extends SelectorUtils.PlayerS
         if (players.isEmpty() && !this.allowEmpty) {
             new Thrower(NO_PLAYERS_EXCEPTION_TYPE.get()).throwIt();
         }
-        return ArgumentParseResult.success(
-                new MultiplePlayerSelector() {
-                    @Override
-                    public @NonNull String inputString() {
-                        return input;
-                    }
+        return new MultiplePlayerSelector() {
+            @Override
+            public @NonNull String inputString() {
+                return input;
+            }
 
-                    @Override
-                    public @NonNull Collection<Player> values() {
-                        return Collections.unmodifiableCollection(players);
-                    }
-                }
-        );
+            @Override
+            public @NonNull Collection<Player> values() {
+                return Collections.unmodifiableCollection(players);
+            }
+        };
     }
 
     @Override

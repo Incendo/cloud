@@ -24,7 +24,6 @@
 package cloud.commandframework.bukkit.parsers.selector;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.bukkit.data.SingleEntitySelector;
 import org.apiguardian.api.API;
@@ -74,23 +73,21 @@ public final class SingleEntitySelectorParser<C> extends SelectorUtils.EntitySel
 
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     @Override
-    public ArgumentParseResult<SingleEntitySelector> mapResult(
+    public SingleEntitySelector mapResult(
             final @NonNull String input,
             final SelectorUtils.@NonNull EntitySelectorWrapper wrapper
     ) {
         final Entity entity = wrapper.singleEntity();
-        return ArgumentParseResult.success(
-                new SingleEntitySelector() {
-                    @Override
-                    public @NonNull Entity single() {
-                        return entity;
-                    }
+        return new SingleEntitySelector() {
+            @Override
+            public @NonNull Entity single() {
+                return entity;
+            }
 
-                    @Override
-                    public @NonNull String inputString() {
-                        return input;
-                    }
-                }
-        );
+            @Override
+            public @NonNull String inputString() {
+                return input;
+            }
+        };
     }
 }

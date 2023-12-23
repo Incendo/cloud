@@ -80,24 +80,22 @@ public final class SinglePlayerSelectorParser<C> extends SelectorUtils.PlayerSel
 
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     @Override
-    public ArgumentParseResult<SinglePlayerSelector> mapResult(
+    public SinglePlayerSelector mapResult(
             final @NonNull String input,
             final SelectorUtils.@NonNull EntitySelectorWrapper wrapper
     ) {
         final Player player = wrapper.singlePlayer();
-        return ArgumentParseResult.success(
-                new SinglePlayerSelector() {
-                    @Override
-                    public @NonNull Player single() {
-                        return player;
-                    }
+        return new SinglePlayerSelector() {
+            @Override
+            public @NonNull Player single() {
+                return player;
+            }
 
-                    @Override
-                    public @NonNull String inputString() {
-                        return input;
-                    }
-                }
-        );
+            @Override
+            public @NonNull String inputString() {
+                return input;
+            }
+        };
     }
 
     @Override

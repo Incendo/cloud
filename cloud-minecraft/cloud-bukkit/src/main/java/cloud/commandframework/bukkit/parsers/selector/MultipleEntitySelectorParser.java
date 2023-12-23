@@ -24,7 +24,6 @@
 package cloud.commandframework.bukkit.parsers.selector;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.bukkit.data.MultipleEntitySelector;
 import java.util.Collection;
@@ -104,7 +103,7 @@ public final class MultipleEntitySelectorParser<C> extends SelectorUtils.EntityS
 
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     @Override
-    public ArgumentParseResult<MultipleEntitySelector> mapResult(
+    public MultipleEntitySelector mapResult(
             final @NonNull String input,
             final SelectorUtils.@NonNull EntitySelectorWrapper wrapper
     ) {
@@ -112,18 +111,16 @@ public final class MultipleEntitySelectorParser<C> extends SelectorUtils.EntityS
         if (entities.isEmpty() && !this.allowEmpty) {
             new Thrower(NO_ENTITIES_EXCEPTION_TYPE.get()).throwIt();
         }
-        return ArgumentParseResult.success(
-                new MultipleEntitySelector() {
-                    @Override
-                    public @NonNull String inputString() {
-                        return input;
-                    }
+        return new MultipleEntitySelector() {
+            @Override
+            public @NonNull String inputString() {
+                return input;
+            }
 
-                    @Override
-                    public @NonNull Collection<Entity> values() {
-                        return Collections.unmodifiableCollection(entities);
-                    }
-                }
-        );
+            @Override
+            public @NonNull Collection<Entity> values() {
+                return Collections.unmodifiableCollection(entities);
+            }
+        };
     }
 }
