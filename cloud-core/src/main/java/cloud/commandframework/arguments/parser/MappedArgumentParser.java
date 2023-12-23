@@ -81,7 +81,7 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser.Futur
     }
 
     @Override
-    public @NonNull <O1> ArgumentParser<C, O1> flatMap(final Mapper<C, O, O1> mapper) {
+    public <O1> ArgumentParser.@NonNull FutureArgumentParser<C, O1> flatMap(final Mapper<C, O, O1> mapper) {
         requireNonNull(mapper, "mapper");
         return new MappedArgumentParser<>(
                 this.base,
