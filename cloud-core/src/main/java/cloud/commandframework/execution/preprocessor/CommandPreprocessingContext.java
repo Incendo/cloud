@@ -31,7 +31,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.immutables.value.Value;
 
 /**
- * Context for {@link CommandPreprocessor command preprocessors}
+ * Context for {@link CommandPreprocessor command preprocessors}.
  *
  * @param <C> command sender type
  * @since 2.0.0
@@ -68,7 +68,7 @@ public interface CommandPreprocessingContext<C> {
      *
      * <p>All changes will persist and will be used during parsing.</p>
      *
-     * @return Input queue
+     * @return command input
      */
     @NonNull CommandInput commandInput();
 }
