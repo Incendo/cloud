@@ -98,16 +98,17 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
             future =
                     future.thenCompose(result -> {
                         if (result != null && result.getFailure().isPresent()) {
-                            return result.asFuture();
+                            return ArgumentParseResult.failureFuture(result.getFailure().get());
                         }
                         return component.parser()
                                 .parseFuture(commandContext, commandInput)
-                                .thenApply(value ->
-                                        value.<Object>mapParsedValue(parsedValue -> {
-                                            final CloudKey key = CloudKey.of(component.name(), component.valueType());
-                                            aggregateCommandContext.store(key, value.getParsedValue().get());
-                                            return parsedValue;
-                                }));
+                                .thenApply(value -> {
+                                    if (value.getParsedValue().isPresent()) {
+                                        final CloudKey key = CloudKey.of(component.name(), component.valueType());
+                                        aggregateCommandContext.store(key, value.getParsedValue().get());
+                                    }
+                                    return (ArgumentParseResult<Object>) value;
+                                });
                     });
         }
         return future.thenCompose(result -> {
