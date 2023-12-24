@@ -48,10 +48,7 @@ import com.google.inject.Singleton;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.plugin.PluginContainer;
-import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.server.RegisteredServer;
-import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -122,10 +119,9 @@ public class VelocityCommandManager<C> extends CommandManager<C>
         this.registerCommandPreProcessor(new VelocityCommandPreprocessor<>(this));
 
         /* Register Velocity Parsers */
-        this.parserRegistry().registerParserSupplier(TypeToken.get(Player.class), parserParameters ->
-                new PlayerParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(RegisteredServer.class), parserParameters ->
-                new ServerParser<>());
+        this.parserRegistry()
+                .registerParser(PlayerParser.playerParser())
+                .registerParser(ServerParser.serverParser());
 
         /* Register default captions */
         if (this.captionRegistry() instanceof FactoryDelegatingCaptionRegistry) {

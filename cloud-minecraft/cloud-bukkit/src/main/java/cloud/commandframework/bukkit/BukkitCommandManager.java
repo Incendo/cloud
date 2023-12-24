@@ -38,9 +38,6 @@ import cloud.commandframework.bukkit.annotation.specifier.DefaultNamespace;
 import cloud.commandframework.bukkit.annotation.specifier.RequireExplicitNamespace;
 import cloud.commandframework.bukkit.data.MultipleEntitySelector;
 import cloud.commandframework.bukkit.data.MultiplePlayerSelector;
-import cloud.commandframework.bukkit.data.ProtoItemStack;
-import cloud.commandframework.bukkit.data.SingleEntitySelector;
-import cloud.commandframework.bukkit.data.SinglePlayerSelector;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.parsers.BlockPredicateParser;
 import cloud.commandframework.bukkit.parsers.EnchantmentParser;
@@ -51,7 +48,6 @@ import cloud.commandframework.bukkit.parsers.NamespacedKeyParser;
 import cloud.commandframework.bukkit.parsers.OfflinePlayerParser;
 import cloud.commandframework.bukkit.parsers.PlayerParser;
 import cloud.commandframework.bukkit.parsers.WorldParser;
-import cloud.commandframework.bukkit.parsers.location.Location2D;
 import cloud.commandframework.bukkit.parsers.location.Location2DParser;
 import cloud.commandframework.bukkit.parsers.location.LocationParser;
 import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorParser;
@@ -73,13 +69,7 @@ import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import org.apiguardian.api.API;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -144,28 +134,19 @@ public class BukkitCommandManager<C> extends CommandManager<C>
         this.registerCommandPreProcessor(new BukkitCommandPreprocessor<>(this));
 
         /* Register Bukkit Parsers */
-        this.parserRegistry().registerParserSupplier(TypeToken.get(World.class), parserParameters ->
-                new WorldParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(Material.class), parserParameters ->
-                new MaterialParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(Player.class), parserParameters ->
-                new PlayerParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(OfflinePlayer.class), parserParameters ->
-                new OfflinePlayerParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(Enchantment.class), parserParameters ->
-                new EnchantmentParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(Location.class), parserParameters ->
-                new LocationParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(Location2D.class), parserParameters ->
-                new Location2DParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(ProtoItemStack.class), parserParameters ->
-                new ItemStackParser<>());
+        this.parserRegistry()
+                .registerParser(WorldParser.worldParser())
+                .registerParser(MaterialParser.materialParser())
+                .registerParser(PlayerParser.playerParser())
+                .registerParser(OfflinePlayerParser.offlinePlayerParser())
+                .registerParser(EnchantmentParser.enchantmentParser())
+                .registerParser(LocationParser.locationParser())
+                .registerParser(Location2DParser.location2DParser())
+                .registerParser(ItemStackParser.itemStackParser())
+                .registerParser(SingleEntitySelectorParser.singleEntitySelectorParser())
+                .registerParser(SinglePlayerSelectorParser.singlePlayerSelectorParser());
 
         /* Register Entity Selector Parsers */
-        this.parserRegistry().registerParserSupplier(TypeToken.get(SingleEntitySelector.class), parserParameters ->
-                new SingleEntitySelectorParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(SinglePlayerSelector.class), parserParameters ->
-                new SinglePlayerSelectorParser<>());
         this.parserRegistry().registerAnnotationMapper(
                 AllowEmptySelection.class,
                 (annotation, type) -> ParserParameters.single(

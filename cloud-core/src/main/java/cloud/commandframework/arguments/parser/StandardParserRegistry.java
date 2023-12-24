@@ -47,17 +47,15 @@ import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedType;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * Standard implementation of {@link ParserRegistry}
@@ -85,8 +83,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
 
     private final Map<String, Function<ParserParameters, ArgumentParser<C, ?>>> namedParsers = new HashMap<>();
     private final Map<AnnotatedType, Function<ParserParameters, ArgumentParser<C, ?>>> parserSuppliers = new AnnotatedTypeMap<>();
-    private final Map<Class<? extends Annotation>, BiFunction<? extends Annotation, TypeToken<?>, ParserParameters>>
-            annotationMappers = new HashMap<>();
+    private final Map<Class<? extends Annotation>, AnnotationMapper<?>> annotationMappers = new HashMap<>();
     private final Map<String, SuggestionProvider<C>> namedSuggestionProviders = new HashMap<>();
 
     /**
@@ -95,17 +92,17 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
      */
     public StandardParserRegistry() {
         /* Register standard mappers */
-        this.<Range, Number>registerAnnotationMapper(Range.class, new RangeMapper());
-        this.<Greedy, String>registerAnnotationMapper(Greedy.class, new GreedyMapper());
-        this.<Quoted, String>registerAnnotationMapper(
+        this.registerAnnotationMapper(Range.class, new RangeMapper());
+        this.registerAnnotationMapper(Greedy.class, new GreedyMapper());
+        this.registerAnnotationMapper(
                 Quoted.class,
                 (quoted, typeToken) -> ParserParameters.single(StandardParameters.QUOTED, true)
         );
-        this.<Liberal, Boolean>registerAnnotationMapper(
+        this.registerAnnotationMapper(
                 Liberal.class,
                 (liberal, typeToken) -> ParserParameters.single(StandardParameters.LIBERAL, true)
         );
-        this.<FlagYielding, String>registerAnnotationMapper(
+        this.registerAnnotationMapper(
                 FlagYielding.class,
                 (flagYielding, typeToken) -> ParserParameters.single(StandardParameters.FLAG_YIELDING, true)
         );
@@ -176,8 +173,8 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             final boolean liberal = options.get(StandardParameters.LIBERAL, false);
             return new BooleanParser<>(liberal);
         });
-        this.registerParserSupplier(TypeToken.get(UUID.class), options -> new UUIDParser<>());
-        this.registerParserSupplier(TypeToken.get(Duration.class), options -> new DurationParser<>());
+        this.registerParser(UUIDParser.uuidParser());
+        this.registerParser(DurationParser.durationParser());
     }
 
     private static boolean isPrimitive(final @NonNull TypeToken<?> type) {
@@ -185,30 +182,32 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     }
 
     @Override
-    public <T> void registerParserSupplier(
+    public <T> @This StandardParserRegistry<C> registerParserSupplier(
             final @NonNull TypeToken<T> type,
             final @NonNull Function<@NonNull ParserParameters,
                     @NonNull ArgumentParser<C, ?>> supplier
     ) {
         this.parserSuppliers.put(type.getAnnotatedType(), supplier);
+        return this;
     }
 
     @Override
-    public void registerNamedParserSupplier(
+    public @This StandardParserRegistry<C> registerNamedParserSupplier(
             final @NonNull String name,
             final @NonNull Function<@NonNull ParserParameters,
                     @NonNull ArgumentParser<C, ?>> supplier
     ) {
         this.namedParsers.put(name, supplier);
+        return this;
     }
 
     @Override
-    public <A extends Annotation, T> void registerAnnotationMapper(
+    public <A extends Annotation> @This StandardParserRegistry<C> registerAnnotationMapper(
             final @NonNull Class<A> annotation,
-            final @NonNull BiFunction<@NonNull A, @NonNull TypeToken<?>,
-                    @NonNull ParserParameters> mapper
+            final @NonNull AnnotationMapper<A> mapper
     ) {
         this.annotationMappers.put(annotation, mapper);
+        return this;
     }
 
     @Override
@@ -220,12 +219,11 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         final ParserParameters parserParameters = new ParserParameters();
         annotations.forEach(annotation -> {
             // noinspection all
-            final BiFunction mapper = this.annotationMappers.get(annotation.annotationType());
+            final AnnotationMapper mapper = this.annotationMappers.get(annotation.annotationType());
             if (mapper == null) {
                 return;
             }
-            @SuppressWarnings("unchecked") final ParserParameters parserParametersCasted = (ParserParameters) mapper.apply(
-                    annotation, parsingType);
+            final ParserParameters parserParametersCasted = mapper.mapAnnotation(annotation, parsingType);
             parserParameters.merge(parserParametersCasted);
         });
         return parserParameters;
@@ -290,11 +288,10 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     }
 
 
-    private static final class RangeMapper implements BiFunction<@NonNull Range, @NonNull TypeToken<?>,
-            @NonNull ParserParameters> {
+    private static final class RangeMapper implements AnnotationMapper<Range> {
 
         @Override
-        public @NonNull ParserParameters apply(final @NonNull Range range, final @NonNull TypeToken<?> type) {
+        public @NonNull ParserParameters mapAnnotation(final @NonNull Range range, final @NonNull TypeToken<?> type) {
             final Class<?> clazz;
             if (isPrimitive(type)) {
                 clazz = PRIMITIVE_MAPPINGS.get(GenericTypeReflector.erase(type.getType()));
@@ -361,11 +358,10 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     }
 
 
-    private static final class GreedyMapper implements BiFunction<@NonNull Greedy, @NonNull TypeToken<?>,
-            @NonNull ParserParameters> {
+    private static final class GreedyMapper implements AnnotationMapper<Greedy> {
 
         @Override
-        public @NonNull ParserParameters apply(final @NonNull Greedy greedy, final @NonNull TypeToken<?> typeToken) {
+        public @NonNull ParserParameters mapAnnotation(final @NonNull Greedy greedy, final @NonNull TypeToken<?> typeToken) {
             return ParserParameters.single(StandardParameters.GREEDY, true);
         }
     }
