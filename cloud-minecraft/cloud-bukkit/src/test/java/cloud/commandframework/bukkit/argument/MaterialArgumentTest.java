@@ -54,8 +54,8 @@ class MaterialArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(material);
+        assertThat(result.failure()).isEmpty();
+        assertThat(result.parsedValue()).hasValue(material);
         assertThat(commandInput.remainingInput()).isEmpty();
     }
 
@@ -72,7 +72,7 @@ class MaterialArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isPresent();
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result.failure()).isPresent();
+        assertThat(result.parsedValue()).isEmpty();
     }
 }

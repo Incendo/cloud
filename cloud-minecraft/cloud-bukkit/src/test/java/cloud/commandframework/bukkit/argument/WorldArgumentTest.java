@@ -56,8 +56,8 @@ class WorldArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(this.world);
+        assertThat(result.failure()).isEmpty();
+        assertThat(result.parsedValue()).hasValue(this.world);
         assertThat(commandInput.remainingInput()).isEmpty();
 
         verify(this.server()).getWorld("world");
@@ -76,8 +76,8 @@ class WorldArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isPresent();
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result.failure()).isPresent();
+        assertThat(result.parsedValue()).isEmpty();
 
         verify(this.server()).getWorld("world");
     }

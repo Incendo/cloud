@@ -307,7 +307,7 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
                     context,
                     input
             );
-            if (result.getFailure().isPresent()) {
+            if (result.failure().isPresent()) {
                 return result;
             }
         }

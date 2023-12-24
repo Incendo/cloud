@@ -511,12 +511,12 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                                     commandInput
                             ).thenApply(parsedValue -> {
                                 // Forward parsing errors.
-                                if (parsedValue.getFailure().isPresent()) {
+                                if (parsedValue.failure().isPresent()) {
                                     return (ArgumentParseResult<Object>) parsedValue;
                                 }
 
                                 // We store the parsed flag in the context. We do ugly erasure here because generics :)
-                                commandContext.flags().addValueFlag(parsingFlag, (Object) parsedValue.getParsedValue().get());
+                                commandContext.flags().addValueFlag(parsingFlag, (Object) parsedValue.parsedValue().get());
                                 // At this point we know the flag parsed successfully.
                                 parsedFlags.add(parsingFlag);
 

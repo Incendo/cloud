@@ -57,8 +57,8 @@ class PlayerArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(player);
+        assertThat(result.failure()).isEmpty();
+        assertThat(result.parsedValue()).hasValue(player);
         assertThat(commandInput.remainingInput()).isEmpty();
 
         verify(this.server()).getPlayer("player");
@@ -77,8 +77,8 @@ class PlayerArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isPresent();
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result.failure()).isPresent();
+        assertThat(result.parsedValue()).isEmpty();
 
         verify(this.server()).getPlayer("player");
     }
