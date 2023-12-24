@@ -24,6 +24,7 @@
 package cloud.commandframework.bukkit.parsers.selector;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.bukkit.data.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.parsers.PlayerParser;
@@ -132,31 +133,29 @@ public final class MultiplePlayerSelectorParser<C> extends SelectorUtils.PlayerS
 
     @Override
     @SuppressWarnings("deprecation")
-    protected @NonNull CompletableFuture<MultiplePlayerSelector> legacyParse(
+    protected @NonNull CompletableFuture<ArgumentParseResult<MultiplePlayerSelector>> legacyParse(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final CompletableFuture<MultiplePlayerSelector> result = new CompletableFuture<>();
         final String input = commandInput.peekString();
         final @Nullable Player player = Bukkit.getPlayer(input);
 
         if (player == null) {
-            result.completeExceptionally(new PlayerParser.PlayerParseException(input, commandContext));
-        } else {
-            final String pop = commandInput.readString();
-            result.complete(new MultiplePlayerSelector() {
-                @Override
-                public @NonNull String inputString() {
-                    return pop;
-                }
-
-                @Override
-                public @NonNull Collection<Player> values() {
-                    return Collections.singletonList(player);
-                }
-            });
+            return CompletableFuture.completedFuture(
+                    ArgumentParseResult.failure(new PlayerParser.PlayerParseException(input, commandContext)));
         }
 
-        return result;
+        final String pop = commandInput.readString();
+        return ArgumentParseResult.successFuture(new MultiplePlayerSelector() {
+            @Override
+            public @NonNull String inputString() {
+                return pop;
+            }
+
+            @Override
+            public @NonNull Collection<Player> values() {
+                return Collections.singletonList(player);
+            }
+        });
     }
 }

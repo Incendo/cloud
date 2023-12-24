@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
+import java.util.concurrent.CompletableFuture;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -41,31 +42,26 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <R> resolved type
  * @since 1.5.0
  */
-abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
+abstract class SidedArgumentParser<C, I, R> implements ArgumentParser.FutureArgumentParser<C, R> {
 
     @Override
-    public @NonNull ArgumentParseResult<@NonNull R> parse(
+    public @NonNull CompletableFuture<@NonNull ArgumentParseResult<R>> parseFuture(
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
         final SharedSuggestionProvider source = commandContext.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
-        final ArgumentParseResult<I> intermediate = this.parseIntermediate(commandContext, commandInput);
-
-        return intermediate.flatMapParsedValue(value -> {
+        return this.intermediateParser().flatMapSuccess((ctx, result) -> {
             if (source instanceof CommandSourceStack) {
-                return this.resolveServer(commandContext, (CommandSourceStack) source, value);
+                return this.resolveServer(commandContext, (CommandSourceStack) source, result);
             } else if (source instanceof FabricClientCommandSource) {
-                return this.resolveClient(commandContext, (FabricClientCommandSource) source, value);
+                return this.resolveClient(commandContext, (FabricClientCommandSource) source, result);
             } else {
                 throw new IllegalStateException("Cannot have non-server command source when not on client");
             }
-        });
+        }).parseFuture(commandContext, commandInput);
     }
 
-    protected abstract @NonNull ArgumentParseResult<@NonNull I> parseIntermediate(
-            @NonNull CommandContext<@NonNull C> commandContext,
-            @NonNull CommandInput commandInput
-    );
+    protected abstract @NonNull FutureArgumentParser<C, I> intermediateParser();
 
     /**
      * Resolve the final value for this argument when running on the client.
@@ -76,7 +72,7 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
      * @return a resolved value
      * @since 1.5.0
      */
-    protected abstract @NonNull ArgumentParseResult<@NonNull R> resolveClient(
+    protected abstract @NonNull CompletableFuture<@NonNull ArgumentParseResult<@NonNull R>> resolveClient(
             @NonNull CommandContext<@NonNull C> context,
             @NonNull FabricClientCommandSource source,
             @NonNull I value
@@ -91,7 +87,7 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
      * @return a resolved value
      * @since 1.5.0
      */
-    protected abstract @NonNull ArgumentParseResult<@NonNull R> resolveServer(
+    protected abstract @NonNull CompletableFuture<@NonNull ArgumentParseResult<@NonNull R>> resolveServer(
             @NonNull CommandContext<@NonNull C> context,
             @NonNull CommandSourceStack source,
             @NonNull I value

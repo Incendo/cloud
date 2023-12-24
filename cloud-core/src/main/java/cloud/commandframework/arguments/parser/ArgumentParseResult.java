@@ -23,13 +23,12 @@
 //
 package cloud.commandframework.arguments.parser;
 
+import cloud.commandframework.exceptions.handling.ExceptionController;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * Result of the parsing done by a {@link ArgumentParser}
@@ -43,25 +42,9 @@ public abstract class ArgumentParseResult<T> {
     }
 
     /**
-     * Maps the future to a future returning an argument parse result
-     *
-     * @param <T>    the type of the result
-     * @param future the future to map
-     * @return the mapped future
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <T> @NonNull CompletableFuture<ArgumentParseResult<T>> mapFuture(final @NonNull CompletableFuture<T> future) {
-        return future.thenApply(ArgumentParseResult::success).exceptionally(throwable -> {
-            if (throwable instanceof CompletionException) {
-                return ArgumentParseResult.failure(throwable.getCause());
-            }
-            return ArgumentParseResult.failure(throwable);
-        });
-    }
-
-    /**
      * Indicate that the parsing failed
+     *
+     * <p>If the {@code failure} is a {@link CompletionException} then it will be unwrapped.</p>
      *
      * @param failure Failure reason
      * @param <T>     Parser return type
@@ -69,6 +52,19 @@ public abstract class ArgumentParseResult<T> {
      */
     public static <T> @NonNull ArgumentParseResult<T> failure(final @NonNull Throwable failure) {
         return new ParseFailure<>(failure);
+    }
+
+    /**
+     * Create a {@link CompletableFuture future} completed with a failed parse result.
+     *
+     * @param failure failure reason
+     * @param <T>     parser value type
+     * @return completed future with failed result
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <T> @NonNull CompletableFuture<@NonNull ArgumentParseResult<T>> failureFuture(final @NonNull Throwable failure) {
+        return new ParseFailure<T>(failure).asFuture();
     }
 
     /**
@@ -83,33 +79,24 @@ public abstract class ArgumentParseResult<T> {
     }
 
     /**
+     * Create a {@link CompletableFuture future} completed with a successful parse result.
+     *
+     * @param value parsed value
+     * @param <T>   parser value type
+     * @return completed future with successful result
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <T> @NonNull CompletableFuture<@NonNull ArgumentParseResult<T>> successFuture(final @NonNull T value) {
+        return success(value).asFuture();
+    }
+
+    /**
      * Get the parsed value, if it exists
      *
      * @return Optional containing the parsed value
      */
     public abstract @NonNull Optional<T> getParsedValue();
-
-    /**
-     * If this result is successful, transform the output value.
-     *
-     * @param mapper the transformation
-     * @param <U>    the result type
-     * @return a new result if successful, otherwise a failure
-     * @since 1.5.0
-     */
-    @API(status = API.Status.STABLE, since = "1.5.0")
-    public abstract <U> @NonNull ArgumentParseResult<U> mapParsedValue(Function<T, U> mapper);
-
-    /**
-     * If this result is successful, transform the output value, returning another parse result.
-     *
-     * @param mapper the transformation
-     * @param <U>    the result type
-     * @return a new result if successful, otherwise a failure
-     * @since 1.5.0
-     */
-    @API(status = API.Status.STABLE, since = "1.5.0")
-    public abstract <U> @NonNull ArgumentParseResult<U> flatMapParsedValue(Function<T, ArgumentParseResult<U>> mapper);
 
     /**
      * Get the failure reason, if it exists
@@ -119,23 +106,15 @@ public abstract class ArgumentParseResult<T> {
     public abstract @NonNull Optional<Throwable> getFailure();
 
     /**
-     * If this result is a failure, transform the exception.
-     *
-     * @param mapper the exception transformation
-     * @return if this is a failure, a transformed result, otherwise this
-     * @since 1.5.0
-     */
-    @API(status = API.Status.STABLE, since = "1.5.0")
-    public abstract @NonNull ArgumentParseResult<T> mapFailure(Function<Throwable, Throwable> mapper);
-
-    /**
      * Maps the result to a completable future.
      *
      * @return the future
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public abstract @NonNull CompletableFuture<T> asFuture();
+    public final @NonNull CompletableFuture<ArgumentParseResult<T>> asFuture() {
+        return CompletableFuture.completedFuture(this);
+    }
 
 
     private static final class ParseSuccess<T> extends ArgumentParseResult<T> {
@@ -155,28 +134,8 @@ public abstract class ArgumentParseResult<T> {
         }
 
         @Override
-        public @NonNull <U> ArgumentParseResult<U> mapParsedValue(final Function<T, U> mapper) {
-            return new ParseSuccess<>(mapper.apply(this.value));
-        }
-
-        @Override
-        public @NonNull <U> ArgumentParseResult<U> flatMapParsedValue(final Function<T, ArgumentParseResult<U>> mapper) {
-            return mapper.apply(this.value);
-        }
-
-        @Override
         public @NonNull Optional<Throwable> getFailure() {
             return Optional.empty();
-        }
-
-        @Override
-        public @This @NonNull ArgumentParseResult<T> mapFailure(final Function<Throwable, Throwable> mapper) {
-            return this;
-        }
-
-        @Override
-        public @NonNull CompletableFuture<T> asFuture() {
-            return CompletableFuture.completedFuture(this.value);
         }
     }
 
@@ -188,7 +147,7 @@ public abstract class ArgumentParseResult<T> {
         private final Throwable failure;
 
         private ParseFailure(final @NonNull Throwable failure) {
-            this.failure = failure;
+            this.failure = ExceptionController.unwrapCompletionException(failure);
         }
 
         @Override
@@ -197,36 +156,8 @@ public abstract class ArgumentParseResult<T> {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
-        public @NonNull <U> @This ArgumentParseResult<U> mapParsedValue(final Function<T, U> mapper) {
-            return (ArgumentParseResult<U>) this;
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public @NonNull <U> @This ArgumentParseResult<U> flatMapParsedValue(final Function<T, ArgumentParseResult<U>> mapper) {
-            return (ArgumentParseResult<U>) this;
-        }
-
-        @Override
         public @NonNull Optional<Throwable> getFailure() {
             return Optional.of(this.failure);
-        }
-
-        @Override
-        public @NonNull ArgumentParseResult<T> mapFailure(final Function<Throwable, Throwable> mapper) {
-            return new ParseFailure<>(mapper.apply(this.failure));
-        }
-
-        @Override
-        public @NonNull CompletableFuture<T> asFuture() {
-            final CompletableFuture<T> future = new CompletableFuture<>();
-            if (this.failure instanceof CompletionException) {
-                future.completeExceptionally(this.failure.getCause());
-            } else {
-                future.completeExceptionally(this.failure);
-            }
-            return future;
         }
     }
 }

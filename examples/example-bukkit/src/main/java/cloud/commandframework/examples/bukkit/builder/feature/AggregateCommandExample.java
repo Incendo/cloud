@@ -25,6 +25,7 @@ package cloud.commandframework.examples.bukkit.builder.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
@@ -73,7 +74,7 @@ public final class AggregateCommandExample implements BuilderFeature {
                     final int x = aggregateCommandContext.get("x");
                     final int y = aggregateCommandContext.get("y");
                     final int z = aggregateCommandContext.get("z");
-                    return new Location(world, x, y, z);
+                    return ArgumentParseResult.success(new Location(world, x, y, z));
                 })
                 .build();
         manager.command(
@@ -94,7 +95,7 @@ public final class AggregateCommandExample implements BuilderFeature {
                         .withMapper(new TypeToken<Pair<Integer, String>>(){}, (commandContext, context) -> {
                             final int slot = context.get("slot");
                             final String name = context.get("name");
-                            return CompletableFuture.completedFuture(Pair.of(slot, name));
+                            return CompletableFuture.completedFuture(ArgumentParseResult.success(Pair.of(slot, name)));
                         })
                         .build();
         manager.command(

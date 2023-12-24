@@ -55,7 +55,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -273,8 +272,8 @@ public final class CommandTree<C> {
                 parsingContext.markStart();
                 commandContext.currentComponent(component);
 
-                return ArgumentParseResult.mapFuture(component.parser()
-                        .parseFuture(commandContext, commandInput))
+                return component.parser()
+                        .parseFuture(commandContext, commandInput)
                         .thenCompose(result -> {
                             parsingContext.markEnd();
                             parsingContext.success(!result.getFailure().isPresent());
@@ -573,8 +572,8 @@ public final class CommandTree<C> {
         // Copy the current queue so that we can deduce the captured input.
         final CommandInput currentInput = commandInput.copy();
 
-        return ArgumentParseResult.mapFuture(node.component().parser()
-                .parseFuture(commandContext, commandInput))
+        return node.component().parser()
+                .parseFuture(commandContext, commandInput)
                 .thenCompose(result -> {
                     // We remove all remaining queue, and then we'll have a list of the captured input.
                     final List<String> consumedInput = tokenize(currentInput);
@@ -806,13 +805,7 @@ public final class CommandTree<C> {
                         .parser()
                         .parseFuture(context.commandContext(), commandInput)
                         .thenApply(ArgumentParseResult::success)
-                        .exceptionally(throwable -> {
-                            if (throwable instanceof CompletionException) {
-                                return ArgumentParseResult.failure(throwable.getCause());
-                            } else {
-                                return ArgumentParseResult.failure(throwable);
-                            }
-                        }).thenCompose(result -> {
+                        .thenCompose(result -> {
                             final Optional<?> parsedValue = result.getParsedValue();
                             final boolean parseSuccess = parsedValue.isPresent();
 
