@@ -48,13 +48,16 @@ public final class LocationExample implements AnnotationFeature {
         annotationParser.parse(this);
     }
 
-    @CommandMethod("annotations teleport location <location>")
+    @CommandMethod("annotations teleport location <location> [announce]")
     public void teleportComplex(
             final @NonNull Player sender,
-            final @Argument("location") @NonNull Location location
+            final @Argument("location") @NonNull Location location,
+            final @Argument("announce") boolean announce
     ) {
         sender.teleport(location);
-        sender.sendMessage("You have been teleported!");
+        if (announce) {
+            sender.sendMessage("You have been teleported!");
+        }
     }
 
     @CommandMethod("annotations teleport chunk <chunk>")

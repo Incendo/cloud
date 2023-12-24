@@ -759,17 +759,6 @@ public final class CommandTree<C> {
             } else {
                 context.commandContext().remove(CommandFlagParser.FLAG_META_KEY);
             }
-        } else if (commandInput.remainingTokens() <= component.parser().getRequestedArgumentCount()) {
-            // If the input queue contains fewer arguments than requested by the parser, then the parser will
-            // need to be given the opportunity to provide suggestions. We store all provided arguments
-            // so that the parser can use these to give contextual suggestions.
-            for (int i = 0; i < component.parser().getRequestedArgumentCount() - 1
-                    && commandInput.remainingTokens() > 1; i++) {
-                context.commandContext().store(
-                        String.format("%s_%d", component.name(), i),
-                        commandInput.readString()
-                );
-            }
         }
 
         return future.thenCompose(ignored -> {
@@ -804,16 +793,19 @@ public final class CommandTree<C> {
                 parsingFuture = child.component()
                         .parser()
                         .parseFuture(context.commandContext(), commandInput)
-                        .thenApply(ArgumentParseResult::success)
                         .thenCompose(result -> {
                             final Optional<?> parsedValue = result.parsedValue();
                             final boolean parseSuccess = parsedValue.isPresent();
 
                             if (result.failure().isPresent()) {
                                 commandInput.cursor(preParseInput.cursor());
+
+                                while (commandInput.remainingTokens() > 1) {
+                                    commandInput.readString();
+                                }
+                                return this.addArgumentSuggestions(context, child, commandInput.lastRemainingToken());
                             }
 
-                            // It's the last node, we don't care for success or not as we don't need to delegate to a child
                             if (child.isLeaf()) {
                                 if (!commandInput.isEmpty()) {
                                     return CompletableFuture.completedFuture(context);
@@ -875,31 +867,33 @@ public final class CommandTree<C> {
             final @NonNull CommandInput commandInput,
             final @NonNull AggregateCommandParser<C, ?> aggregateParser
     ) {
-        final int requiredArguments = aggregateParser.getRequestedArgumentCount();
-        if (commandInput.remainingTokens() > requiredArguments) {
-            return CompletableFuture.completedFuture(null);
-        }
+        // Try to parse the entire input. If it works, we skip this whole thing.
+        return aggregateParser.parseFuture(commandContext, commandInput.copy()).thenCompose(previous -> {
+            if (previous.parsedValue().isPresent()) {
+                return CompletableFuture.completedFuture(null);
+            }
 
-        CompletableFuture<Void> future = CompletableFuture.completedFuture(null);
-        final List<CommandComponent<C>> components = aggregateParser.components();
-        // We try to pop the input that would get parsed the inner components, but not the last one. We know that we have input
-        // that will be parsed by one of the inner components. If no parser before the last one parses the input, then we
-        // know for sure that the last one should capture all remaining input.
-        //
-        // We make sure to leave one string in the command input, as it should be passed to the suggestion method.
-        for (int argumentCount = 0; argumentCount < components.size() - 1 && commandInput.remainingTokens() > 1; argumentCount++) {
-            final CommandComponent<C> component = components.get(argumentCount);
-            future = future.thenCompose(previousResult -> {
-                        if (commandInput.remainingTokens() <= 1) {
-                            return CompletableFuture.completedFuture(previousResult);
-                        }
-                        return component.parser().parseFuture(commandContext, commandInput).thenApply(result -> {
-                            commandContext.store(component.name(), result);
-                            return null;
-                        });
+            CompletableFuture<Void> future = CompletableFuture.completedFuture(null);
+            final List<CommandComponent<C>> components = aggregateParser.components();
+            // We try to pop the input that would get parsed the inner components, but not the last one. We know that we have input
+            // that will be parsed by one of the inner components. If no parser before the last one parses the input, then we
+            // know for sure that the last one should capture all remaining input.
+            //
+            // We make sure to leave one string in the command input, as it should be passed to the suggestion method.
+            for (int argumentCount = 0; argumentCount < components.size() - 1 && commandInput.remainingTokens() > 1; argumentCount++) {
+                final CommandComponent<C> component = components.get(argumentCount);
+                future = future.thenCompose(previousResult -> {
+                    if (commandInput.remainingTokens() <= 1) {
+                        return CompletableFuture.completedFuture(previousResult);
+                    }
+                    return component.parser().parseFuture(commandContext, commandInput).thenApply(result -> {
+                        commandContext.store(component.name(), result);
+                        return null;
                     });
-        }
-        return future;
+                });
+            }
+            return future;
+        });
     }
 
     /**
