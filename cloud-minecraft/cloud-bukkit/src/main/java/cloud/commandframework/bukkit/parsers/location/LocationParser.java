@@ -105,12 +105,12 @@ public final class LocationParser<C> implements ArgumentParser<C, Location>, Blo
                     commandContext,
                     commandInput
             );
-            if (coordinate.getFailure().isPresent()) {
+            if (coordinate.failure().isPresent()) {
                 return ArgumentParseResult.failure(
-                        coordinate.getFailure().get()
+                        coordinate.failure().get()
                 );
             }
-            coordinates[i] = coordinate.getParsedValue().orElseThrow(NullPointerException::new);
+            coordinates[i] = coordinate.parsedValue().orElseThrow(NullPointerException::new);
         }
         final Location originalLocation;
         final CommandSender bukkitSender = commandContext.get(BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER);

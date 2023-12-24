@@ -63,8 +63,8 @@ class OfflinePlayerArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(player);
+        assertThat(result.failure()).isEmpty();
+        assertThat(result.parsedValue()).hasValue(player);
         Truth.assertThat(commandInput.remainingInput()).isEmpty();
 
         verify(this.server()).getOfflinePlayer("player");
@@ -83,8 +83,8 @@ class OfflinePlayerArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isPresent();
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result.failure()).isPresent();
+        assertThat(result.parsedValue()).isEmpty();
 
         verify(this.server()).getOfflinePlayer("player");
     }

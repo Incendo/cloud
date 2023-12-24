@@ -139,10 +139,10 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
     ) {
         requireNonNull(mapper, "mapper");
         return this.flatMap((ctx, orig) -> {
-            if (orig.getFailure().isPresent()) {
-                return ArgumentParseResult.failureFuture(orig.getFailure().get());
+            if (orig.failure().isPresent()) {
+                return ArgumentParseResult.failureFuture(orig.failure().get());
             }
-            return mapper.apply(ctx, orig.getParsedValue().get());
+            return mapper.apply(ctx, orig.parsedValue().get());
         });
     }
 

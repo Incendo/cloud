@@ -276,16 +276,16 @@ public final class CommandTree<C> {
                         .parseFuture(commandContext, commandInput)
                         .thenCompose(result -> {
                             parsingContext.markEnd();
-                            parsingContext.success(!result.getFailure().isPresent());
+                            parsingContext.success(!result.failure().isPresent());
 
                             final List<String> consumedTokens = tokenize(currentInput);
                             consumedTokens.removeAll(tokenize(commandInput));
                             parsingContext.consumedInput(consumedTokens);
 
-                            if (result.getParsedValue().isPresent()) {
+                            if (result.parsedValue().isPresent()) {
                                 parsedArguments.add(component);
                                 return this.parseCommand(parsedArguments, commandContext, commandInput, child);
-                            } else if (result.getFailure().isPresent()) {
+                            } else if (result.failure().isPresent()) {
                                 commandInput.cursor(currentInput.cursor());
                             }
                             // We do not want to respond with a parsing error, as parsing errors are meant to propagate.
@@ -509,7 +509,7 @@ public final class CommandTree<C> {
         } else {
             parseResult =
                     this.parseArgument(commandContext, child, commandInput)
-                            .thenApply(ArgumentParseResult::getParsedValue)
+                            .thenApply(ArgumentParseResult::parsedValue)
                             .thenApply(optional -> optional.orElse(null));
         }
 
@@ -561,7 +561,7 @@ public final class CommandTree<C> {
 
         final ArgumentParseResult<Boolean> preParseResult = node.component().preprocess(commandContext, commandInput);
 
-        if (preParseResult.getFailure().isPresent() || !preParseResult.getParsedValue().orElse(false)) {
+        if (preParseResult.failure().isPresent() || !preParseResult.parsedValue().orElse(false)) {
             parsingContext.markEnd();
             parsingContext.success(false);
             return CompletableFuture.completedFuture(preParseResult);
@@ -585,11 +585,11 @@ public final class CommandTree<C> {
 
                     final CompletableFuture<ArgumentParseResult<?>> resultFuture = new CompletableFuture<>();
 
-                    if (result.getFailure().isPresent()) {
+                    if (result.failure().isPresent()) {
                         commandInput.cursor(currentInput.cursor());
                         resultFuture.completeExceptionally(
                                 new ArgumentParseException(
-                                        result.getFailure().get(),
+                                        result.failure().get(),
                                         commandContext.sender(),
                                         this.getChain(node)
                                                 .stream()
@@ -659,11 +659,11 @@ public final class CommandTree<C> {
                         commandInput
                 );
 
-                if (result.getFailure().isPresent()) {
+                if (result.failure().isPresent()) {
                     commandInput.cursor(commandInputCopy.cursor());
                 }
 
-                if (!result.getParsedValue().isPresent()) {
+                if (!result.parsedValue().isPresent()) {
                     continue;
                 }
 
@@ -789,8 +789,8 @@ public final class CommandTree<C> {
                     context.commandContext(),
                     commandInput
             );
-            final boolean preParseSuccess = !preParseResult.getFailure().isPresent()
-                    && preParseResult.getParsedValue().orElse(false);
+            final boolean preParseSuccess = !preParseResult.failure().isPresent()
+                    && preParseResult.parsedValue().orElse(false);
             // END: Preprocessing
 
             final CompletableFuture<SuggestionContext<C>> parsingFuture;
@@ -806,10 +806,10 @@ public final class CommandTree<C> {
                         .parseFuture(context.commandContext(), commandInput)
                         .thenApply(ArgumentParseResult::success)
                         .thenCompose(result -> {
-                            final Optional<?> parsedValue = result.getParsedValue();
+                            final Optional<?> parsedValue = result.parsedValue();
                             final boolean parseSuccess = parsedValue.isPresent();
 
-                            if (result.getFailure().isPresent()) {
+                            if (result.failure().isPresent()) {
                                 commandInput.cursor(preParseInput.cursor());
                             }
 

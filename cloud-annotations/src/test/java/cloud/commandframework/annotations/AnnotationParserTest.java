@@ -175,7 +175,7 @@ class AnnotationParserTest {
                 new TestCommandSender(),
                 this.manager
         );
-        assertThat(parser.parse(context, CommandInput.empty()).getParsedValue().orElse(new CustomType("")).toString())
+        assertThat(parser.parse(context, CommandInput.empty()).parsedValue().orElse(new CustomType("")).toString())
                 .isEqualTo("yay");
         assertThat(parser.suggestionProvider().suggestionsFuture(context, "").join()).contains(Suggestion.simple("Stella"));
     }

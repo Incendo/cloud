@@ -95,15 +95,19 @@ public abstract class ArgumentParseResult<T> {
      * Get the parsed value, if it exists
      *
      * @return Optional containing the parsed value
+     * @since 2.0.0
      */
-    public abstract @NonNull Optional<T> getParsedValue();
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public abstract @NonNull Optional<T> parsedValue();
 
     /**
      * Get the failure reason, if it exists
      *
      * @return Optional containing the failure reason
+     * @since 2.0.0
      */
-    public abstract @NonNull Optional<Throwable> getFailure();
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public abstract @NonNull Optional<Throwable> failure();
 
     /**
      * Maps the result to a completable future.
@@ -129,12 +133,12 @@ public abstract class ArgumentParseResult<T> {
         }
 
         @Override
-        public @NonNull Optional<T> getParsedValue() {
+        public @NonNull Optional<T> parsedValue() {
             return Optional.of(this.value);
         }
 
         @Override
-        public @NonNull Optional<Throwable> getFailure() {
+        public @NonNull Optional<Throwable> failure() {
             return Optional.empty();
         }
     }
@@ -151,12 +155,12 @@ public abstract class ArgumentParseResult<T> {
         }
 
         @Override
-        public @NonNull Optional<T> getParsedValue() {
+        public @NonNull Optional<T> parsedValue() {
             return Optional.empty();
         }
 
         @Override
-        public @NonNull Optional<Throwable> getFailure() {
+        public @NonNull Optional<Throwable> failure() {
             return Optional.of(this.failure);
         }
     }

@@ -65,9 +65,9 @@ class LocationArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue().isPresent()).isTrue();
-        assertThat(result.getParsedValue().get().toVector()).isEqualTo(expectedLocation);
+        assertThat(result.failure()).isEmpty();
+        assertThat(result.parsedValue().isPresent()).isTrue();
+        assertThat(result.parsedValue().get().toVector()).isEqualTo(expectedLocation);
         assertThat(commandInput.remainingInput()).isEmpty();
     }
 
@@ -98,7 +98,7 @@ class LocationArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isPresent();
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result.failure()).isPresent();
+        assertThat(result.parsedValue()).isEmpty();
     }
 }

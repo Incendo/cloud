@@ -60,14 +60,14 @@ public final class ArgumentParseResultSubject<T> extends Subject {
         if (this.actual == null) {
             this.failWithActual(Fact.simpleFact("expected to not be null"));
         }
-        return this.check("getParsedValue()").about(OptionalSubject.optionals()).that(this.actual.getParsedValue());
+        return this.check("getParsedValue()").about(OptionalSubject.optionals()).that(this.actual.parsedValue());
     }
 
     public @NonNull OptionalSubject failure() {
         if (this.actual == null) {
             this.failWithActual(Fact.simpleFact("expected to not be null"));
         }
-        return this.check("getFailure()").about(OptionalSubject.optionals()).that(this.actual.getFailure());
+        return this.check("getFailure()").about(OptionalSubject.optionals()).that(this.actual.failure());
     }
 
     public void hasParsedValue(final @NonNull T value) {
@@ -82,6 +82,6 @@ public final class ArgumentParseResultSubject<T> extends Subject {
 
     public @NonNull ThrowableSubject hasFailureThat() {
         this.failure().isPresent();
-        return this.check("getFailure().get()").that(this.actual.getFailure().get());
+        return this.check("getFailure().get()").that(this.actual.failure().get());
     }
 }

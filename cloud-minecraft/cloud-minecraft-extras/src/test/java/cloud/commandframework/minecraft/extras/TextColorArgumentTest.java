@@ -60,8 +60,8 @@ class TextColorArgumentTest {
         final ArgumentParseResult<TextColor> result = parser.parse(this.commandContext, commandInput);
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(color);
+        assertThat(result.failure()).isEmpty();
+        assertThat(result.parsedValue()).hasValue(color);
         assertThat(commandInput.remainingInput()).isEmpty();
     }
 
@@ -97,8 +97,8 @@ class TextColorArgumentTest {
         final ArgumentParseResult<TextColor> result = parser.parse(this.commandContext, commandInput);
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(color);
+        assertThat(result.failure()).isEmpty();
+        assertThat(result.parsedValue()).hasValue(color);
         assertThat(commandInput.remainingInput()).isEmpty();
     }
 
@@ -117,8 +117,8 @@ class TextColorArgumentTest {
         final ArgumentParseResult<TextColor> result = parser.parse(this.commandContext, commandInput);
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(color);
+        assertThat(result.failure()).isEmpty();
+        assertThat(result.parsedValue()).hasValue(color);
         assertThat(commandInput.remainingInput()).isEmpty();
     }
 
@@ -142,7 +142,7 @@ class TextColorArgumentTest {
         final ArgumentParseResult<TextColor> result = parser.parse(this.commandContext, commandInput);
 
         // Assert
-        assertThat(result.getFailure()).isPresent();
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result.failure()).isPresent();
+        assertThat(result.parsedValue()).isEmpty();
     }
 }
