@@ -25,71 +25,50 @@ package cloud.commandframework.execution.preprocessor;
 
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import java.util.Objects;
+import cloud.commandframework.internal.ImmutableImpl;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
 /**
- * Context for {@link CommandPreprocessor command preprocessors}
+ * Context for {@link CommandPreprocessor command preprocessors}.
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
+ * @since 2.0.0
  */
-@API(status = API.Status.STABLE)
-public final class CommandPreprocessingContext<C> {
-
-    private final CommandContext<C> commandContext;
-    private final CommandInput commandInput;
+@Value.Immutable
+@ImmutableImpl
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface CommandPreprocessingContext<C> {
 
     /**
-     * Construct a new command preprocessing context
+     * Returns a new preprocessing context.
      *
-     * @param commandContext Command context
-     * @param commandInput   The command input
+     * @param <C>            command sender type
+     * @param commandContext command context
+     * @param commandInput   user-supplied input, possibly modified by prior preprocessors
+     * @return the context instance
      */
-    public CommandPreprocessingContext(
+    static <C> @NonNull CommandPreprocessingContext<C> of(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        this.commandContext = commandContext;
-        this.commandInput = commandInput;
+        return CommandPreprocessingContextImpl.of(commandContext, commandInput);
     }
 
     /**
-     * Get the command context
+     * Returns the command context.
      *
-     * @return Command context
+     * @return command context
      */
-    public @NonNull CommandContext<C> getCommandContext() {
-        return this.commandContext;
-    }
+    @NonNull CommandContext<@NonNull C> commandContext();
 
     /**
-     * Returns the original input. All changes will persist and will be
-     * used during parsing
+     * Returns the original input.
      *
-     * @return Input queue
-     * @since 2.0.0
+     * <p>All changes will persist and will be used during parsing.</p>
+     *
+     * @return command input
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull CommandInput commandInput() {
-        return this.commandInput;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final CommandPreprocessingContext<?> that = (CommandPreprocessingContext<?>) o;
-        return Objects.equals(this.getCommandContext(), that.getCommandContext())
-                && Objects.equals(this.commandInput(), that.commandInput());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.getCommandContext(), this.commandInput());
-    }
+    @NonNull CommandInput commandInput();
 }

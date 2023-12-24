@@ -42,6 +42,6 @@ public final class AcceptingCommandPreprocessor<C> implements CommandPreprocesso
 
     @Override
     public void accept(final @NonNull CommandPreprocessingContext<C> context) {
-        context.getCommandContext().store(PROCESSED_INDICATOR_KEY, "true");
+        context.commandContext().store(PROCESSED_INDICATOR_KEY, "true");
     }
 }

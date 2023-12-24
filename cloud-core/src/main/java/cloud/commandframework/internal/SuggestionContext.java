@@ -56,7 +56,7 @@ public final class SuggestionContext<C> {
     ) {
         this.processor = processor;
         this.commandContext = commandContext;
-        this.preprocessingContext = new CommandPreprocessingContext<>(this.commandContext, commandInput);
+        this.preprocessingContext = CommandPreprocessingContext.of(this.commandContext, commandInput);
     }
 
     /**

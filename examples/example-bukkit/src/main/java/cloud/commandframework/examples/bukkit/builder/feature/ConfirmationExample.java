@@ -69,7 +69,7 @@ public final class ConfirmationExample implements BuilderFeature {
         final CommandConfirmationManager<CommandSender> confirmationManager = new CommandConfirmationManager<>(
                 /* Timeout */ 30L,
                 /* Timeout unit */ TimeUnit.SECONDS,
-                /* Action when confirmation is required */ context -> context.getCommandContext().sender().sendMessage(
+                /* Action when confirmation is required */ context -> context.commandContext().sender().sendMessage(
                 ChatColor.RED + "Confirmation required. Confirm using /builder confirm."),
                 /* Action when no confirmation is pending */ sender -> sender.sendMessage(
                 ChatColor.RED + "You don't have any pending commands.")

@@ -77,11 +77,11 @@ public final class ProcessorExample {
 
         @Override
         public void accept(final @NonNull CommandPostprocessingContext<CommandSender> context) {
-            final Command<CommandSender> command = context.getCommand();
+            final Command<CommandSender> command = context.command();
             if (!command.commandMeta().getOrDefault(REQUIRES_BOOTS, false)) {
                 return;
             }
-            final CommandSender sender = context.getCommandContext().sender();
+            final CommandSender sender = context.commandContext().sender();
             if (!(sender instanceof Player)) {
                 return;
             }

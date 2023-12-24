@@ -103,7 +103,7 @@ public class CommandConfirmationManager<C> {
     }
 
     private void addPending(final @NonNull CommandPostprocessingContext<C> context) {
-        this.pendingCommands.put(context.getCommandContext().sender(), Pair.of(context, System.currentTimeMillis()));
+        this.pendingCommands.put(context.commandContext().sender(), Pair.of(context, System.currentTimeMillis()));
     }
 
     /**
@@ -151,9 +151,9 @@ public class CommandConfirmationManager<C> {
             final Optional<CommandPostprocessingContext<C>> pending = this.getPending(context.sender());
             if (pending.isPresent()) {
                 final CommandPostprocessingContext<C> postprocessingContext = pending.get();
-                return postprocessingContext.getCommand()
+                return postprocessingContext.command()
                         .commandExecutionHandler()
-                        .executeFuture(postprocessingContext.getCommandContext());
+                        .executeFuture(postprocessingContext.commandContext());
             } else {
                 this.errorNotifier.accept(context.sender());
             }
@@ -165,7 +165,7 @@ public class CommandConfirmationManager<C> {
 
         @Override
         public void accept(final @NonNull CommandPostprocessingContext<C> context) {
-            if (!context.getCommand()
+            if (!context.command()
                     .commandMeta()
                     .getOrDefault(META_CONFIRMATION_REQUIRED, false)) {
                 return;

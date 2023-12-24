@@ -77,7 +77,7 @@ public final class ExamplePlugin extends Plugin {
         this.confirmationManager = new CommandConfirmationManager<>(
                 30L,
                 TimeUnit.SECONDS,
-                context -> this.bungeeAudiences.sender(context.getCommandContext().sender()).sendMessage(
+                context -> this.bungeeAudiences.sender(context.commandContext().sender()).sendMessage(
                         text(
                                 "Confirmation required. Confirm using /example confirm.", NamedTextColor.RED)),
                 sender -> this.bungeeAudiences.sender(sender).sendMessage(

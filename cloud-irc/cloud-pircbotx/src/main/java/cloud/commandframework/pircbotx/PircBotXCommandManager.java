@@ -135,7 +135,7 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
                     (caption, user) -> ARGUMENT_PARSE_FAILURE_USER
             );
         }
-        this.registerCommandPreProcessor(context -> context.getCommandContext().store(PIRCBOTX_META_KEY, pircBotX));
+        this.registerCommandPreProcessor(context -> context.commandContext().store(PIRCBOTX_META_KEY, pircBotX));
         this.parserRegistry().registerParserSupplier(
                 TypeToken.get(User.class),
                 parameters -> new UserParser<>()

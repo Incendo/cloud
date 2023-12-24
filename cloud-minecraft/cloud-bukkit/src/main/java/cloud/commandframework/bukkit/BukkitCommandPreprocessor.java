@@ -61,18 +61,18 @@ final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
         if (this.mapper != null) {
             // If the server is Brigadier capable but the Brigadier manager has not been registered, store the native
             // sender in context manually so that getting suggestions from WrappedBrigadierParser works like expected.
-            if (!context.getCommandContext().contains(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER)) {
-                context.getCommandContext().store(
+            if (!context.commandContext().contains(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER)) {
+                context.commandContext().store(
                         WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER,
-                        this.mapper.apply(context.getCommandContext().sender())
+                        this.mapper.apply(context.commandContext().sender())
                 );
             }
         }
-        context.getCommandContext().store(
+        context.commandContext().store(
                 BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER,
-                this.commandManager.getBackwardsCommandSenderMapper().apply(context.getCommandContext().sender())
+                this.commandManager.getBackwardsCommandSenderMapper().apply(context.commandContext().sender())
         );
-        context.getCommandContext().store(
+        context.commandContext().store(
                 BukkitCommandContextKeys.CLOUD_BUKKIT_CAPABILITIES,
                 this.commandManager.queryCapabilities()
         );
