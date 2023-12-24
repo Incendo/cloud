@@ -81,9 +81,10 @@ final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
         );
 
         // Store if PaperCommandManager's preprocessor didn't already
-        if (!context.commandContext().contains(BukkitCommandContextKeys.SENDER_SCHEDULER_EXECUTOR)) {
-            context.commandContext().store(BukkitCommandContextKeys.SENDER_SCHEDULER_EXECUTOR, this.mainThreadExecutor());
-        }
+        context.commandContext().computeIfAbsent(
+                BukkitCommandContextKeys.SENDER_SCHEDULER_EXECUTOR,
+                $ -> this.mainThreadExecutor()
+        );
     }
 
     private Executor mainThreadExecutor() {
