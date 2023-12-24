@@ -54,7 +54,9 @@ public final class SelectorExample implements BuilderFeature {
                 .handler(commandContext -> {
                     final Player player = commandContext.sender();
                     final SingleEntitySelector singleEntitySelector = commandContext.get("entity");
-                    singleEntitySelector.single().teleport(player);
+                    player.getServer().getScheduler().runTask(examplePlugin, () -> {
+                        singleEntitySelector.single().teleport(player);
+                    });
                     player.sendMessage(ChatColor.GREEN + "The entity was teleported to you!");
                 }));
     }

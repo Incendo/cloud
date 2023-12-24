@@ -27,6 +27,9 @@ import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
+import java.util.concurrent.Executor;
+import org.bukkit.Server;
+import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -76,5 +79,23 @@ final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
                 BukkitCommandContextKeys.CLOUD_BUKKIT_CAPABILITIES,
                 this.commandManager.queryCapabilities()
         );
+
+        // Store if PaperCommandManager's preprocessor didn't already
+        context.commandContext().computeIfAbsent(
+                BukkitCommandContextKeys.SENDER_SCHEDULER_EXECUTOR,
+                $ -> this.mainThreadExecutor()
+        );
+    }
+
+    private Executor mainThreadExecutor() {
+        final Plugin plugin = this.commandManager.getOwningPlugin();
+        final Server server = plugin.getServer();
+        return task -> {
+            if (server.isPrimaryThread()) {
+                task.run();
+                return;
+            }
+            server.getScheduler().runTask(plugin, task);
+        };
     }
 }

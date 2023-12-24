@@ -79,7 +79,7 @@ final class SelectorUtils {
         if (CraftBukkitReflection.MAJOR_REVISION < 13) {
             return null;
         }
-        final ArgumentParser<C, Object> wrappedBrigParser = new WrappedBrigadierParser<>(
+        final WrappedBrigadierParser<C, Object> wrappedBrigParser = new WrappedBrigadierParser<>(
                 () -> createEntityArgument(single, playersOnly),
                 ArgumentParser.DEFAULT_ARGUMENT_COUNT,
                 EntityArgumentParseFunction.INSTANCE
@@ -267,11 +267,11 @@ final class SelectorUtils {
 
     private static class ModernSelectorParser<C, T> implements ArgumentParser.FutureArgumentParser<C, T>, SuggestionProvider<C> {
 
-        private final ArgumentParser<C, Object> wrappedBrigadierParser;
+        private final WrappedBrigadierParser<C, Object> wrappedBrigadierParser;
         private final SelectorMapper<T> mapper;
 
         ModernSelectorParser(
-                final ArgumentParser<C, Object> wrapperBrigParser,
+                final WrappedBrigadierParser<C, Object> wrapperBrigParser,
                 final SelectorMapper<T> mapper
         ) {
             this.wrappedBrigadierParser = wrapperBrigParser;
@@ -279,27 +279,31 @@ final class SelectorUtils {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public CompletableFuture<ArgumentParseResult<T>> parseFuture(
                 final CommandContext<C> commandContext,
                 final CommandInput commandInput
         ) {
-            final CommandInput originalCommandInput = commandInput.copy();
-            return this.wrappedBrigadierParser.parseFuture(commandContext, commandInput)
-                    .thenCompose(result -> {
-                        try {
-                            final String input = originalCommandInput.difference(commandInput);
-                            return ArgumentParseResult.successFuture(
-                                    this.mapper.mapResult(input, new EntitySelectorWrapper(commandContext, result))
-                            );
-                        } catch (final CommandSyntaxException ex) {
-                            commandInput.cursor(originalCommandInput.cursor());
-                            return ArgumentParseResult.failureFuture(ex);
-                        } catch (final Exception ex) {
-                            final CompletableFuture<ArgumentParseResult<T>> future = new CompletableFuture<>();
-                            future.completeExceptionally(ex);
-                            return future;
-                        }
-                    });
+            return CompletableFuture.supplyAsync(() -> {
+                final CommandInput originalCommandInput = commandInput.copy();
+                final ArgumentParseResult<Object> result = this.wrappedBrigadierParser.parse(
+                        commandContext,
+                        commandInput
+                );
+                if (result.failure().isPresent()) {
+                    return (ArgumentParseResult<T>) result;
+                }
+                final String input = originalCommandInput.difference(commandInput);
+                try {
+                    return ArgumentParseResult.success(
+                            this.mapper.mapResult(input, new EntitySelectorWrapper(commandContext, result.parsedValue().get()))
+                    );
+                } catch (final CommandSyntaxException ex) {
+                    return ArgumentParseResult.failure(ex);
+                } catch (final Exception ex) {
+                    throw rethrow(ex);
+                }
+            }, commandContext.get(BukkitCommandContextKeys.SENDER_SCHEDULER_EXECUTOR));
         }
 
         @Override

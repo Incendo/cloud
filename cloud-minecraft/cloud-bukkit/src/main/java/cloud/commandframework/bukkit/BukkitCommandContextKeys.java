@@ -26,6 +26,8 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.keys.CloudKey;
 import io.leangen.geantyref.TypeToken;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import org.apiguardian.api.API;
 import org.bukkit.command.CommandSender;
 
 /**
@@ -55,6 +57,15 @@ public final class BukkitCommandContextKeys {
             new TypeToken<Set<CloudBukkitCapabilities>>() {
             }
     );
+
+    /**
+     * Key used to store an {@link Executor} for the command sender's scheduler.
+     *
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static final CloudKey<Executor> SENDER_SCHEDULER_EXECUTOR = CloudKey.of(
+            "SenderSchedulerExecutor", Executor.class);
 
     private BukkitCommandContextKeys() {
     }
