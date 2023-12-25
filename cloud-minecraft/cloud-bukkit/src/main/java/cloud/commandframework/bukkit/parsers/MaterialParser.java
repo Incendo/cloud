@@ -92,7 +92,7 @@ public final class MaterialParser<C> implements ArgumentParser<C, Material>, Blo
     @Override
     public @NonNull Iterable<@NonNull Suggestion> suggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         return Arrays.stream(Material.values())
                 .map(Material::name)

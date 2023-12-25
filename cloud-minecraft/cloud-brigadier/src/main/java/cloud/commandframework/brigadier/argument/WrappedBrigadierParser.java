@@ -37,6 +37,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import org.apiguardian.api.API;
@@ -163,7 +164,7 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
     @Override
     public final @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         /*
          * Strictly, this is incorrect.
@@ -185,7 +186,7 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
 
         return this.nativeType.get().listSuggestions(
                 reverseMappedContext,
-                new SuggestionsBuilder(input, 0)
+                new SuggestionsBuilder(input.input(), input.input().toLowerCase(Locale.ROOT), input.cursor())
         ).thenApply(suggestions -> {
             final List<cloud.commandframework.arguments.suggestion.Suggestion> cloud = new ArrayList<>();
             for (final com.mojang.brigadier.suggestion.Suggestion suggestion : suggestions.getList()) {

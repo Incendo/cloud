@@ -30,6 +30,7 @@ import cloud.commandframework.annotations.CommandMethod
 import cloud.commandframework.annotations.suggestions.Suggestions
 import cloud.commandframework.arguments.suggestion.Suggestion
 import cloud.commandframework.context.CommandContext
+import cloud.commandframework.context.CommandInput
 import cloud.commandframework.context.StandardCommandContextFactory
 import cloud.commandframework.exceptions.CommandExecutionException
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
@@ -105,7 +106,7 @@ class KotlinAnnotatedMethodsTest {
             TestCommandSender()
         )
         val suggestions = commandManager.parserRegistry().getSuggestionProvider("suspending-suggestions").get()
-            .suggestionsFuture(commandContext, "")
+            .suggestionsFuture(commandContext, CommandInput.empty())
             .await()
             .map(Suggestion::suggestion)
             .map(String::toInt)
@@ -123,7 +124,7 @@ class KotlinAnnotatedMethodsTest {
             TestCommandSender()
         )
         val suggestions = commandManager.parserRegistry().getSuggestionProvider("non-suspending-suggestions").get()
-            .suggestionsFuture(commandContext, "")
+            .suggestionsFuture(commandContext, CommandInput.empty())
             .await()
             .map(Suggestion::suggestion)
             .map(String::toInt)

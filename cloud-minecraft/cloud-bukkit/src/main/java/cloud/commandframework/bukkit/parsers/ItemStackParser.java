@@ -276,7 +276,7 @@ public class ItemStackParser<C> implements ArgumentParser.FutureArgumentParser<C
     }
 
     private static final class LegacyParser<C> implements ArgumentParser.FutureArgumentParser<C, ProtoItemStack>,
-            BlockingSuggestionProvider.Strings<C> {
+            BlockingSuggestionProvider.ConstantStrings<C> {
 
         private final ArgumentParser<C, ProtoItemStack> parser = new MaterialParser<C>()
                 .mapSuccess((ctx, material) -> CompletableFuture.completedFuture(new LegacyProtoItemStack(material)));
@@ -290,10 +290,7 @@ public class ItemStackParser<C> implements ArgumentParser.FutureArgumentParser<C
         }
 
         @Override
-        public @NonNull Iterable<@NonNull String> stringSuggestions(
-                final @NonNull CommandContext<C> commandContext,
-                final @NonNull String input
-        ) {
+        public @NonNull Iterable<@NonNull String> stringSuggestions() {
             return Arrays.stream(Material.values())
                     .filter(Material::isItem)
                     .map(value -> value.name().toLowerCase(Locale.ROOT))

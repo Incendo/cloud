@@ -26,6 +26,7 @@ package cloud.commandframework.annotations.suggestions;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
@@ -47,6 +48,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> {
 
     private final MethodHandle methodHandle;
+    private final boolean passString;
 
     /**
      * Create a new provider
@@ -60,6 +62,7 @@ public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> 
     ) {
         try {
             this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);
+            this.passString = method.getParameterTypes()[1] == String.class;
         } catch (final IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -68,10 +71,15 @@ public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> 
     @Override
     public @NonNull CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> context,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         try {
-            final Object output = this.methodHandle.invokeWithArguments(context, input);
+            final Object output;
+            if (this.passString) {
+                output = this.methodHandle.invokeWithArguments(context, input.lastRemainingToken());
+            } else {
+                output = this.methodHandle.invokeWithArguments(context, input);
+            }
             return mapSuggestions(output);
         } catch (final Throwable t) {
             throw new RuntimeException(t);

@@ -146,7 +146,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
     @SuppressWarnings({"unchecked", "rawtypes"})
     public @NonNull CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         /* Check if we have a last flag stored */
         final String lastArg = Objects.requireNonNull(commandContext.getOrDefault(FLAG_META_KEY, ""));
@@ -193,7 +193,8 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                 suggestions.add(Suggestion.simple(String.format("--%s", flag.getName())));
             }
             /* Recommend aliases */
-            final boolean suggestCombined = input.length() > 1 && input.charAt(0) == '-' && input.charAt(1) != '-';
+            final String nextToken = input.peekString();
+            final boolean suggestCombined = nextToken.length() > 1 && nextToken.startsWith("-") && !nextToken.startsWith("--");
             for (final CommandFlag<?> flag : this.flags) {
                 if (usedFlags.contains(flag) && flag.mode() != CommandFlag.FlagMode.REPEATABLE) {
                     continue;
@@ -204,7 +205,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
 
                 for (final String alias : flag.getAliases()) {
                     if (suggestCombined && flag.commandComponent() == null) {
-                        suggestions.add(Suggestion.simple(String.format("%s%s", input, alias)));
+                        suggestions.add(Suggestion.simple(String.format("%s%s", input.peekString(), alias)));
                     } else {
                         suggestions.add(Suggestion.simple(String.format("-%s", alias)));
                     }
@@ -212,7 +213,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
             }
             /* If we are suggesting the combined flag, then also suggest the current input */
             if (suggestCombined) {
-                suggestions.add(Suggestion.simple(input));
+                suggestions.add(Suggestion.simple(input.peekString()));
             }
             return CompletableFuture.completedFuture(suggestions);
         } else {

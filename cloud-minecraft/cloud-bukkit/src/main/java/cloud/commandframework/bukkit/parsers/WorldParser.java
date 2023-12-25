@@ -40,7 +40,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public final class WorldParser<C> implements ArgumentParser<C, World>, BlockingSuggestionProvider.Strings<C> {
+public final class WorldParser<C> implements ArgumentParser<C, World>, BlockingSuggestionProvider.ConstantStrings<C> {
 
     /**
      * Creates a new world parser.
@@ -88,10 +88,7 @@ public final class WorldParser<C> implements ArgumentParser<C, World>, BlockingS
     }
 
     @Override
-    public @NonNull Iterable<@NonNull String> stringSuggestions(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
-    ) {
+    public @NonNull Iterable<@NonNull String> stringSuggestions() {
         return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
     }
 

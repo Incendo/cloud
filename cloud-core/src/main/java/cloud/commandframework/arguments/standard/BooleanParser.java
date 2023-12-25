@@ -41,7 +41,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class BooleanParser<C> implements ArgumentParser<C, Boolean>, BlockingSuggestionProvider.Strings<C> {
+public final class BooleanParser<C> implements ArgumentParser<C, Boolean>, BlockingSuggestionProvider.ConstantStrings<C> {
 
     private static final List<String> STRICT_LOWER = CommandInput.BOOLEAN_STRICT
             .stream().map(s -> s.toLowerCase(Locale.ROOT)).collect(Collectors.toList());
@@ -113,10 +113,7 @@ public final class BooleanParser<C> implements ArgumentParser<C, Boolean>, Block
     }
 
     @Override
-    public @NonNull Iterable<@NonNull String> stringSuggestions(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
-    ) {
+    public @NonNull Iterable<@NonNull String> stringSuggestions() {
         if (!this.liberal) {
             return STRICT_LOWER;
         }

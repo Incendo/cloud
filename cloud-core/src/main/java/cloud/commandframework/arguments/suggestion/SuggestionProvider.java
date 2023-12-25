@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.suggestion;
 
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
@@ -51,7 +52,7 @@ public interface SuggestionProvider<C> {
      */
     @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
             @NonNull CommandContext<C> context,
-            @NonNull String input
+            @NonNull CommandInput input
     );
 
     /**

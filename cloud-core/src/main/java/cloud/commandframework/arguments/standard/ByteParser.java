@@ -183,7 +183,7 @@ public final class ByteParser<C> implements ArgumentParser<C, Byte>, BlockingSug
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         return IntegerParser.getSuggestions(this.min, this.max, input);
     }

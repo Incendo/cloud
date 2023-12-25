@@ -36,7 +36,6 @@ import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.time.Duration;
 import java.util.Collections;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -133,28 +132,25 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
-        char[] chars = input.toLowerCase(Locale.ROOT).toCharArray();
-
-        if (chars.length == 0) {
+        if (input.isEmpty(true)) {
             return IntStream.range(1, 10).boxed()
                     .sorted()
                     .map(String::valueOf)
                     .collect(Collectors.toList());
         }
 
-        char last = chars[chars.length - 1];
-
         // 1d_, 5d4m_, etc
-        if (Character.isLetter(last)) {
+        if (Character.isLetter(input.lastRemainingCharacter())) {
             return Collections.emptyList();
         }
 
         // 1d5_, 5d4m2_, etc
+        final String string = input.readString();
         return Stream.of("d", "h", "m", "s")
-                .filter(unit -> !input.contains(unit))
-                .map(unit -> input + unit)
+                .filter(unit -> !string.contains(unit))
+                .map(unit -> string + unit)
                 .collect(Collectors.toList());
     }
 

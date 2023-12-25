@@ -682,10 +682,9 @@ public final class CommandTree<C> {
         // Calculate suggestions for the literal arguments
         CompletableFuture<SuggestionContext<C>> suggestionFuture = CompletableFuture.completedFuture(context);
         if (commandInput.remainingTokens() <= 1) {
-            final String literalValue = commandInput.peekString().replace(" ", "");
             for (final CommandNode<C> node : staticArguments) {
                 suggestionFuture = suggestionFuture
-                        .thenCompose(ctx -> this.addSuggestionsForLiteralArgument(context, node, literalValue));
+                        .thenCompose(ctx -> this.addSuggestionsForLiteralArgument(context, node, commandInput));
             }
         }
 
@@ -712,7 +711,7 @@ public final class CommandTree<C> {
     private CompletableFuture<SuggestionContext<C>> addSuggestionsForLiteralArgument(
             final @NonNull SuggestionContext<C> context,
             final @NonNull CommandNode<C> node,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         if (this.findMissingPermission(context.commandContext().sender(), node) != null) {
             return CompletableFuture.completedFuture(context);
@@ -720,10 +719,11 @@ public final class CommandTree<C> {
         final CommandComponent<C> component = Objects.requireNonNull(node.component());
         context.commandContext().currentComponent(component);
         return component.suggestionProvider()
-                .suggestionsFuture(context.commandContext(), input)
+                .suggestionsFuture(context.commandContext(), input.copy())
                 .thenApply(suggestionsToAdd -> {
+                    final String string = input.peekString();
                     for (Suggestion suggestion : suggestionsToAdd) {
-                        if (suggestion.suggestion().equals(input) || !suggestion.suggestion().startsWith(input)) {
+                        if (suggestion.suggestion().equals(string) || !suggestion.suggestion().startsWith(string)) {
                             continue;
                         }
                         context.addSuggestion(suggestion);
@@ -764,10 +764,9 @@ public final class CommandTree<C> {
         return future.thenCompose(ignored -> {
             if (commandInput.isEmpty()) {
                 return CompletableFuture.completedFuture(context);
-            } else if (commandInput.remainingTokens() == 1) {
-                return this.addArgumentSuggestions(context, child, commandInput.peekString());
-            } else if (child.isLeaf() && child.component().parser() instanceof AggregateCommandParser) {
-                return this.addArgumentSuggestions(context, child, commandInput.lastRemainingToken());
+            } else if (commandInput.remainingTokens() == 1
+                    || (child.isLeaf() && child.component().parser() instanceof AggregateCommandParser)) {
+                return this.addArgumentSuggestions(context, child, commandInput);
             }
 
             // Store original input command queue before the parsers below modify it
@@ -799,11 +798,7 @@ public final class CommandTree<C> {
 
                             if (result.failure().isPresent()) {
                                 commandInput.cursor(preParseInput.cursor());
-
-                                while (commandInput.remainingTokens() > 1) {
-                                    commandInput.readString();
-                                }
-                                return this.addArgumentSuggestions(context, child, commandInput.lastRemainingToken());
+                                return this.addArgumentSuggestions(context, child, commandInput);
                             }
 
                             if (child.isLeaf()) {
@@ -813,10 +808,13 @@ public final class CommandTree<C> {
 
                                 // Greedy parser took all the input, we can restore and just ask for suggestions
                                 commandInput.cursor(commandInputOriginal.cursor());
-                                this.addArgumentSuggestions(context, child, commandInput.remainingInput());
+                                this.addArgumentSuggestions(context, child, commandInput);
                             }
 
-                            if (parseSuccess && !commandInput.isEmpty()) {
+                            if (parseSuccess && (!commandInput.isEmpty() || commandInput.input().endsWith(" "))) {
+                                if (commandInput.isEmpty()) {
+                                    commandInput.moveCursor(-1);
+                                }
                                 // the current argument at the position is parsable and there are more arguments following
                                 context.commandContext().store(child.component().name(), parsedValue.get());
                                 return this.getSuggestions(context, commandInput, child);
@@ -848,7 +846,7 @@ public final class CommandTree<C> {
                     return CompletableFuture.completedFuture(context);
                 }
 
-                return this.addArgumentSuggestions(context, child, commandInput.peekString());
+                return this.addArgumentSuggestions(context, child, commandInput);
             });
         });
     }
@@ -902,20 +900,20 @@ public final class CommandTree<C> {
      *
      * @param context the suggestion context
      * @param node    the node containing the argument to get suggestions from
-     * @param text    the input from the sender
+     * @param input   the input from the sender
      * @return the context
      */
     private @NonNull CompletableFuture<SuggestionContext<C>> addArgumentSuggestions(
             final @NonNull SuggestionContext<C> context,
             final @NonNull CommandNode<C> node,
-            final @NonNull String text
+            final @NonNull CommandInput input
     ) {
         final CommandComponent<C> component = Objects.requireNonNull(node.component());
-        return this.addArgumentSuggestions(context, component, text).thenCompose(ctx -> {
+        return this.addArgumentSuggestions(context, component, input).thenCompose(ctx -> {
             // When suggesting a flag, potentially suggest following nodes too
             final boolean isParsingFlag = component.type() == CommandComponent.ComponentType.FLAG
                     && !node.children().isEmpty() // Has children
-                    && !text.startsWith("-") // Not a flag
+                    && !(input.hasRemainingInput() && input.peek() == '-') // Not a flag
                     && !context.commandContext().optional(CommandFlagParser.FLAG_META_KEY).isPresent();
 
             if (!isParsingFlag) {
@@ -925,7 +923,7 @@ public final class CommandTree<C> {
             return CompletableFuture.allOf(
                     node.children()
                             .stream()
-                            .map(child -> this.addArgumentSuggestions(context, Objects.requireNonNull(child.component()), text))
+                            .map(child -> this.addArgumentSuggestions(context, Objects.requireNonNull(child.component()), input))
                             .toArray(CompletableFuture[]::new)
             ).thenApply(v -> ctx);
         });
@@ -936,17 +934,17 @@ public final class CommandTree<C> {
      *
      * @param context   the suggestion context
      * @param component the component to get suggestions from
-     * @param text      the input from the sender
+     * @param input     the input from the sender
      * @return future that completes with the context
      */
     private CompletableFuture<SuggestionContext<C>> addArgumentSuggestions(
             final @NonNull SuggestionContext<C> context,
             final @NonNull CommandComponent<C> component,
-            final @NonNull String text
+            final @NonNull CommandInput input
     ) {
         context.commandContext().currentComponent(component);
         return component.suggestionProvider()
-                .suggestionsFuture(context.commandContext(), text)
+                .suggestionsFuture(context.commandContext(), input.copy())
                 .thenAccept(context::addSuggestions)
                 .thenApply(in -> context);
     }

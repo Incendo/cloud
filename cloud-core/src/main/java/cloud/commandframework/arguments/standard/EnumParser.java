@@ -43,7 +43,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
 public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C, E>,
-        BlockingSuggestionProvider.Strings<C> {
+        BlockingSuggestionProvider.ConstantStrings<C> {
 
     /**
      * Creates a new enum parser.
@@ -112,10 +112,7 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
     }
 
     @Override
-    public @NonNull Iterable<@NonNull String> stringSuggestions(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
-    ) {
+    public @NonNull Iterable<@NonNull String> stringSuggestions() {
         return EnumSet.allOf(this.enumClass).stream().map(e -> e.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
     }
 

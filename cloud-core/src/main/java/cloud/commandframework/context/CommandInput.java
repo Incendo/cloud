@@ -623,6 +623,20 @@ public interface CommandInput {
     }
 
     /**
+     * Returns the last remaining character.
+     *
+     * @return the last remaining character
+     * @throws CursorOutOfBoundsException if {@link #isEmpty()} is {@code true}
+     */
+    default char lastRemainingCharacter() {
+        final String lastToken = this.lastRemainingToken();
+        if (lastToken.isEmpty()) {
+            throw new CursorOutOfBoundsException(this.cursor(), this.length());
+        }
+        return lastToken.charAt(lastToken.length() - 1);
+    }
+
+    /**
      * Returns a copy of this instance.
      *
      * @return copy of this instance

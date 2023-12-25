@@ -179,7 +179,7 @@ final class SelectorUtils {
 
         protected @NonNull Iterable<@NonNull Suggestion> legacySuggestions(
                 final CommandContext<C> commandContext,
-                final String input
+                final CommandInput input
         ) {
             return Collections.emptyList();
         }
@@ -198,7 +198,7 @@ final class SelectorUtils {
         @Override
         public CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull String input
+                final @NonNull CommandInput input
         ) {
             if (this.modernParser != null) {
                 this.modernParser.suggestionProvider().suggestionsFuture(commandContext, input);
@@ -249,7 +249,7 @@ final class SelectorUtils {
         @Override
         protected @NonNull Iterable<@NonNull Suggestion> legacySuggestions(
                 final CommandContext<C> commandContext,
-                final String input
+                final CommandInput input
         ) {
             final List<Suggestion> suggestions = new ArrayList<>();
 
@@ -309,7 +309,7 @@ final class SelectorUtils {
         @Override
         public CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull String input
+                final @NonNull CommandInput input
         ) {
             final Object commandSourceStack = commandContext.get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER);
             final @Nullable Field bypassField =

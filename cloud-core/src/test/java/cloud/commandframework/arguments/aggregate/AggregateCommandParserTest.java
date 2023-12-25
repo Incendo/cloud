@@ -135,7 +135,7 @@ class AggregateCommandParserTest {
                 .build();
 
         // Act
-        final Iterable<Suggestion> suggestions = parser.suggestionsFuture(this.commandContext, "").join();
+        final Iterable<Suggestion> suggestions = parser.suggestionsFuture(this.commandContext, CommandInput.empty()).join();
 
         // Assert
         assertThat(suggestions).containsExactly(
@@ -164,7 +164,7 @@ class AggregateCommandParserTest {
         when(this.commandContext.contains("number")).thenReturn(true);
 
         // Act
-        final Iterable<Suggestion> suggestions = parser.suggestionsFuture(this.commandContext, "").join();
+        final Iterable<Suggestion> suggestions = parser.suggestionsFuture(this.commandContext, CommandInput.empty()).join();
 
         // Assert
         assertThat(suggestions).containsExactly(

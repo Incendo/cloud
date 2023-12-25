@@ -102,7 +102,7 @@ public final class PlayerParser<C> implements ArgumentParser<C, Player>, Blockin
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         return commandContext.<ProxyServer>get("ProxyServer").getAllPlayers()
                 .stream().map(Player::getUsername).collect(Collectors.toList());

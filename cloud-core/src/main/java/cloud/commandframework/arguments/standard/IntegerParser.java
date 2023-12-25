@@ -145,12 +145,13 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
     public static @NonNull List<@NonNull String> getSuggestions(
             final long min,
             final long max,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         final Set<Long> numbers = new TreeSet<>();
+        final String token = input.peekString();
 
         try {
-            final long inputNum = Long.parseLong(input.equals("-") ? "-0" : input.isEmpty() ? "0" : input);
+            final long inputNum = Long.parseLong(token.equals("-") ? "-0" : token.isEmpty() ? "0" : token);
             final long inputNumAbsolute = Math.abs(inputNum);
 
             numbers.add(inputNumAbsolute); /* It's a valid number, so we suggest it */
@@ -161,7 +162,7 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
 
             final List<String> suggestions = new LinkedList<>();
             for (long number : numbers) {
-                if (input.startsWith("-")) {
+                if (token.startsWith("-")) {
                     number = -number; /* Preserve sign */
                 }
                 if (number < min || number > max) {
@@ -234,7 +235,7 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         return getSuggestions(this.min, this.max, input);
     }

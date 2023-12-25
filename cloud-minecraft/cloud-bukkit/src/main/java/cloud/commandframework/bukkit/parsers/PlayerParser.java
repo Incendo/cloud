@@ -95,7 +95,7 @@ public final class PlayerParser<C> implements ArgumentParser<C, Player>, Blockin
     @Override
     public @NonNull Iterable<@NonNull Suggestion> suggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         final CommandSender bukkit = commandContext.get(BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER);
         return Bukkit.getOnlinePlayers().stream()
