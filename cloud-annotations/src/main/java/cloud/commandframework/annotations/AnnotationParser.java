@@ -747,11 +747,13 @@ public final class AnnotationParser<C> {
                 valid = false;
             } else if (method.getParameterCount() == 3) {
                 valid = method.getParameters()[0].getType().equals(CommandContext.class)
-                        && method.getParameters()[1].getType().equals(String.class)
+                        && (method.getParameters()[1].getType().equals(String.class)
+                            || method.getParameters()[1].getType().equals(CommandInput.class))
                         && method.getParameters()[2].getType().getSimpleName().equals("Continuation");
             } else {
                 valid = method.getParameters()[0].getType().equals(CommandContext.class)
-                        && method.getParameters()[1].getType().equals(String.class);
+                        && (method.getParameters()[1].getType().equals(String.class)
+                            || method.getParameters()[1].getType().equals(CommandInput.class));
             }
 
             valid = valid
