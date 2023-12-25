@@ -32,6 +32,7 @@ import java.util.StringTokenizer;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.returnsreceiver.qual.This;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 
@@ -369,22 +370,26 @@ public interface CommandInput {
      * Skips any whitespace characters at the head of the input.
      *
      * @param preserveSingleSpace whether a single space should be ignored
+     * @return {@code this}
      */
-    default void skipWhitespace(final boolean preserveSingleSpace) {
+    default @This @NonNull CommandInput skipWhitespace(final boolean preserveSingleSpace) {
         // We only skip the whitespace if the input doesn't end with a space. If it does, we do not want to consume it.
         if (preserveSingleSpace && this.remainingLength() == 1 && this.peek() == ' ') {
-            return;
+            return this;
         }
         while (this.hasRemainingInput() && Character.isWhitespace(this.peek())) {
             this.read();
         }
+        return this;
     }
 
     /**
      * Skips any whitespace characters at the head of the input.
+     *
+     * @return {@code this}
      */
-    default void skipWhitespace() {
-        this.skipWhitespace(true /* preserveSingleSpace */);
+    default @This @NonNull CommandInput skipWhitespace() {
+        return this.skipWhitespace(true /* preserveSingleSpace */);
     }
 
     /**

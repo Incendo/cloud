@@ -719,7 +719,7 @@ public final class CommandTree<C> {
         final CommandComponent<C> component = Objects.requireNonNull(node.component());
         context.commandContext().currentComponent(component);
         return component.suggestionProvider()
-                .suggestionsFuture(context.commandContext(), input.copy())
+                .suggestionsFuture(context.commandContext(), input.copy().skipWhitespace(false))
                 .thenApply(suggestionsToAdd -> {
                     final String string = input.peekString();
                     for (Suggestion suggestion : suggestionsToAdd) {
@@ -944,7 +944,7 @@ public final class CommandTree<C> {
     ) {
         context.commandContext().currentComponent(component);
         return component.suggestionProvider()
-                .suggestionsFuture(context.commandContext(), input.copy())
+                .suggestionsFuture(context.commandContext(), input.copy().skipWhitespace(false))
                 .thenAccept(context::addSuggestions)
                 .thenApply(in -> context);
     }
