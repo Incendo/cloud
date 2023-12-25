@@ -44,6 +44,12 @@ public interface SuggestionProvider<C> {
     /**
      * Returns a future that completes with the suggestions for the given {@code input}.
      *
+     * <p>The {@code input} parameter contains all sender-provided input that has not yet been consumed by the argument parsers.
+     * If the component that the suggestion provider is generating suggestions for consumes multiple tokens the suggestion
+     * provider might receive a {@link CommandInput} instance containing multiple tokens.
+     * {@link CommandInput#lastRemainingToken()} may be used to extract the part of the command that is currently being
+     * completed by the command sender.</p>
+     *
      * <p>If you don't need to return a future, you can implement {@link BlockingSuggestionProvider} instead.</p>
      *
      * @param context the context of the suggestion lookup

@@ -47,6 +47,12 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
     /**
      * Returns the suggestions for the given {@code input}.
      *
+     * <p>The {@code input} parameter contains all sender-provided input that has not yet been consumed by the argument parsers.
+     * If the component that the suggestion provider is generating suggestions for consumes multiple tokens the suggestion
+     * provider might receive a {@link CommandInput} instance containing multiple tokens.
+     * {@link CommandInput#lastRemainingToken()} may be used to extract the part of the command that is currently being
+     * completed by the command sender.</p>
+     *
      * @param context the context of the suggestion lookup
      * @param input   the current input
      * @return the suggestions
@@ -75,10 +81,13 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
     interface Strings<C> extends cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider<C> {
 
         /**
-         * Returns a list of suggested arguments that would be correctly parsed by this parser
-         * <p>
-         * This method is likely to be called for every character provided by the sender and
-         * so it may be necessary to cache results locally to prevent unnecessary computations
+         * Returns the suggestions for the given {@code input}.
+         *
+         * <p>The {@code input} parameter contains all sender-provided input that has not yet been consumed by the argument parsers.
+         * If the component that the suggestion provider is generating suggestions for consumes multiple tokens the suggestion
+         * provider might receive a {@link CommandInput} instance containing multiple tokens.
+         * {@link CommandInput#lastRemainingToken()} may be used to extract the part of the command that is currently being
+         * completed by the command sender.</p>
          *
          * @param commandContext Command context
          * @param input          Input string
@@ -114,10 +123,7 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
     interface ConstantStrings<C> extends cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider<C> {
 
         /**
-         * Returns a list of suggested arguments that would be correctly parsed by this parser.
-         *
-         * <p>This method is likely to be called for every character provided by the sender and
-         * so it may be necessary to cache results locally to prevent unnecessary computations</p>
+         * Returns the suggestions for the given {@code input}.
          *
          * @return list of suggestions
          */
