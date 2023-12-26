@@ -42,6 +42,7 @@ import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import org.apiguardian.api.API;
 import org.bukkit.NamespacedKey;
@@ -60,7 +61,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  * @since 1.5.0
  */
-public final class BlockPredicateParser<C> implements ArgumentParser<C, BlockPredicate> {
+public final class BlockPredicateParser<C> implements ArgumentParser.FutureArgumentParser<C, BlockPredicate> {
 
     private static final Class<?> TAG_CONTAINER_CLASS;
 
@@ -213,11 +214,11 @@ public final class BlockPredicateParser<C> implements ArgumentParser<C, BlockPre
     }
 
     @Override
-    public @NonNull ArgumentParseResult<@NonNull BlockPredicate> parse(
+    public @NonNull CompletableFuture<ArgumentParseResult<@NonNull BlockPredicate>> parseFuture(
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        return this.parser.parse(commandContext, commandInput);
+        return this.parser.parseFuture(commandContext, commandInput);
     }
 
     @Override
