@@ -43,6 +43,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import org.apiguardian.api.API;
 import org.bukkit.NamespacedKey;
@@ -61,7 +62,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  * @since 1.5.0
  */
-public final class ItemStackPredicateParser<C> implements ArgumentParser<C, ItemStackPredicate> {
+public final class ItemStackPredicateParser<C> implements ArgumentParser.FutureArgumentParser<C, ItemStackPredicate> {
 
     private static final Class<?> CRAFT_ITEM_STACK_CLASS =
             CraftBukkitReflection.needOBCClass("inventory.CraftItemStack");
@@ -188,11 +189,11 @@ public final class ItemStackPredicateParser<C> implements ArgumentParser<C, Item
     }
 
     @Override
-    public @NonNull ArgumentParseResult<@NonNull ItemStackPredicate> parse(
+    public @NonNull CompletableFuture<ArgumentParseResult<@NonNull ItemStackPredicate>> parseFuture(
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        return this.parser.parse(commandContext, commandInput);
+        return this.parser.parseFuture(commandContext, commandInput);
     }
 
     @Override
