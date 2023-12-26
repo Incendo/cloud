@@ -201,7 +201,7 @@ final class SelectorUtils {
                 final @NonNull String input
         ) {
             if (this.modernParser != null) {
-                this.modernParser.suggestionProvider().suggestionsFuture(commandContext, input);
+                return this.modernParser.suggestionProvider().suggestionsFuture(commandContext, input);
             }
             return CompletableFuture.completedFuture(this.legacySuggestions(commandContext, input));
         }
