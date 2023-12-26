@@ -37,7 +37,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import org.apiguardian.api.API;
@@ -173,12 +172,12 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
          */
         final com.mojang.brigadier.context.CommandContext<Object> reverseMappedContext = new com.mojang.brigadier.context.CommandContext<>(
                 commandContext.getOrDefault(COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER, commandContext.sender()),
-                commandContext.rawInput().input(),
+                input.input(),
                 Collections.emptyMap(),
                 null,
                 null,
                 Collections.emptyList(),
-                StringRange.at(0),
+                StringRange.at(input.cursor()),
                 null,
                 null,
                 false
@@ -186,14 +185,23 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
 
         return this.nativeType.get().listSuggestions(
                 reverseMappedContext,
-                new SuggestionsBuilder(input.input(), input.input().toLowerCase(Locale.ROOT), input.cursor())
+                new SuggestionsBuilder(input.input(), input.cursor())
         ).thenApply(suggestions -> {
             final List<cloud.commandframework.arguments.suggestion.Suggestion> cloud = new ArrayList<>();
             for (final com.mojang.brigadier.suggestion.Suggestion suggestion : suggestions.getList()) {
-                cloud.add(tooltipSuggestion(
-                        suggestion.getText(),
-                        suggestion.getTooltip()
-                ));
+                final String beforeSuggestion = input.input().substring(input.cursor(), suggestion.getRange().getStart());
+                final String afterSuggestion = input.input().substring(suggestion.getRange().getEnd());
+                if (beforeSuggestion.isEmpty() && afterSuggestion.isEmpty()) {
+                    cloud.add(tooltipSuggestion(
+                            suggestion.getText(),
+                            suggestion.getTooltip()
+                    ));
+                } else {
+                    cloud.add(tooltipSuggestion(
+                            beforeSuggestion + suggestion.getText() + afterSuggestion,
+                            suggestion.getTooltip()
+                    ));
+                }
             }
             return cloud;
         });
