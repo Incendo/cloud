@@ -28,6 +28,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.types.tuples.Pair;
 import com.mojang.brigadier.context.ParsedCommandNode;
 import com.mojang.brigadier.context.StringRange;
@@ -120,31 +121,34 @@ public final class BrigadierSuggestionFactory<C, S> {
             command = command.substring(leading.split(":")[0].length() + 1);
         }
 
-        return this.suggestionFactory.suggest(commandContext.sender(), command).thenCompose(suggestionsUnfiltered -> {
+        return this.suggestionFactory.suggest(commandContext.sender(), command).thenApply(suggestionsUnfiltered -> {
             /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
             final List<TooltipSuggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
             if (parentNode != null) {
                 final Set<String> siblingLiterals = parentNode.children().stream()
                         .map(cloud.commandframework.internal.CommandNode::component)
                         .filter(Objects::nonNull)
+                        .filter(c -> c.type() == CommandComponent.ComponentType.LITERAL)
                         .flatMap(commandComponent -> commandComponent.aliases().stream())
                         .collect(Collectors.toSet());
 
                 suggestions.removeIf(suggestion -> siblingLiterals.contains(suggestion.suggestion()));
             }
 
-            SuggestionsBuilder suggestionsBuilder = builder;
-
-            final int lastIndexOfSpaceInRemainingString = builder.getRemaining().lastIndexOf(' ');
-            if (lastIndexOfSpaceInRemainingString != -1) {
-                suggestionsBuilder = builder.createOffset(builder.getStart() + lastIndexOfSpaceInRemainingString + 1);
-            }
+            final CommandInput rawInput = commandContext.rawInput();
+            final int trimmed = builder.getInput().length() - rawInput.length();
+            final SuggestionsBuilder suggestionsBuilder =
+                    // TODO - this is the wrong cursor (post-parse position), we need the pre-parse position (same as given to the
+                    // target node's suggestion provider)
+                    // I'm pretty sure this logic is correct but can't test it until we have a way of getting the needed cursor
+                    // pos
+                    builder.createOffset(rawInput.cursor() + trimmed);
 
             for (final TooltipSuggestion suggestion : suggestions) {
-                suggestionsBuilder = suggestionsBuilder.suggest(suggestion.suggestion(), suggestion.tooltip());
+                suggestionsBuilder.suggest(suggestion.suggestion(), suggestion.tooltip());
             }
 
-            return suggestionsBuilder.buildFuture();
+            return suggestionsBuilder.build();
         });
     }
 
@@ -181,6 +185,7 @@ public final class BrigadierSuggestionFactory<C, S> {
     // Inner class to prevent attempting to load ParsedCommandNode when it doesn't exist
     @SuppressWarnings("unchecked")
     private static final class ParsedCommandNodeHandler {
+
         private ParsedCommandNodeHandler() {
         }
 
