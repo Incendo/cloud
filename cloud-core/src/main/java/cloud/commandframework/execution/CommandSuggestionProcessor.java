@@ -25,6 +25,8 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Stream;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -53,12 +55,24 @@ public interface CommandSuggestionProcessor<C> {
     /**
      * Adds operations to the {@link Suggestion suggestions} {@link Stream stream} and returns the result.
      *
-     * @param context command preprocessing context which can be used to access the command context and command input
-     * @param suggestions  the suggestions to process
+     * @param context     command preprocessing context which can be used to access the command context and command input
+     * @param suggestions the suggestions to process
      * @return the processed suggestions
      */
     @NonNull Stream<@NonNull Suggestion> process(
             @NonNull CommandPreprocessingContext<C> context,
             @NonNull Stream<@NonNull Suggestion> suggestions
     );
+
+    /**
+     * Create a chained {@link CommandSuggestionProcessor processor} that invokes {@code this} processor and then the
+     * {@code nextProcessor} with the result.
+     *
+     * @param nextProcessor next suggestion processor
+     * @return chained processor
+     */
+    default @NonNull CommandSuggestionProcessor<C> and(final @NonNull CommandSuggestionProcessor<C> nextProcessor) {
+        Objects.requireNonNull(nextProcessor, "nextProcessor");
+        return new ChainedCommandSuggestionProcessor<>(Arrays.asList(this, nextProcessor));
+    }
 }
