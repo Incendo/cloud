@@ -25,12 +25,13 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
+import java.util.stream.Stream;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Processor that formats command suggestions
+ * Processor that operates on the {@link Stream stream} of {@link Suggestion suggestions} before it is collected
+ * for the suggestion result passed to platform implementations or other callers.
  *
  * @param <C> command sender type
  * @since 2.0.0
@@ -40,23 +41,24 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public interface CommandSuggestionProcessor<C> {
 
     /**
-     * Creates a {@link CommandSuggestionProcessor} that simply returns the input suggestion.
+     * Creates a {@link CommandSuggestionProcessor} that simply returns the input suggestions.
      *
      * @param <C> command sender type
      * @return the processor
      */
     static <C> @NonNull CommandSuggestionProcessor<C> passThrough() {
-        return (ctx, suggestion) -> suggestion;
+        return (ctx, suggestions) -> suggestions;
     }
 
     /**
-     * Processes the given {@code suggestion} and returns the result.
+     * Adds operations to the {@link Suggestion suggestions} {@link Stream stream} and returns the result.
      *
-     * <p>If {@code null} is returned, the suggestion will be dropped.</p>
-     *
-     * @param context    command preprocessing context which can be used to access the command context and command input
-     * @param suggestion the suggestion to process
-     * @return the processed suggestion, or {@code null}
+     * @param context command preprocessing context which can be used to access the command context and command input
+     * @param suggestions  the suggestions to process
+     * @return the processed suggestions
      */
-    @Nullable Suggestion process(@NonNull CommandPreprocessingContext<C> context, @NonNull Suggestion suggestion);
+    @NonNull Stream<@NonNull Suggestion> process(
+            @NonNull CommandPreprocessingContext<C> context,
+            @NonNull Stream<@NonNull Suggestion> suggestions
+    );
 }

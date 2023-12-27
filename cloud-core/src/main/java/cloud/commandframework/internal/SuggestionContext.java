@@ -31,6 +31,8 @@ import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -65,7 +67,11 @@ public final class SuggestionContext<C> {
      * @return list of suggestions
      */
     public @NonNull List<@NonNull Suggestion> suggestions() {
-        return Collections.unmodifiableList(this.suggestions);
+        return Collections.unmodifiableList(
+                this.processor.process(this.preprocessingContext, this.suggestions.stream())
+                        .peek(obj -> Objects.requireNonNull(obj, "suggestion"))
+                        .collect(Collectors.toList())
+        );
     }
 
     /**
@@ -92,10 +98,7 @@ public final class SuggestionContext<C> {
      * @param suggestion the suggestion to add
      */
     public void addSuggestion(final @NonNull Suggestion suggestion) {
-        final Suggestion result = this.processor.process(this.preprocessingContext, suggestion);
-        if (result == null) {
-            return;
-        }
-        this.suggestions.add(result);
+        Objects.requireNonNull(suggestion, "suggestion");
+        this.suggestions.add(suggestion);
     }
 }
