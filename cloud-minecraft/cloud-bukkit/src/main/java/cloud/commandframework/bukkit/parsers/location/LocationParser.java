@@ -209,7 +209,7 @@ public final class LocationParser<C> implements ArgumentParser<C, Location>, Blo
         final int toSkip = Math.min(components, input.remainingTokens()) - 1;
         final StringBuilder prefix = new StringBuilder();
         for (int i = 0; i < toSkip; i++) {
-            prefix.append(input.readString()).append(" ");
+            prefix.append(input.readStringSkipWhitespace()).append(" ");
         }
 
         if (input.hasRemainingInput() && (input.peek() == '~' || input.peek() == '^')) {

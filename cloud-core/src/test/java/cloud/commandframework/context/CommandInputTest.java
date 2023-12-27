@@ -24,13 +24,18 @@
 package cloud.commandframework.context;
 
 import cloud.commandframework.internal.CommandInputTokenizer;
+import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class CommandInputTest {
 
@@ -245,6 +250,31 @@ class CommandInputTest {
         assertThat(commandInput.cursor()).isEqualTo(0);
     }
 
+    @ParameterizedTest
+    @MethodSource("PeekString_LeadingWhitespace_WhitespaceIsIgnored_Source")
+    void PeekString_LeadingWhitespace_WhitespaceIsIgnored(
+            final @NonNull String input,
+            final @NonNull String expectedRead
+    ) {
+        // Arrange
+        final CommandInput commandInput = CommandInput.of(input);
+
+        // Act
+        final String result = commandInput.peekString();
+
+        // Assert
+        assertThat(result).isEqualTo(expectedRead);
+    }
+
+    static @NonNull Stream<@NonNull Arguments> PeekString_LeadingWhitespace_WhitespaceIsIgnored_Source() {
+        return Stream.of(
+                arguments(" hello world ", "hello"),
+                arguments("  hello world", "hello"),
+                arguments(" ", ""),
+                arguments("  ", "")
+        );
+    }
+
     @Test
     void ReadString_EmptyString_ReturnsEmptyString() {
         // Arrange
@@ -274,12 +304,12 @@ class CommandInputTest {
     }
 
     @Test
-    void ReadString_MultipleTokens_ReturnsFirstTokenAndConsumesWhitespace() {
+    void ReadStringSkipWhitespace_MultipleTokens_ReturnsFirstTokenAndConsumesWhitespace() {
         // Arrange
         final CommandInput commandInput = CommandInput.of("hello cruel world");
 
         // Act
-        final String result = commandInput.readString();
+        final String result = commandInput.readStringSkipWhitespace();
 
         // Assert
         assertThat(result).isEqualTo("hello");
@@ -290,12 +320,12 @@ class CommandInputTest {
     }
 
     @Test
-    void ReadStringPreserveWhitespace_MultipleTokens_ReturnsFirstTokenAndPreservesWhitespace() {
+    void ReadString_MultipleTokens_ReturnsFirstTokenAndPreservesWhitespace() {
         // Arrange
         final CommandInput commandInput = CommandInput.of("hello cruel world");
 
         // Act
-        final String result = commandInput.readStringPreserveWhitespace();
+        final String result = commandInput.readString();
 
         // Assert
         assertThat(result).isEqualTo("hello");
@@ -303,6 +333,22 @@ class CommandInputTest {
         assertThat(commandInput.cursor()).isEqualTo(5);
         assertThat(commandInput.remainingLength()).isEqualTo(12);
         assertThat(commandInput.readInput()).isEqualTo("hello");
+    }
+
+    @Test
+    void ReadString_MultipleTokensWithLeadingWhitespace_ReturnsFirstTokenAndPreservesWhitespace() {
+        // Arrange
+        final CommandInput commandInput = CommandInput.of("     hello cruel world");
+
+        // Act
+        final String result = commandInput.readString();
+
+        // Assert
+        assertThat(result).isEqualTo("hello");
+        assertThat(commandInput.remainingInput()).isEqualTo(" cruel world");
+        assertThat(commandInput.cursor()).isEqualTo(10);
+        assertThat(commandInput.remainingLength()).isEqualTo(12);
+        assertThat(commandInput.readInput()).isEqualTo("     hello");
     }
 
     @Test
@@ -377,6 +423,18 @@ class CommandInputTest {
 
         // Assert
         assertThat(commandInput.remainingInput()).isEqualTo("hello");
+    }
+
+    @Test
+    void SkipWhitespace_WithLimit_SkipsLimitedAmount() {
+        // Arrange
+        final CommandInput commandInput = CommandInput.of("   hello");
+
+        // Act
+        commandInput.skipWhitespace(1);
+
+        // Assert
+        assertThat(commandInput.remainingInput()).isEqualTo("  hello");
     }
 
     @Test

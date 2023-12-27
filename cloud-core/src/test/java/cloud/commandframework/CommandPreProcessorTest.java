@@ -78,6 +78,8 @@ public class CommandPreProcessorTest {
         public void accept(final @NonNull CommandPreprocessingContext<TestCommandSender> context) {
             try {
                 final int num = context.commandInput().readInteger();
+                // The processor must leave the input in a readable state.
+                context.commandInput().skipWhitespace();
                 context.commandContext().store("int", num);
             } catch (final Exception ignored) {
                 /* Will prevent execution */

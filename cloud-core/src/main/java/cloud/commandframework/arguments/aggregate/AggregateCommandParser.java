@@ -101,7 +101,7 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
                             return ArgumentParseResult.failureFuture(result.failure().get());
                         }
                         return component.parser()
-                                .parseFuture(commandContext, commandInput)
+                                .parseFuture(commandContext, commandInput.skipWhitespace(1))
                                 .thenApply(value -> {
                                     if (value.parsedValue().isPresent()) {
                                         final CloudKey key = CloudKey.of(component.name(), component.valueType());

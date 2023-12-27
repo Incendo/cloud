@@ -275,6 +275,9 @@ public final class CommandTree<C> {
                 return component.parser()
                         .parseFuture(commandContext, commandInput)
                         .thenCompose(result -> {
+                            // We skip any trailing whitespace left by the parser.
+                            commandInput.skipWhitespace(1);
+
                             parsingContext.markEnd();
                             parsingContext.success(!result.failure().isPresent());
 
@@ -575,6 +578,9 @@ public final class CommandTree<C> {
         return node.component().parser()
                 .parseFuture(commandContext, commandInput)
                 .thenCompose(result -> {
+                    // We skip any trailing whitespace left by the parser.
+                    commandInput.skipWhitespace(1);
+
                     // We remove all remaining queue, and then we'll have a list of the captured input.
                     final List<String> consumedInput = tokenize(currentInput);
                     consumedInput.removeAll(tokenize(commandInput));
@@ -656,8 +662,9 @@ public final class CommandTree<C> {
                 context.commandContext().currentComponent(childComponent);
                 final ArgumentParseResult<?> result = childComponent.parser().parse(
                         context.commandContext(),
-                        commandInput
+                        commandInput.skipWhitespace(1)
                 );
+                commandInput.skipWhitespace(1);
 
                 if (result.failure().isPresent()) {
                     commandInput.cursor(commandInputCopy.cursor());
@@ -719,7 +726,7 @@ public final class CommandTree<C> {
         final CommandComponent<C> component = Objects.requireNonNull(node.component());
         context.commandContext().currentComponent(component);
         return component.suggestionProvider()
-                .suggestionsFuture(context.commandContext(), input.copy().skipWhitespace(false))
+                .suggestionsFuture(context.commandContext(), input.copy().skipWhitespace(1, false))
                 .thenApply(suggestionsToAdd -> {
                     final String string = input.peekString();
                     for (Suggestion suggestion : suggestionsToAdd) {
@@ -775,7 +782,7 @@ public final class CommandTree<C> {
             // START: Preprocessing
             final ArgumentParseResult<Boolean> preParseResult = component.preprocess(
                     context.commandContext(),
-                    commandInput
+                    commandInput.skipWhitespace(1)
             );
             final boolean preParseSuccess = !preParseResult.failure().isPresent()
                     && preParseResult.parsedValue().orElse(false);
@@ -791,7 +798,7 @@ public final class CommandTree<C> {
 
                 parsingFuture = child.component()
                         .parser()
-                        .parseFuture(context.commandContext(), commandInput)
+                        .parseFuture(context.commandContext(), commandInput.skipWhitespace(1))
                         .thenCompose(result -> {
                             final Optional<?> parsedValue = result.parsedValue();
                             final boolean parseSuccess = parsedValue.isPresent();
@@ -884,8 +891,8 @@ public final class CommandTree<C> {
                     if (commandInput.remainingTokens() <= 1) {
                         return CompletableFuture.completedFuture(previousResult);
                     }
-                    return component.parser().parseFuture(commandContext, commandInput).thenApply(result -> {
-                        commandContext.store(component.name(), result);
+                    return component.parser().parseFuture(commandContext, commandInput.skipWhitespace(1)).thenApply(result -> {
+                        result.parsedValue().ifPresent(value -> commandContext.store(component.name(), value));
                         return null;
                     });
                 });
@@ -944,7 +951,7 @@ public final class CommandTree<C> {
     ) {
         context.commandContext().currentComponent(component);
         return component.suggestionProvider()
-                .suggestionsFuture(context.commandContext(), input.copy().skipWhitespace(false))
+                .suggestionsFuture(context.commandContext(), input.copy().skipWhitespace(1, false))
                 .thenAccept(context::addSuggestions)
                 .thenApply(in -> context);
     }
