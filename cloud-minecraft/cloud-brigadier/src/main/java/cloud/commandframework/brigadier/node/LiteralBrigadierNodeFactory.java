@@ -51,6 +51,8 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -211,14 +213,11 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
             final com.mojang.brigadier.@NonNull Command<S> executor,
             final SuggestionProvider<S> suggestionProvider
     ) {
-        final List<? extends CommandComponent<?>> components = aggregateParser.components();
+        final Iterator<CommandComponent<C>> components = aggregateParser.components().iterator();
+        final List<ArgumentBuilder<S, ?>> argumentBuilders = new ArrayList<>();
 
-        /* Build nodes backwards */
-        final ArgumentBuilder<S, ?>[] argumentBuilders = new ArgumentBuilder[components.size()];
-
-        for (int i = components.size() - 1; i >= 0; i--) {
-            final CommandComponent<C> component = (CommandComponent<C>) components.get(i);
-
+        while (components.hasNext()) {
+            final CommandComponent<C> component = components.next();
             final ArgumentParser<C, ?> parser = component.parser();
             final ArgumentMapping<S> argumentMapping = this.getArgument(component.valueType(), parser);
             final SuggestionProvider<S> provider = argumentMapping.suggestionsType() == SuggestionsType.CLOUD_SUGGESTIONS
@@ -229,26 +228,29 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
                     .<S, Object>argument(component.name(), (ArgumentType<Object>) argumentMapping.argumentType())
                     .suggests(provider)
                     .requires(new BrigadierPermissionPredicate<>(permissionChecker, root));
-            argumentBuilders[i] = fragmentBuilder;
 
             if (this.cloudBrigadierManager.settings().get(BrigadierSetting.FORCE_EXECUTABLE)) {
                 fragmentBuilder.executes(executor);
             }
 
-            /* Link all previous builders to this one */
-            if ((i + 1) < components.size()) {
-                fragmentBuilder.then(argumentBuilders[i + 1]);
-            }
+            argumentBuilders.add(fragmentBuilder);
         }
 
-        this.updateExecutes(argumentBuilders[components.size() - 1], root, executor);
-
+        // We now want to link up all subsequent components to the tail.
+        final ArgumentBuilder<S, ?> tail = argumentBuilders.get(argumentBuilders.size() - 1);
         for (final cloud.commandframework.internal.CommandNode<C> node : root.children()) {
-            argumentBuilders[components.size() - 1]
-                    .then(this.constructCommandNode(node, permissionChecker, executor, suggestionProvider));
+            tail.then(this.constructCommandNode(node, permissionChecker, executor, suggestionProvider));
         }
 
-        return argumentBuilders[0];
+        this.updateExecutes(tail, root, executor);
+
+        // We now have the arguments constructed in order. We now want to link them up.
+        // We have to do this backwards, as we cannot modify the node after it has been added to the node before it.
+        for (int i = argumentBuilders.size() - 1; i > 0; i--) {
+            argumentBuilders.get(i - 1).then(argumentBuilders.get(i));
+        }
+
+        return argumentBuilders.get(0);
     }
 
     /**
