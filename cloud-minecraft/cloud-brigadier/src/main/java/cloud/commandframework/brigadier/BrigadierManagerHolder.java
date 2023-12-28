@@ -24,6 +24,7 @@
 package cloud.commandframework.brigadier;
 
 import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Interface implemented by {@link cloud.commandframework.CommandManager command managers} that are capable of registering
@@ -57,7 +58,7 @@ public interface BrigadierManagerHolder<C, S> {
      * @since 1.2.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    CloudBrigadierManager<C, ? extends S> brigadierManager();
+    @NonNull CloudBrigadierManager<C, ? extends S> brigadierManager();
 
     /**
      * Exception thrown when {@link #brigadierManager()} is called and {@link #hasBrigadierManager()}

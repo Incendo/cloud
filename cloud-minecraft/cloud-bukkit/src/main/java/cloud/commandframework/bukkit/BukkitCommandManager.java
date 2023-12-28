@@ -365,7 +365,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     @Override
-    public @Nullable CloudBrigadierManager<C, ?> brigadierManager() {
+    public @NonNull CloudBrigadierManager<C, ?> brigadierManager() {
         if (this.commandRegistrationHandler() instanceof CloudCommodoreManager) {
             return ((CloudCommodoreManager<C>) this.commandRegistrationHandler()).brigadierManager();
         }

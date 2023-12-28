@@ -164,7 +164,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     @Override
-    public @Nullable CloudBrigadierManager<C, ?> brigadierManager() {
+    public @NonNull CloudBrigadierManager<C, ?> brigadierManager() {
         if (this.paperBrigadierListener != null) {
             return this.paperBrigadierListener.brigadierManager();
         }
