@@ -91,7 +91,7 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
         this.unregisterWithCommodore(label);
     }
 
-    protected @NonNull CloudBrigadierManager brigadierManager() {
+    protected @NonNull CloudBrigadierManager<C, Object> brigadierManager() {
         return this.brigadierManager;
     }
 

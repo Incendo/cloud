@@ -72,8 +72,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * <a href="https://github.com/aikar/commands/blob/master/brigadier/src/main/java/co.aikar.commands/ACFBrigadierManager.java">
  * ACFBrigadiermanager</a> in the ACF project, which was originally written by MiniDigger and licensed under the MIT license.
  *
- * @param <C> Command sender type
- * @param <S> Brigadier sender type
+ * @param <C> cloud command sender type
+ * @param <S> brigadier command source type
  */
 @SuppressWarnings({"unchecked", "unused"})
 public final class CloudBrigadierManager<C, S> {
