@@ -65,8 +65,15 @@ public interface BrigadierManagerHolder<C, S> {
      *
      * @since 2.0.0
      */
+    @SuppressWarnings("serial")
     @API(status = API.Status.STABLE, since = "2.0.0")
     final class BrigadierManagerNotPresent extends RuntimeException {
+
+        /**
+         * Creates a new {@link BrigadierManagerNotPresent} exception.
+         *
+         * @param message detail message
+         */
         public BrigadierManagerNotPresent(final String message) {
             super(message);
         }

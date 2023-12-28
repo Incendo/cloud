@@ -344,19 +344,32 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     * @since 2.0.0
+     */
     @Override
     public boolean hasBrigadierManager() {
         return this.commandRegistrationHandler() instanceof CloudCommodoreManager;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     * @throws BrigadierManagerNotPresent when {@link #hasBrigadierManager()} is false
+     * @since 1.2.0
+     */
     @API(status = API.Status.STABLE, since = "2.0.0")
     @Override
     public @Nullable CloudBrigadierManager<C, ?> brigadierManager() {
         if (this.commandRegistrationHandler() instanceof CloudCommodoreManager) {
             return ((CloudCommodoreManager<C>) this.commandRegistrationHandler()).brigadierManager();
         }
-        throw new BrigadierManagerHolder.BrigadierManagerNotPresent("The CloudBrigadierManager is either not supported in the " +
-                "current environment, or it is not enabled.");
+        throw new BrigadierManagerHolder.BrigadierManagerNotPresent("The CloudBrigadierManager is either not supported in the "
+                + "current environment, or it is not enabled.");
     }
 
     /**

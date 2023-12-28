@@ -143,11 +143,24 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     * @since 2.0.0
+     */
     @Override
     public boolean hasBrigadierManager() {
         return this.paperBrigadierListener != null || super.hasBrigadierManager();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     * @throws BrigadierManagerNotPresent when {@link #hasBrigadierManager()} is false
+     * @since 1.2.0
+     */
     @API(status = API.Status.STABLE, since = "2.0.0")
     @Override
     public @Nullable CloudBrigadierManager<C, ?> brigadierManager() {
