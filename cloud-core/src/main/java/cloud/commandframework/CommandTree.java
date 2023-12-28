@@ -751,11 +751,7 @@ public final class CommandTree<C> {
         }
 
         CompletableFuture<Void> future = CompletableFuture.completedFuture(null);
-        if (component.parser() instanceof AggregateCommandParser) {
-            // If we're working with a compound argument then we attempt to pop the required arguments from the input queue.
-            final AggregateCommandParser<C, ?> aggregateParser = (AggregateCommandParser<C, ?>) component.parser();
-            future = this.popRequiredArguments(context.commandContext(), commandInput, aggregateParser);
-        } else if (component.parser() instanceof CommandFlagParser) {
+        if (component.parser() instanceof CommandFlagParser) {
             // Use the flag argument parser to deduce what flag is being suggested right now
             // If empty, then no flag value is being typed, and the different flag options should
             // be suggested instead.
@@ -855,49 +851,6 @@ public final class CommandTree<C> {
 
                 return this.addArgumentSuggestions(context, child, commandInput);
             });
-        });
-    }
-
-    /**
-     * Removes as many arguments from the {@code commandQueue} as the given {@code aggregateParser} requires. If the
-     * {@code commandQueue} fewer than the required arguments then no arguments are popped
-     *
-     * @param commandContext  the command context
-     * @param commandInput    the input
-     * @param aggregateParser the aggregate parser
-     * @return future that completes when the arguments have been popped
-     */
-    private CompletableFuture<Void> popRequiredArguments(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull CommandInput commandInput,
-            final @NonNull AggregateCommandParser<C, ?> aggregateParser
-    ) {
-        // Try to parse the entire input. If it works, we skip this whole thing.
-        return aggregateParser.parseFuture(commandContext, commandInput.copy()).thenCompose(previous -> {
-            if (previous.parsedValue().isPresent()) {
-                return CompletableFuture.completedFuture(null);
-            }
-
-            CompletableFuture<Void> future = CompletableFuture.completedFuture(null);
-            final List<CommandComponent<C>> components = aggregateParser.components();
-            // We try to pop the input that would get parsed the inner components, but not the last one. We know that we have input
-            // that will be parsed by one of the inner components. If no parser before the last one parses the input, then we
-            // know for sure that the last one should capture all remaining input.
-            //
-            // We make sure to leave one string in the command input, as it should be passed to the suggestion method.
-            for (int argumentCount = 0; argumentCount < components.size() - 1 && commandInput.remainingTokens() > 1; argumentCount++) {
-                final CommandComponent<C> component = components.get(argumentCount);
-                future = future.thenCompose(previousResult -> {
-                    if (commandInput.remainingTokens() <= 1) {
-                        return CompletableFuture.completedFuture(previousResult);
-                    }
-                    return component.parser().parseFuture(commandContext, commandInput.skipWhitespace(1)).thenApply(result -> {
-                        result.parsedValue().ifPresent(value -> commandContext.store(component.name(), value));
-                        return null;
-                    });
-                });
-            }
-            return future;
         });
     }
 

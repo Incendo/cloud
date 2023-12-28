@@ -27,12 +27,10 @@ import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.keys.CloudKey;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
@@ -58,8 +56,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgumentParser<C, O>, ParserDescriptor<C, O>,
-        SuggestionProvider<C> {
+public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgumentParser<C, O>, ParserDescriptor<C, O> {
 
     /**
      * Returns a new aggregate command parser builder. The builder is immutable, and each method returns
@@ -120,17 +117,8 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
     }
 
     @Override
-    default @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
-            final @NonNull CommandContext<C> context,
-            final @NonNull CommandInput input
-    ) {
-        return this.components()
-                .stream()
-                .filter(arg -> !context.contains(arg.name()))
-                .map(CommandComponent::suggestionProvider)
-                .map(suggestionProvider -> suggestionProvider.suggestionsFuture(context, input))
-                .findFirst()
-                .orElse(CompletableFuture.completedFuture(Collections.emptyList()));
+    default @NonNull SuggestionProvider<C> suggestionProvider() {
+        return new AggregateSuggestionProvider<>(this);
     }
 
     @Override

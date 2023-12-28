@@ -686,20 +686,31 @@ public interface CommandInput {
     /**
      * Returns the input that has been consumed by {@code that} input that has not been consumed by {@code input}.
      *
-     * @param that the input to compare to
+     * @param that                      the input to compare to
+     * @param includeTrailingWhitespace whether to include trailing whitespace
      * @return the difference in consumed input
      */
-    default @NonNull String difference(final @NonNull CommandInput that) {
+    default @NonNull String difference(final @NonNull CommandInput that, final boolean includeTrailingWhitespace) {
         // If the inputs are different then there's nothing to compare.
         if (!this.input().equals(that.input())) {
             return this.input();
         }
         final String difference = this.input().substring(this.cursor(), that.cursor());
-        if (difference.endsWith(" ")) {
+        if (!includeTrailingWhitespace && difference.endsWith(" ")) {
             return difference.substring(0, difference.length() - 1);
         } else {
             return difference;
         }
+    }
+
+    /**
+     * Returns the input that has been consumed by {@code that} input that has not been consumed by {@code input}.
+     *
+     * @param that the input to compare to
+     * @return the difference in consumed input
+     */
+    default @NonNull String difference(final @NonNull CommandInput that) {
+        return this.difference(that, false);
     }
 
     @API(status = API.Status.STABLE, since = "2.0.0")
