@@ -37,6 +37,7 @@ import cloud.commandframework.arguments.standard.ShortParser;
 import cloud.commandframework.arguments.standard.StringArrayParser;
 import cloud.commandframework.arguments.standard.StringParser;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.ArgumentTypeFactory;
 import cloud.commandframework.brigadier.argument.BrigadierMapping;
 import cloud.commandframework.brigadier.argument.BrigadierMappingBuilder;
@@ -116,9 +117,9 @@ public final class CloudBrigadierManager<C, S> {
     private void registerInternalMappings() {
         /* Map byte, short and int to IntegerArgumentType */
         this.registerMapping(new TypeToken<ByteParser<C>>() {
-        }, builder -> builder.to(argument -> IntegerArgumentType.integer(argument.getMin(), argument.getMax())));
+        }, builder -> builder.to(argument -> IntegerArgumentType.integer(argument.getMin(), argument.getMax())).cloudSuggestions());
         this.registerMapping(new TypeToken<ShortParser<C>>() {
-        }, builder -> builder.to(argument -> IntegerArgumentType.integer(argument.getMin(), argument.getMax())));
+        }, builder -> builder.to(argument -> IntegerArgumentType.integer(argument.getMin(), argument.getMax())).cloudSuggestions());
         this.registerMapping(new TypeToken<IntegerParser<C>>() {
         }, builder -> builder.to(argument -> {
             if (!argument.hasMin() && !argument.hasMax()) {
@@ -131,7 +132,7 @@ public final class CloudBrigadierManager<C, S> {
                 return IntegerArgumentType.integer(Integer.MIN_VALUE, argument.getMax());
             }
             return IntegerArgumentType.integer(argument.getMin(), argument.getMax());
-        }));
+        }).cloudSuggestions());
         /* Map float to FloatArgumentType */
         this.registerMapping(new TypeToken<FloatParser<C>>() {
         }, builder -> builder.to(argument -> {
@@ -145,7 +146,7 @@ public final class CloudBrigadierManager<C, S> {
                 return FloatArgumentType.floatArg(-Float.MAX_VALUE, argument.getMax());
             }
             return FloatArgumentType.floatArg(argument.getMin(), argument.getMax());
-        }));
+        }).cloudSuggestions());
         /* Map double to DoubleArgumentType */
         this.registerMapping(new TypeToken<DoubleParser<C>>() {
         }, builder -> builder.to(argument -> {
@@ -159,7 +160,7 @@ public final class CloudBrigadierManager<C, S> {
                 return DoubleArgumentType.doubleArg(-Double.MAX_VALUE, argument.getMax());
             }
             return DoubleArgumentType.doubleArg(argument.getMin(), argument.getMax());
-        }));
+        }).cloudSuggestions());
         /* Map long parser to LongArgumentType */
         this.registerMapping(new TypeToken<LongParser<C>>() {
         }, builder -> builder.to(longParser -> {
@@ -173,7 +174,7 @@ public final class CloudBrigadierManager<C, S> {
                 return LongArgumentType.longArg(Long.MIN_VALUE, longParser.getMax());
             }
             return LongArgumentType.longArg(longParser.getMin(), longParser.getMax());
-        }));
+        }).cloudSuggestions());
         /* Map boolean to BoolArgumentType */
         this.registerMapping(new TypeToken<BooleanParser<C>>() {
         }, builder -> builder.toConstant(BoolArgumentType.bool()));
@@ -239,27 +240,23 @@ public final class CloudBrigadierManager<C, S> {
     }
 
     /**
-     * Set whether to use Brigadier's native suggestions for number argument types.
-     * <p>
-     * If Brigadier's suggestions are not used, cloud's default number suggestion provider will be used.
+     * Sets whether Brigadier's native suggestions for number types will be used, or if cloud's number suggestions should be
+     * used instead. At the time of writing the native suggestions are equivalent to
+     * {@link SuggestionProvider#noSuggestions()}.
      *
-     * @param nativeNumberSuggestions whether Brigadier suggestions should be used for numbers
+     * <p>The default is to use cloud's suggestions, or {@code false}.</p>
+     *
+     * @param nativeNumberSuggestions whether Brigadier suggestions should be used for number types
      * @since 1.2.0
      */
     @API(status = API.Status.STABLE, since = "1.2.0")
     public void setNativeNumberSuggestions(final boolean nativeNumberSuggestions) {
-        this.setNativeSuggestions(new TypeToken<ByteParser<C>>() {
-        }, nativeNumberSuggestions);
-        this.setNativeSuggestions(new TypeToken<ShortParser<C>>() {
-        }, nativeNumberSuggestions);
-        this.setNativeSuggestions(new TypeToken<IntegerParser<C>>() {
-        }, nativeNumberSuggestions);
-        this.setNativeSuggestions(new TypeToken<FloatParser<C>>() {
-        }, nativeNumberSuggestions);
-        this.setNativeSuggestions(new TypeToken<DoubleParser<C>>() {
-        }, nativeNumberSuggestions);
-        this.setNativeSuggestions(new TypeToken<LongParser<C>>() {
-        }, nativeNumberSuggestions);
+        this.setNativeSuggestions(new TypeToken<ByteParser<C>>() {}, nativeNumberSuggestions);
+        this.setNativeSuggestions(new TypeToken<ShortParser<C>>() {}, nativeNumberSuggestions);
+        this.setNativeSuggestions(new TypeToken<IntegerParser<C>>() {}, nativeNumberSuggestions);
+        this.setNativeSuggestions(new TypeToken<FloatParser<C>>() {}, nativeNumberSuggestions);
+        this.setNativeSuggestions(new TypeToken<DoubleParser<C>>() {}, nativeNumberSuggestions);
+        this.setNativeSuggestions(new TypeToken<LongParser<C>>() {}, nativeNumberSuggestions);
     }
 
     /**
