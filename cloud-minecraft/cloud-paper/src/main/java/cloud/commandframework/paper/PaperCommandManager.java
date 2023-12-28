@@ -34,6 +34,7 @@ import cloud.commandframework.paper.suggestions.SuggestionListenerFactory;
 import cloud.commandframework.state.RegistrationState;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
@@ -142,11 +143,12 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.2.0
-     */
+    @Override
+    public boolean hasBrigadierManager() {
+        return this.paperBrigadierListener != null || super.hasBrigadierManager();
+    }
+
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @Override
     public @Nullable CloudBrigadierManager<C, ?> brigadierManager() {
         if (this.paperBrigadierListener != null) {
