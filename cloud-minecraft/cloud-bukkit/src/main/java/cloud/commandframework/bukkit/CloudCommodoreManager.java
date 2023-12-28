@@ -111,7 +111,7 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
                             this.commandManager.getCommandSenderMapper().apply(bukkitSender),
                             commandPermission
                     );
-                }, false, o -> 1);
+                }, o -> 1);
         final CommandNode existingNode = this.getDispatcher().findNode(Collections.singletonList(label));
         if (existingNode != null) {
             this.mergeChildren(existingNode, literalCommandNode);
