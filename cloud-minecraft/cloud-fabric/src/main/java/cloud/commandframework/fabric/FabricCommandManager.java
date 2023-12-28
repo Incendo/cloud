@@ -373,8 +373,9 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
      * @return {@code true}
      * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @Override
-    public boolean hasBrigadierManager() {
+    public final boolean hasBrigadierManager() {
         return true;
     }
 

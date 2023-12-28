@@ -149,6 +149,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      * @return {@inheritDoc}
      * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @Override
     public boolean hasBrigadierManager() {
         return this.paperBrigadierListener != null || super.hasBrigadierManager();

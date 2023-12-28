@@ -350,6 +350,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      * @return {@inheritDoc}
      * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @Override
     public boolean hasBrigadierManager() {
         return this.commandRegistrationHandler() instanceof CloudCommodoreManager;

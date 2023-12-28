@@ -172,8 +172,9 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
      * @return {@code true}
      * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @Override
-    public boolean hasBrigadierManager() {
+    public final boolean hasBrigadierManager() {
         return true;
     }
 
@@ -187,7 +188,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     @Override
-    public @NonNull CloudBrigadierManager<C, CommandSource> brigadierManager() {
+    public final @NonNull CloudBrigadierManager<C, CommandSource> brigadierManager() {
         return ((VelocityPluginRegistrationHandler<C>) this.commandRegistrationHandler()).brigadierManager();
     }
 
