@@ -171,7 +171,6 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                                     this.commandManager().commandSourceMapper().apply(src),
                                     perm
                             ),
-                            true,
                             new FabricExecutor<>(this.commandManager())
                     );
 
@@ -240,7 +239,6 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                         component.name(),
                         command,
                         permission,
-                        true /* forceRegister */,
                         executor
             );
 

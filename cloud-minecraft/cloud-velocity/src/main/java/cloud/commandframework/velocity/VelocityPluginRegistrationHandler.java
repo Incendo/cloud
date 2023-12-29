@@ -70,7 +70,6 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                                 this.manager.commandSenderMapper().apply(c),
                                 p
                         ),
-                        true,
                         new VelocityExecutor<>(this.manager)
                 )
         );

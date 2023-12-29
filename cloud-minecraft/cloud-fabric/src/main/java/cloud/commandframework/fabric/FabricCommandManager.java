@@ -102,6 +102,7 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -119,7 +120,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 1.5.0
  */
 public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider> extends CommandManager<C> implements
-        BrigadierManagerHolder<C> {
+        BrigadierManagerHolder<C, S> {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int MOD_PUBLIC_STATIC_FINAL = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
@@ -364,6 +365,28 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         return this.backwardsCommandSourceMapper;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>This will always return true for {@link FabricCommandManager}s.</p>
+     *
+     * @return {@code true}
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    @Override
+    public final boolean hasBrigadierManager() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>{@link FabricCommandManager}s always use Brigadier for registration, so the aforementioned check is not needed.</p>
+     *
+     * @return {@inheritDoc}
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @Override
     public final @NonNull CloudBrigadierManager<C, S> brigadierManager() {
         return this.brigadierManager;

@@ -135,7 +135,7 @@ public class ItemStackParser<C> implements ArgumentParser.FutureArgumentParser<C
     }
 
 
-    private static final class ModernParser<C> implements ArgumentParser<C, ProtoItemStack> {
+    private static final class ModernParser<C> implements ArgumentParser.FutureArgumentParser<C, ProtoItemStack> {
 
         private static final Class<?> NMS_ITEM_STACK_CLASS = CraftBukkitReflection.needNMSClassOrElse(
                 "ItemStack",
@@ -206,12 +206,12 @@ public class ItemStackParser<C> implements ArgumentParser.FutureArgumentParser<C
         }
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull ProtoItemStack> parse(
+        public @NonNull CompletableFuture<@NonNull ArgumentParseResult<@NonNull ProtoItemStack>> parseFuture(
                 final @NonNull CommandContext<@NonNull C> commandContext,
                 final @NonNull CommandInput commandInput
         ) {
             // Minecraft has a parser for this - just use it
-            return this.parser.parse(commandContext, commandInput);
+            return this.parser.parseFuture(commandContext, commandInput);
         }
 
         @Override

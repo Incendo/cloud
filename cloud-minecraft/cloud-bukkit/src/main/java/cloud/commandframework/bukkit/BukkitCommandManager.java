@@ -73,6 +73,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
+import org.apiguardian.api.API;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -83,15 +84,13 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Command manager for the Bukkit platform
  *
  * @param <C> Command sender type
  */
-@SuppressWarnings("unchecked")
-public class BukkitCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C> {
+public class BukkitCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C, Object> {
 
     private static final String MESSAGE_INTERNAL_ERROR = ChatColor.RED
             + "An internal error occurred while attempting to perform this command.";
@@ -124,7 +123,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
      */
-    @SuppressWarnings("unchecked")
     public BukkitCommandManager(
             final @NonNull Plugin owningPlugin,
             final @NonNull Function<@NonNull CommandTree<@NonNull C>,
@@ -348,14 +346,30 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     /**
      * {@inheritDoc}
      *
+     * @return {@inheritDoc}
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    @Override
+    public boolean hasBrigadierManager() {
+        return this.commandRegistrationHandler() instanceof CloudCommodoreManager;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     * @throws BrigadierManagerNotPresent when {@link #hasBrigadierManager()} is false
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @Override
-    public @Nullable CloudBrigadierManager<C, ?> brigadierManager() {
+    public @NonNull CloudBrigadierManager<C, ?> brigadierManager() {
         if (this.commandRegistrationHandler() instanceof CloudCommodoreManager) {
             return ((CloudCommodoreManager<C>) this.commandRegistrationHandler()).brigadierManager();
         }
-        return null;
+        throw new BrigadierManagerHolder.BrigadierManagerNotPresent("The CloudBrigadierManager is either not supported in the "
+                + "current environment, or it is not enabled.");
     }
 
     /**

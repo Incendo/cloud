@@ -56,6 +56,7 @@ import java.util.function.Function;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -72,7 +73,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  */
 @Singleton
-public class VelocityCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C> {
+public class VelocityCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C, CommandSource> {
 
     private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS =
@@ -165,15 +166,29 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
 
     /**
      * {@inheritDoc}
-     * <p>
-     * In the case of the {@link VelocityCommandManager}, Brigadier is always used for command registration,
-     * and therefore this method will never return {@code null}.
      *
+     * <p>This will always return true for {@link VelocityCommandManager}s.</p>
+     *
+     * @return {@code true}
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    @Override
+    public final boolean hasBrigadierManager() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>{@link VelocityCommandManager}s always use Brigadier for registration, so the aforementioned check is not needed.</p>
+     *
+     * @return {@inheritDoc}
      * @since 1.2.0
      */
-    @SuppressWarnings("unchecked")
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @Override
-    public @NonNull CloudBrigadierManager<C, CommandSource> brigadierManager() {
+    public final @NonNull CloudBrigadierManager<C, CommandSource> brigadierManager() {
         return ((VelocityPluginRegistrationHandler<C>) this.commandRegistrationHandler()).brigadierManager();
     }
 

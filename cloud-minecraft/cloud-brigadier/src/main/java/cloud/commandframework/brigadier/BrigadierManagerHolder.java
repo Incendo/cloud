@@ -23,26 +23,60 @@
 //
 package cloud.commandframework.brigadier;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * This interface is implemented by command managers capable of registering commands to Brigadier.
+ * Interface implemented by {@link cloud.commandframework.CommandManager command managers} that are capable of registering
+ * commands to Brigadier using {@link CloudBrigadierManager}.
  *
- * @param <C> Command sender type
+ * @param <C> cloud command sender type
+ * @param <S> brigadier command source type
  * @since 1.2.0
  */
-public interface BrigadierManagerHolder<C> {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface BrigadierManagerHolder<C, S> {
 
     /**
-     * Get the Brigadier manager instance used by this manager. This method being present
-     * in a command manager means the manager has the capability to register commands
-     * to Brigadier, but does not necessarily mean that this capability is being used.
-     * <p>
-     * In the case that Brigadier isn't used, this method should always return {@code null}.
+     * Returns whether the {@link CloudBrigadierManager} is present and active.
      *
-     * @return The Brigadier manager instance, if commands are being registered to Brigadier.
-     *         Else, {@code null}
+     * @return if the {@link CloudBrigadierManager brigadier manager} is  present and active
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    boolean hasBrigadierManager();
+
+    /**
+     * Get the {@link CloudBrigadierManager} used by this {@link cloud.commandframework.CommandManager command manager}.
+     *
+     * <p>Generally, {@link #hasBrigadierManager()} should be checked before calling this method. However, some command managers
+     * will always use Brigadier and in those cases the check can be skipped (this will be in the relevant manager's
+     * documentation).</p>
+     *
+     * @return the {@link CloudBrigadierManager}
+     * @throws BrigadierManagerNotPresent when {@link #hasBrigadierManager()} is false
      * @since 1.2.0
      */
-    @Nullable CloudBrigadierManager<C, ?> brigadierManager();
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    @NonNull CloudBrigadierManager<C, ? extends S> brigadierManager();
+
+    /**
+     * Exception thrown when {@link #brigadierManager()} is called and {@link #hasBrigadierManager()}
+     * is {@code false}.
+     *
+     * @since 2.0.0
+     */
+    @SuppressWarnings("serial")
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    final class BrigadierManagerNotPresent extends RuntimeException {
+
+        /**
+         * Creates a new {@link BrigadierManagerNotPresent} exception.
+         *
+         * @param message detail message
+         */
+        public BrigadierManagerNotPresent(final String message) {
+            super(message);
+        }
+    }
 }
