@@ -750,7 +750,6 @@ public final class CommandTree<C> {
             return CompletableFuture.completedFuture(context);
         }
 
-        CompletableFuture<Void> future = CompletableFuture.completedFuture(null);
         if (component.parser() instanceof CommandFlagParser) {
             // Use the flag argument parser to deduce what flag is being suggested right now
             // If empty, then no flag value is being typed, and the different flag options should
@@ -764,93 +763,91 @@ public final class CommandTree<C> {
             }
         }
 
-        return future.thenCompose(ignored -> {
-            if (commandInput.isEmpty()) {
-                return CompletableFuture.completedFuture(context);
-            } else if (commandInput.remainingTokens() == 1
-                    || (child.isLeaf() && child.component().parser() instanceof AggregateCommandParser)) {
-                return this.addArgumentSuggestions(context, child, commandInput);
-            }
+        if (commandInput.isEmpty()) {
+            return CompletableFuture.completedFuture(context);
+        } else if (commandInput.remainingTokens() == 1
+                || (child.isLeaf() && child.component().parser() instanceof AggregateCommandParser)) {
+            return this.addArgumentSuggestions(context, child, commandInput);
+        }
 
-            // Store original input command queue before the parsers below modify it
-            final CommandInput commandInputOriginal = commandInput.copy();
+        // Store original input command queue before the parsers below modify it
+        final CommandInput commandInputOriginal = commandInput.copy();
 
-            // START: Preprocessing
-            final ArgumentParseResult<Boolean> preParseResult = component.preprocess(
-                    context.commandContext(),
-                    commandInput.skipWhitespace(1)
-            );
-            final boolean preParseSuccess = !preParseResult.failure().isPresent()
-                    && preParseResult.parsedValue().orElse(false);
-            // END: Preprocessing
+        // START: Preprocessing
+        final ArgumentParseResult<Boolean> preParseResult = component.preprocess(
+                context.commandContext(),
+                commandInput.skipWhitespace(1)
+        );
+        final boolean preParseSuccess = !preParseResult.failure().isPresent()
+                && preParseResult.parsedValue().orElse(false);
+        // END: Preprocessing
 
-            final CompletableFuture<SuggestionContext<C>> parsingFuture;
-            if (!preParseSuccess) {
-                parsingFuture = CompletableFuture.completedFuture(null);
-            } else {
-                // START: Parsing
-                context.commandContext().currentComponent(child.component());
-                final CommandInput preParseInput = commandInput.copy();
+        final CompletableFuture<SuggestionContext<C>> parsingFuture;
+        if (!preParseSuccess) {
+            parsingFuture = CompletableFuture.completedFuture(null);
+        } else {
+            // START: Parsing
+            context.commandContext().currentComponent(child.component());
+            final CommandInput preParseInput = commandInput.copy();
 
-                parsingFuture = child.component()
-                        .parser()
-                        .parseFuture(context.commandContext(), commandInput.skipWhitespace(1))
-                        .thenCompose(result -> {
-                            final Optional<?> parsedValue = result.parsedValue();
-                            final boolean parseSuccess = parsedValue.isPresent();
+            parsingFuture = child.component()
+                    .parser()
+                    .parseFuture(context.commandContext(), commandInput.skipWhitespace(1))
+                    .thenCompose(result -> {
+                        final Optional<?> parsedValue = result.parsedValue();
+                        final boolean parseSuccess = parsedValue.isPresent();
 
-                            if (result.failure().isPresent()) {
-                                commandInput.cursor(preParseInput.cursor());
-                                return this.addArgumentSuggestions(context, child, commandInput);
-                            }
+                        if (result.failure().isPresent()) {
+                            commandInput.cursor(preParseInput.cursor());
+                            return this.addArgumentSuggestions(context, child, commandInput);
+                        }
 
-                            if (child.isLeaf()) {
-                                if (!commandInput.isEmpty()) {
-                                    return CompletableFuture.completedFuture(context);
-                                }
-
-                                // Greedy parser took all the input, we can restore and just ask for suggestions
-                                commandInput.cursor(commandInputOriginal.cursor());
-                                this.addArgumentSuggestions(context, child, commandInput);
-                            }
-
-                            if (parseSuccess && (!commandInput.isEmpty() || commandInput.input().endsWith(" "))) {
-                                if (commandInput.isEmpty()) {
-                                    commandInput.moveCursor(-1);
-                                }
-                                // the current argument at the position is parsable and there are more arguments following
-                                context.commandContext().store(child.component().name(), parsedValue.get());
-                                return this.getSuggestions(context, commandInput, child);
-                            } else if (!parseSuccess && commandInputOriginal.remainingTokens() > 1) {
-                                // at this point there should normally be no need to reset the command queue as we expect
-                                // users to only take out an argument if the parse succeeded. Just to be sure we reset anyway
-                                commandInput.cursor(commandInputOriginal.cursor());
-
-                                // there are more arguments following but the current argument isn't matching - there
-                                // is no need to collect any further suggestions
+                        if (child.isLeaf()) {
+                            if (!commandInput.isEmpty()) {
                                 return CompletableFuture.completedFuture(context);
                             }
-                            return CompletableFuture.completedFuture(null);
-                        });
+
+                            // Greedy parser took all the input, we can restore and just ask for suggestions
+                            commandInput.cursor(commandInputOriginal.cursor());
+                            this.addArgumentSuggestions(context, child, commandInput);
+                        }
+
+                        if (parseSuccess && (!commandInput.isEmpty() || commandInput.input().endsWith(" "))) {
+                            if (commandInput.isEmpty()) {
+                                commandInput.moveCursor(-1);
+                            }
+                            // the current argument at the position is parsable and there are more arguments following
+                            context.commandContext().store(child.component().name(), parsedValue.get());
+                            return this.getSuggestions(context, commandInput, child);
+                        } else if (!parseSuccess && commandInputOriginal.remainingTokens() > 1) {
+                            // at this point there should normally be no need to reset the command queue as we expect
+                            // users to only take out an argument if the parse succeeded. Just to be sure we reset anyway
+                            commandInput.cursor(commandInputOriginal.cursor());
+
+                            // there are more arguments following but the current argument isn't matching - there
+                            // is no need to collect any further suggestions
+                            return CompletableFuture.completedFuture(context);
+                        }
+                        return CompletableFuture.completedFuture(null);
+                    });
+        }
+
+        return parsingFuture.thenCompose(previousResult -> {
+            if (previousResult != null) {
+                return CompletableFuture.completedFuture(previousResult);
             }
 
-            return parsingFuture.thenCompose(previousResult -> {
-                if (previousResult != null) {
-                    return CompletableFuture.completedFuture(previousResult);
-                }
+            // Restore original command input queue
+            commandInput.cursor(commandInputOriginal.cursor());
 
-                // Restore original command input queue
-                commandInput.cursor(commandInputOriginal.cursor());
+            if (!preParseSuccess && commandInput.remainingTokens() > 1) {
+                // The preprocessor denied the argument, and there are more arguments following the current one
+                // Therefore we shouldn't list the suggestions of the current argument, as clearly the suggestions of
+                // one of the following arguments is requested
+                return CompletableFuture.completedFuture(context);
+            }
 
-                if (!preParseSuccess && commandInput.remainingTokens() > 1) {
-                    // The preprocessor denied the argument, and there are more arguments following the current one
-                    // Therefore we shouldn't list the suggestions of the current argument, as clearly the suggestions of
-                    // one of the following arguments is requested
-                    return CompletableFuture.completedFuture(context);
-                }
-
-                return this.addArgumentSuggestions(context, child, commandInput);
-            });
+            return this.addArgumentSuggestions(context, child, commandInput);
         });
     }
 
