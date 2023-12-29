@@ -39,7 +39,7 @@ import java.util.TreeSet;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public final class LiteralParser<C> implements ArgumentParser<C, String>, BlockingSuggestionProvider.ConstantStrings<C> {
+public final class LiteralParser<C> implements ArgumentParser<C, String>, BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a new literal parser that accepts the given {@code name} and {@code aliases}.
@@ -90,7 +90,8 @@ public final class LiteralParser<C> implements ArgumentParser<C, String>, Blocki
     }
 
     @Override
-    public @NonNull Iterable<@NonNull String> stringSuggestions() {
+    public @NonNull Iterable<@NonNull String> stringSuggestions(final @NonNull CommandContext<C> commandContext,
+                                                                final @NonNull CommandInput input) {
         return Collections.singletonList(this.name);
     }
 
