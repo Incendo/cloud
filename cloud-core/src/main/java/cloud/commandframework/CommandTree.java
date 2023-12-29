@@ -275,7 +275,7 @@ public final class CommandTree<C> {
                 return component.parser()
                         .parseFuture(commandContext, commandInput)
                         .thenCompose(result -> {
-                            // We skip any trailing whitespace left by the parser.
+                            // Skip a single space (argument delimiter)
                             commandInput.skipWhitespace(1);
 
                             parsingContext.markEnd();
@@ -578,7 +578,7 @@ public final class CommandTree<C> {
         return node.component().parser()
                 .parseFuture(commandContext, commandInput)
                 .thenCompose(result -> {
-                    // We skip any trailing whitespace left by the parser.
+                    // Skip a single space (argument delimiter)
                     commandInput.skipWhitespace(1);
 
                     // We remove all remaining queue, and then we'll have a list of the captured input.
