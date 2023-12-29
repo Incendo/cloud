@@ -108,35 +108,4 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
                     .collect(Collectors.toList());
         }
     }
-
-    /**
-     * Specialized variant of {@link cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider} that has {@link String} results
-     * instead of {@link Suggestion} results.
-     *
-     * <p>The provided default implementation of {@link #suggestions(CommandContext, CommandInput)}
-     * maps the {@link String} results to {@link Suggestion suggestions} using {@link Suggestion#simple(String)}.</p>
-     *
-     * @param <C> command sender type
-     */
-    @FunctionalInterface
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    interface ConstantStrings<C> extends cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider<C> {
-
-        /**
-         * Returns the suggestions for the given {@code input}.
-         *
-         * @return list of suggestions
-         */
-        @NonNull Iterable<@NonNull String> stringSuggestions();
-
-        @Override
-        default @NonNull Iterable<@NonNull Suggestion> suggestions(
-                final @NonNull CommandContext<C> context,
-                final @NonNull CommandInput input
-        ) {
-            return StreamSupport.stream(this.stringSuggestions().spliterator(), false)
-                    .map(Suggestion::simple)
-                    .collect(Collectors.toList());
-        }
-    }
 }
