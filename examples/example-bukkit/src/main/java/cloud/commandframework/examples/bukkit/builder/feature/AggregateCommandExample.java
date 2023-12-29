@@ -24,6 +24,7 @@
 package cloud.commandframework.examples.bukkit.builder.feature;
 
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
@@ -45,6 +46,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import static cloud.commandframework.arguments.standard.BooleanParser.booleanParser;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 import static cloud.commandframework.bukkit.parsers.WorldParser.worldParser;
@@ -82,8 +84,14 @@ public final class AggregateCommandExample implements BuilderFeature {
                         .literal("aggregate")
                         .literal("teleport")
                         .required("location", locationParser)
+                        .optional("announce", booleanParser(), DefaultValue.constant(true))
                         .senderType(Player.class)
-                        .handler(commandContext -> commandContext.sender().teleport(commandContext.<Location>get("location")))
+                        .handler(commandContext -> {
+                            commandContext.sender().teleport(commandContext.<Location>get("location"));
+                            if (commandContext.get("announce")) {
+                                commandContext.sender().sendMessage("You've been teleported :)");
+                            }
+                        })
         );
     }
 

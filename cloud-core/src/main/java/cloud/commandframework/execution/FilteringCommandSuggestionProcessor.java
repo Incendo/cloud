@@ -72,7 +72,7 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
         if (context.commandInput().isEmpty(true /* ignoreWhitespace */)) {
             input = "";
         } else {
-            input = context.commandInput().remainingInput();
+            input = context.commandInput().skipWhitespace().remainingInput();
         }
         final String filtered = this.filter.filter(context, suggestion.suggestion(), input);
         if (filtered == null) {

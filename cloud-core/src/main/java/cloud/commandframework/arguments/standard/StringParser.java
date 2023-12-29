@@ -246,7 +246,7 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
                 }
             }
 
-            stringJoiner.add(commandInput.readString(false /* preserveSingleSpace */));
+            stringJoiner.add(commandInput.readStringSkipWhitespace(false /* preserveSingleSpace */));
         }
 
         return ArgumentParseResult.success(stringJoiner.toString());

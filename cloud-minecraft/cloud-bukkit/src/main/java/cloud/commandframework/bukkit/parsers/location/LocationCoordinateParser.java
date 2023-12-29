@@ -45,7 +45,7 @@ public final class LocationCoordinateParser<C> implements ArgumentParser<C, Loca
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
+        final String input = commandInput.skipWhitespace().peekString();
         if (input.isEmpty()) {
             return ArgumentParseResult.failure(new NoInputProvidedException(
                     PlayerParser.class,

@@ -152,8 +152,6 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
             final T result = this.parse != null
                     ? this.parse.apply(this.nativeType.get(), reader)
                     : this.nativeType.get().parse(reader);
-            // Brigadier doesn't automatically do this, whereas Cloud does.
-            commandInput.skipWhitespace();
             return ArgumentParseResult.success(result);
         } catch (final CommandSyntaxException ex) {
             return ArgumentParseResult.failure(ex);

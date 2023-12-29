@@ -354,6 +354,10 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
             final int remainingTokens = commandInput.remainingTokens();
             for (int i = 0; i <= remainingTokens; i++) {
                 result = result.thenCompose(parseResult -> {
+                    // The previous flag might have left us with trailing whitespace. We remove it so that we
+                    // do not have to account for it throughout the parsing process.
+                    commandInput.skipWhitespace();
+
                     if (parseResult != null || commandInput.isEmpty()) {
                         return CompletableFuture.completedFuture(parseResult);
                     }
@@ -375,7 +379,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                         commandInput.moveCursor(1);
                     }
 
-                    final String flagName = commandInput.readString();
+                    final String flagName = commandInput.readStringSkipWhitespace();
                     CommandFlag<?> flag = null;
 
                     if (string.startsWith("--")) {

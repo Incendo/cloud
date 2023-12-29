@@ -25,6 +25,7 @@ package cloud.commandframework.context;
 
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 final class CommandInputImpl implements CommandInput {
 
@@ -68,11 +69,12 @@ final class CommandInputImpl implements CommandInput {
     }
 
     @Override
-    public void cursor(final int cursor) {
+    public @This @NonNull CommandInput cursor(final int cursor) {
         if (cursor < 0 || cursor > this.length()) {
             throw new CursorOutOfBoundsException(cursor, this.length());
         }
         this.cursor = cursor;
+        return this;
     }
 
     @Override
