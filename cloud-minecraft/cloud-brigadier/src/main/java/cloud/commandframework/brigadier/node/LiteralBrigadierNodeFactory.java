@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.MappedArgumentParser;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
+import cloud.commandframework.brigadier.BrigadierSetting;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.brigadier.argument.ArgumentTypeFactory;
 import cloud.commandframework.brigadier.argument.BrigadierMapping;
@@ -39,6 +40,7 @@ import cloud.commandframework.brigadier.suggestion.CloudDelegatingSuggestionProv
 import cloud.commandframework.brigadier.suggestion.SuggestionsType;
 import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.internal.CommandNode;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -50,6 +52,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.apiguardian.api.API;
@@ -97,13 +100,10 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
     ) {
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder.<S>literal(root.getLiteral())
                 .requires(new BrigadierPermissionPredicate<>(permissionChecker, cloudCommand));
-        if (cloudCommand.component() != null && cloudCommand.component().owningCommand() != null) {
-            literalArgumentBuilder.executes(executor);
-        }
+        this.updateExecutes(literalArgumentBuilder, cloudCommand, executor);
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
         for (final cloud.commandframework.internal.CommandNode<C> child : cloudCommand.children()) {
             constructedRoot.addChild(this.constructCommandNode(
-                    true,
                     child,
                     permissionChecker,
                     executor,
@@ -118,7 +118,6 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
             final @NonNull String label,
             final cloud.commandframework.@NonNull Command<C> cloudCommand,
             final @NonNull BrigadierPermissionChecker<S> permissionChecker,
-            final boolean forceRegister,
             final @NonNull Command<S> executor
     ) {
         final cloud.commandframework.internal.CommandNode<C> node = this.commandManager
@@ -133,21 +132,17 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder
                 .<S>literal(label)
                 .requires(new BrigadierPermissionPredicate<>(permissionChecker, node));
-        if (forceRegister || (node.component() != null && node.component().owningCommand() != null)) {
-            literalArgumentBuilder.executes(executor);
-        }
-        literalArgumentBuilder.executes(executor);
+
+        this.updateExecutes(literalArgumentBuilder, node, executor);
+
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
         for (final cloud.commandframework.internal.CommandNode<C> child : node.children()) {
-            constructedRoot.addChild(this.constructCommandNode(forceRegister, child,
-                    permissionChecker, executor, provider
-            ).build());
+            constructedRoot.addChild(this.constructCommandNode(child, permissionChecker, executor, provider).build());
         }
         return constructedRoot;
     }
 
     private @NonNull ArgumentBuilder<S, ?> constructCommandNode(
-            final boolean forceExecutor,
             final cloud.commandframework.internal.@NonNull CommandNode<C> root,
             final @NonNull BrigadierPermissionChecker<S> permissionChecker,
             final com.mojang.brigadier.@NonNull Command<S> executor,
@@ -157,7 +152,6 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
             final AggregateCommandParser<C, ?> aggregateParser = (AggregateCommandParser<C, ?>) root.component().parser();
             return this.constructAggregateNode(
                     aggregateParser,
-                    forceExecutor,
                     root,
                     permissionChecker,
                     executor,
@@ -167,18 +161,13 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
 
         final ArgumentBuilder<S, ?> argumentBuilder;
         if (root.component().type() == CommandComponent.ComponentType.LITERAL) {
-            argumentBuilder = this.createLiteralArgumentBuilder(root.component(), root, permissionChecker, executor);
+            argumentBuilder = this.createLiteralArgumentBuilder(root.component(), root, permissionChecker);
         } else {
             argumentBuilder = this.createVariableArgumentBuilder(root.component(), root, permissionChecker);
         }
-        if (forceExecutor || root.isLeaf() || root.component().optional()) {
-            argumentBuilder.executes(executor);
-        }
-        if (root.children().stream().noneMatch(node -> node.component().required())) {
-            argumentBuilder.executes(executor);
-        }
+        this.updateExecutes(argumentBuilder, root, executor);
         for (final cloud.commandframework.internal.CommandNode<C> node : root.children()) {
-            argumentBuilder.then(this.constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
+            argumentBuilder.then(this.constructCommandNode(node, permissionChecker, executor, suggestionProvider));
         }
         return argumentBuilder;
     }
@@ -186,12 +175,10 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
     private @NonNull ArgumentBuilder<S, ?> createLiteralArgumentBuilder(
             final @NonNull CommandComponent<C> component,
             final cloud.commandframework.internal.@NonNull CommandNode<C> root,
-            final @NonNull BrigadierPermissionChecker<S> permissionChecker,
-            final com.mojang.brigadier.@NonNull Command<S> executor
+            final @NonNull BrigadierPermissionChecker<S> permissionChecker
     ) {
         return LiteralArgumentBuilder.<S>literal(component.name())
-                .requires(new BrigadierPermissionPredicate<>(permissionChecker, root))
-                .executes(executor);
+                .requires(new BrigadierPermissionPredicate<>(permissionChecker, root));
     }
 
     private @NonNull ArgumentBuilder<S, ?> createVariableArgumentBuilder(
@@ -219,7 +206,6 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
 
     private @NonNull ArgumentBuilder<S, ?> constructAggregateNode(
             final @NonNull AggregateCommandParser<C, ?> aggregateParser,
-            final boolean forceExecutor,
             final cloud.commandframework.internal.@NonNull CommandNode<C> root,
             final @NonNull BrigadierPermissionChecker<S> permissionChecker,
             final com.mojang.brigadier.@NonNull Command<S> executor,
@@ -245,7 +231,7 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
                     .requires(new BrigadierPermissionPredicate<>(permissionChecker, root));
             argumentBuilders[i] = fragmentBuilder;
 
-            if (forceExecutor || ((i == components.size() - 1) && (root.isLeaf() || !root.component().required()))) {
+            if (this.cloudBrigadierManager.settings().get(BrigadierSetting.FORCE_EXECUTABLE)) {
                 fragmentBuilder.executes(executor);
             }
 
@@ -255,9 +241,11 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
             }
         }
 
+        this.updateExecutes(argumentBuilders[components.size() - 1], root, executor);
+
         for (final cloud.commandframework.internal.CommandNode<C> node : root.children()) {
             argumentBuilders[components.size() - 1]
-                    .then(this.constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
+                    .then(this.constructCommandNode(node, permissionChecker, executor, suggestionProvider));
         }
 
         return argumentBuilders[0];
@@ -320,5 +308,33 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
                 .argumentType(StringArgumentType.word())
                 .suggestionsType(SuggestionsType.CLOUD_SUGGESTIONS)
                 .build();
+    }
+
+    /**
+     * Invokes {@link ArgumentBuilder#executes(Command)} on the given {@code builder} if any of the given conditions are met:
+     * <ul>
+     *     <li>the node is a leaf node</li>
+     *     <li>the node is optional</li>
+     *     <li>the node has an associated owning command</li>
+     *     <li>any of the children of the node is optional</li>
+     * </ul>
+     *
+     * @param builder  brigadier node builder
+     * @param node     cloud node
+     * @param executor brigadier executor
+     */
+    private void updateExecutes(
+            final @NonNull ArgumentBuilder<S, ?> builder,
+            final @NonNull CommandNode<C> node,
+            final @NonNull Command<S> executor
+    ) {
+        if (this.cloudBrigadierManager.settings().get(BrigadierSetting.FORCE_EXECUTABLE)
+                || node.isLeaf()
+                || node.component().optional()
+                || node.component().owningCommand() != null
+                || node.children().stream().map(CommandNode::component)
+                    .filter(Objects::nonNull).anyMatch(CommandComponent::optional)) {
+            builder.executes(executor);
+        }
     }
 }

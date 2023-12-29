@@ -46,6 +46,7 @@ import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.brigadier.node.LiteralBrigadierNodeFactory;
 import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.setting.Configurable;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
@@ -81,6 +82,7 @@ public final class CloudBrigadierManager<C, S> {
     private final BrigadierMappings<C, S> brigadierMappings = BrigadierMappings.create();
     private final LiteralBrigadierNodeFactory<C, S> literalBrigadierNodeFactory;
     private final Map<@NonNull Class<?>, @NonNull ArgumentTypeFactory<?>> defaultArgumentTypeSuppliers;
+    private final Configurable<BrigadierSetting> settings = Configurable.enumConfigurable(BrigadierSetting.class);
     private Function<S, C> brigadierCommandSenderMapper;
     private Function<C, S> backwardsBrigadierCommandSenderMapper;
 
@@ -200,6 +202,17 @@ public final class CloudBrigadierManager<C, S> {
         /* Map wrapped parsers to their native types */
         this.registerMapping(new TypeToken<WrappedBrigadierParser<C, ?>>() {
         }, builder -> builder.to(WrappedBrigadierParser::getNativeArgument));
+    }
+
+    /**
+     * Returns a {@link Configurable} instance that can be used to modify the settings for this instance.
+     *
+     * @return settings instance
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull Configurable<BrigadierSetting> settings() {
+        return this.settings;
     }
 
     /**

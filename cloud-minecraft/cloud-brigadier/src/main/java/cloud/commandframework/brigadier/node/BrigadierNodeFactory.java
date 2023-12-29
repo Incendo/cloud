@@ -58,7 +58,6 @@ public interface BrigadierNodeFactory<C, S, N extends CommandNode<S>> {
      * @param label             the command label
      * @param cloudCommand      the cloud command
      * @param permissionChecker function that determines whether a sender has access to the command
-     * @param forceRegister     whether to force-register an executor at every node
      * @param executor          the Brigadier command execution handler
      * @return the created command node
      */
@@ -66,7 +65,6 @@ public interface BrigadierNodeFactory<C, S, N extends CommandNode<S>> {
             @NonNull String label,
             cloud.commandframework.@NonNull Command<C> cloudCommand,
             @NonNull BrigadierPermissionChecker<S> permissionChecker,
-            boolean forceRegister,
             @NonNull Command<S> executor
     );
 }
