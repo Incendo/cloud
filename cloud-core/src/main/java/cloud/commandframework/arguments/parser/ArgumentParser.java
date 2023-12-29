@@ -46,11 +46,6 @@ import static java.util.Objects.requireNonNull;
 public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
 
     /**
-     * Default amount of arguments that the parser expects to consume
-     */
-    int DEFAULT_ARGUMENT_COUNT = 1;
-
-    /**
      * Attempts to parse the {@code input} into an object of type {@link T}.
      *
      * <p>This method may be called when a command chain is being parsed for execution
@@ -161,18 +156,6 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
     ) {
         requireNonNull(mapper, "mapper");
         return this.flatMapSuccess((ctx, orig) -> mapper.apply(ctx, orig).thenApply(ArgumentParseResult::success));
-    }
-
-    /**
-     * Get the amount of arguments that this parsers seeks to
-     * consume
-     *
-     * @return The number of arguments tha the parser expects
-     * @since 1.1.0
-     */
-    @API(status = API.Status.STABLE, since = "1.1.0")
-    default int getRequestedArgumentCount() {
-        return DEFAULT_ARGUMENT_COUNT;
     }
 
     /**

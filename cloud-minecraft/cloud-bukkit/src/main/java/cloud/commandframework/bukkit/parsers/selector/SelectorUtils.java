@@ -81,7 +81,6 @@ final class SelectorUtils {
         }
         final WrappedBrigadierParser<C, Object> wrappedBrigParser = new WrappedBrigadierParser<>(
                 () -> createEntityArgument(single, playersOnly),
-                ArgumentParser.DEFAULT_ARGUMENT_COUNT,
                 EntityArgumentParseFunction.INSTANCE
         );
         return new ModernSelectorParser<>(wrappedBrigParser, mapper);

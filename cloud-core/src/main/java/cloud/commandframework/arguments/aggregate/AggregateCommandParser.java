@@ -122,11 +122,6 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
     }
 
     @Override
-    default int getRequestedArgumentCount() {
-        return this.components().stream().map(CommandComponent::parser).mapToInt(ArgumentParser::getRequestedArgumentCount).sum();
-    }
-
-    @Override
     default @NonNull ArgumentParser<C, O> parser() {
         return this;
     }
