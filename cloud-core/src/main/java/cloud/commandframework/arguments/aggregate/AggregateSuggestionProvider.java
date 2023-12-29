@@ -99,9 +99,14 @@ final class AggregateSuggestionProvider<C> implements SuggestionProvider<C> {
         }
 
         private @NonNull CompletableFuture<CommandComponent<C>> handleResult(final @NonNull ArgumentParseResult<?> result) {
-            if (result.failure().isPresent() || !this.components.hasNext()) {
+            // We store this before resetting the cursor.
+            final boolean consumedAll = this.input.isEmpty();
+
+            if (result.failure().isPresent() || !this.components.hasNext() || this.input.isEmpty()) {
                 // We reset the cursor to whatever it was before parsing in the instance that this is the component we want
-                // to provide suggestions for. We do this if it's the last component, or if the parsing failed.
+                // to provide suggestions for. We do this if it's the last component, or if the parsing failed. We also need
+                // to reset the cursor if the input was empty, so that we can keep providing suggestions for the current
+                // component.
                 this.input.cursor(this.previousCursor);
             }
 
@@ -112,6 +117,11 @@ final class AggregateSuggestionProvider<C> implements SuggestionProvider<C> {
 
             // We store the value in the context so that it can be accessed from the suggestion providers.
             result.parsedValue().ifPresent(value -> this.context.store(this.component.name(), value));
+
+            // This means that there's no more input to parse, so we stop.
+            if (consumedAll) {
+                return CompletableFuture.completedFuture(this.component);
+            }
 
             // If the parsing succeeded then we'll attempt to parse the subsequent component as well.
             return this.parseComponent();

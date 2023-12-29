@@ -42,7 +42,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public final class EnchantmentParser<C> implements ArgumentParser<C, Enchantment>,
-        BlockingSuggestionProvider.ConstantStrings<C> {
+        BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Creates a enchantment parser.
@@ -101,7 +101,8 @@ public final class EnchantmentParser<C> implements ArgumentParser<C, Enchantment
     }
 
     @Override
-    public @NonNull Iterable<@NonNull String> stringSuggestions() {
+    public @NonNull Iterable<@NonNull String> stringSuggestions(final @NonNull CommandContext<C> commandContext,
+                                                                final @NonNull CommandInput input) {
         final List<String> completions = new ArrayList<>();
         for (Enchantment value : Enchantment.values()) {
             if (value.getKey().getNamespace().equals(NamespacedKey.MINECRAFT)) {
