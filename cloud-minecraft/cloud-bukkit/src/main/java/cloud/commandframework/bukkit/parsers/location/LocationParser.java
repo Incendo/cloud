@@ -56,8 +56,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class LocationParser<C> implements ArgumentParser<C, Location>, BlockingSuggestionProvider.Strings<C> {
 
-    private static final int EXPECTED_PARAMETER_COUNT = 3;
-
     /**
      * Creates a new location parser.
      *
@@ -221,11 +219,6 @@ public final class LocationParser<C> implements ArgumentParser<C, Location>, Blo
                 Integer.MAX_VALUE,
                 input
         ).stream().map(string -> prefix + string).collect(Collectors.toList());
-    }
-
-    @Override
-    public int getRequestedArgumentCount() {
-        return EXPECTED_PARAMETER_COUNT;
     }
 
 
