@@ -208,8 +208,17 @@ class LiteralBrigadierNodeFactoryTest {
         assertThat(stringArgument.getType()).isInstanceOf(StringArgumentType.class);
         assertThat(((StringArgumentType) stringArgument.getType()).getType())
                 .isEqualTo(StringArgumentType.StringType.GREEDY_PHRASE);
-        assertThat(stringArgument.getChildren()).hasSize(0);
+        assertThat(stringArgument.getChildren()).hasSize(1);
         assertThat(stringArgument.getCommand()).isNull();
+
+        assertThat(stringArgument.getChild("boolean")).isNotNull();
+        assertThat(stringArgument.getChild("boolean")).isInstanceOf(ArgumentCommandNode.class);
+        final ArgumentCommandNode<Object, Boolean> booleanArgument = (ArgumentCommandNode<Object, Boolean>)
+                stringArgument.getChild("boolean");
+        assertThat(booleanArgument.getName()).isEqualTo("boolean");
+        assertThat(booleanArgument.getType()).isInstanceOf(BoolArgumentType.class);
+        assertThat(booleanArgument.getChildren()).isEmpty();
+        assertThat(booleanArgument.getCommand()).isEqualTo(brigadierCommand);
     }
 
 
