@@ -31,7 +31,6 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.util.StringUtils;
 import java.util.StringJoiner;
@@ -154,14 +153,6 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    StringParser.class,
-                    commandContext
-            ));
-        }
-
         if (this.stringMode == StringMode.SINGLE) {
             return ArgumentParseResult.success(commandInput.readString());
         } else if (this.stringMode == StringMode.QUOTED) {

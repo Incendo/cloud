@@ -29,7 +29,6 @@ import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -76,12 +75,6 @@ public final class LiteralParser<C> implements ArgumentParser<C, String>, Blocki
             final @NonNull CommandInput commandInput
     ) {
         final String string = commandInput.peekString();
-        if (string.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    LiteralParser.class,
-                    commandContext
-            ));
-        }
         if (this.allAcceptedAliases.contains(string)) {
             commandInput.readString();
             return ArgumentParseResult.success(this.name);

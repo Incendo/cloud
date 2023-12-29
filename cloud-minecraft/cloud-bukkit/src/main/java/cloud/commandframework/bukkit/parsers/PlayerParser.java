@@ -34,7 +34,6 @@ import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
@@ -75,15 +74,9 @@ public final class PlayerParser<C> implements ArgumentParser<C, Player>, Blockin
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    PlayerParser.class,
-                    commandContext
-            ));
-        }
+        final String input = commandInput.readString();
 
-        Player player = Bukkit.getPlayer(commandInput.readString());
+        Player player = Bukkit.getPlayer(input);
 
         if (player == null) {
             return ArgumentParseResult.failure(new PlayerParseException(input, commandContext));

@@ -32,7 +32,6 @@ import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
@@ -71,13 +70,6 @@ public final class WorldParser<C> implements ArgumentParser<C, World>, BlockingS
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        if (commandInput.peekString().isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    WorldParser.class,
-                    commandContext
-            ));
-        }
-
         final String input = commandInput.readString();
         final World world = Bukkit.getWorld(input);
         if (world == null) {

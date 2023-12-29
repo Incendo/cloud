@@ -32,7 +32,6 @@ import cloud.commandframework.bungee.BungeeCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.ProxyServer;
@@ -77,14 +76,8 @@ public final class PlayerParser<C> implements ArgumentParser<C, ProxiedPlayer>, 
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    PlayerParser.class,
-                    commandContext
-            ));
-        }
-        final ProxiedPlayer player = commandContext.<ProxyServer>get("ProxyServer").getPlayer(commandInput.readString());
+        final String input = commandInput.readString();
+        final ProxiedPlayer player = commandContext.<ProxyServer>get("ProxyServer").getPlayer(input);
         if (player == null) {
             return ArgumentParseResult.failure(
                     new PlayerParseException(

@@ -32,7 +32,6 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.types.tuples.Pair;
 import java.util.Arrays;
@@ -112,12 +111,6 @@ public final class TextColorParser<C> implements ArgumentParser<C, TextColor>, B
             final @NonNull CommandInput commandInput
     ) {
         final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    TextColorParser.class,
-                    commandContext
-            ));
-        }
         if (LEGACY_PREDICATE.matcher(input).matches()) {
             commandInput.moveCursor(1);
             final char code = Character.toLowerCase(commandInput.read());

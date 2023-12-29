@@ -31,7 +31,6 @@ import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.fabric.FabricCaptionKeys;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
@@ -133,11 +132,6 @@ public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V>, Bl
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String possibleIdentifier = commandInput.peekString();
-        if (possibleIdentifier.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(RegistryEntryParser.class, commandContext));
-        }
-
         final ResourceLocation key;
         try {
             key = ResourceLocation.read(new StringReader(commandInput.readString()));

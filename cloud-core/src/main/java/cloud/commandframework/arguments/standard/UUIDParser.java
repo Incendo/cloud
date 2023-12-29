@@ -31,7 +31,6 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.Objects;
 import java.util.UUID;
@@ -70,16 +69,10 @@ public final class UUIDParser<C> implements ArgumentParser<C, UUID> {
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    UUIDParser.class,
-                    commandContext
-            ));
-        }
+        final String input = commandInput.readString();
 
         try {
-            final UUID uuid = UUID.fromString(commandInput.readString());
+            final UUID uuid = UUID.fromString(input);
             return ArgumentParseResult.success(uuid);
         } catch (IllegalArgumentException e) {
             return ArgumentParseResult.failure(new UUIDParseException(input, commandContext));

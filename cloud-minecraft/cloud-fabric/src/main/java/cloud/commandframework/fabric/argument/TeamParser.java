@@ -30,7 +30,6 @@ import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.fabric.FabricCaptionKeys;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
@@ -85,13 +84,7 @@ public final class TeamParser<C> extends SidedArgumentParser<C, String, PlayerTe
 
     @Override
     protected @NonNull FutureArgumentParser<C, String> intermediateParser() {
-        return (ctx, commandInput) -> {
-            final String input = commandInput.readString();
-            if (input.isEmpty()) {
-                return ArgumentParseResult.failureFuture(new NoInputProvidedException(TeamParser.class, ctx));
-            }
-            return ArgumentParseResult.successFuture(input);
-        };
+        return (ctx, commandInput) -> ArgumentParseResult.successFuture(commandInput.readString());
     }
 
     @Override

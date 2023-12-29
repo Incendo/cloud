@@ -26,10 +26,8 @@ package cloud.commandframework.bukkit.parsers.location;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.standard.DoubleParser;
-import cloud.commandframework.bukkit.parsers.PlayerParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -46,12 +44,6 @@ public final class LocationCoordinateParser<C> implements ArgumentParser<C, Loca
             final @NonNull CommandInput commandInput
     ) {
         final String input = commandInput.skipWhitespace().peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    PlayerParser.class,
-                    commandContext
-            ));
-        }
 
         /* Determine the type */
         final LocationCoordinateType locationCoordinateType;

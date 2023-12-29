@@ -34,7 +34,6 @@ import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
@@ -84,15 +83,9 @@ public final class OfflinePlayerParser<C> implements ArgumentParser<C, OfflinePl
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    OfflinePlayerParser.class,
-                    commandContext
-            ));
-        }
+        final String input = commandInput.readString();
 
-        final OfflinePlayer player = Bukkit.getOfflinePlayer(commandInput.readString());
+        final OfflinePlayer player = Bukkit.getOfflinePlayer(input);
 
         if (!player.hasPlayedBefore() && !player.isOnline()) {
             return ArgumentParseResult.failure(new OfflinePlayerParseException(input, commandContext));

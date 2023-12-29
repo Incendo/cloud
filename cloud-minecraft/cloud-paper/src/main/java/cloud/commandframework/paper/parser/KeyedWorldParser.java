@@ -33,7 +33,6 @@ import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.parsers.WorldParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -97,19 +96,13 @@ public final class KeyedWorldParser<C> implements ArgumentParser<C, World>, Sugg
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    KeyedWorldParser.class,
-                    commandContext
-            ));
-        }
-
         if (this.parser != null) {
             return this.parser.parse(commandContext, commandInput);
         }
 
-        final NamespacedKey key = NamespacedKey.fromString(commandInput.readString());
+        final String input = commandInput.readString();
+
+        final NamespacedKey key = NamespacedKey.fromString(input);
         if (key == null) {
             return ArgumentParseResult.failure(new WorldParser.WorldParseException(input, commandContext));
         }

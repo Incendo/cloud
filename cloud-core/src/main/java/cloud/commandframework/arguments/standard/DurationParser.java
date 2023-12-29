@@ -32,7 +32,6 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.time.Duration;
 import java.util.Collections;
@@ -87,13 +86,7 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    DurationParseException.class,
-                    commandContext
-            ));
-        }
+        final String input = commandInput.readString();
 
         final Matcher matcher = DURATION_PATTERN.matcher(input);
 
@@ -125,7 +118,6 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
             return ArgumentParseResult.failure(new DurationParseException(input, commandContext));
         }
 
-        commandInput.readString();
         return ArgumentParseResult.success(duration);
     }
 

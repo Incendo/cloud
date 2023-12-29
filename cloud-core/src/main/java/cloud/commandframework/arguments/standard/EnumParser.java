@@ -32,7 +32,6 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.EnumSet;
 import java.util.Locale;
@@ -93,17 +92,10 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    EnumParser.class,
-                    commandContext
-            ));
-        }
+        final String input = commandInput.readString();
 
         for (final E value : this.allowedValues) {
             if (value.name().equalsIgnoreCase(input)) {
-                commandInput.readString();
                 return ArgumentParseResult.success(value);
             }
         }

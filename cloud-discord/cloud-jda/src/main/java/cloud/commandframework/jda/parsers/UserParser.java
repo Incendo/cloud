@@ -29,7 +29,6 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -128,12 +127,6 @@ public final class UserParser<C> implements ArgumentParser<C, User> {
             final @NonNull CommandInput commandInput
     ) {
         final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    UserParser.class,
-                    commandContext
-            ));
-        }
 
         if (!commandContext.contains("MessageReceivedEvent")) {
             return ArgumentParseResult.failure(new IllegalStateException(

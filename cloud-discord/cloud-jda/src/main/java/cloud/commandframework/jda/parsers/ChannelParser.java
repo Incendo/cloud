@@ -29,7 +29,6 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.List;
 import java.util.Set;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -110,12 +109,6 @@ public final class ChannelParser<C> implements ArgumentParser<C, MessageChannel>
             final @NonNull CommandInput commandInput
     ) {
         final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    ChannelParser.class,
-                    commandContext
-            ));
-        }
 
         if (!commandContext.contains("MessageReceivedEvent")) {
             return ArgumentParseResult.failure(new IllegalStateException(
