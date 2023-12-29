@@ -99,6 +99,15 @@ public final class LocationParser<C> implements ArgumentParser<C, Location>, Blo
 
         final LocationCoordinate[] coordinates = new LocationCoordinate[3];
         for (int i = 0; i < 3; i++) {
+            if (commandInput.peekString().isEmpty()) {
+                return ArgumentParseResult.failure(
+                        new LocationParseException(
+                                commandContext,
+                                LocationParseException.FailureReason.WRONG_FORMAT,
+                                commandInput.remainingInput()
+                        )
+                );
+            }
             final ArgumentParseResult<@NonNull LocationCoordinate> coordinate = this.locationCoordinateParser.parse(
                     commandContext,
                     commandInput

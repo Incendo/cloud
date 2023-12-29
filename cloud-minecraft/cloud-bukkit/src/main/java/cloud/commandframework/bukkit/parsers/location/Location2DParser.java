@@ -91,6 +91,15 @@ public final class Location2DParser<C> implements ArgumentParser<C, Location2D>,
         }
         final LocationCoordinate[] coordinates = new LocationCoordinate[2];
         for (int i = 0; i < 2; i++) {
+            if (commandInput.peekString().isEmpty()) {
+                return ArgumentParseResult.failure(
+                        new LocationParser.LocationParseException(
+                                commandContext,
+                                LocationParser.LocationParseException.FailureReason.WRONG_FORMAT,
+                                commandInput.remainingInput()
+                        )
+                );
+            }
             final ArgumentParseResult<@NonNull LocationCoordinate> coordinate = this.locationCoordinateParser.parse(
                     commandContext,
                     commandInput
