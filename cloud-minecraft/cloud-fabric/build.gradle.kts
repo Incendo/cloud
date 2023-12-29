@@ -45,6 +45,12 @@ tasks {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        force("net.fabricmc:fabric-loader:${libs.versions.fabricLoader.get()}")
+    }
+}
+
 dependencies {
     minecraft(libs.fabricMinecraft)
     mappings(loom.officialMojangMappings())
