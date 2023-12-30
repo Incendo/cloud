@@ -90,10 +90,8 @@ public final class LiteralParser<C> implements ArgumentParser<C, String>, Blocki
     }
 
     @Override
-    public @NonNull Iterable<@NonNull String> stringSuggestions(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
-    ) {
+    public @NonNull Iterable<@NonNull String> stringSuggestions(final @NonNull CommandContext<C> commandContext,
+                                                                final @NonNull CommandInput input) {
         return Collections.singletonList(this.name);
     }
 

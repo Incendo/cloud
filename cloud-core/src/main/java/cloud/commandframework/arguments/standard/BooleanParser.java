@@ -113,10 +113,8 @@ public final class BooleanParser<C> implements ArgumentParser<C, Boolean>, Block
     }
 
     @Override
-    public @NonNull Iterable<@NonNull String> stringSuggestions(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
-    ) {
+    public @NonNull Iterable<@NonNull String> stringSuggestions(final @NonNull CommandContext<C> commandContext,
+                                                                final @NonNull CommandInput input) {
         if (!this.liberal) {
             return STRICT_LOWER;
         }

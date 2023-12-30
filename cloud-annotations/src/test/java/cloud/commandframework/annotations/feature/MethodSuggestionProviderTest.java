@@ -31,6 +31,7 @@ import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.StandardCommandContextFactory;
 import java.util.Collections;
 import java.util.List;
@@ -74,7 +75,7 @@ class MethodSuggestionProviderTest {
                 this.commandManager.parserRegistry()
                         .getSuggestionProvider("suggestions")
                         .orElseThrow(NullPointerException::new)
-                        .suggestionsFuture(context, "")
+                        .suggestionsFuture(context, CommandInput.empty())
                         .join();
 
         // Assert
@@ -87,7 +88,8 @@ class MethodSuggestionProviderTest {
                 new TestClassSet(),
                 new TestClassStream(),
                 new TestClassIterable(),
-                new TestClassListString()
+                new TestClassListString(),
+                new TestClassCommandInput()
         );
     }
 
@@ -142,6 +144,17 @@ class MethodSuggestionProviderTest {
         public @NonNull List<@NonNull String> suggestions(
                 final @NonNull CommandContext<TestCommandSender> context,
                 final @NonNull String input
+        ) {
+            return Collections.singletonList("foo");
+        }
+    }
+
+    public static final class TestClassCommandInput {
+
+        @Suggestions("suggestions")
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<TestCommandSender> context,
+                final @NonNull CommandInput input
         ) {
             return Collections.singletonList("foo");
         }

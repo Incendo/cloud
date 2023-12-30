@@ -183,7 +183,7 @@ public final class ShortParser<C> implements ArgumentParser<C, Short>, BlockingS
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         return IntegerParser.getSuggestions(this.min, this.max, input);
     }

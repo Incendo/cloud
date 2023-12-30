@@ -101,10 +101,8 @@ public final class EnchantmentParser<C> implements ArgumentParser<C, Enchantment
     }
 
     @Override
-    public @NonNull Iterable<@NonNull String> stringSuggestions(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
-    ) {
+    public @NonNull Iterable<@NonNull String> stringSuggestions(final @NonNull CommandContext<C> commandContext,
+                                                                final @NonNull CommandInput input) {
         final List<String> completions = new ArrayList<>();
         for (Enchantment value : Enchantment.values()) {
             if (value.getKey().getNamespace().equals(NamespacedKey.MINECRAFT)) {

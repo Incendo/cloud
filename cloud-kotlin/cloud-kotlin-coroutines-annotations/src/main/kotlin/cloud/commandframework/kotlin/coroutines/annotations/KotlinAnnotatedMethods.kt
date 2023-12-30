@@ -30,6 +30,7 @@ import cloud.commandframework.annotations.suggestions.SuggestionProviderFactory
 import cloud.commandframework.arguments.suggestion.Suggestion
 import cloud.commandframework.arguments.suggestion.SuggestionProvider
 import cloud.commandframework.context.CommandContext
+import cloud.commandframework.context.CommandInput
 import cloud.commandframework.execution.CommandExecutionCoordinator
 import io.leangen.geantyref.GenericTypeReflector
 import kotlinx.coroutines.CoroutineScope
@@ -186,10 +187,14 @@ private class KotlinSuggestionProvider<C>(
     private val instance: Any
 ) : SuggestionProvider<C> {
 
-    override fun suggestionsFuture(context: CommandContext<C>, input: String): CompletableFuture<Iterable<Suggestion>> {
+    override fun suggestionsFuture(context: CommandContext<C>, input: CommandInput): CompletableFuture<Iterable<Suggestion>> {
         return coroutineScope.future(coroutineContext) {
             try {
-                kFunction.callSuspend(instance, context, input)
+                if (kFunction.valueParameters[1].type.classifier == String::class) {
+                    kFunction.callSuspend(instance, context, input.lastRemainingToken())
+                } else {
+                    kFunction.callSuspend(instance, context, input)
+                }
             } catch (e: InvocationTargetException) {
                 e.cause?.let { throw it } ?: throw e // if cause exists, throw, else rethrow invocation exception
             }

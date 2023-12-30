@@ -166,7 +166,7 @@ public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V>, Bl
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         final Set<ResourceLocation> ids = this.resolveRegistry(commandContext).keySet();
         final List<String> results = new ArrayList<>(ids.size());

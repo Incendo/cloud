@@ -102,7 +102,7 @@ public final class ServerParser<C> implements ArgumentParser<C, RegisteredServer
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         return commandContext.<ProxyServer>get("ProxyServer")
                 .getAllServers()

@@ -56,8 +56,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class LocationParser<C> implements ArgumentParser<C, Location>, BlockingSuggestionProvider.Strings<C> {
 
-    private static final int EXPECTED_PARAMETER_COUNT = 3;
-
     /**
      * Creates a new location parser.
      *
@@ -196,34 +194,31 @@ public final class LocationParser<C> implements ArgumentParser<C, Location>, Blo
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
-        return LocationParser.getSuggestions(commandContext, input);
+        return LocationParser.getSuggestions(3, commandContext, input);
     }
 
     static <C> @NonNull List<@NonNull String> getSuggestions(
+            final int components,
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
-        final String workingInput;
-        final String prefix;
-        if (input.startsWith("~") || input.startsWith("^")) {
-            prefix = Character.toString(input.charAt(0));
-            workingInput = input.substring(1);
-        } else {
-            prefix = "";
-            workingInput = input;
+        final int toSkip = Math.min(components, input.remainingTokens()) - 1;
+        final StringBuilder prefix = new StringBuilder();
+        for (int i = 0; i < toSkip; i++) {
+            prefix.append(input.readStringSkipWhitespace()).append(" ");
         }
+
+        if (input.hasRemainingInput() && (input.peek() == '~' || input.peek() == '^')) {
+            prefix.append(input.read());
+        }
+
         return IntegerParser.getSuggestions(
                 Integer.MIN_VALUE,
                 Integer.MAX_VALUE,
-                workingInput
+                input
         ).stream().map(string -> prefix + string).collect(Collectors.toList());
-    }
-
-    @Override
-    public int getRequestedArgumentCount() {
-        return EXPECTED_PARAMETER_COUNT;
     }
 
 

@@ -47,10 +47,10 @@ import static cloud.commandframework.brigadier.suggestion.TooltipSuggestion.tool
 import static java.util.Objects.requireNonNull;
 
 /**
- * A wrapped argument parser that can expose Brigadier argument types to the Cloud world.
+ * A wrapped {@link ArgumentParser argument parser} adapting Brigadier {@link ArgumentType argument types}.
  *
- * @param <C> the sender type
- * @param <T> the value type of the argument
+ * @param <C> command sender type
+ * @param <T> value type
  * @since 1.5.0
  */
 public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, SuggestionProvider<C> {
@@ -58,74 +58,42 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
     public static final String COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER = "_cloud_brigadier_native_sender";
 
     private final Supplier<ArgumentType<T>> nativeType;
-    private final int expectedArgumentCount;
     private final @Nullable ParseFunction<T> parse;
 
     /**
-     * Create an argument parser based on a brigadier command.
+     * Create an {@link ArgumentParser argument parser} from a Brigadier {@link ArgumentType}.
      *
-     * @param nativeType the native command type
+     * @param argumentType Brigadier argument type
      * @since 1.5.0
      */
-    public WrappedBrigadierParser(final ArgumentType<T> nativeType) {
-        this(() -> nativeType, DEFAULT_ARGUMENT_COUNT);
+    public WrappedBrigadierParser(final ArgumentType<T> argumentType) {
+        this(() -> argumentType);
     }
 
     /**
-     * Create an argument parser based on a brigadier command.
+     * Create a {@link WrappedBrigadierParser} for the {@link ArgumentType argument type}.
      *
-     * @param nativeType the native command type, computed lazily
+     * @param argumentTypeSupplier Brigadier argument type supplier
      * @since 1.7.0
      */
-    public WrappedBrigadierParser(final Supplier<ArgumentType<T>> nativeType) {
-        this(nativeType, DEFAULT_ARGUMENT_COUNT);
+    public WrappedBrigadierParser(final Supplier<ArgumentType<T>> argumentTypeSupplier) {
+        this(argumentTypeSupplier, null);
     }
 
     /**
-     * Create an argument parser based on a brigadier command.
+     * Create an {@link ArgumentParser argument parser} from a Brigadier {@link ArgumentType}.
      *
-     * @param nativeType            the native command type
-     * @param expectedArgumentCount the number of arguments the brigadier type is expected to consume
-     * @since 1.5.0
-     */
-    public WrappedBrigadierParser(
-            final ArgumentType<T> nativeType,
-            final int expectedArgumentCount
-    ) {
-        this(() -> nativeType, expectedArgumentCount);
-    }
-
-    /**
-     * Create an argument parser based on a brigadier command.
-     *
-     * @param nativeType            the native command type provider, calculated lazily
-     * @param expectedArgumentCount the number of arguments the brigadier type is expected to consume
-     * @since 1.7.0
-     */
-    public WrappedBrigadierParser(
-            final Supplier<ArgumentType<T>> nativeType,
-            final int expectedArgumentCount
-    ) {
-        this(nativeType, expectedArgumentCount, null);
-    }
-
-    /**
-     * Create an argument parser based on a brigadier command.
-     *
-     * @param nativeType            the native command type provider, calculated lazily
-     * @param expectedArgumentCount the number of arguments the brigadier type is expected to consume
+     * @param argumentTypeSupplier  Brigadier argument type supplier
      * @param parse                 special function to replace {@link ArgumentType#parse(StringReader)} (for CraftBukkit weirdness)
-     * @since 1.8.0
+     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "1.8.0")
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public WrappedBrigadierParser(
-            final Supplier<ArgumentType<T>> nativeType,
-            final int expectedArgumentCount,
+            final Supplier<ArgumentType<T>> argumentTypeSupplier,
             final @Nullable ParseFunction<T> parse
     ) {
-        requireNonNull(nativeType, "brigadierType");
-        this.nativeType = nativeType;
-        this.expectedArgumentCount = expectedArgumentCount;
+        requireNonNull(argumentTypeSupplier, "brigadierType");
+        this.nativeType = argumentTypeSupplier;
         this.parse = parse;
     }
 
@@ -152,8 +120,6 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
             final T result = this.parse != null
                     ? this.parse.apply(this.nativeType.get(), reader)
                     : this.nativeType.get().parse(reader);
-            // Brigadier doesn't automatically do this, whereas Cloud does.
-            commandInput.skipWhitespace();
             return ArgumentParseResult.success(result);
         } catch (final CommandSyntaxException ex) {
             return ArgumentParseResult.failure(ex);
@@ -163,7 +129,7 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
     @Override
     public final @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         /*
          * Strictly, this is incorrect.
@@ -172,12 +138,12 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
          */
         final com.mojang.brigadier.context.CommandContext<Object> reverseMappedContext = new com.mojang.brigadier.context.CommandContext<>(
                 commandContext.getOrDefault(COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER, commandContext.sender()),
-                commandContext.rawInput().input(),
+                input.input(),
                 Collections.emptyMap(),
                 null,
                 null,
                 Collections.emptyList(),
-                StringRange.at(0),
+                StringRange.at(input.cursor()),
                 null,
                 null,
                 false
@@ -185,22 +151,26 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
 
         return this.nativeType.get().listSuggestions(
                 reverseMappedContext,
-                new SuggestionsBuilder(input, 0)
+                new SuggestionsBuilder(input.input(), input.cursor())
         ).thenApply(suggestions -> {
             final List<cloud.commandframework.arguments.suggestion.Suggestion> cloud = new ArrayList<>();
             for (final com.mojang.brigadier.suggestion.Suggestion suggestion : suggestions.getList()) {
-                cloud.add(tooltipSuggestion(
-                        suggestion.getText(),
-                        suggestion.getTooltip()
-                ));
+                final String beforeSuggestion = input.input().substring(input.cursor(), suggestion.getRange().getStart());
+                final String afterSuggestion = input.input().substring(suggestion.getRange().getEnd());
+                if (beforeSuggestion.isEmpty() && afterSuggestion.isEmpty()) {
+                    cloud.add(tooltipSuggestion(
+                            suggestion.getText(),
+                            suggestion.getTooltip()
+                    ));
+                } else {
+                    cloud.add(tooltipSuggestion(
+                            beforeSuggestion + suggestion.getText() + afterSuggestion,
+                            suggestion.getTooltip()
+                    ));
+                }
             }
             return cloud;
         });
-    }
-
-    @Override
-    public final int getRequestedArgumentCount() {
-        return this.expectedArgumentCount;
     }
 
     /**

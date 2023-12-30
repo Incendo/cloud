@@ -184,13 +184,16 @@ public final class NamespacedKeyParser<C> implements ArgumentParser<C, Namespace
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         final List<String> ret = new ArrayList<>();
         ret.add(this.defaultNamespace + ":");
-        if (!input.contains(":") && !input.isEmpty()) {
-            ret.add(input + ":");
+
+        final String token = input.peekString();
+        if (!token.contains(":") && !token.isEmpty()) {
+            ret.add(token + ":");
         }
+
         return ret;
     }
 

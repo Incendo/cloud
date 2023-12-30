@@ -32,6 +32,7 @@ import java.util.StringTokenizer;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.returnsreceiver.qual.This;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 
@@ -208,8 +209,9 @@ public interface CommandInput {
      * Sets the cursor position
      *
      * @param position the new position
+     * @return {@code this}
      */
-    void cursor(@NonNegative int position);
+    @This @NonNull CommandInput cursor(@NonNegative int position);
 
     /**
      * Reads {@code chars} characters of the {@link #remainingInput() remaining input}
@@ -272,7 +274,7 @@ public interface CommandInput {
     }
 
     /**
-     * {@link #peek() Peeks} until the next whitespace is encountered.
+     * {@link #peek() Peeks} until the next whitespace is encountered, skipping leading whitespace.
      *
      * @return the peeked string
      */
@@ -285,11 +287,24 @@ public interface CommandInput {
         final int indexOfWhitespace = remainingInput.indexOf(' ');
         if (indexOfWhitespace == -1) {
             return remainingInput;
-        } else {
-            // We want to read until the whitespace. Thus, we do add
-            // to account for the 0-indexing.
-            return this.peekString(indexOfWhitespace);
         }
+
+        final StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < remainingInput.length(); i++) {
+            final char currentChar = remainingInput.charAt(i);
+            if (Character.isWhitespace(currentChar)) {
+                // Skip leading whitespace.
+                if (builder.length() == 0) {
+                    continue;
+                }
+
+                // End on trailing whitespace.
+                break;
+            }
+            builder.append(currentChar);
+        }
+
+        return builder.toString();
     }
 
     /**
@@ -299,8 +314,8 @@ public interface CommandInput {
      * @param preserveSingleSpace whether a single trailing space should be preserved
      * @return the read string
      */
-    default @NonNull String readString(final boolean preserveSingleSpace) {
-        final String readString = this.readStringPreserveWhitespace();
+    default @NonNull String readStringSkipWhitespace(final boolean preserveSingleSpace) {
+        final String readString = this.readString();
         this.skipWhitespace(preserveSingleSpace);
         return readString;
     }
@@ -311,17 +326,17 @@ public interface CommandInput {
      *
      * @return the read string
      */
-    default @NonNull String readString() {
-        return this.readString(true /* preserveSingleSpace */);
+    default @NonNull String readStringSkipWhitespace() {
+        return this.readStringSkipWhitespace(true /* preserveSingleSpace */);
     }
 
     /**
-     * Like {@link #readString()}, but whitespace is preserved.
+     * Skips initial whitespace and {@link #read() reads} until the next whitespace is encountered.
      *
      * @return the read string
      */
-    default @NonNull String readStringPreserveWhitespace() {
-        return this.readUntil(' ');
+    default @NonNull String readString() {
+        return this.skipWhitespace().readUntil(' ');
     }
 
     /**
@@ -366,25 +381,50 @@ public interface CommandInput {
     }
 
     /**
-     * Skips any whitespace characters at the head of the input.
+     * Skips {@code maxSpaces} of whitespace characters at the head of the input.
      *
-     * @param preserveSingleSpace whether a single space should be ignored
+     * @param maxSpaces           maximum number of spaces of consume
+     * @param preserveSingleSpace whether a single whitespace at the tail of the input should be ignored
+     * @return {@code this}
      */
-    default void skipWhitespace(final boolean preserveSingleSpace) {
+    default @This @NonNull CommandInput skipWhitespace(final int maxSpaces, final boolean preserveSingleSpace) {
         // We only skip the whitespace if the input doesn't end with a space. If it does, we do not want to consume it.
         if (preserveSingleSpace && this.remainingLength() == 1 && this.peek() == ' ') {
-            return;
+            return this;
         }
-        while (this.hasRemainingInput() && Character.isWhitespace(this.peek())) {
+        for (int i = 0; i < maxSpaces && this.hasRemainingInput() && Character.isWhitespace(this.peek()); i++) {
             this.read();
         }
+        return this;
+    }
+
+    /**
+     * Skips {@code maxSpaces} of whitespace characters at the head of the input.
+     *
+     * @param maxSpaces maximum number of spaces of consume
+     * @return {@code this}
+     */
+    default @This @NonNull CommandInput skipWhitespace(final int maxSpaces) {
+        return this.skipWhitespace(maxSpaces, true /* preserveSingleSpace */);
     }
 
     /**
      * Skips any whitespace characters at the head of the input.
+     *
+     * @param preserveSingleSpace whether a single space should be ignored
+     * @return {@code this}
      */
-    default void skipWhitespace() {
-        this.skipWhitespace(true /* preserveSingleSpace */);
+    default @This @NonNull CommandInput skipWhitespace(final boolean preserveSingleSpace) {
+        return this.skipWhitespace(Integer.MAX_VALUE, preserveSingleSpace);
+    }
+
+    /**
+     * Skips any whitespace characters at the head of the input.
+     *
+     * @return {@code this}
+     */
+    default @This @NonNull CommandInput skipWhitespace() {
+        return this.skipWhitespace(true /* preserveSingleSpace */);
     }
 
     /**
@@ -623,6 +663,20 @@ public interface CommandInput {
     }
 
     /**
+     * Returns the last remaining character.
+     *
+     * @return the last remaining character
+     * @throws CursorOutOfBoundsException if {@link #isEmpty()} is {@code true}
+     */
+    default char lastRemainingCharacter() {
+        final String lastToken = this.lastRemainingToken();
+        if (lastToken.isEmpty()) {
+            throw new CursorOutOfBoundsException(this.cursor(), this.length());
+        }
+        return lastToken.charAt(lastToken.length() - 1);
+    }
+
+    /**
      * Returns a copy of this instance.
      *
      * @return copy of this instance
@@ -632,20 +686,31 @@ public interface CommandInput {
     /**
      * Returns the input that has been consumed by {@code that} input that has not been consumed by {@code input}.
      *
-     * @param that the input to compare to
+     * @param that                      the input to compare to
+     * @param includeTrailingWhitespace whether to include trailing whitespace
      * @return the difference in consumed input
      */
-    default @NonNull String difference(final @NonNull CommandInput that) {
+    default @NonNull String difference(final @NonNull CommandInput that, final boolean includeTrailingWhitespace) {
         // If the inputs are different then there's nothing to compare.
         if (!this.input().equals(that.input())) {
             return this.input();
         }
         final String difference = this.input().substring(this.cursor(), that.cursor());
-        if (difference.endsWith(" ")) {
+        if (!includeTrailingWhitespace && difference.endsWith(" ")) {
             return difference.substring(0, difference.length() - 1);
         } else {
             return difference;
         }
+    }
+
+    /**
+     * Returns the input that has been consumed by {@code that} input that has not been consumed by {@code input}.
+     *
+     * @param that the input to compare to
+     * @return the difference in consumed input
+     */
+    default @NonNull String difference(final @NonNull CommandInput that) {
+        return this.difference(that, false);
     }
 
     @API(status = API.Status.STABLE, since = "2.0.0")

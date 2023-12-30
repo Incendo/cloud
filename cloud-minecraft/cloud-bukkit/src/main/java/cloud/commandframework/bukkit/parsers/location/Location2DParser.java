@@ -49,8 +49,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class Location2DParser<C> implements ArgumentParser<C, Location2D>, BlockingSuggestionProvider.Strings<C> {
 
-    private static final int EXPECTED_PARAMETER_COUNT = 2;
-
     /**
      * Creates a new location 2D parser.
      *
@@ -159,13 +157,9 @@ public final class Location2DParser<C> implements ArgumentParser<C, Location2D>,
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
-        return LocationParser.getSuggestions(commandContext, input);
+        return LocationParser.getSuggestions(2, commandContext, input);
     }
 
-    @Override
-    public int getRequestedArgumentCount() {
-        return EXPECTED_PARAMETER_COUNT;
-    }
 }

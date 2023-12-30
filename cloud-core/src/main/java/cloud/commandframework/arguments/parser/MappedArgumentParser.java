@@ -91,11 +91,6 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser.Futur
     }
 
     @Override
-    public int getRequestedArgumentCount() {
-        return this.base.getRequestedArgumentCount();
-    }
-
-    @Override
     public int hashCode() {
         return 31 + this.base.hashCode()
                 + 7 * this.mapper.hashCode();

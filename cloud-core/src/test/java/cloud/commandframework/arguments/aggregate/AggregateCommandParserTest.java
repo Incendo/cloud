@@ -41,7 +41,6 @@ import static cloud.commandframework.arguments.standard.IntegerParser.integerPar
 import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 import static cloud.commandframework.truth.ArgumentParseResultSubject.assertThat;
 import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AggregateCommandParserTest {
@@ -135,7 +134,8 @@ class AggregateCommandParserTest {
                 .build();
 
         // Act
-        final Iterable<Suggestion> suggestions = parser.suggestionsFuture(this.commandContext, "").join();
+        final Iterable<Suggestion> suggestions = parser.suggestionProvider()
+                .suggestionsFuture(this.commandContext, CommandInput.empty()).join();
 
         // Assert
         assertThat(suggestions).containsExactly(
@@ -161,16 +161,16 @@ class AggregateCommandParserTest {
                                 ArgumentParseResult.successFuture(
                                         new OutputType(context.get("number"), context.get("string"))))
                 .build();
-        when(this.commandContext.contains("number")).thenReturn(true);
 
         // Act
-        final Iterable<Suggestion> suggestions = parser.suggestionsFuture(this.commandContext, "").join();
+        final Iterable<Suggestion> suggestions = parser.suggestionProvider()
+                .suggestionsFuture(this.commandContext, CommandInput.of("123 ")).join();
 
         // Assert
         assertThat(suggestions).containsExactly(
-                Suggestion.simple("a"),
-                Suggestion.simple("b"),
-                Suggestion.simple("c")
+                Suggestion.simple("123 a"),
+                Suggestion.simple("123 b"),
+                Suggestion.simple("123 c")
         );
     }
 

@@ -146,17 +146,18 @@ public final class TextColorParser<C> implements ArgumentParser<C, TextColor>, B
 
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
-            final @NonNull CommandContext<C> commandContext, final @NonNull String input
+            final @NonNull CommandContext<C> commandContext, final @NonNull CommandInput input
     ) {
         final List<String> suggestions = new LinkedList<>();
-        if (input.isEmpty() || input.equals("#") || (HEX_PREDICATE.matcher(input).matches()
-                && input.length() < (input.startsWith("#") ? 7 : 6))) {
+        final String token = input.readString();
+        if (token.isEmpty() || token.equals("#") || (HEX_PREDICATE.matcher(token).matches()
+                && token.length() < (token.startsWith("#") ? 7 : 6))) {
             for (char c = 'a'; c <= 'f'; c++) {
-                suggestions.add(String.format("%s%c", input, c));
+                suggestions.add(String.format("%s%c", token, c));
                 suggestions.add(String.format("&%c", c));
             }
             for (char c = '0'; c <= '9'; c++) {
-                suggestions.add(String.format("%s%c", input, c));
+                suggestions.add(String.format("%s%c", token, c));
                 suggestions.add(String.format("&%c", c));
             }
         }

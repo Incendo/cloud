@@ -290,10 +290,8 @@ public class ItemStackParser<C> implements ArgumentParser.FutureArgumentParser<C
         }
 
         @Override
-        public @NonNull Iterable<@NonNull String> stringSuggestions(
-                final @NonNull CommandContext<C> commandContext,
-                final @NonNull String input
-        ) {
+        public @NonNull Iterable<@NonNull String> stringSuggestions(final @NonNull CommandContext<C> commandContext,
+                                                                    final @NonNull CommandInput input) {
             return Arrays.stream(Material.values())
                     .filter(Material::isItem)
                     .map(value -> value.name().toLowerCase(Locale.ROOT))

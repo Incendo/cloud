@@ -155,7 +155,7 @@ class ByteParserTest {
         // Act
         final Iterable<Suggestion> suggestions = parser.suggestions(
                 this.context,
-                ""
+                CommandInput.empty()
         );
 
         // Assert
@@ -178,7 +178,7 @@ class ByteParserTest {
         // Act
         final Iterable<Suggestion> suggestions = parser.suggestions(
                 this.context,
-                "-"
+                CommandInput.of("-")
         );
 
         // Assert

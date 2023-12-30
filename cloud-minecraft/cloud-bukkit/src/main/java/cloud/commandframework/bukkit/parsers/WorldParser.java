@@ -88,10 +88,8 @@ public final class WorldParser<C> implements ArgumentParser<C, World>, BlockingS
     }
 
     @Override
-    public @NonNull Iterable<@NonNull String> stringSuggestions(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
-    ) {
+    public @NonNull Iterable<@NonNull String> stringSuggestions(final @NonNull CommandContext<C> commandContext,
+                                                                final @NonNull CommandInput input) {
         return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
     }
 

@@ -26,6 +26,7 @@ package cloud.commandframework.kotlin.coroutines
 import cloud.commandframework.arguments.suggestion.Suggestion
 import cloud.commandframework.arguments.suggestion.SuggestionProvider
 import cloud.commandframework.context.CommandContext
+import cloud.commandframework.context.CommandInput
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
 import cloud.commandframework.execution.CommandExecutionCoordinator
 import kotlinx.coroutines.CoroutineScope
@@ -50,7 +51,7 @@ public fun interface SuspendingSuggestionProvider<C : Any> {
      * @param input   the current input
      * @return the suggestions
      */
-    public suspend operator fun invoke(context: CommandContext<C>, input: String): Iterable<Suggestion>
+    public suspend operator fun invoke(context: CommandContext<C>, input: CommandInput): Iterable<Suggestion>
 
     /**
      * Creates a new [SuggestionProvider] backed by this [SuspendingExecutionHandler].
@@ -95,7 +96,7 @@ public fun interface SuspendingSuggestionProvider<C : Any> {
 public suspend inline fun <C : Any> suspendingSuggestionProvider(
     scope: CoroutineScope = GlobalScope,
     context: CoroutineContext = EmptyCoroutineContext,
-    crossinline provider: suspend (CommandContext<C>, String) -> Iterable<Suggestion>
+    crossinline provider: suspend (CommandContext<C>, CommandInput) -> Iterable<Suggestion>
 ): SuggestionProvider<C> = SuspendingSuggestionProvider<C> { commandContext, input ->
     provider(commandContext, input)
 }.asSuggestionProvider(scope, context)

@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.fabric.FabricCaptionKeys;
@@ -77,7 +78,7 @@ public final class TeamParser<C> extends SidedArgumentParser<C, String, PlayerTe
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         return new ArrayList<>(commandContext.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE).getAllTeams());
     }

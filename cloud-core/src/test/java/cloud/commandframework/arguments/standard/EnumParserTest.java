@@ -95,7 +95,7 @@ class EnumParserTest {
         // Act
         final Iterable<Suggestion> suggestions = parser.suggestions(
                 this.context,
-                ""
+                CommandInput.empty()
         );
 
         // Assert

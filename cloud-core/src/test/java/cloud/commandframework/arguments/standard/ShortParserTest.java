@@ -149,7 +149,7 @@ class ShortParserTest {
         // Act
         final Iterable<Suggestion> suggestions = parser.suggestions(
                 this.context,
-                ""
+                CommandInput.empty()
         );
 
         // Assert
@@ -172,7 +172,7 @@ class ShortParserTest {
         // Act
         final Iterable<Suggestion> suggestions = parser.suggestions(
                 this.context,
-                "-"
+                CommandInput.of("-")
         );
 
         // Assert
