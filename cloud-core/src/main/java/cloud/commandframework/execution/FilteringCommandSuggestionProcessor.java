@@ -184,19 +184,20 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
 
                     boolean foundMatch = false;
 
-                    for (String suggestionToken : suggestionTokens) {
-                        if (ignoreCase) {
-                            suggestionToken = suggestionToken.toLowerCase(Locale.ROOT);
-                        }
-
-                        if (suggestionToken.contains(inputToken)) {
+                    for (final String suggestionToken : suggestionTokens) {
+                        final String suggestionTokenLower =
+                                ignoreCase ? suggestionToken.toLowerCase(Locale.ROOT) : suggestionToken;
+                        if (suggestionTokenLower.contains(inputToken)) {
                             suggestionTokens.remove(suggestionToken);
                             foundMatch = true;
                             break;
                         }
                     }
 
-                    passed = passed && foundMatch;
+                    if (!foundMatch) {
+                        passed = false;
+                        break;
+                    }
                 }
 
                 return passed;
