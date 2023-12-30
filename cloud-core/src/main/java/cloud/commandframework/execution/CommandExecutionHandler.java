@@ -131,6 +131,8 @@ public interface CommandExecutionHandler<C> {
         default void execute(
                 @NonNull CommandContext<C> commandContext
         ) {
+            throw new UnsupportedOperationException(
+                    "execute should not be called on FutureCommandExecutionHandlers, call executeFuture instead.");
         }
 
         @Override
