@@ -40,7 +40,6 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.exceptions.handling.ExceptionContext;
 import cloud.commandframework.exceptions.handling.ExceptionHandler;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.velocity.arguments.PlayerParser;
 import cloud.commandframework.velocity.arguments.ServerParser;
 import com.google.inject.Inject;
@@ -117,9 +116,6 @@ public class VelocityCommandManager<C> extends CommandManager<C>
         this.proxyServer = proxyServer;
         this.senderMapper = senderMapper;
 
-        this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
-                FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
-        ));
         this.suggestionFactory = super.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion);
 
         /* Register Velocity Preprocessor */

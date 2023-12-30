@@ -59,9 +59,10 @@ final class MappingSuggestionFactory<C, S extends Suggestion> implements Suggest
     private <S1 extends Suggestion> @NonNull CompletableFuture<@NonNull Suggestions<C, S>> map(
             final @NonNull CompletableFuture<Suggestions<C, S1>> future
     ) {
-        return future.thenApply(suggestions -> SuggestionsImpl.of(
+        return future.thenApply(suggestions -> Suggestions.create(
                 suggestions.commandContext(),
-                suggestions.list().stream().map(this.suggestionMapper::map).collect(Collectors.toList())
+                suggestions.list().stream().map(this.suggestionMapper::map).collect(Collectors.toList()),
+                suggestions.commandInput()
         ));
     }
 }

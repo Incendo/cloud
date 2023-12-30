@@ -33,6 +33,7 @@ import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.setting.ManagerSetting;
 import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
+import cloud.commandframework.util.StringUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -677,7 +678,9 @@ class CommandSuggestionsTest {
         );
         this.manager.commandSuggestionProcessor(
                 new FilteringCommandSuggestionProcessor<>(
-                        FilteringCommandSuggestionProcessor.Filter.<TestCommandSender>startsWith(true).andTrimBeforeLastSpace()));
+                        FilteringCommandSuggestionProcessor.Filter.<TestCommandSender>startsWith(true).and(
+                                (ctx, s, in) ->
+                                        StringUtils.trimBeforeLastSpace(s, in))));
 
         // Act
         final List<? extends Suggestion> suggestions = this.manager.suggestionFactory().suggestImmediately(new TestCommandSender(), input).list();

@@ -24,14 +24,13 @@
 package cloud.commandframework.execution;
 
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.Suggestions;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.CommandParseException;
 import cloud.commandframework.services.State;
 import cloud.commandframework.types.tuples.Pair;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
@@ -150,7 +149,7 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
     }
 
     @Override
-    public @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> coordinateSuggestions(
+    public @NonNull CompletableFuture<@NonNull Suggestions<C, ?>> coordinateSuggestions(
             final @NonNull CommandTree<C> commandTree,
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput

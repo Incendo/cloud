@@ -129,18 +129,6 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
         }
 
         /**
-         * Returns a new {@link Filter} that tests this filter, and then
-         * uses {@link #trimBeforeLastSpace()} if the result is non-null.
-         *
-         * @return combined filter
-         * @since 1.8.0
-         */
-        @API(status = API.Status.STABLE, since = "1.8.0")
-        default Filter<C> andTrimBeforeLastSpace() {
-            return this.and(trimBeforeLastSpace());
-        }
-
-        /**
          * Create a filter using {@link String#startsWith(String)} that can optionally ignore case.
          *
          * @param ignoreCase whether to ignore case
@@ -213,35 +201,6 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
 
                 return passed;
             });
-        }
-
-        /**
-         * Create a filter which does extra processing when the input contains spaces.
-         *
-         * <p>Will return the portion of the suggestion which is after the last space in
-         * the input.</p>
-         *
-         * @param <C> sender type
-         * @return new filter
-         * @since 1.8.0
-         */
-        @API(status = API.Status.STABLE, since = "1.8.0")
-        static <C> @NonNull Filter<C> trimBeforeLastSpace() {
-            return (context, suggestion, input) -> {
-                final int lastSpace = input.lastIndexOf(' ');
-                // No spaces in input, don't do anything
-                if (lastSpace == -1) {
-                    return suggestion;
-                }
-
-                // Always use case-insensitive here. If case-sensitive filtering is desired it should
-                // be done in another filter which this is appended to using #and/#andTrimBeforeLastSpace.
-                if (suggestion.toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT).substring(0, lastSpace))) {
-                    return suggestion.substring(lastSpace + 1);
-                }
-
-                return null;
-            };
         }
 
         /**

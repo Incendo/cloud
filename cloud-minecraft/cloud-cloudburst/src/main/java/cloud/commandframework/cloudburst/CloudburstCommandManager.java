@@ -35,7 +35,6 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.exceptions.handling.ExceptionContext;
 import cloud.commandframework.exceptions.handling.ExceptionHandler;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.state.RegistrationState;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.cloudburstmc.server.command.CommandSender;
@@ -78,9 +77,6 @@ public class CloudburstCommandManager<C> extends CommandManager<C> implements Se
         ((CloudburstPluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
         this.senderMapper = senderMapper;
         this.owningPlugin = owningPlugin;
-        this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
-                FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
-        ));
         this.parameterInjectorRegistry().registerInjector(
                 CommandSender.class,
                 (context, annotations) -> this.senderMapper.reverse(context.sender())

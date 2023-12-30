@@ -405,7 +405,7 @@ public interface CommandInput {
      * @return {@code this}
      */
     default @This @NonNull CommandInput skipWhitespace(final int maxSpaces) {
-        return this.skipWhitespace(maxSpaces, true /* preserveSingleSpace */);
+        return this.skipWhitespace(maxSpaces, false /* preserveSingleSpace */);
     }
 
     /**
@@ -424,7 +424,7 @@ public interface CommandInput {
      * @return {@code this}
      */
     default @This @NonNull CommandInput skipWhitespace() {
-        return this.skipWhitespace(true /* preserveSingleSpace */);
+        return this.skipWhitespace(false /* preserveSingleSpace */);
     }
 
     /**

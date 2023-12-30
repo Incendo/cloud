@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.suggestion;
 
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.internal.ImmutableImpl;
 import java.util.List;
 import org.apiguardian.api.API;
@@ -48,4 +49,30 @@ public interface Suggestions<C, S extends Suggestion> {
      * @return suggestion list
      */
     @NonNull List<S> list();
+
+    /**
+     * Returns the {@link CommandInput} as seen by the last suggestion provider.
+     *
+     * @return command input
+     */
+    @NonNull CommandInput commandInput();
+
+    /**
+     * Create a {@link Suggestions} instance.
+     *
+     * @param ctx          command context
+     * @param list         suggestion list
+     * @param commandInput command input
+     * @param <C>          command sender type
+     * @param <S>          suggestion type
+     * @return suggestions instance
+     */
+    @API(status = API.Status.INTERNAL)
+    static <C, S extends Suggestion> Suggestions<C, S> create(
+            final @NonNull CommandContext<C> ctx,
+            final @NonNull List<S> list,
+            final @NonNull CommandInput commandInput
+    ) {
+        return SuggestionsImpl.of(ctx, list, commandInput);
+    }
 }

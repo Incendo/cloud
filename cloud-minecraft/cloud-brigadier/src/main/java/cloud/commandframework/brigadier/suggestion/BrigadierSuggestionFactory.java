@@ -38,7 +38,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -121,7 +120,6 @@ public final class BrigadierSuggestionFactory<C, S> {
             command = command.substring(leading.split(":")[0].length() + 1);
         }
 
-        final String finalCommand = command;
         return this.suggestionFactory.suggest(commandContext.sender(), command).thenApply(suggestionsResult -> {
             /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
             final List<TooltipSuggestion> suggestions = new ArrayList<>(suggestionsResult.list());
@@ -136,22 +134,8 @@ public final class BrigadierSuggestionFactory<C, S> {
                 suggestions.removeIf(suggestion -> siblingLiterals.contains(suggestion.suggestion()));
             }
 
-            final int trimmed = builder.getInput().length() - finalCommand.length();
-            int rawOffset;
-            try {
-                rawOffset = suggestionsResult.commandContext().parsingContext(component.name()).consumedFrom();
-            } catch (final NoSuchElementException ignored) {
-                if (!finalCommand.contains(" ")) {
-                    rawOffset = finalCommand.length();
-                } else {
-                    rawOffset = finalCommand.lastIndexOf(' ');
-                    char peek;
-                    do {
-                        peek = finalCommand.charAt(--rawOffset);
-                    } while (peek == ' ');
-                    rawOffset += 2;
-                }
-            }
+            final int trimmed = builder.getInput().length() - suggestionsResult.commandInput().length();
+            final int rawOffset = suggestionsResult.commandInput().cursor();
             final SuggestionsBuilder suggestionsBuilder = builder.createOffset(rawOffset + trimmed);
 
             for (final TooltipSuggestion suggestion : suggestions) {

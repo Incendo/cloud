@@ -35,7 +35,6 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.exceptions.handling.ExceptionContext;
 import cloud.commandframework.exceptions.handling.ExceptionHandler;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.keys.CloudKey;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -100,9 +99,6 @@ public class SpongeCommandManager<C> extends CommandManager<C> implements Sender
         super(commandExecutionCoordinator, new SpongePluginRegistrationHandler<>());
         this.owningPlugin = requireNonNull(container, "container");
         this.senderMapper = requireNonNull(senderMapper, "senderMapper");
-        this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
-                FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
-        ));
         ((SpongePluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
         this.registerDefaultExceptionHandlers();
     }

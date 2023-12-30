@@ -25,6 +25,7 @@ package cloud.commandframework.paper;
 
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.SenderMapper;
+import cloud.commandframework.brigadier.BrigadierSetting;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
@@ -131,6 +132,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
                         this.paperBrigadierListener,
                         this.getOwningPlugin()
                 );
+                this.paperBrigadierListener.brigadierManager().settings().set(BrigadierSetting.FORCE_EXECUTABLE, true);
             } catch (final Throwable e) {
                 throw new BrigadierFailureException(BrigadierFailureReason.PAPER_BRIGADIER_INITIALIZATION_FAILURE, e);
             }

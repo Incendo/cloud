@@ -40,7 +40,6 @@ import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
 import cloud.commandframework.fabric.argument.RegistryEntryParser;
 import cloud.commandframework.fabric.argument.TeamParser;
@@ -183,9 +182,6 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         this.registerNativeBrigadierMappings(this.brigadierManager);
         this.captionRegistry(new FabricCaptionRegistry<>());
         this.registerCommandPreProcessor(new FabricCommandPreprocessor<>(this));
-        this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
-                FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
-        ));
 
         ((FabricCommandRegistrationHandler<C, S>) this.commandRegistrationHandler()).initialize(this);
     }
