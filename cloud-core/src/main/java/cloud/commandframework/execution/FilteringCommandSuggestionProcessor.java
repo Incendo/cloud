@@ -26,6 +26,7 @@ package cloud.commandframework.execution;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.internal.CommandInputTokenizer;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.BiFunction;
@@ -184,11 +185,12 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
 
                     boolean foundMatch = false;
 
-                    for (final String suggestionToken : suggestionTokens) {
+                    for (final Iterator<String> iterator = suggestionTokens.iterator(); iterator.hasNext();) {
+                        final String suggestionToken = iterator.next();
                         final String suggestionTokenLower =
                                 ignoreCase ? suggestionToken.toLowerCase(Locale.ROOT) : suggestionToken;
                         if (suggestionTokenLower.contains(inputToken)) {
-                            suggestionTokens.remove(suggestionToken);
+                            iterator.remove();
                             foundMatch = true;
                             break;
                         }
