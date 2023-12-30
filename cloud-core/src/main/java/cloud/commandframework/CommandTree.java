@@ -284,8 +284,8 @@ public final class CommandTree<C> {
                 parsingContext.markStart();
                 commandContext.currentComponent(component);
 
-                return CompletableFutures.scheduleOn(executor, () -> component.parser().parseFuture(commandContext, commandInput))
-                        .thenCompose(result -> {
+                return component.parser().parseFuture(commandContext, commandInput)
+                        .thenComposeAsync(result -> {
                             // Skip a single space (argument delimiter)
                             commandInput.skipWhitespace(1);
 
@@ -305,7 +305,7 @@ public final class CommandTree<C> {
                             // We do not want to respond with a parsing error, as parsing errors are meant to propagate.
                             // Just not being able to parse is not enough.
                             return CompletableFuture.completedFuture(null);
-                        });
+                        }, executor);
             });
         }
 
@@ -556,8 +556,8 @@ public final class CommandTree<C> {
         // Copy the current queue so that we can deduce the captured input.
         final CommandInput currentInput = commandInput.copy();
 
-        return CompletableFutures.scheduleOn(executor, () -> node.component().parser().parseFuture(commandContext, commandInput))
-                .thenCompose(result -> {
+        return node.component().parser().parseFuture(commandContext, commandInput)
+                .thenComposeAsync(result -> {
                     // Skip a single space (argument delimiter)
                     commandInput.skipWhitespace(1);
 
@@ -584,7 +584,7 @@ public final class CommandTree<C> {
                         resultFuture.complete(result);
                     }
                     return resultFuture;
-                });
+                }, executor);
     }
 
     /**
@@ -778,10 +778,10 @@ public final class CommandTree<C> {
             context.commandContext().currentComponent(child.component());
             final CommandInput preParseInput = commandInput.copy();
 
-            parsingFuture = CompletableFutures.scheduleOn(executor, () -> child.component()
+            parsingFuture = child.component()
                     .parser()
-                    .parseFuture(context.commandContext(), commandInput.skipWhitespace(1)))
-                    .thenCompose(result -> {
+                    .parseFuture(context.commandContext(), commandInput.skipWhitespace(1))
+                    .thenComposeAsync(result -> {
                         final Optional<?> parsedValue = result.parsedValue();
                         final boolean parseSuccess = parsedValue.isPresent();
 
@@ -817,7 +817,7 @@ public final class CommandTree<C> {
                             return CompletableFuture.completedFuture(context);
                         }
                         return CompletableFuture.completedFuture(null);
-                    });
+                    }, executor);
         }
 
         return parsingFuture.thenCompose(previousResult -> {
@@ -891,9 +891,9 @@ public final class CommandTree<C> {
             final @NonNull Executor executor
     ) {
         context.commandContext().currentComponent(component);
-        return CompletableFutures.scheduleOn(executor, () -> component.suggestionProvider()
-                .suggestionsFuture(context.commandContext(), input.copy().skipWhitespace(1, false)))
-                .thenAccept(context::addSuggestions)
+        return component.suggestionProvider()
+                .suggestionsFuture(context.commandContext(), input.copy().skipWhitespace(1, false))
+                .thenAcceptAsync(context::addSuggestions, executor)
                 .thenApply(in -> context);
     }
 
