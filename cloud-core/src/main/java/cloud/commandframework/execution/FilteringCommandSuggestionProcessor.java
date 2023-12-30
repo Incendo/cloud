@@ -25,6 +25,8 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
+import cloud.commandframework.internal.CommandInputTokenizer;
+import java.util.List;
 import java.util.Locale;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -168,6 +170,49 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
                     ? (suggestion, input) -> suggestion.toLowerCase(Locale.ROOT).contains(input.toLowerCase(Locale.ROOT))
                     : String::contains;
             return Simple.contextFree(test);
+        }
+
+        /**
+         * Filter that requires every token of input to be a partial or full match for a single corresponding token in the
+         * suggestion.
+         *
+         * @param ignoreCase whether to ignore case
+         * @param <C>        command sender type
+         * @return new filter
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        static <C> @NonNull Simple<C> partialTokenMatches(final boolean ignoreCase) {
+            return Simple.contextFree((suggestion, input) -> {
+                final List<String> suggestionTokens = new CommandInputTokenizer(suggestion).tokenize();
+                final List<String> inputTokens = new CommandInputTokenizer(input).tokenize();
+
+                boolean passed = true;
+
+                for (String inputToken : inputTokens) {
+                    if (ignoreCase) {
+                        inputToken = inputToken.toLowerCase(Locale.ROOT);
+                    }
+
+                    boolean foundMatch = false;
+
+                    for (String suggestionToken : suggestionTokens) {
+                        if (ignoreCase) {
+                            suggestionToken = suggestionToken.toLowerCase(Locale.ROOT);
+                        }
+
+                        if (suggestionToken.contains(inputToken)) {
+                            suggestionTokens.remove(suggestionToken);
+                            foundMatch = true;
+                            break;
+                        }
+                    }
+
+                    passed = passed && foundMatch;
+                }
+
+                return passed;
+            });
         }
 
         /**
