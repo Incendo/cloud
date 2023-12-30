@@ -74,7 +74,9 @@ final class CloudCommandCallable<C> implements CommandCallable {
                 .suggestImmediately(
                         this.manager.senderMapper().map(source),
                         this.formatCommand(arguments)
-                ).stream()
+                )
+                .list()
+                .stream()
                 .map(Suggestion::suggestion)
                 .collect(Collectors.toList());
     }

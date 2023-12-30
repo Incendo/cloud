@@ -73,6 +73,6 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
         return this.manager.suggestionFactory().suggestImmediately(
                 this.manager.senderMapper().map(sender),
                 builder.toString()
-        ).stream().map(Suggestion::suggestion).collect(Collectors.toList());
+        ).list().stream().map(Suggestion::suggestion).collect(Collectors.toList());
     }
 }

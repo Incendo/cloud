@@ -70,7 +70,7 @@ class PermissionTest {
 
         // Act
         final List<? extends Suggestion> suggestions = this.manager.suggestionFactory()
-                .suggestImmediately(new TestCommandSender(), "t");
+                .suggestImmediately(new TestCommandSender(), "t").list();
 
         // Assert
         assertThat(suggestions).isEmpty();
@@ -88,7 +88,7 @@ class PermissionTest {
 
         // Act
         final List<? extends Suggestion> suggestions = this.manager.suggestionFactory()
-                .suggestImmediately(new TestCommandSender(), "t");
+                .suggestImmediately(new TestCommandSender(), "t").list();
 
         // Assert
         assertThat(suggestions).isNotEmpty();

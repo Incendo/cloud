@@ -104,7 +104,7 @@ class RepeatableFlagTest {
         final List<? extends Suggestion> suggestions = this.commandManager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 "test --flag --"
-        );
+        ).list();
 
         // Assert
         assertThat(suggestions).containsExactly(Suggestion.simple("--flag"));

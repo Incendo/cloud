@@ -762,12 +762,14 @@ public final class CommandTree<C> {
             parsingFuture = CompletableFuture.completedFuture(null);
         } else {
             // START: Parsing
+            final ParsingContext<C> parsingContext = context.commandContext().createParsingContext(child.component());
+            parsingContext.markStart();
             context.commandContext().currentComponent(child.component());
-            final CommandInput preParseInput = commandInput.copy();
+            final CommandInput preParseInput = commandInput.skipWhitespace(1).copy();
 
             parsingFuture = child.component()
                     .parser()
-                    .parseFuture(context.commandContext(), commandInput.skipWhitespace(1))
+                    .parseFuture(context.commandContext(), commandInput)
                     .thenComposeAsync(result -> {
                         final Optional<?> parsedValue = result.parsedValue();
                         final boolean parseSuccess = parsedValue.isPresent();
@@ -793,6 +795,7 @@ public final class CommandTree<C> {
                             }
                             // the current argument at the position is parsable and there are more arguments following
                             context.commandContext().store(child.component().name(), parsedValue.get());
+                            parsingContext.success(true);
                             return this.getSuggestions(context, commandInput, child, executor);
                         } else if (!parseSuccess && commandInputOriginal.remainingTokens() > 1) {
                             // at this point there should normally be no need to reset the command queue as we expect

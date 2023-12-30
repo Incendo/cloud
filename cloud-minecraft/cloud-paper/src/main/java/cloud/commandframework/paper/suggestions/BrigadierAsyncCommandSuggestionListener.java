@@ -52,7 +52,7 @@ class BrigadierAsyncCommandSuggestionListener<C> extends AsyncCommandSuggestionL
 
     @Override
     protected List<? extends TooltipSuggestion> querySuggestions(final @NonNull C commandSender, final @NonNull String input) {
-        return this.suggestionFactory.suggestImmediately(commandSender, input);
+        return this.suggestionFactory.suggestImmediately(commandSender, input).list();
     }
 
     @Override

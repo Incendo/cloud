@@ -69,7 +69,7 @@ class AsyncCommandSuggestionListener<C> implements SuggestionListener<C> {
     }
 
     protected List<? extends Suggestion> querySuggestions(final @NonNull C commandSender, final @NonNull String input) {
-        return this.paperCommandManager.suggestionFactory().suggestImmediately(commandSender, input);
+        return this.paperCommandManager.suggestionFactory().suggestImmediately(commandSender, input).list();
     }
 
     protected void setSuggestions(

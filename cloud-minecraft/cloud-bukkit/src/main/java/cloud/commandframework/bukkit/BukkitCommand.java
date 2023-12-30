@@ -98,7 +98,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         return this.manager.suggestionFactory().suggestImmediately(
                 this.manager.senderMapper().map(sender),
                 builder.toString()
-        ).stream().map(Suggestion::suggestion).collect(Collectors.toList());
+        ).list().stream().map(Suggestion::suggestion).collect(Collectors.toList());
     }
 
     @Override

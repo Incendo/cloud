@@ -122,9 +122,9 @@ public final class BrigadierSuggestionFactory<C, S> {
         }
 
         final String finalCommand = command;
-        return this.suggestionFactory.suggest(commandContext.sender(), command).thenApply(suggestionsUnfiltered -> {
+        return this.suggestionFactory.suggest(commandContext.sender(), command).thenApply(suggestionsResult -> {
             /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
-            final List<TooltipSuggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
+            final List<TooltipSuggestion> suggestions = new ArrayList<>(suggestionsResult.list());
             if (parentNode != null) {
                 final Set<String> siblingLiterals = parentNode.children().stream()
                         .map(cloud.commandframework.internal.CommandNode::component)
@@ -139,9 +139,18 @@ public final class BrigadierSuggestionFactory<C, S> {
             final int trimmed = builder.getInput().length() - finalCommand.length();
             int rawOffset;
             try {
-                rawOffset = commandContext.parsingContext(component).consumedFrom();
+                rawOffset = suggestionsResult.commandContext().parsingContext(component.name()).consumedFrom();
             } catch (final NoSuchElementException ignored) {
-                rawOffset = finalCommand.length();
+                if (!finalCommand.contains(" ")) {
+                    rawOffset = finalCommand.length();
+                } else {
+                    rawOffset = finalCommand.lastIndexOf(' ');
+                    char peek;
+                    do {
+                        peek = finalCommand.charAt(--rawOffset);
+                    } while (peek == ' ');
+                    rawOffset += 2;
+                }
             }
             final SuggestionsBuilder suggestionsBuilder = builder.createOffset(rawOffset + trimmed);
 
