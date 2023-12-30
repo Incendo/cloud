@@ -100,17 +100,21 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
                     return Pair.of(command, passedPostprocessing);
                 }, this.postProcessingExecutor)
                 .thenComposeAsync(preprocessResult -> {
-                    if (preprocessResult.getSecond()) {
-                        if (this.executionLock != null) {
-                            try {
-                                this.executionLock.acquire();
-                            } catch (final InterruptedException e) {
-                                Thread.currentThread().interrupt();
-                            }
-                        }
+                    if (!preprocessResult.getSecond()) {
+                        return CompletableFuture.completedFuture(CommandResult.of(commandContext));
+                    }
 
-                        final CompletableFuture<CommandResult<C>> commandResultFuture = preprocessResult
-                                .getFirst()
+                    if (this.executionLock != null) {
+                        try {
+                            this.executionLock.acquire();
+                        } catch (final InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+
+                    CompletableFuture<CommandResult<C>> commandResultFuture = null;
+                    try {
+                        commandResultFuture = preprocessResult.getFirst()
                                 .commandExecutionHandler()
                                 .executeFuture(commandContext)
                                 .exceptionally(exception -> {
@@ -130,15 +134,17 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
                                     }
                                 })
                                 .thenApply(v -> CommandResult.of(commandContext));
-
+                    } finally {
                         if (this.executionLock != null) {
-                            commandResultFuture.whenComplete(($, $$) -> this.executionLock.release());
+                            if (commandResultFuture != null) {
+                                commandResultFuture.whenComplete(($, $$) -> this.executionLock.release());
+                            } else {
+                                this.executionLock.release();
+                            }
                         }
-
-                        return commandResultFuture;
                     }
 
-                    return CompletableFuture.completedFuture(CommandResult.of(commandContext));
+                    return commandResultFuture;
                 }, this.defaultExecutionExecutor);
     }
 
