@@ -36,7 +36,7 @@ final class ExecutionCoordinatorBuilderImpl<C> implements ExecutionCoordinator.B
     private @Nullable Executor suggestionsExecutor;
     private @Nullable Executor postProcessingExecutor;
     private @Nullable Executor executionSchedulingExecutor;
-    private boolean lockExecution = false;
+    private boolean synchronizeExecution = false;
 
     @Override
     public ExecutionCoordinator.@NonNull Builder<C> parsingExecutor(final @NonNull Executor executor) {
@@ -67,8 +67,8 @@ final class ExecutionCoordinatorBuilderImpl<C> implements ExecutionCoordinator.B
     }
 
     @Override
-    public ExecutionCoordinator.@NonNull Builder<C> lockExecution() {
-        this.lockExecution = true;
+    public ExecutionCoordinator.@NonNull Builder<C> synchronizeExecution() {
+        this.synchronizeExecution = true;
         return this;
     }
 
@@ -79,7 +79,7 @@ final class ExecutionCoordinatorBuilderImpl<C> implements ExecutionCoordinator.B
                 this.suggestionsExecutor,
                 this.postProcessingExecutor,
                 this.executionSchedulingExecutor,
-                this.lockExecution
+                this.synchronizeExecution
         );
     }
 }

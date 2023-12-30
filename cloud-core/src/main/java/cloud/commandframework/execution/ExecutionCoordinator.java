@@ -115,7 +115,12 @@ public interface ExecutionCoordinator<C> {
 
         @This @NonNull Builder<C> executionSchedulingExecutor(@NonNull Executor executor);
 
-        @This @NonNull Builder<C> lockExecution();
+        /**
+         * Sets the execution coordinator to disallow concurrent {@link CommandExecutionHandler command handler} execution.
+         *
+         * @return this builder
+         */
+        @This @NonNull Builder<C> synchronizeExecution();
 
         /**
          * Creates a new {@link ExecutionCoordinator} from the state of this builder.

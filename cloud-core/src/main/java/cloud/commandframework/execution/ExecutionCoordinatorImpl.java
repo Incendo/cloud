@@ -74,13 +74,13 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
             final @Nullable Executor suggestionsExecutor,
             final @Nullable Executor postProcessingExecutor,
             final @Nullable Executor defaultExecutionExecutor,
-            final boolean lockExecution
+            final boolean syncExecution
     ) {
         this.parsingExecutor = orRunNow(parsingExecutor);
         this.suggestionsExecutor = orRunNow(suggestionsExecutor);
         this.postProcessingExecutor = orRunNow(postProcessingExecutor);
         this.defaultExecutionExecutor = orRunNow(defaultExecutionExecutor);
-        this.executionLock = lockExecution ? new Semaphore(1) : null;
+        this.executionLock = syncExecution ? new Semaphore(1) : null;
     }
 
     private static @NonNull Executor orRunNow(final @Nullable Executor e) {
