@@ -113,6 +113,22 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
                                 .getFirst()
                                 .commandExecutionHandler()
                                 .executeFuture(commandContext)
+                                .exceptionally(exception -> {
+                                    final Throwable workingException;
+                                    if (exception instanceof CompletionException) {
+                                        workingException = exception.getCause();
+                                    } else {
+                                        workingException = exception;
+                                    }
+
+                                    if (workingException instanceof CommandParseException) {
+                                        throw (CommandParseException) workingException;
+                                    } else if (workingException instanceof CommandExecutionException) {
+                                        throw (CommandExecutionException) workingException;
+                                    } else {
+                                        throw new CommandExecutionException(workingException, commandContext);
+                                    }
+                                })
                                 .thenApply(v -> CommandResult.of(commandContext));
 
                         if (this.executionLock != null) {
@@ -123,23 +139,7 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
                     }
 
                     return CompletableFuture.completedFuture(CommandResult.of(commandContext));
-                }, this.defaultExecutionExecutor)
-                .exceptionally(exception -> {
-                    final Throwable workingException;
-                    if (exception instanceof CompletionException) {
-                        workingException = exception.getCause();
-                    } else {
-                        workingException = exception;
-                    }
-
-                    if (workingException instanceof CommandParseException) {
-                        throw (CommandParseException) workingException;
-                    } else if (workingException instanceof CommandExecutionException) {
-                        throw (CommandExecutionException) workingException;
-                    } else {
-                        throw new CommandExecutionException(workingException, commandContext);
-                    }
-                });
+                }, this.defaultExecutionExecutor);
     }
 
     @Override
