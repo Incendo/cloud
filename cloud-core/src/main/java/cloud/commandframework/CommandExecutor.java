@@ -24,8 +24,8 @@
 package cloud.commandframework;
 
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandResult;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import java.util.concurrent.CompletableFuture;
@@ -38,7 +38,7 @@ public interface CommandExecutor<C> {
 
     /**
      * Executes a command and get a future that completes with the result. The command may be executed immediately
-     * or at some point in the future, depending on the {@link CommandExecutionCoordinator} used in the command manager.
+     * or at some point in the future, depending on the {@link ExecutionCoordinator} used in the command manager.
      *
      * <p>The command may also be filtered out by preprocessors (see {@link CommandPreprocessor}) before they are parsed,
      * or by the {@link CommandComponent} command components during parsing. The execution may also be filtered out
@@ -66,7 +66,7 @@ public interface CommandExecutor<C> {
 
     /**
      * Executes a command and get a future that completes with the result. The command may be executed immediately
-     * or at some point in the future, depending on the {@link CommandExecutionCoordinator} used in the command manager.
+     * or at some point in the future, depending on the {@link ExecutionCoordinator} used in the command manager.
      *
      * <p>The command may also be filtered out by preprocessors (see {@link CommandPreprocessor}) before they are parsed,
      * or by the {@link CommandComponent} command components during parsing. The execution may also be filtered out
@@ -97,5 +97,5 @@ public interface CommandExecutor<C> {
      *
      * @return command execution coordinator
      */
-    @NonNull CommandExecutionCoordinator<C> commandExecutionCoordinator();
+    @NonNull ExecutionCoordinator<C> executionCoordinator();
 }

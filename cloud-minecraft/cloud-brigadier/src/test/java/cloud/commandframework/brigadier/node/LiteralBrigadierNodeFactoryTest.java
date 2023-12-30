@@ -32,7 +32,7 @@ import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.brigadier.suggestion.CloudDelegatingSuggestionProvider;
 import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.context.StandardCommandContextFactory;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.types.tuples.Pair;
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -225,7 +225,7 @@ class LiteralBrigadierNodeFactoryTest {
     private static final class TestCommandManager extends CommandManager<Object> {
 
         private TestCommandManager() {
-            super(CommandExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
+            super(ExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
         }
 
         @Override

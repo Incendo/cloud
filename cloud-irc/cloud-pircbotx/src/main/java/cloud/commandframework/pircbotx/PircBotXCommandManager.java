@@ -25,7 +25,6 @@ package cloud.commandframework.pircbotx;
 
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.exceptions.ArgumentParseException;
@@ -36,8 +35,7 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.exceptions.handling.ExceptionContext;
 import cloud.commandframework.exceptions.handling.ExceptionHandler;
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.pircbotx.arguments.UserParser;
@@ -104,8 +102,8 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
      *                                    when the parsers used in that particular platform are not thread safe. If you have
      *                                    commands that perform blocking operations, however, it might not be a good idea to
      *                                    use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                    {@link CommandExecutionCoordinator#simpleCoordinator()} and
-     *                                    {@link AsynchronousCommandExecutionCoordinator}
+     *                                    {@link ExecutionCoordinator#simpleCoordinator()} and
+     *                                    {@link ExecutionCoordinator#asyncCoordinator()}
      * @param commandRegistrationHandler  Command registration handler. This will get called every time a new command is
      *                                    registered to the command manager. This may be used to forward command registration
      * @param permissionFunction          Function used to determine whether or not a sender is permitted to use a certain
@@ -117,7 +115,7 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
      */
     public PircBotXCommandManager(
             final @NonNull PircBotX pircBotX,
-            final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
             final @NonNull CommandRegistrationHandler<C> commandRegistrationHandler,
             final @NonNull BiFunction<C, String, Boolean> permissionFunction,
             final @NonNull Function<User, C> userMapper,

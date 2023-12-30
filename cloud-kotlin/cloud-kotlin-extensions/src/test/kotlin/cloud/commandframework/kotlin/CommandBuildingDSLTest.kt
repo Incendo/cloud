@@ -26,7 +26,7 @@ package cloud.commandframework.kotlin
 import cloud.commandframework.CommandDescription
 import cloud.commandframework.CommandManager
 import cloud.commandframework.arguments.standard.StringParser.stringParser
-import cloud.commandframework.execution.CommandExecutionCoordinator
+import cloud.commandframework.execution.ExecutionCoordinator
 import cloud.commandframework.help.result.CommandEntry
 import cloud.commandframework.internal.CommandRegistrationHandler
 import cloud.commandframework.keys.CloudKey
@@ -110,7 +110,7 @@ class CommandBuildingDSLTest {
     }
 
     class TestCommandManager : CommandManager<TestCommandSender>(
-        CommandExecutionCoordinator.simpleCoordinator(),
+        ExecutionCoordinator.simpleCoordinator(),
         CommandRegistrationHandler.nullCommandRegistrationHandler()
     ) {
 

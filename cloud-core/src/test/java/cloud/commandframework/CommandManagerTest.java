@@ -24,8 +24,8 @@
 package cloud.commandframework;
 
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionHandler;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import io.leangen.geantyref.TypeToken;
 import java.util.List;
@@ -54,7 +54,7 @@ class CommandManagerTest {
     @BeforeEach
     void setup() {
         this.commandManager = new CommandManager<TestCommandSender>(
-                CommandExecutionCoordinator.simpleCoordinator(),
+                ExecutionCoordinator.simpleCoordinator(),
                 CommandRegistrationHandler.nullCommandRegistrationHandler()
         ) {
             @Override

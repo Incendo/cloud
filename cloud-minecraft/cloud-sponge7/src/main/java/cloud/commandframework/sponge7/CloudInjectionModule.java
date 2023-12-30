@@ -24,7 +24,7 @@
 package cloud.commandframework.sponge7;
 
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.util.Types;
@@ -42,7 +42,7 @@ import org.spongepowered.api.command.CommandSource;
 public final class CloudInjectionModule<C> extends AbstractModule {
 
     private final Class<C> commandSenderType;
-    private final Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator;
+    private final Function<@NonNull CommandTree<C>, @NonNull ExecutionCoordinator<C>> commandExecutionCoordinator;
     private final Function<@NonNull CommandSource, @NonNull C> commandSenderMapper;
     private final Function<@NonNull C, @NonNull CommandSource> backwardsCommandSenderMapper;
 
@@ -56,7 +56,7 @@ public final class CloudInjectionModule<C> extends AbstractModule {
      */
     public CloudInjectionModule(
             final @NonNull Class<C> commandSenderType,
-            final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull Function<@NonNull CommandTree<C>, @NonNull ExecutionCoordinator<C>> commandExecutionCoordinator,
             final @NonNull Function<@NonNull CommandSource, @NonNull C> commandSenderMapper,
             final @NonNull Function<@NonNull C, @NonNull CommandSource> backwardsCommandSenderMapper
     ) {
@@ -71,7 +71,7 @@ public final class CloudInjectionModule<C> extends AbstractModule {
     protected void configure() {
         final Type commandTreeType = Types.newParameterizedType(CommandTree.class, this.commandSenderType);
         final Type commandExecutionCoordinatorType = Types.newParameterizedType(
-                CommandExecutionCoordinator.class,
+                ExecutionCoordinator.class,
                 this.commandSenderType
         );
         final Type executorFunction = Types.newParameterizedType(Function.class, commandTreeType,

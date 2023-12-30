@@ -28,6 +28,7 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.services.State;
 import cloud.commandframework.setting.ManagerSetting;
 import java.util.Collections;
@@ -47,23 +48,26 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 final class DelegatingSuggestionFactory<C, S extends Suggestion> implements SuggestionFactory<C, S> {
 
     private static final List<Suggestion> SINGLE_EMPTY_SUGGESTION =
-            Collections.unmodifiableList(Collections.singletonList(Suggestion.simple("")));
+            Collections.singletonList(Suggestion.simple(""));
 
     private final CommandManager<C> commandManager;
     private final CommandTree<C> commandTree;
     private final SuggestionMapper<S> suggestionMapper;
     private final CommandContextFactory<C> contextFactory;
+    private final ExecutionCoordinator<C> executionCoordinator;
 
     DelegatingSuggestionFactory(
             final @NonNull CommandManager<C> commandManager,
             final @NonNull CommandTree<C> commandTree,
             final @NonNull SuggestionMapper<S> suggestionMapper,
-            final @NonNull CommandContextFactory<C> contextFactory
+            final @NonNull CommandContextFactory<C> contextFactory,
+            final @NonNull ExecutionCoordinator<C> executionCoordinator
     ) {
         this.commandManager = commandManager;
         this.commandTree = commandTree;
         this.suggestionMapper = suggestionMapper;
         this.contextFactory = contextFactory;
+        this.executionCoordinator = executionCoordinator;
     }
 
     @Override
@@ -97,7 +101,7 @@ final class DelegatingSuggestionFactory<C, S extends Suggestion> implements Sugg
             return CompletableFuture.completedFuture(Collections.emptyList());
         }
 
-        return this.commandTree.getSuggestions(context, commandInput).thenApply(suggestions -> {
+        return this.executionCoordinator.coordinateSuggestions(this.commandTree, context, commandInput).thenApply(suggestions -> {
             if (this.commandManager.settings().get(ManagerSetting.FORCE_SUGGESTION) && suggestions.isEmpty()) {
                 return SINGLE_EMPTY_SUGGESTION;
             }

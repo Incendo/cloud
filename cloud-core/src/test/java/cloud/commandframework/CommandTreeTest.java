@@ -155,7 +155,8 @@ class CommandTreeTest {
         // Act
         final List<Suggestion> results = this.commandManager.commandTree().getSuggestions(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("test ")
+                CommandInput.of("test "),
+                Runnable::run
         ).join();
 
         // Assert

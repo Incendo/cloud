@@ -31,7 +31,6 @@ import cloud.commandframework.arguments.suggestion.Suggestion
 import cloud.commandframework.arguments.suggestion.SuggestionProvider
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.context.CommandInput
-import cloud.commandframework.execution.CommandExecutionCoordinator
 import io.leangen.geantyref.GenericTypeReflector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
@@ -66,13 +65,16 @@ public fun <C> AnnotationParser<C>.installCoroutineSupport(
     context: CoroutineContext = EmptyCoroutineContext,
     onlyForSuspending: Boolean = false
 ): AnnotationParser<C> {
-    if (manager().commandExecutor().commandExecutionCoordinator() is CommandExecutionCoordinator.SimpleCoordinator) {
+    // todo
+    /*
+    if (manager().commandExecutor().executionCoordinator() is ExecutionCoordinatorImpl) {
         RuntimeException(
             """You are highly advised to not use the simple command execution coordinator together
                             with coroutine support. Consider using the asynchronous command execution coordinator instead."""
         )
             .printStackTrace()
     }
+     */
 
     val predicate = Predicate<Method> { method ->
         if (onlyForSuspending) {

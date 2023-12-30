@@ -42,8 +42,8 @@ import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.StandardCommandContextFactory;
 import cloud.commandframework.exceptions.handling.ExceptionController;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandSuggestionProcessor;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.execution.postprocessor.AcceptingCommandPostprocessor;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessingContext;
@@ -78,7 +78,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -120,20 +119,20 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
     /**
      * Create a new command manager instance
      *
-     * @param commandExecutionCoordinator Execution coordinator instance. The coordinator is in charge of executing incoming
+     * @param executionCoordinator Execution coordinator instance. The coordinator is in charge of executing incoming
      *                                    commands. Some considerations must be made when picking a suitable execution coordinator
      *                                    for your platform. For example, an entirely asynchronous coordinator is not suitable
      *                                    when the parsers used in that particular platform are not thread safe. If you have
      *                                    commands that perform blocking operations, however, it might not be a good idea to
      *                                    use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                    {@link CommandExecutionCoordinator#simpleCoordinator()} and
-     *                                    {@link cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator}
+     *                                    {@link ExecutionCoordinator#simpleCoordinator()} and
+     *                                    {@link ExecutionCoordinator#asyncCoordinator()}
      * @param commandRegistrationHandler  Command registration handler. This will get called every time a new command is
      *                                    registered to the command manager. This may be used to forward command registration
      *                                    to the platform.
      */
     protected CommandManager(
-            final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull ExecutionCoordinator<C> executionCoordinator,
             final @NonNull CommandRegistrationHandler<C> commandRegistrationHandler
     ) {
         final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>(this);
@@ -142,11 +141,12 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
         this.suggestionFactory = SuggestionFactory.delegating(
                 this,
                 (suggestion) -> this.suggestionMapper.map(suggestion),
-                commandContextFactory
+                commandContextFactory,
+                executionCoordinator
         );
         this.commandExecutor = new StandardCommandExecutor<>(
                 this,
-                commandExecutionCoordinator.apply(this.commandTree),
+                executionCoordinator,
                 commandContextFactory
         );
         /* Register service types */

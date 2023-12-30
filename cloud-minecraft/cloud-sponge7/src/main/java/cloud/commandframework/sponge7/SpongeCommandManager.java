@@ -24,7 +24,6 @@
 package cloud.commandframework.sponge7;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -33,8 +32,7 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.exceptions.handling.ExceptionContext;
 import cloud.commandframework.exceptions.handling.ExceptionHandler;
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.keys.CloudKey;
 import java.util.function.Function;
@@ -88,8 +86,8 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
      *                                    when the parsers used in that particular platform are not thread safe. If you have
      *                                    commands that perform blocking operations, however, it might not be a good idea to
      *                                    use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                    {@link CommandExecutionCoordinator#simpleCoordinator()} and
-     *                                    {@link AsynchronousCommandExecutionCoordinator}
+     *                                    {@link ExecutionCoordinator#simpleCoordinator()} and
+     *                                    {@link ExecutionCoordinator#asyncCoordinator()}
      * @param forwardMapper               A function converting from a native {@link CommandSource} to this manager's sender type
      * @param reverseMapper               A function converting from this manager's sender type to a native {@link CommandSource}
      */
@@ -97,7 +95,7 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
     @SuppressWarnings("unchecked")
     public SpongeCommandManager(
             final @NonNull PluginContainer container,
-            final @NonNull Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
             final Function<CommandSource, C> forwardMapper,
             final Function<C, CommandSource> reverseMapper
     ) {

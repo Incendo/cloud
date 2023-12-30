@@ -24,7 +24,6 @@
 package cloud.commandframework.cloudburst;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -33,7 +32,7 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.exceptions.handling.ExceptionContext;
 import cloud.commandframework.exceptions.handling.ExceptionHandler;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.state.RegistrationState;
 import java.util.function.Function;
@@ -73,8 +72,7 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
     @SuppressWarnings("unchecked")
     public CloudburstCommandManager(
             final @NonNull Plugin owningPlugin,
-            final @NonNull Function<@NonNull CommandTree<C>,
-                    @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
             final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
             final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper
     ) {

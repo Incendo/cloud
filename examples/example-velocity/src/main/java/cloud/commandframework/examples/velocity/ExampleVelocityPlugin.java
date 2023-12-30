@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.examples.velocity;
 
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.velocity.CloudInjectionModule;
 import cloud.commandframework.velocity.VelocityCommandManager;
@@ -66,7 +66,7 @@ public final class ExampleVelocityPlugin {
         final Injector childInjector = this.injector.createChildInjector(
                 new CloudInjectionModule<>(
                         CommandSource.class,
-                        CommandExecutionCoordinator.simpleCoordinator(),
+                        ExecutionCoordinator.simpleCoordinator(),
                         Function.identity(),
                         Function.identity()
                 )

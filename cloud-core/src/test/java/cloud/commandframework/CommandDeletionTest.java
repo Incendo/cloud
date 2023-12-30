@@ -25,8 +25,8 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.exceptions.NoSuchCommandException;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionHandler;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import java.util.concurrent.CompletionException;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -46,7 +46,7 @@ class CommandDeletionTest {
     @BeforeEach
     void setup() {
         this.commandManager = new CommandManager<TestCommandSender>(
-                CommandExecutionCoordinator.simpleCoordinator(),
+                ExecutionCoordinator.simpleCoordinator(),
                 CommandRegistrationHandler.nullCommandRegistrationHandler()
         ) {
             {
