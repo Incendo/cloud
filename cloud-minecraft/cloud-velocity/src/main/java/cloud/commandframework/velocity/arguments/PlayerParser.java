@@ -31,7 +31,6 @@ import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.velocity.VelocityCaptionKeys;
 import com.velocitypowered.api.proxy.Player;
@@ -78,15 +77,9 @@ public final class PlayerParser<C> implements ArgumentParser<C, Player>, Blockin
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    PlayerParser.class,
-                    commandContext
-            ));
-        }
+        final String input = commandInput.readString();
         final Player player = commandContext.<ProxyServer>get("ProxyServer")
-                .getPlayer(commandInput.readString())
+                .getPlayer(input)
                 .orElse(null);
         if (player == null) {
             return ArgumentParseResult.failure(

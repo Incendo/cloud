@@ -32,7 +32,6 @@ import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,12 +74,6 @@ public final class EnchantmentParser<C> implements ArgumentParser<C, Enchantment
             final @NonNull CommandInput commandInput
     ) {
         final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    EnchantmentParser.class,
-                    commandContext
-            ));
-        }
 
         final NamespacedKey key;
         try {

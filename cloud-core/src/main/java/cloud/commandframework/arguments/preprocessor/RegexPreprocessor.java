@@ -30,7 +30,6 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import org.apiguardian.api.API;
@@ -91,12 +90,6 @@ public final class RegexPreprocessor<C> implements ComponentPreprocessor<C> {
             final @NonNull CommandInput commandInput
     ) {
         final String head = commandInput.peekString();
-        if (head.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    RegexPreprocessor.class,
-                    context
-            ));
-        }
         if (this.predicate.test(head)) {
             return ArgumentParseResult.success(true);
         }

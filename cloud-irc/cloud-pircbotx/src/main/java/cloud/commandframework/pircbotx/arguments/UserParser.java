@@ -30,7 +30,6 @@ import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.pircbotx.PircBotXCommandManager;
 import org.apiguardian.api.API;
@@ -76,17 +75,11 @@ public final class UserParser<C> implements ArgumentParser<C, User> {
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    UserParser.class,
-                    commandContext
-            ));
-        }
+        final String input = commandInput.readString();
         final PircBotX pircBotX = commandContext.get(PircBotXCommandManager.PIRCBOTX_META_KEY);
         final User user;
         try {
-            user = pircBotX.getUserChannelDao().getUser(commandInput.readString());
+            user = pircBotX.getUserChannelDao().getUser(input);
         } catch (final DaoException exception) {
             return ArgumentParseResult.failure(
                     new UserParseException(
