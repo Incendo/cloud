@@ -28,7 +28,6 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.types.tuples.Pair;
 import com.mojang.brigadier.context.ParsedCommandNode;
 import com.mojang.brigadier.context.StringRange;
@@ -39,6 +38,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -121,6 +121,7 @@ public final class BrigadierSuggestionFactory<C, S> {
             command = command.substring(leading.split(":")[0].length() + 1);
         }
 
+        final String finalCommand = command;
         return this.suggestionFactory.suggest(commandContext.sender(), command).thenApply(suggestionsUnfiltered -> {
             /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
             final List<TooltipSuggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
@@ -135,14 +136,14 @@ public final class BrigadierSuggestionFactory<C, S> {
                 suggestions.removeIf(suggestion -> siblingLiterals.contains(suggestion.suggestion()));
             }
 
-            final CommandInput rawInput = commandContext.rawInput();
-            final int trimmed = builder.getInput().length() - rawInput.length();
-            final SuggestionsBuilder suggestionsBuilder =
-                    // TODO - this is the wrong cursor (post-parse position), we need the pre-parse position (same as given to the
-                    // target node's suggestion provider)
-                    // I'm pretty sure this logic is correct but can't test it until we have a way of getting the needed cursor
-                    // pos
-                    builder.createOffset(rawInput.cursor() + trimmed);
+            final int trimmed = builder.getInput().length() - finalCommand.length();
+            int rawOffset;
+            try {
+                rawOffset = commandContext.parsingContext(component).consumedFrom();
+            } catch (final NoSuchElementException ignored) {
+                rawOffset = finalCommand.length();
+            }
+            final SuggestionsBuilder suggestionsBuilder = builder.createOffset(rawOffset + trimmed);
 
             for (final TooltipSuggestion suggestion : suggestions) {
                 suggestionsBuilder.suggest(suggestion.suggestion(), suggestion.tooltip());

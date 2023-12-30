@@ -39,7 +39,6 @@ import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoCommandInLeafException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
-import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.SuggestionContext;
 import cloud.commandframework.permission.Permission;
@@ -285,10 +284,7 @@ public final class CommandTree<C> {
 
                             parsingContext.markEnd();
                             parsingContext.success(!result.failure().isPresent());
-
-                            final List<String> consumedTokens = tokenize(currentInput);
-                            consumedTokens.removeAll(tokenize(commandInput));
-                            parsingContext.consumedInput(consumedTokens);
+                            parsingContext.consumedInput(currentInput, commandInput);
 
                             if (result.parsedValue().isPresent()) {
                                 parsedArguments.add(component);
@@ -555,11 +551,7 @@ public final class CommandTree<C> {
                     // Skip a single space (argument delimiter)
                     commandInput.skipWhitespace(1);
 
-                    // We remove all remaining queue, and then we'll have a list of the captured input.
-                    final List<String> consumedInput = tokenize(currentInput);
-                    consumedInput.removeAll(tokenize(commandInput));
-                    parsingContext.consumedInput(consumedInput);
-
+                    parsingContext.consumedInput(currentInput, commandInput);
                     parsingContext.markEnd();
                     parsingContext.success(false);
 
@@ -1245,9 +1237,5 @@ public final class CommandTree<C> {
         } else {
             Objects.requireNonNull(node.parent(), "parent").removeChild(node);
         }
-    }
-
-    private static @NonNull List<@NonNull String> tokenize(final @NonNull CommandInput commandInput) {
-        return new CommandInputTokenizer(commandInput.remainingInput()).tokenize();
     }
 }

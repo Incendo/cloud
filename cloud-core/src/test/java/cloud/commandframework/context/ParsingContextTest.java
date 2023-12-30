@@ -30,7 +30,6 @@ import cloud.commandframework.execution.CommandResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.arguments.standard.StringParser.greedyStringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
@@ -62,9 +61,9 @@ class ParsingContextTest {
 
         // Assert
         final CommandContext<TestCommandSender> context = result.commandContext();
-        assertThat(context.parsingContext("test").consumedInput()).containsExactly("t");
-        assertThat(context.parsingContext("int").consumedInput()).containsExactly("1337");
-        assertThat(context.parsingContext("string").consumedInput()).containsExactly("roflmao", "xd");
+        assertThat(context.parsingContext("test").consumedInput()).isEqualTo("t");
+        assertThat(context.parsingContext("int").consumedInput()).isEqualTo("1337");
+        assertThat(context.parsingContext("string").consumedInput()).isEqualTo("roflmao xd");
     }
 
     @Test
