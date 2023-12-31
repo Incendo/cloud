@@ -65,14 +65,7 @@ public final class ExamplePlugin extends JavaPlugin {
             //
             manager = new PaperCommandManager<>(
                     /* Owning plugin */ this,
-                    /* (1) */ ExecutionCoordinator.<CommandSender>builder()
-                                  .commonPoolExecutor()
-                                  // If Brigadier or the async suggestions listener is not active, then this is necessary
-                                  // to avoid a deadlock in the case that a SuggestionProvider needs to run on the main thread
-                                  // but Bukkit is asking for suggestions on the main thread (after joining the suggestions
-                                  // future we won't be able to get back on main if we leave it. without ugly hacks at least).
-                                  .suggestionsExecutor(ExecutionCoordinator.nonSchedulingExecutor())
-                                  .build(),
+                    /* (1) */ ExecutionCoordinator.simpleCoordinator(),
                     /* (2) */ Function.identity(),
                     /* (3) */ Function.identity()
             );
