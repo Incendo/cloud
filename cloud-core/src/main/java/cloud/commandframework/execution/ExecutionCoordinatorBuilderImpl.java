@@ -34,7 +34,6 @@ final class ExecutionCoordinatorBuilderImpl<C> implements ExecutionCoordinator.B
 
     private @Nullable Executor parsingExecutor;
     private @Nullable Executor suggestionsExecutor;
-    private @Nullable Executor postprocessingExecutor;
     private @Nullable Executor executionSchedulingExecutor;
     private boolean synchronizeExecution = false;
 
@@ -49,13 +48,6 @@ final class ExecutionCoordinatorBuilderImpl<C> implements ExecutionCoordinator.B
     public ExecutionCoordinator.@NonNull Builder<C> suggestionsExecutor(final @NonNull Executor executor) {
         Objects.requireNonNull(executor, "executor");
         this.suggestionsExecutor = executor;
-        return this;
-    }
-
-    @Override
-    public ExecutionCoordinator.@NonNull Builder<C> postprocessingExecutor(final @NonNull Executor executor) {
-        Objects.requireNonNull(executor, "executor");
-        this.postprocessingExecutor = executor;
         return this;
     }
 
@@ -77,7 +69,6 @@ final class ExecutionCoordinatorBuilderImpl<C> implements ExecutionCoordinator.B
         return new ExecutionCoordinatorImpl<>(
                 this.parsingExecutor,
                 this.suggestionsExecutor,
-                this.postprocessingExecutor,
                 this.executionSchedulingExecutor,
                 this.synchronizeExecution
         );

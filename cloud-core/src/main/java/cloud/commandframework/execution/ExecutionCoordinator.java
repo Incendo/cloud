@@ -27,7 +27,6 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -138,7 +137,6 @@ public interface ExecutionCoordinator<C> {
          * <ul>
          *     <li>{@link #parsingExecutor(Executor)}</li>
          *     <li>{@link #suggestionsExecutor(Executor)}</li>
-         *     <li>{@link #postprocessingExecutor(Executor)}</li>
          *     <li>{@link #executionSchedulingExecutor(Executor)}</li>
          * </ul>
          * using the provided executor.
@@ -149,7 +147,6 @@ public interface ExecutionCoordinator<C> {
         default @This @NonNull Builder<C> executor(final @NonNull Executor executor) {
             return this.parsingExecutor(executor)
                     .suggestionsExecutor(executor)
-                    .postprocessingExecutor(executor)
                     .executionSchedulingExecutor(executor);
         }
 
@@ -177,14 +174,6 @@ public interface ExecutionCoordinator<C> {
          * @return this builder
          */
         @This @NonNull Builder<C> suggestionsExecutor(@NonNull Executor executor);
-
-        /**
-         * Sets the executor to run {@link CommandPostprocessor command postprocessors} on.
-         *
-         * @param executor executor to use
-         * @return this builder
-         */
-        @This @NonNull Builder<C> postprocessingExecutor(@NonNull Executor executor);
 
         /**
          * Sets the executor to {@link CommandExecutionHandler#executeFuture(CommandContext) schedule command execution} from.

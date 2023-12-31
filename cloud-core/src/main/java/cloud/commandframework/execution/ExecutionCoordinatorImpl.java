@@ -43,8 +43,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
 
-    // todo pre-processing executor(s)
-
     /**
      * runs parsing logic. when interacting with futures that complete in unknown thread contexts (i.e. parsers), parsing will
      * chain further logic using the 'Async' variant of CF methods and this executor.
@@ -58,11 +56,6 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
     private final @NonNull Executor suggestionsExecutor;
 
     /**
-     * runs post-processing
-     */
-    private final @NonNull Executor postprocessingExecutor;
-
-    /**
      * schedules command execution futures
      */
     private final @NonNull Executor defaultExecutionExecutor;
@@ -72,13 +65,11 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
     ExecutionCoordinatorImpl(
             final @Nullable Executor parsingExecutor,
             final @Nullable Executor suggestionsExecutor,
-            final @Nullable Executor postprocessingExecutor,
             final @Nullable Executor defaultExecutionExecutor,
             final boolean syncExecution
     ) {
         this.parsingExecutor = orRunNow(parsingExecutor);
         this.suggestionsExecutor = orRunNow(suggestionsExecutor);
-        this.postprocessingExecutor = orRunNow(postprocessingExecutor);
         this.defaultExecutionExecutor = orRunNow(defaultExecutionExecutor);
         this.executionLock = syncExecution ? new Semaphore(1) : null;
     }
@@ -98,7 +89,7 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
                     final boolean passedPostprocessing =
                             commandTree.commandManager().postprocessContext(commandContext, command) == State.ACCEPTED;
                     return Pair.of(command, passedPostprocessing);
-                }, this.postprocessingExecutor)
+                }, this.parsingExecutor)
                 .thenComposeAsync(preprocessResult -> {
                     if (!preprocessResult.getSecond()) {
                         return CompletableFuture.completedFuture(CommandResult.of(commandContext));
