@@ -213,11 +213,7 @@ public final class CommandTree<C> {
                     new NoPermissionException(
                             permission,
                             commandContext.sender(),
-                            this.getChain(root)
-                                    .stream()
-                                    .filter(node -> node.component() != null)
-                                    .map(CommandNode::component)
-                                    .collect(Collectors.toList())
+                            this.getComponentChain(root)
                     )
             );
         }
@@ -241,11 +237,7 @@ public final class CommandTree<C> {
                         new InvalidSyntaxException(
                                 this.commandManager.commandSyntaxFormatter()
                                         .apply(parsedArguments, root),
-                                commandContext.sender(), this.getChain(root)
-                                .stream()
-                                .filter(node -> node.component() != null)
-                                .map(CommandNode::component)
-                                .collect(Collectors.toList())
+                                commandContext.sender(), this.getComponentChain(root)
                         )
                 );
             }
@@ -326,11 +318,7 @@ public final class CommandTree<C> {
                                     new NoPermissionException(
                                             command.commandPermission(),
                                             commandContext.sender(),
-                                            this.getChain(root)
-                                                    .stream()
-                                                    .filter(node -> node.component() != null)
-                                                    .map(CommandNode::component)
-                                                    .collect(Collectors.toList())
+                                            this.getComponentChain(root)
                                     )
                             );
                         }
@@ -342,11 +330,7 @@ public final class CommandTree<C> {
                             new InvalidSyntaxException(
                                     this.commandManager.commandSyntaxFormatter()
                                             .apply(parsedArguments, root),
-                                    commandContext.sender(), this.getChain(root)
-                                    .stream()
-                                    .filter(node -> node.component() != null)
-                                    .map(CommandNode::component)
-                                    .collect(Collectors.toList())
+                                    commandContext.sender(), this.getComponentChain(root)
                             )
                     );
                 });
@@ -384,11 +368,7 @@ public final class CommandTree<C> {
                     new NoPermissionException(
                             permission,
                             commandContext.sender(),
-                            this.getChain(child)
-                                    .stream()
-                                    .filter(node -> node.component() != null)
-                                    .map(CommandNode::component)
-                                    .collect(Collectors.toList())
+                            this.getComponentChain(child)
                     )
             );
         }
@@ -441,11 +421,7 @@ public final class CommandTree<C> {
                             new InvalidSyntaxException(
                                     this.commandManager.commandSyntaxFormatter().apply(components, child),
                                     commandContext.sender(),
-                                    this.getChain(root)
-                                            .stream()
-                                            .filter(node -> node.component() != null)
-                                            .map(CommandNode::component)
-                                            .collect(Collectors.toList())
+                                    this.getComponentChain(root)
                             )
                     );
                 }
@@ -458,11 +434,7 @@ public final class CommandTree<C> {
                         new NoPermissionException(
                                 command.commandPermission(),
                                 commandContext.sender(),
-                                this.getChain(root)
-                                        .stream()
-                                        .filter(node -> node.component() != null)
-                                        .map(CommandNode::component)
-                                        .collect(Collectors.toList())
+                                this.getComponentChain(root)
                         )
                 );
             } else {
@@ -475,11 +447,7 @@ public final class CommandTree<C> {
                                     this.commandManager.commandSyntaxFormatter()
                                             .apply(parsedArguments, root),
                                     commandContext.sender(),
-                                    this.getChain(root)
-                                            .stream()
-                                            .filter(node -> node.component() != null)
-                                            .map(CommandNode::component)
-                                            .collect(Collectors.toList())
+                                    this.getComponentChain(root)
                             )
                     );
                 }
@@ -494,11 +462,7 @@ public final class CommandTree<C> {
                         new NoPermissionException(
                                 command.commandPermission(),
                                 commandContext.sender(),
-                                this.getChain(root)
-                                        .stream()
-                                        .filter(node -> node.component() != null)
-                                        .map(CommandNode::component)
-                                        .collect(Collectors.toList())
+                                this.getComponentChain(root)
                         )
                 );
             }
@@ -530,12 +494,7 @@ public final class CommandTree<C> {
                        new InvalidSyntaxException(
                                this.commandManager.commandSyntaxFormatter().apply(parsedArguments, child),
                                commandContext.sender(),
-                               this.getChain(root)
-                                       .stream()
-                                       .filter(node -> node.component() != null)
-                                       .map(CommandNode::component)
-                                       .collect(Collectors.toList()
-                                       )
+                               this.getComponentChain(root)
                        )
                );
            }
@@ -597,11 +556,7 @@ public final class CommandTree<C> {
                                 new ArgumentParseException(
                                         result.failure().get(),
                                         commandContext.sender(),
-                                        this.getChain(node)
-                                                .stream()
-                                                .filter(n -> n.component() != null)
-                                                .map(CommandNode::component)
-                                                .collect(Collectors.toList())
+                                        this.getComponentChain(node)
                                 )
                         );
                     } else {
@@ -1183,7 +1138,22 @@ public final class CommandTree<C> {
     }
 
     /**
-     * Returns an ordered list containing the chain of nodes that leads up to the given {@code end} node
+     * Returns an ordered list containing the chain of components that leads up to the given {@code end} node.
+     *
+     * @param end the end node
+     * @return the list of components leading up to the {@code end} node
+     */
+    private @NonNull List<@NonNull CommandComponent<?>> getComponentChain(
+            final @NonNull CommandNode<C> end
+    ) {
+        return this.getChain(end).stream()
+                .map(CommandNode::component)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns an ordered list containing the chain of nodes that leads up to the given {@code end} node.
      *
      * @param end the end node
      * @return the list of nodes leading up to the {@code end} node
