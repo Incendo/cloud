@@ -156,13 +156,6 @@ public final class CommandTree<C> {
         return null;
     }
 
-    public @NonNull CompletableFuture<@Nullable Command<C>> parse(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull CommandInput commandInput
-    ) {
-        return this.parse(commandContext, commandInput, Runnable::run);
-    }
-
     /**
      * Attempts to parse string input into a command
      *

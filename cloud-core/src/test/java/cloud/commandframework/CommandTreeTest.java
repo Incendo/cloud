@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -93,22 +94,28 @@ class CommandTreeTest {
                         .build()
         );
 
+        final Executor executor = Runnable::run;
+
         // Act
         final CompletableFuture<Command<TestCommandSender>> command1 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("test one")
+                CommandInput.of("test one"),
+                executor
         );
         final CompletableFuture<Command<TestCommandSender>> command2 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("test two")
+                CommandInput.of("test two"),
+                executor
         );
         final CompletableFuture<Command<TestCommandSender>> command3 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("test opt")
+                CommandInput.of("test opt"),
+                executor
         );
         final CompletableFuture<Command<TestCommandSender>> command4 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("test opt 12")
+                CommandInput.of("test opt 12"),
+                executor
         );
 
         // Assert
@@ -133,7 +140,8 @@ class CommandTreeTest {
         // Act
         final Command<TestCommandSender> result = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("other öpt 12")
+                CommandInput.of("other öpt 12"),
+                Runnable::run
         ).join();
 
         // Assert
@@ -480,10 +488,13 @@ class CommandTreeTest {
                         .literal("literal", "literalalias")
         );
 
+        final Executor executor = Runnable::run;
+
         /* Try parsing as a variable, which should match the variable command */
         final Command<TestCommandSender> variableResult = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("literalwithvariable argthatdoesnotmatch")
+                CommandInput.of("literalwithvariable argthatdoesnotmatch"),
+                executor
         ).join();
         assertThat(variableResult).isNotNull();
         assertThat(variableResult.rootComponent().name()).isEqualTo("literalwithvariable");
@@ -492,7 +503,8 @@ class CommandTreeTest {
         /* Try parsing with the main name literal, which should match the literal command */
         final Command<TestCommandSender> literalResult = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("literalwithvariable literal")
+                CommandInput.of("literalwithvariable literal"),
+                executor
         ).join();
         assertThat(literalResult).isNotNull();
         assertThat(literalResult.rootComponent().name()).isEqualTo("literalwithvariable");
@@ -501,7 +513,8 @@ class CommandTreeTest {
         /* Try parsing with the alias of the literal, which should match the literal command */
         final Command<TestCommandSender> literalAliasResult = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("literalwithvariable literalalias")
+                CommandInput.of("literalwithvariable literalalias"),
+                executor
         ).join();
         assertThat(literalAliasResult).isNotNull();
         assertThat(literalAliasResult.rootComponent().name()).isEqualTo("literalwithvariable");

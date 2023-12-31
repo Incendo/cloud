@@ -52,7 +52,7 @@ class Issue337 {
         // Act
         final CompletionException exception = Assertions.assertThrows(
                 CompletionException.class,
-                () -> commandTree.parse(new CommandContext<>(commandSender, commandManager), commandInput).join()
+                () -> commandTree.parse(new CommandContext<>(commandSender, commandManager), commandInput, Runnable::run).join()
         );
 
         // Assert
