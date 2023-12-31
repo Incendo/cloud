@@ -65,17 +65,6 @@ public fun <C> AnnotationParser<C>.installCoroutineSupport(
     context: CoroutineContext = EmptyCoroutineContext,
     onlyForSuspending: Boolean = false
 ): AnnotationParser<C> {
-    // todo
-    /*
-    if (manager().commandExecutor().executionCoordinator() is ExecutionCoordinatorImpl) {
-        RuntimeException(
-            """You are highly advised to not use the simple command execution coordinator together
-                            with coroutine support. Consider using the asynchronous command execution coordinator instead."""
-        )
-            .printStackTrace()
-    }
-     */
-
     val predicate = Predicate<Method> { method ->
         if (onlyForSuspending) {
             method.kotlinFunction?.isSuspend == true
