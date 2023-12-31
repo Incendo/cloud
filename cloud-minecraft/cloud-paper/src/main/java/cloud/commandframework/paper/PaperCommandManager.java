@@ -60,7 +60,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      *                                     commands that perform blocking operations, however, it might not be a good idea to
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
      *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
-     *                                     {@link ExecutionCoordinator#asyncCoordinator()} ()}.
+     *                                     {@link ExecutionCoordinator#asyncCoordinator()}.
      *                                     <p>
      *                                     The execution coordinator will not have an impact on command suggestions. More
      *                                     specifically, using an asynchronous command executor does not mean that command

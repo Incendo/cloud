@@ -117,7 +117,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      *                                     commands that perform blocking operations, however, it might not be a good idea to
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
      *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
-     *                                     {@link ExecutionCoordinator#simpleCoordinator()}.
+     *                                     {@link ExecutionCoordinator#asyncCoordinator()}.
      * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails

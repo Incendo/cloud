@@ -95,7 +95,7 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      *                                     commands that perform blocking operations, however, it might not be a good idea to
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
      *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
-     *                                     {@link ExecutionCoordinator#asyncCoordinator()} ()}
+     *                                     {@link ExecutionCoordinator#asyncCoordinator()}
      * @param commandSourceMapper          Function that maps {@link CommandSourceStack} to the command sender type
      * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link CommandSourceStack}
      * @since 1.5.0
