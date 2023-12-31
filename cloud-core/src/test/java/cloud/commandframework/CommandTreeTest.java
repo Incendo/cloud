@@ -32,6 +32,7 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.AmbiguousNodeException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.execution.CommandExecutionHandler;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.meta.CommandMeta;
 import io.leangen.geantyref.TypeToken;
@@ -94,7 +95,7 @@ class CommandTreeTest {
                         .build()
         );
 
-        final Executor executor = Runnable::run;
+        final Executor executor = ExecutionCoordinator.nonSchedulingExecutor();
 
         // Act
         final CompletableFuture<Command<TestCommandSender>> command1 = this.commandManager.commandTree().parse(
@@ -141,7 +142,7 @@ class CommandTreeTest {
         final Command<TestCommandSender> result = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 CommandInput.of("other öpt 12"),
-                Runnable::run
+                ExecutionCoordinator.nonSchedulingExecutor()
         ).join();
 
         // Assert
@@ -164,7 +165,7 @@ class CommandTreeTest {
         final List<Suggestion> results = this.commandManager.commandTree().getSuggestions(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 CommandInput.of("test "),
-                Runnable::run
+                ExecutionCoordinator.nonSchedulingExecutor()
         ).join();
 
         // Assert
@@ -488,7 +489,7 @@ class CommandTreeTest {
                         .literal("literal", "literalalias")
         );
 
-        final Executor executor = Runnable::run;
+        final Executor executor = ExecutionCoordinator.nonSchedulingExecutor();
 
         /* Try parsing as a variable, which should match the variable command */
         final Command<TestCommandSender> variableResult = this.commandManager.commandTree().parse(

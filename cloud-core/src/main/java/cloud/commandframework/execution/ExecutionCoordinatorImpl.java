@@ -43,6 +43,16 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
 
+    static final Executor NON_SCHEDULING_EXECUTOR = new NonSchedulingExecutor();
+
+    private static final class NonSchedulingExecutor implements Executor {
+
+        @Override
+        public void execute(final Runnable command) {
+            command.run();
+        }
+    }
+
     /**
      * runs parsing logic. when interacting with futures that complete in unknown thread contexts (i.e. parsers), parsing will
      * chain further logic using the 'Async' variant of CF methods and this executor.
@@ -75,7 +85,7 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
     }
 
     private static @NonNull Executor orRunNow(final @Nullable Executor e) {
-        return e == null ? Runnable::run : e;
+        return e == null ? ExecutionCoordinator.nonSchedulingExecutor() : e;
     }
 
     @Override

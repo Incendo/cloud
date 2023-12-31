@@ -59,8 +59,8 @@ final class ExecutionCoordinatorBuilderImpl<C> implements ExecutionCoordinator.B
     }
 
     @Override
-    public ExecutionCoordinator.@NonNull Builder<C> synchronizeExecution() {
-        this.synchronizeExecution = true;
+    public ExecutionCoordinator.@NonNull Builder<C> synchronizeExecution(final boolean synchronizeExecution) {
+        this.synchronizeExecution = synchronizeExecution;
         return this;
     }
 

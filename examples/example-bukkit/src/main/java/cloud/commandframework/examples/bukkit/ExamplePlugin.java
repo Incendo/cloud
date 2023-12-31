@@ -71,7 +71,7 @@ public final class ExamplePlugin extends JavaPlugin {
                                   // to avoid a deadlock in the case that a SuggestionProvider needs to run on the main thread
                                   // but Bukkit is asking for suggestions on the main thread (after joining the suggestions
                                   // future we won't be able to get back on main if we leave it. without ugly hacks at least).
-                                  .suggestionsExecutor(Runnable::run)
+                                  .suggestionsExecutor(ExecutionCoordinator.nonSchedulingExecutor())
                                   .build(),
                     /* (2) */ Function.identity(),
                     /* (3) */ Function.identity()

@@ -120,9 +120,19 @@ public interface ExecutionCoordinator<C> {
     );
 
     /**
+     * Returns the non-scheduling executor. This is an executor that simply invokes {@link Runnable#run()} immediately on the
+     * calling thread of {@link Executor#execute(Runnable)}.
+     *
+     * @return the non-scheduling executor
+     */
+    static @Pure @NonNull Executor nonSchedulingExecutor() {
+        return ExecutionCoordinatorImpl.NON_SCHEDULING_EXECUTOR;
+    }
+
+    /**
      * Builder for {@link ExecutionCoordinator}.
      *
-     * <p>Any executors left unset will default to a non-scheduling executor that
+     * <p>Any executors left unset will default to a {@link #nonSchedulingExecutor() non-scheduling executor} that
      * executes tasks immediately on the calling thread (meaning it will not redirect execution to another thread context, it
      * will continue in the current one).</p>
      *
@@ -188,7 +198,18 @@ public interface ExecutionCoordinator<C> {
          *
          * @return this builder
          */
-        @This @NonNull Builder<C> synchronizeExecution();
+        default @This @NonNull Builder<C> synchronizeExecution() {
+            return this.synchronizeExecution(true);
+        }
+
+        /**
+         * Sets whether the execution coordinator should allow concurrent {@link CommandExecutionHandler command handler}
+         * execution.
+         *
+         * @param synchronizeExecution whether execution should be synchronized
+         * @return this builder
+         */
+        @This @NonNull Builder<C> synchronizeExecution(boolean synchronizeExecution);
 
         /**
          * Creates a new {@link ExecutionCoordinator} from the current state of this builder.
