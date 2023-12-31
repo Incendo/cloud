@@ -60,7 +60,7 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
     /**
      * runs post-processing
      */
-    private final @NonNull Executor postProcessingExecutor;
+    private final @NonNull Executor postprocessingExecutor;
 
     /**
      * schedules command execution futures
@@ -72,13 +72,13 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
     ExecutionCoordinatorImpl(
             final @Nullable Executor parsingExecutor,
             final @Nullable Executor suggestionsExecutor,
-            final @Nullable Executor postProcessingExecutor,
+            final @Nullable Executor postprocessingExecutor,
             final @Nullable Executor defaultExecutionExecutor,
             final boolean syncExecution
     ) {
         this.parsingExecutor = orRunNow(parsingExecutor);
         this.suggestionsExecutor = orRunNow(suggestionsExecutor);
-        this.postProcessingExecutor = orRunNow(postProcessingExecutor);
+        this.postprocessingExecutor = orRunNow(postprocessingExecutor);
         this.defaultExecutionExecutor = orRunNow(defaultExecutionExecutor);
         this.executionLock = syncExecution ? new Semaphore(1) : null;
     }
@@ -98,7 +98,7 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
                     final boolean passedPostprocessing =
                             commandTree.commandManager().postprocessContext(commandContext, command) == State.ACCEPTED;
                     return Pair.of(command, passedPostprocessing);
-                }, this.postProcessingExecutor)
+                }, this.postprocessingExecutor)
                 .thenComposeAsync(preprocessResult -> {
                     if (!preprocessResult.getSecond()) {
                         return CompletableFuture.completedFuture(CommandResult.of(commandContext));

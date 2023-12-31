@@ -77,7 +77,7 @@ public interface ExecutionCoordinator<C> {
      * @param <C>      command sender type
      * @return new coordinator
      */
-    static <C> @NonNull ExecutionCoordinator<C> coordinatorFor(final @NonNull Executor executor) {
+    static <C> @Pure @NonNull ExecutionCoordinator<C> coordinatorFor(final @NonNull Executor executor) {
         return ExecutionCoordinator.<C>builder().executor(executor).build();
     }
 
@@ -88,7 +88,7 @@ public interface ExecutionCoordinator<C> {
      * @param <C> command sender type
      * @return new coordinator
      */
-    static <C> @NonNull ExecutionCoordinator<C> asyncCoordinator() {
+    static <C> @Pure @NonNull ExecutionCoordinator<C> asyncCoordinator() {
         return ExecutionCoordinator.<C>builder().commonPoolExecutor().build();
     }
 
@@ -138,7 +138,7 @@ public interface ExecutionCoordinator<C> {
          * <ul>
          *     <li>{@link #parsingExecutor(Executor)}</li>
          *     <li>{@link #suggestionsExecutor(Executor)}</li>
-         *     <li>{@link #postProcessingExecutor(Executor)}</li>
+         *     <li>{@link #postprocessingExecutor(Executor)}</li>
          *     <li>{@link #executionSchedulingExecutor(Executor)}</li>
          * </ul>
          * using the provided executor.
@@ -149,7 +149,7 @@ public interface ExecutionCoordinator<C> {
         default @This @NonNull Builder<C> executor(final @NonNull Executor executor) {
             return this.parsingExecutor(executor)
                     .suggestionsExecutor(executor)
-                    .postProcessingExecutor(executor)
+                    .postprocessingExecutor(executor)
                     .executionSchedulingExecutor(executor);
         }
 
@@ -184,7 +184,7 @@ public interface ExecutionCoordinator<C> {
          * @param executor executor to use
          * @return this builder
          */
-        @This @NonNull Builder<C> postProcessingExecutor(@NonNull Executor executor);
+        @This @NonNull Builder<C> postprocessingExecutor(@NonNull Executor executor);
 
         /**
          * Sets the executor to {@link CommandExecutionHandler#executeFuture(CommandContext) schedule command execution} from.
