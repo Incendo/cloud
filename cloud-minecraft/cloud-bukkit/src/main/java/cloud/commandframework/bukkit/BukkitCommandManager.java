@@ -25,7 +25,6 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionMapper;
@@ -63,7 +62,7 @@ import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.state.RegistrationState;
 import io.leangen.geantyref.TypeToken;
@@ -117,16 +116,15 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      *                                     when the parsers used in your commands are not thread safe. If you have
      *                                     commands that perform blocking operations, however, it might not be a good idea to
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
-     *                                     {@link cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator}.
+     *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
+     *                                     {@link ExecutionCoordinator#asyncCoordinator()}.
      * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
      */
     public BukkitCommandManager(
             final @NonNull Plugin owningPlugin,
-            final @NonNull Function<@NonNull CommandTree<@NonNull C>,
-                    @NonNull CommandExecutionCoordinator<@NonNull C>> commandExecutionCoordinator,
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
             final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
             final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper
     )
@@ -226,13 +224,12 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      * @param commandExecutionCoordinator execution coordinator instance
      * @return a new command manager
      * @throws Exception If the construction of the manager fails
-     * @see #BukkitCommandManager(Plugin, Function, Function, Function) for a more thorough explanation
+     * @see #BukkitCommandManager(Plugin, ExecutionCoordinator, Function, Function) for a more thorough explanation
      * @since 1.5.0
      */
     public static @NonNull BukkitCommandManager<@NonNull CommandSender> createNative(
             final @NonNull Plugin owningPlugin,
-            final @NonNull Function<@NonNull CommandTree<@NonNull CommandSender>,
-                    @NonNull CommandExecutionCoordinator<@NonNull CommandSender>> commandExecutionCoordinator
+            final @NonNull ExecutionCoordinator<CommandSender> commandExecutionCoordinator
     ) throws Exception {
         return new BukkitCommandManager<>(
                 owningPlugin,

@@ -24,11 +24,10 @@
 package cloud.commandframework.paper;
 
 import cloud.commandframework.CloudCapability;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.paper.suggestions.SuggestionListener;
 import cloud.commandframework.paper.suggestions.SuggestionListenerFactory;
 import cloud.commandframework.state.RegistrationState;
@@ -60,8 +59,8 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      *                                     when the parsers used in your commands are not thread safe. If you have
      *                                     commands that perform blocking operations, however, it might not be a good idea to
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
-     *                                     {@link cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator}.
+     *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
+     *                                     {@link ExecutionCoordinator#asyncCoordinator()}.
      *                                     <p>
      *                                     The execution coordinator will not have an impact on command suggestions. More
      *                                     specifically, using an asynchronous command executor does not mean that command
@@ -76,8 +75,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      */
     public PaperCommandManager(
             final @NonNull Plugin owningPlugin,
-            final @NonNull Function<CommandTree<C>,
-                    CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
             final @NonNull Function<CommandSender, C> commandSenderMapper,
             final @NonNull Function<C, CommandSender> backwardsCommandSenderMapper
     ) throws Exception {
@@ -93,13 +91,12 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      * @param commandExecutionCoordinator execution coordinator instance
      * @return a new command manager
      * @throws Exception If the construction of the manager fails
-     * @see #PaperCommandManager(Plugin, Function, Function, Function) for a more thorough explanation
+     * @see #PaperCommandManager(Plugin, ExecutionCoordinator, Function, Function) for a more thorough explanation
      * @since 1.5.0
      */
     public static @NonNull PaperCommandManager<@NonNull CommandSender> createNative(
             final @NonNull Plugin owningPlugin,
-            final @NonNull Function<@NonNull CommandTree<@NonNull CommandSender>,
-                    @NonNull CommandExecutionCoordinator<@NonNull CommandSender>> commandExecutionCoordinator
+            final @NonNull ExecutionCoordinator<CommandSender> commandExecutionCoordinator
     ) throws Exception {
         return new PaperCommandManager<>(
                 owningPlugin,

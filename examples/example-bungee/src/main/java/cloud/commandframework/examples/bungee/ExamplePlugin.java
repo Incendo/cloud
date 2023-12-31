@@ -24,13 +24,11 @@
 package cloud.commandframework.examples.bungee;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.Description;
 import cloud.commandframework.bungee.BungeeCommandManager;
 import cloud.commandframework.bungee.arguments.PlayerParser;
 import cloud.commandframework.bungee.arguments.ServerParser;
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.RichDescription;
@@ -55,15 +53,12 @@ public final class ExamplePlugin extends Plugin {
 
     @Override
     public void onEnable() {
-        final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
-                AsynchronousCommandExecutionCoordinator.<CommandSender>builder().build();
-
         final Function<CommandSender, CommandSender> mapperFunction = Function.identity();
 
         try {
             this.manager = new BungeeCommandManager<>(
                     this,
-                    executionCoordinatorFunction,
+                    ExecutionCoordinator.simpleCoordinator(),
                     mapperFunction,
                     mapperFunction
             );

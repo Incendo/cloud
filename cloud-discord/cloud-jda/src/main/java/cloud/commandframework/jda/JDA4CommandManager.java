@@ -23,8 +23,7 @@
 //
 package cloud.commandframework.jda;
 
-import cloud.commandframework.CommandTree;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import net.dv8tion.jda.api.JDA;
@@ -52,8 +51,8 @@ public class JDA4CommandManager<C> extends JDACommandManager<C> {
      *                                     when the parsers used in that particular platform are not thread safe. If you have
      *                                     commands that perform blocking operations, however, it might not be a good idea to
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
-     *                                     {@link cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator}
+     *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
+     *                                     {@link ExecutionCoordinator#simpleCoordinator()}
      * @param commandSenderMapper          Function that maps {@link JDACommandSender} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link JDACommandSender}
      * @throws InterruptedException If the jda instance does not ready correctly
@@ -62,7 +61,7 @@ public class JDA4CommandManager<C> extends JDACommandManager<C> {
             final @NonNull JDA jda,
             final @NonNull Function<@NonNull C, @NonNull String> prefixMapper,
             final @Nullable BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper,
-            final @NonNull Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
             final @NonNull Function<@NonNull JDACommandSender, @NonNull C> commandSenderMapper,
             final @NonNull Function<@NonNull C, @NonNull JDACommandSender> backwardsCommandSenderMapper
     )

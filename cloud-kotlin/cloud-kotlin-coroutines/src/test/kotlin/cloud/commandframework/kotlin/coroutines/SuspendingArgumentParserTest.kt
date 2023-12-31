@@ -26,7 +26,7 @@ package cloud.commandframework.kotlin.coroutines
 import cloud.commandframework.CommandManager
 import cloud.commandframework.arguments.parser.ArgumentParseResult
 import cloud.commandframework.arguments.suggestion.Suggestion
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
+import cloud.commandframework.execution.ExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
 import cloud.commandframework.kotlin.extension.buildAndRegister
 import com.google.common.truth.Truth.assertThat
@@ -73,8 +73,8 @@ class SuspendingArgumentParserTest {
     private class TestCommandSender
 
     private class TestCommandManager : CommandManager<TestCommandSender>(
-        AsynchronousCommandExecutionCoordinator.builder<TestCommandSender>()
-            .withExecutor(SuspendingHandlerTest.executorService)
+        ExecutionCoordinator.builder<TestCommandSender>()
+            .executor(executorService)
             .build(),
         CommandRegistrationHandler.nullCommandRegistrationHandler()
     ) {

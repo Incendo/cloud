@@ -55,6 +55,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -156,17 +157,27 @@ public final class CommandTree<C> {
     }
 
     /**
-     * Attempts to parse string input into a command
+     * Attempts to parse a command from the provided input.
      *
-     * @param commandContext Command context instance
-     * @param commandInput   Input
+     * @param commandContext  command context instance
+     * @param commandInput    command input
+     * @param parsingExecutor executor to schedule parsing logic on
      * @return parsed command, if one could be found
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull CompletableFuture<@Nullable Command<C>> parse(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull CommandInput commandInput
+            final @NonNull CommandInput commandInput,
+            final @NonNull Executor parsingExecutor
+    ) {
+        return CompletableFutures.scheduleOn(parsingExecutor, () -> this.parseDirect(commandContext, commandInput, parsingExecutor));
+    }
+
+    private @NonNull CompletableFuture<@Nullable Command<C>> parseDirect(
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull CommandInput commandInput,
+            final @NonNull Executor parsingExecutor
     ) {
         // Special case for empty command trees.
         if (this.internalTree.isLeaf() && this.internalTree.component() == null) {
@@ -183,7 +194,8 @@ public final class CommandTree<C> {
                 new ArrayList<>(),
                 commandContext,
                 commandInput,
-                this.internalTree
+               this.internalTree,
+               parsingExecutor
         ).thenCompose(command -> {
             if (command != null
                     && command.senderType().isPresent()
@@ -205,7 +217,8 @@ public final class CommandTree<C> {
             final @NonNull List<@NonNull CommandComponent<C>> parsedArguments,
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput,
-            final @NonNull CommandNode<C> root
+            final @NonNull CommandNode<C> root,
+            final @NonNull Executor executor
     ) {
         final Permission permission = this.findMissingPermission(commandContext.sender(), root);
         if (permission != null) {
@@ -222,7 +235,8 @@ public final class CommandTree<C> {
                 parsedArguments,
                 commandContext,
                 root,
-                commandInput
+                commandInput,
+                executor
         );
         if (parsedChild != null) {
             return parsedChild;
@@ -264,9 +278,8 @@ public final class CommandTree<C> {
                 parsingContext.markStart();
                 commandContext.currentComponent(component);
 
-                return component.parser()
-                        .parseFuture(commandContext, commandInput)
-                        .thenCompose(result -> {
+                return component.parser().parseFuture(commandContext, commandInput)
+                        .thenComposeAsync(result -> {
                             // Skip a single space (argument delimiter)
                             commandInput.skipWhitespace(1);
 
@@ -279,14 +292,14 @@ public final class CommandTree<C> {
 
                             if (result.parsedValue().isPresent()) {
                                 parsedArguments.add(component);
-                                return this.parseCommand(parsedArguments, commandContext, commandInput, child);
+                                return this.parseCommand(parsedArguments, commandContext, commandInput, child, executor);
                             } else if (result.failure().isPresent()) {
                                 commandInput.cursor(currentInput.cursor());
                             }
                             // We do not want to respond with a parsing error, as parsing errors are meant to propagate.
                             // Just not being able to parse is not enough.
                             return CompletableFuture.completedFuture(null);
-                        });
+                        }, executor);
             });
         }
 
@@ -340,7 +353,8 @@ public final class CommandTree<C> {
             final @NonNull List<@NonNull CommandComponent<C>> parsedArguments,
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandNode<C> root,
-            final @NonNull CommandInput commandInput
+            final @NonNull CommandInput commandInput,
+            final @NonNull Executor executor
     ) {
         final List<CommandNode<C>> children = root.children();
 
@@ -392,7 +406,8 @@ public final class CommandTree<C> {
                             parsedArguments,
                             commandContext,
                             root,
-                            commandInput.appendString(((DefaultValue.ParsedDefaultValue<C, ?>) defaultValue).value())
+                            commandInput.appendString(((DefaultValue.ParsedDefaultValue<C, ?>) defaultValue).value()),
+                            executor
                     );
                 } else {
                     argumentValue = defaultValue.evaluateDefault(commandContext);
@@ -475,12 +490,12 @@ public final class CommandTree<C> {
             parseResult = CompletableFuture.completedFuture(argumentValue);
         } else {
             parseResult =
-                    this.parseArgument(commandContext, child, commandInput)
+                    this.parseArgument(commandContext, child, commandInput, executor)
                             .thenApply(ArgumentParseResult::parsedValue)
                             .thenApply(optional -> optional.orElse(null));
         }
 
-        return parseResult.thenCompose(value -> {
+        return parseResult.thenComposeAsync(value -> {
            if (value == null) {
                return CompletableFuture.completedFuture(null);
            }
@@ -500,8 +515,8 @@ public final class CommandTree<C> {
            }
 
             parsedArguments.add(Objects.requireNonNull(child.component()));
-            return this.parseCommand(parsedArguments, commandContext, commandInput, child);
-        });
+            return this.parseCommand(parsedArguments, commandContext, commandInput, child, executor);
+        }, executor);
     }
 
     private boolean matchesLiteral(final @NonNull List<@NonNull CommandNode<C>> children, final @NonNull String input) {
@@ -516,7 +531,8 @@ public final class CommandTree<C> {
     private @NonNull CompletableFuture<ArgumentParseResult<?>> parseArgument(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandNode<C> node,
-            final @NonNull CommandInput commandInput
+            final @NonNull CommandInput commandInput,
+            final @NonNull Executor executor
     ) {
         final ParsingContext<C> parsingContext = commandContext.createParsingContext(node.component());
         parsingContext.markStart();
@@ -534,9 +550,8 @@ public final class CommandTree<C> {
         // Copy the current queue so that we can deduce the captured input.
         final CommandInput currentInput = commandInput.copy();
 
-        return node.component().parser()
-                .parseFuture(commandContext, commandInput)
-                .thenCompose(result -> {
+        return node.component().parser().parseFuture(commandContext, commandInput)
+                .thenComposeAsync(result -> {
                     // Skip a single space (argument delimiter)
                     commandInput.skipWhitespace(1);
 
@@ -563,7 +578,7 @@ public final class CommandTree<C> {
                         resultFuture.complete(result);
                     }
                     return resultFuture;
-                });
+                }, executor);
     }
 
     /**
@@ -571,27 +586,39 @@ public final class CommandTree<C> {
      *
      * @param context      Context instance
      * @param commandInput Input
+     * @param executor     executor to schedule suggestion logic on
      * @return String suggestions. These should be filtered based on {@link String#startsWith(String)}
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull CompletableFuture<List<@NonNull Suggestion>> getSuggestions(
             final @NonNull CommandContext<C> context,
-            final @NonNull CommandInput commandInput
+            final @NonNull CommandInput commandInput,
+            final @NonNull Executor executor
+    ) {
+        return CompletableFutures.scheduleOn(executor, () -> this.getSuggestionsDirect(context, commandInput, executor));
+    }
+
+    private @NonNull CompletableFuture<List<@NonNull Suggestion>> getSuggestionsDirect(
+            final @NonNull CommandContext<C> context,
+            final @NonNull CommandInput commandInput,
+            final @NonNull Executor executor
     ) {
         final SuggestionContext<C> suggestionContext = new SuggestionContext<>(
                 this.commandManager.commandSuggestionProcessor(),
                 context,
                 commandInput
         );
-        return this.getSuggestions(suggestionContext, commandInput, this.internalTree).thenApply(SuggestionContext::suggestions);
+        return this.getSuggestions(suggestionContext, commandInput, this.internalTree, executor)
+                .thenApply(SuggestionContext::suggestions);
     }
 
     @SuppressWarnings("MixedMutabilityReturnType")
     private @NonNull CompletableFuture<SuggestionContext<C>> getSuggestions(
             final @NonNull SuggestionContext<C> context,
             final @NonNull CommandInput commandInput,
-            final @NonNull CommandNode<C> root
+            final @NonNull CommandNode<C> root,
+            final @NonNull Executor executor
     ) {
         // If the sender isn't allowed to access the root node, no suggestions are needed
         if (this.findMissingPermission(context.commandContext().sender(), root) != null) {
@@ -634,7 +661,7 @@ public final class CommandTree<C> {
                     break;
                 }
 
-                return this.getSuggestions(context, commandInput, child);
+                return this.getSuggestions(context, commandInput, child, executor);
             }
 
             // Restore original queue
@@ -656,7 +683,7 @@ public final class CommandTree<C> {
                 continue;
             }
             suggestionFuture = suggestionFuture
-                    .thenCompose(ctx -> this.addSuggestionsForDynamicArgument(context, commandInput, child));
+                    .thenCompose(ctx -> this.addSuggestionsForDynamicArgument(context, commandInput, child, executor));
         }
 
         return suggestionFuture;
@@ -698,7 +725,8 @@ public final class CommandTree<C> {
     private @NonNull CompletableFuture<SuggestionContext<C>> addSuggestionsForDynamicArgument(
             final @NonNull SuggestionContext<C> context,
             final @NonNull CommandInput commandInput,
-            final @NonNull CommandNode<C> child
+            final @NonNull CommandNode<C> child,
+            final @NonNull Executor executor
     ) {
         final CommandComponent<C> component = child.component();
         if (component == null) {
@@ -722,7 +750,7 @@ public final class CommandTree<C> {
             return CompletableFuture.completedFuture(context);
         } else if (commandInput.remainingTokens() == 1
                 || (child.isLeaf() && child.component().parser() instanceof AggregateCommandParser)) {
-            return this.addArgumentSuggestions(context, child, commandInput);
+            return this.addArgumentSuggestions(context, child, commandInput, executor);
         }
 
         // Store original input command queue before the parsers below modify it
@@ -748,13 +776,13 @@ public final class CommandTree<C> {
             parsingFuture = child.component()
                     .parser()
                     .parseFuture(context.commandContext(), commandInput.skipWhitespace(1))
-                    .thenCompose(result -> {
+                    .thenComposeAsync(result -> {
                         final Optional<?> parsedValue = result.parsedValue();
                         final boolean parseSuccess = parsedValue.isPresent();
 
                         if (result.failure().isPresent()) {
                             commandInput.cursor(preParseInput.cursor());
-                            return this.addArgumentSuggestions(context, child, commandInput);
+                            return this.addArgumentSuggestions(context, child, commandInput, executor);
                         }
 
                         if (child.isLeaf()) {
@@ -764,7 +792,7 @@ public final class CommandTree<C> {
 
                             // Greedy parser took all the input, we can restore and just ask for suggestions
                             commandInput.cursor(commandInputOriginal.cursor());
-                            this.addArgumentSuggestions(context, child, commandInput);
+                            this.addArgumentSuggestions(context, child, commandInput, executor);
                         }
 
                         if (parseSuccess && (!commandInput.isEmpty() || commandInput.input().endsWith(" "))) {
@@ -773,7 +801,7 @@ public final class CommandTree<C> {
                             }
                             // the current argument at the position is parsable and there are more arguments following
                             context.commandContext().store(child.component().name(), parsedValue.get());
-                            return this.getSuggestions(context, commandInput, child);
+                            return this.getSuggestions(context, commandInput, child, executor);
                         } else if (!parseSuccess && commandInputOriginal.remainingTokens() > 1) {
                             // at this point there should normally be no need to reset the command queue as we expect
                             // users to only take out an argument if the parse succeeded. Just to be sure we reset anyway
@@ -784,7 +812,7 @@ public final class CommandTree<C> {
                             return CompletableFuture.completedFuture(context);
                         }
                         return CompletableFuture.completedFuture(null);
-                    });
+                    }, executor);
         }
 
         return parsingFuture.thenCompose(previousResult -> {
@@ -802,7 +830,7 @@ public final class CommandTree<C> {
                 return CompletableFuture.completedFuture(context);
             }
 
-            return this.addArgumentSuggestions(context, child, commandInput);
+            return this.addArgumentSuggestions(context, child, commandInput, executor);
         });
     }
 
@@ -810,18 +838,20 @@ public final class CommandTree<C> {
      * Adds the suggestions for the given {@code node} to the given {@code context}. If the {@code node} contains
      * a flag, then all children of the {@code node} will contribute with suggestions as well
      *
-     * @param context the suggestion context
-     * @param node    the node containing the argument to get suggestions from
-     * @param input   the input from the sender
+     * @param context  the suggestion context
+     * @param node     the node containing the argument to get suggestions from
+     * @param input    the input from the sender
+     * @param executor executor to schedule further suggestion logic to
      * @return the context
      */
     private @NonNull CompletableFuture<SuggestionContext<C>> addArgumentSuggestions(
             final @NonNull SuggestionContext<C> context,
             final @NonNull CommandNode<C> node,
-            final @NonNull CommandInput input
+            final @NonNull CommandInput input,
+            final @NonNull Executor executor
     ) {
         final CommandComponent<C> component = Objects.requireNonNull(node.component());
-        return this.addArgumentSuggestions(context, component, input).thenCompose(ctx -> {
+        return this.addArgumentSuggestions(context, component, input, executor).thenCompose(ctx -> {
             // When suggesting a flag, potentially suggest following nodes too
             final boolean isParsingFlag = component.type() == CommandComponent.ComponentType.FLAG
                     && !node.children().isEmpty() // Has children
@@ -835,7 +865,8 @@ public final class CommandTree<C> {
             return CompletableFuture.allOf(
                     node.children()
                             .stream()
-                            .map(child -> this.addArgumentSuggestions(context, Objects.requireNonNull(child.component()), input))
+                            .map(child -> this.addArgumentSuggestions(
+                                    context, Objects.requireNonNull(child.component()), input, executor))
                             .toArray(CompletableFuture[]::new)
             ).thenApply(v -> ctx);
         });
@@ -847,17 +878,19 @@ public final class CommandTree<C> {
      * @param context   the suggestion context
      * @param component the component to get suggestions from
      * @param input     the input from the sender
+     * @param executor  executor to schedule further suggestion logic to
      * @return future that completes with the context
      */
     private CompletableFuture<SuggestionContext<C>> addArgumentSuggestions(
             final @NonNull SuggestionContext<C> context,
             final @NonNull CommandComponent<C> component,
-            final @NonNull CommandInput input
+            final @NonNull CommandInput input,
+            final @NonNull Executor executor
     ) {
         context.commandContext().currentComponent(component);
         return component.suggestionProvider()
                 .suggestionsFuture(context.commandContext(), input.copy().skipWhitespace(1, false))
-                .thenAccept(context::addSuggestions)
+                .thenAcceptAsync(context::addSuggestions, executor)
                 .thenApply(in -> context);
     }
 

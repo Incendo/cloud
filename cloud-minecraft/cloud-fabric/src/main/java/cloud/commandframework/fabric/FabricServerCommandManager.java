@@ -23,10 +23,8 @@
 //
 package cloud.commandframework.fabric;
 
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.fabric.annotations.specifier.Center;
 import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
 import cloud.commandframework.fabric.data.Coordinates;
@@ -78,12 +76,11 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      *
      * @param execCoordinator Execution coordinator instance.
      * @return a new command manager
-     * @see #FabricServerCommandManager(Function, Function, Function) for a more thorough explanation
+     * @see #FabricServerCommandManager(ExecutionCoordinator, Function, Function) for a more thorough explanation
      * @since 1.5.0
      */
     public static @NonNull FabricServerCommandManager<@NonNull CommandSourceStack> createNative(
-            final @NonNull Function<@NonNull CommandTree<@NonNull CommandSourceStack>,
-                    @NonNull CommandExecutionCoordinator<@NonNull CommandSourceStack>> execCoordinator
+            final @NonNull ExecutionCoordinator<CommandSourceStack> execCoordinator
     ) {
         return new FabricServerCommandManager<>(execCoordinator, Function.identity(), Function.identity());
     }
@@ -97,15 +94,14 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      *                                     when the parsers used in that particular platform are not thread safe. If you have
      *                                     commands that perform blocking operations, however, it might not be a good idea to
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
-     *                                     {@link AsynchronousCommandExecutionCoordinator}
+     *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
+     *                                     {@link ExecutionCoordinator#asyncCoordinator()}
      * @param commandSourceMapper          Function that maps {@link CommandSourceStack} to the command sender type
      * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link CommandSourceStack}
      * @since 1.5.0
      */
     public FabricServerCommandManager(
-            final @NonNull Function<@NonNull CommandTree<@NonNull C>,
-                    @NonNull CommandExecutionCoordinator<@NonNull C>> commandExecutionCoordinator,
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
             final @NonNull Function<@NonNull CommandSourceStack, @NonNull C> commandSourceMapper,
             final @NonNull Function<@NonNull C, @NonNull CommandSourceStack> backwardsCommandSourceMapper
     ) {

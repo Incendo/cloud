@@ -26,7 +26,7 @@ package cloud.commandframework.issue;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.exceptions.CommandExecutionException;
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import java.util.concurrent.CompletionException;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -45,7 +45,8 @@ class Issue281 {
     void commandExceptionShouldNotBeSwallowed() {
         // Arrange
         final CommandManager<TestCommandSender> commandManager = new CommandManager<TestCommandSender>(
-                AsynchronousCommandExecutionCoordinator.<TestCommandSender>builder().withSynchronousParsing().build(),
+                ExecutionCoordinator.<TestCommandSender>builder()
+                        .parsingExecutor(ExecutionCoordinator.nonSchedulingExecutor()).build(),
                 CommandRegistrationHandler.nullCommandRegistrationHandler()
         ) {
             @Override

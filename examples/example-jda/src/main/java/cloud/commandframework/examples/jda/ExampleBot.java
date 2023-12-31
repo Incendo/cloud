@@ -24,7 +24,7 @@
 package cloud.commandframework.examples.jda;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.jda.JDA4CommandManager;
 import cloud.commandframework.jda.JDAGuildSender;
 import cloud.commandframework.jda.JDAPrivateSender;
@@ -78,7 +78,7 @@ public final class ExampleBot {
                 jda,
                 message -> "!",
                 (sender, permission) -> permissionRegistry.hasPermission(sender.getUser().getIdLong(), permission),
-                CommandExecutionCoordinator.simpleCoordinator(),
+                ExecutionCoordinator.simpleCoordinator(),
                 sender -> {
                     MessageReceivedEvent event = sender.getEvent().orElse(null);
 

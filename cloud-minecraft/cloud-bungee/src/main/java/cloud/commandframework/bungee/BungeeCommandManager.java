@@ -24,7 +24,6 @@
 package cloud.commandframework.bungee;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.bungee.arguments.PlayerParser;
 import cloud.commandframework.bungee.arguments.ServerParser;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
@@ -34,7 +33,7 @@ import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.Function;
@@ -80,8 +79,7 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
     @SuppressWarnings("unchecked")
     public BungeeCommandManager(
             final @NonNull Plugin owningPlugin,
-            final @NonNull Function<@NonNull CommandTree<C>,
-                    @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
             final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
             final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper
     ) {

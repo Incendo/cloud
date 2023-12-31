@@ -30,7 +30,7 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
 import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
 import cloud.commandframework.fabric.argument.NamedColorParser;
@@ -76,7 +76,7 @@ public final class FabricExample implements ModInitializer {
     public void onInitialize() {
         // Create a commands manager. We'll use native command source types for this.
         final FabricServerCommandManager<CommandSourceStack> manager =
-                FabricServerCommandManager.createNative(CommandExecutionCoordinator.simpleCoordinator());
+                FabricServerCommandManager.createNative(ExecutionCoordinator.simpleCoordinator());
 
         final Command.Builder<CommandSourceStack> base = manager.commandBuilder("cloudtest");
 

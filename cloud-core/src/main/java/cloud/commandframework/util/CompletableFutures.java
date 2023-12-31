@@ -24,6 +24,9 @@
 package cloud.commandframework.util;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -51,5 +54,20 @@ public final class CompletableFutures {
         final CompletableFuture<T> future = new CompletableFuture<>();
         future.completeExceptionally(throwable);
         return future;
+    }
+
+    /**
+     * Creates a future that schedules a future on the provided executor.
+     *
+     * @param executor       executor
+     * @param futureSupplier future factory
+     * @param <T>            future result type
+     * @return future
+     */
+    public static <T> CompletableFuture<T> scheduleOn(
+            final Executor executor,
+            final Supplier<CompletableFuture<T>> futureSupplier
+    ) {
+        return CompletableFuture.supplyAsync(futureSupplier, executor).thenCompose(Function.identity());
     }
 }

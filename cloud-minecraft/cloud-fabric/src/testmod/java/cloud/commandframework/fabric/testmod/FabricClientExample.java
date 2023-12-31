@@ -26,7 +26,7 @@ package cloud.commandframework.fabric.testmod;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandDescription;
 import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.fabric.FabricClientCommandManager;
 import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
 import com.google.gson.JsonObject;
@@ -64,7 +64,7 @@ public final class FabricClientExample implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         final FabricClientCommandManager<FabricClientCommandSource> commandManager =
-                FabricClientCommandManager.createNative(CommandExecutionCoordinator.simpleCoordinator());
+                FabricClientCommandManager.createNative(ExecutionCoordinator.simpleCoordinator());
 
         final Command.Builder<FabricClientCommandSource> base = commandManager.commandBuilder("cloud_client");
 

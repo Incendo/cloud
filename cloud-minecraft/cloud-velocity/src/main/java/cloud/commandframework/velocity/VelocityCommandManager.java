@@ -24,7 +24,6 @@
 package cloud.commandframework.velocity;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
@@ -38,7 +37,7 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.exceptions.handling.ExceptionContext;
 import cloud.commandframework.exceptions.handling.ExceptionHandler;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.velocity.arguments.PlayerParser;
 import cloud.commandframework.velocity.arguments.ServerParser;
@@ -110,7 +109,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
     public VelocityCommandManager(
             final @NonNull PluginContainer plugin,
             final @NonNull ProxyServer proxyServer,
-            final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
             final @NonNull Function<@NonNull CommandSource, @NonNull C> commandSenderMapper,
             final @NonNull Function<@NonNull C, @NonNull CommandSource> backwardsCommandSenderMapper
     ) {

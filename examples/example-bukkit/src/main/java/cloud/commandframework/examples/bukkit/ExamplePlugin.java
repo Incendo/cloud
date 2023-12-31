@@ -27,7 +27,7 @@ import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationParserExample;
 import cloud.commandframework.examples.bukkit.builder.BuilderExample;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
@@ -65,7 +65,7 @@ public final class ExamplePlugin extends JavaPlugin {
             //
             manager = new PaperCommandManager<>(
                     /* Owning plugin */ this,
-                    /* (1) */ CommandExecutionCoordinator.simpleCoordinator(),
+                    /* (1) */ ExecutionCoordinator.simpleCoordinator(),
                     /* (2) */ Function.identity(),
                     /* (3) */ Function.identity()
             );

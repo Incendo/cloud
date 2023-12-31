@@ -40,7 +40,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class CommandExecutionCoordinatorTest {
+class ExecutionCoordinatorTest {
 
     @ParameterizedTest
     @MethodSource("testErrorMappingSource")
@@ -48,7 +48,7 @@ class CommandExecutionCoordinatorTest {
         // Arrange
         final CommandRegistrationHandler<TestCommandSender> registrationHandler = (command) -> true;
         final CommandManager<TestCommandSender> commandManager = new CommandManager<TestCommandSender>(
-                CommandExecutionCoordinator.simpleCoordinator(),
+                ExecutionCoordinator.simpleCoordinator(),
                 registrationHandler
         ) {
             @Override
@@ -86,7 +86,7 @@ class CommandExecutionCoordinatorTest {
         // Arrange
         final CommandRegistrationHandler<TestCommandSender> registrationHandler = (command) -> true;
         final CommandManager<TestCommandSender> commandManager = new CommandManager<TestCommandSender>(
-                CommandExecutionCoordinator.simpleCoordinator(),
+                ExecutionCoordinator.simpleCoordinator(),
                 registrationHandler
         ) {
             @Override
@@ -124,7 +124,7 @@ class CommandExecutionCoordinatorTest {
         // Arrange
         final CommandRegistrationHandler<TestCommandSender> registrationHandler = (command) -> true;
         final CommandManager<TestCommandSender> commandManager = new CommandManager<TestCommandSender>(
-                AsynchronousCommandExecutionCoordinator.<TestCommandSender>builder().withAsynchronousParsing().build(),
+                ExecutionCoordinator.asyncCoordinator(),
                 registrationHandler
         ) {
             @Override
@@ -172,7 +172,7 @@ class CommandExecutionCoordinatorTest {
         // Arrange
         final CommandRegistrationHandler<TestCommandSender> registrationHandler = (command) -> true;
         final CommandManager<TestCommandSender> commandManager = new CommandManager<TestCommandSender>(
-                AsynchronousCommandExecutionCoordinator.<TestCommandSender>builder().withAsynchronousParsing().build(),
+                ExecutionCoordinator.asyncCoordinator(),
                 registrationHandler
         ) {
             @Override

@@ -26,7 +26,7 @@ package cloud.commandframework.annotations.feature;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import io.leangen.geantyref.TypeToken;
 import java.util.concurrent.CompletionException;
@@ -43,7 +43,7 @@ class RequiredSenderDeductionTest {
     @BeforeEach
     void setup() {
         this.commandManager = new CommandManager<SuperSender<?>>(
-                CommandExecutionCoordinator.simpleCoordinator(),
+                ExecutionCoordinator.simpleCoordinator(),
                 CommandRegistrationHandler.nullCommandRegistrationHandler()
         ) {
             @Override

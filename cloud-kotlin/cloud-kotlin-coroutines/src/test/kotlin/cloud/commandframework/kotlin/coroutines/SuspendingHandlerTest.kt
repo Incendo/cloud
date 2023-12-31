@@ -24,7 +24,7 @@
 package cloud.commandframework.kotlin.coroutines
 
 import cloud.commandframework.CommandManager
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
+import cloud.commandframework.execution.ExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
 import cloud.commandframework.kotlin.coroutines.extension.suspendingHandler
 import cloud.commandframework.kotlin.extension.buildAndRegister
@@ -60,8 +60,8 @@ class SuspendingHandlerTest {
     private class TestCommandSender
 
     private class TestCommandManager : CommandManager<TestCommandSender>(
-        AsynchronousCommandExecutionCoordinator.builder<TestCommandSender>()
-            .withExecutor(executorService)
+        ExecutionCoordinator.builder<TestCommandSender>()
+            .executor(executorService)
             .build(),
         CommandRegistrationHandler.nullCommandRegistrationHandler()
     ) {

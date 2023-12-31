@@ -24,7 +24,6 @@
 package cloud.commandframework.fabric;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.standard.UUIDParser;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
@@ -38,8 +37,7 @@ import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
 import cloud.commandframework.fabric.argument.RegistryEntryParser;
@@ -149,8 +147,8 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
      *                                     when the parsers used in that particular platform are not thread safe. If you have
      *                                     commands that perform blocking operations, however, it might not be a good idea to
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
-     *                                     {@link AsynchronousCommandExecutionCoordinator}
+     *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
+     *                                     {@link ExecutionCoordinator#asyncCoordinator()}
      * @param commandSourceMapper          Function that maps {@link SharedSuggestionProvider} to the command sender type
      * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link SharedSuggestionProvider}
      * @param registrationHandler          the handler accepting command registrations
@@ -159,7 +157,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
      */
     @SuppressWarnings("unchecked")
     FabricCommandManager(
-            final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
             final @NonNull Function<S, C> commandSourceMapper,
             final @NonNull Function<C, S> backwardsCommandSourceMapper,
             final @NonNull FabricCommandRegistrationHandler<C, S> registrationHandler,

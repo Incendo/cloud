@@ -30,8 +30,7 @@ import cloud.commandframework.arguments.parser.ParserDescriptor
 import cloud.commandframework.arguments.suggestion.SuggestionFactory
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.context.CommandInput
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
-import cloud.commandframework.execution.CommandExecutionCoordinator
+import cloud.commandframework.execution.ExecutionCoordinator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.future
@@ -41,8 +40,8 @@ import kotlin.coroutines.EmptyCoroutineContext
 /**
  * Suspending version of [ArgumentParser] for use with coroutines.
  *
- * NOTE: It is highly advised to not use [CommandExecutionCoordinator.SimpleCoordinator] together
- * with coroutine support. Consider using [AsynchronousCommandExecutionCoordinator] instead.
+ * NOTE: It is highly advised to not use [ExecutionCoordinator.simpleCoordinator] together
+ * with coroutine support. Consider using [ExecutionCoordinator.asyncCoordinator] instead.
  *
  * @param C command sender type.
  */

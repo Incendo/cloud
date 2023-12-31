@@ -25,7 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.exceptions.NoPermissionException;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PredicatePermission;
@@ -238,7 +238,7 @@ class PermissionTest {
         private final Function<String, Boolean> permissionFunction;
 
         private MockPermissionManager(final @NonNull Function<String, Boolean> permissionFunction) {
-            super(CommandExecutionCoordinator.simpleCoordinator(), cmd -> true);
+            super(ExecutionCoordinator.simpleCoordinator(), cmd -> true);
             this.permissionFunction = permissionFunction;
         }
 

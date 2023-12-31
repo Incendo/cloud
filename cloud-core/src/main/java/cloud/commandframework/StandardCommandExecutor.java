@@ -27,8 +27,8 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.handling.ExceptionController;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandResult;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.services.State;
 import cloud.commandframework.util.CompletableFutures;
 import java.util.concurrent.CompletableFuture;
@@ -39,16 +39,16 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 final class StandardCommandExecutor<C> implements CommandExecutor<C> {
 
     private final CommandManager<C> commandManager;
-    private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
+    private final ExecutionCoordinator<C> executionCoordinator;
     private final CommandContextFactory<C> commandContextFactory;
 
     StandardCommandExecutor(
             final @NonNull CommandManager<C> commandManager,
-            final @NonNull CommandExecutionCoordinator<C> commandExecutionCoordinator,
+            final @NonNull ExecutionCoordinator<C> executionCoordinator,
             final @NonNull CommandContextFactory<C> commandContextFactory
     ) {
         this.commandManager = commandManager;
-        this.commandExecutionCoordinator = commandExecutionCoordinator;
+        this.executionCoordinator = executionCoordinator;
         this.commandContextFactory = commandContextFactory;
     }
 
@@ -86,7 +86,8 @@ final class StandardCommandExecutor<C> implements CommandExecutor<C> {
         context.store("__raw_input__", commandInput.copy());
         try {
             if (this.commandManager.preprocessContext(context, commandInput) == State.ACCEPTED) {
-                return this.commandExecutionCoordinator().coordinateExecution(context, commandInput);
+                return this.executionCoordinator()
+                        .coordinateExecution(this.commandManager.commandTree(), context, commandInput);
             }
         } catch (final Exception e) {
             return CompletableFutures.failedFuture(e);
@@ -96,7 +97,7 @@ final class StandardCommandExecutor<C> implements CommandExecutor<C> {
     }
 
     @Override
-    public @NonNull CommandExecutionCoordinator<C> commandExecutionCoordinator() {
-        return this.commandExecutionCoordinator;
+    public @NonNull ExecutionCoordinator<C> executionCoordinator() {
+        return this.executionCoordinator;
     }
 }
