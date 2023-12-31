@@ -53,7 +53,7 @@ public interface ExecutionCoordinator<C> {
      * @param <C> command sender type
      * @return new {@link Builder}
      */
-    static <C> Builder<C> builder() {
+    static <C> @Pure @NonNull Builder<C> builder() {
         return new ExecutionCoordinatorBuilderImpl<>();
     }
 
