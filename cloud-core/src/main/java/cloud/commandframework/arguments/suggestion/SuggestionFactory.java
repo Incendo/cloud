@@ -47,11 +47,12 @@ public interface SuggestionFactory<C, S extends Suggestion> {
      * Returns a suggestion factory that invokes the command tree to create the suggestions, and then maps them
      * to the output type using the given {@code mapper}.
      *
-     * @param <C>            the command sender type
-     * @param <S>            the output suggestion type
-     * @param manager        the command manager
-     * @param mapper         the suggestion mapper
-     * @param contextFactory factory producing {@link CommandContext} instances
+     * @param <C>                  the command sender type
+     * @param <S>                  the output suggestion type
+     * @param manager              the command manager
+     * @param mapper               the suggestion mapper
+     * @param contextFactory       factory producing {@link CommandContext} instances
+     * @param executionCoordinator the execution coordinator
      * @return the factory
      */
     static <C, S extends Suggestion> @NonNull SuggestionFactory<C, S> delegating(
@@ -59,7 +60,7 @@ public interface SuggestionFactory<C, S extends Suggestion> {
             final @NonNull SuggestionMapper<S> mapper,
             final @NonNull CommandContextFactory<C> contextFactory,
             final @NonNull ExecutionCoordinator<C> executionCoordinator
-            ) {
+    ) {
         return new DelegatingSuggestionFactory<>(
                 manager,
                 manager.commandTree(),

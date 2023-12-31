@@ -27,6 +27,7 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -34,6 +35,7 @@ import java.util.concurrent.ForkJoinPool;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.dataflow.qual.Pure;
 
 /**
  * The {@link ExecutionCoordinator execution coordinator} is responsible for coordinating execution of command parsing,
@@ -56,14 +58,36 @@ public interface ExecutionCoordinator<C> {
         return new ExecutionCoordinatorBuilderImpl<>();
     }
 
-    static <C> @NonNull ExecutionCoordinator<C> simpleCoordinator() {
+    /**
+     * Create a new execution coordinator that does not make any attempt to schedule tasks to a particular executor. Parsing
+     * and suggestions will run on the calling thread until redirected by a parser, suggestion provider, or similar, at which
+     * point execution will continue on that thread.
+     *
+     * @param <C> command sender type
+     * @return new coordinator
+     */
+    static <C> @Pure @NonNull ExecutionCoordinator<C> simpleCoordinator() {
         return ExecutionCoordinator.<C>builder().build();
     }
 
+    /**
+     * Create a new execution coordinator that schedules to {@code executor} at every possible point in the pipeline.
+     *
+     * @param executor executor to use
+     * @param <C>      command sender type
+     * @return new coordinator
+     */
     static <C> @NonNull ExecutionCoordinator<C> coordinatorFor(final @NonNull Executor executor) {
         return ExecutionCoordinator.<C>builder().executor(executor).build();
     }
 
+    /**
+     * Create a new execution coordinator that schedules to {@link ForkJoinPool#commonPool() the common pool} at every possible
+     * point in the pipeline.
+     *
+     * @param <C> command sender type
+     * @return new coordinator
+     */
     static <C> @NonNull ExecutionCoordinator<C> asyncCoordinator() {
         return ExecutionCoordinator.<C>builder().commonPoolExecutor().build();
     }
@@ -71,9 +95,10 @@ public interface ExecutionCoordinator<C> {
     /**
      * Coordinate the execution of a command and return the result
      *
-     * @param commandContext Command context
-     * @param commandInput   Command input
-     * @return Future that completes with the result
+     * @param commandTree    command tree to suggest from
+     * @param commandContext command context
+     * @param commandInput   command input
+     * @return future that completes with the result
      */
     @NonNull CompletableFuture<CommandResult<C>> coordinateExecution(
             @NonNull CommandTree<C> commandTree,
@@ -81,6 +106,14 @@ public interface ExecutionCoordinator<C> {
             @NonNull CommandInput commandInput
     );
 
+    /**
+     * Coordinates the execution of a suggestions query.
+     *
+     * @param commandTree  command tree to suggest from
+     * @param context      command context
+     * @param commandInput command input
+     * @return future that completes with the result
+     */
     @NonNull CompletableFuture<@NonNull List<@NonNull Suggestion>> coordinateSuggestions(
             @NonNull CommandTree<C> commandTree,
             @NonNull CommandContext<C> context,
@@ -90,12 +123,29 @@ public interface ExecutionCoordinator<C> {
     /**
      * Builder for {@link ExecutionCoordinator}.
      *
+     * <p>Any executors left unset will default to a non-scheduling executor that
+     * executes tasks immediately on the calling thread (meaning it will not redirect execution to another thread context, it
+     * will continue in the current one).</p>
+     *
      * @param <C> command sender type
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     interface Builder<C> {
 
+        /**
+         * Sets all of:
+         * <ul>
+         *     <li>{@link #parsingExecutor(Executor)}</li>
+         *     <li>{@link #suggestionsExecutor(Executor)}</li>
+         *     <li>{@link #postProcessingExecutor(Executor)}</li>
+         *     <li>{@link #executionSchedulingExecutor(Executor)}</li>
+         * </ul>
+         * using the provided executor.
+         *
+         * @param executor executor to use
+         * @return this builder
+         */
         default @This @NonNull Builder<C> executor(final @NonNull Executor executor) {
             return this.parsingExecutor(executor)
                     .suggestionsExecutor(executor)
@@ -103,16 +153,45 @@ public interface ExecutionCoordinator<C> {
                     .executionSchedulingExecutor(executor);
         }
 
+        /**
+         * Sets {@link #executor(Executor)} to the {@link ForkJoinPool#commonPool() common pool}.
+         *
+         * @return this builder
+         */
         default @This @NonNull Builder<C> commonPoolExecutor() {
             return this.executor(ForkJoinPool.commonPool());
         }
 
+        /**
+         * Sets the executor to run parsing logic on.
+         *
+         * @param executor executor to use
+         * @return this builder
+         */
         @This @NonNull Builder<C> parsingExecutor(@NonNull Executor executor);
 
+        /**
+         * Sets the executor to run suggestions logic on.
+         *
+         * @param executor executor to use
+         * @return this builder
+         */
         @This @NonNull Builder<C> suggestionsExecutor(@NonNull Executor executor);
 
+        /**
+         * Sets the executor to run {@link CommandPostprocessor command postprocessors} on.
+         *
+         * @param executor executor to use
+         * @return this builder
+         */
         @This @NonNull Builder<C> postProcessingExecutor(@NonNull Executor executor);
 
+        /**
+         * Sets the executor to {@link CommandExecutionHandler#executeFuture(CommandContext) schedule command execution} from.
+         *
+         * @param executor executor to use
+         * @return this builder
+         */
         @This @NonNull Builder<C> executionSchedulingExecutor(@NonNull Executor executor);
 
         /**
@@ -123,7 +202,7 @@ public interface ExecutionCoordinator<C> {
         @This @NonNull Builder<C> synchronizeExecution();
 
         /**
-         * Creates a new {@link ExecutionCoordinator} from the state of this builder.
+         * Creates a new {@link ExecutionCoordinator} from the current state of this builder.
          *
          * @return new {@link ExecutionCoordinator}
          */

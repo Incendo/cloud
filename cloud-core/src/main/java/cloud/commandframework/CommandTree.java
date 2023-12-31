@@ -157,10 +157,11 @@ public final class CommandTree<C> {
     }
 
     /**
-     * Attempts to parse string input into a command
+     * Attempts to parse a command from the provided input.
      *
-     * @param commandContext Command context instance
-     * @param commandInput   Input
+     * @param commandContext  command context instance
+     * @param commandInput    command input
+     * @param parsingExecutor executor to schedule parsing logic on
      * @return parsed command, if one could be found
      * @since 2.0.0
      */
@@ -585,6 +586,7 @@ public final class CommandTree<C> {
      *
      * @param context      Context instance
      * @param commandInput Input
+     * @param executor     executor to schedule suggestion logic on
      * @return String suggestions. These should be filtered based on {@link String#startsWith(String)}
      * @since 2.0.0
      */
@@ -836,9 +838,10 @@ public final class CommandTree<C> {
      * Adds the suggestions for the given {@code node} to the given {@code context}. If the {@code node} contains
      * a flag, then all children of the {@code node} will contribute with suggestions as well
      *
-     * @param context the suggestion context
-     * @param node    the node containing the argument to get suggestions from
-     * @param input   the input from the sender
+     * @param context  the suggestion context
+     * @param node     the node containing the argument to get suggestions from
+     * @param input    the input from the sender
+     * @param executor executor to schedule further suggestion logic to
      * @return the context
      */
     private @NonNull CompletableFuture<SuggestionContext<C>> addArgumentSuggestions(
@@ -875,6 +878,7 @@ public final class CommandTree<C> {
      * @param context   the suggestion context
      * @param component the component to get suggestions from
      * @param input     the input from the sender
+     * @param executor  executor to schedule further suggestion logic to
      * @return future that completes with the context
      */
     private CompletableFuture<SuggestionContext<C>> addArgumentSuggestions(
