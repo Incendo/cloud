@@ -51,7 +51,7 @@ public final class BukkitBackwardsBrigadierSenderMapper<C, S> implements Functio
     @Override
     public S apply(final @NonNull C cloud) {
         try {
-            return (S) GET_LISTENER_METHOD.invoke(null, this.commandManager.getBackwardsCommandSenderMapper().apply(cloud));
+            return (S) GET_LISTENER_METHOD.invoke(null, this.commandManager.senderMapper().reverse(cloud));
         } catch (final ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }

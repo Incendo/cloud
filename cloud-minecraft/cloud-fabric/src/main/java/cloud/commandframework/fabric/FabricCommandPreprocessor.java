@@ -39,7 +39,7 @@ final class FabricCommandPreprocessor<C> implements CommandPreprocessor<C> {
     public void accept(final @NonNull CommandPreprocessingContext<C> context) {
         context.commandContext().store(
                 FabricCommandContextKeys.NATIVE_COMMAND_SOURCE,
-                this.manager.backwardsCommandSourceMapper().apply(context.commandContext().sender())
+                this.manager.senderMapper().reverse(context.commandContext().sender())
         );
     }
 }

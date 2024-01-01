@@ -46,7 +46,7 @@ final class FabricExceptionHandler<C, S extends SharedSuggestionProvider, T exte
     @Override
     public void handle(final @NonNull ExceptionContext<C, T> context) throws Throwable {
         this.consumer.handle(
-                this.fabricCommandManager.backwardsCommandSourceMapper().apply(context.context().sender()),
+                this.fabricCommandManager.senderMapper().reverse(context.context().sender()),
                 context.context().sender(),
                 context.exception()
         );

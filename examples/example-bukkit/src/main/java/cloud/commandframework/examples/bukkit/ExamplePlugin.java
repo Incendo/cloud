@@ -32,7 +32,7 @@ import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.paper.PaperCommandManager;
-import cloud.commandframework.util.SenderMapper;
+import cloud.commandframework.SenderMapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;

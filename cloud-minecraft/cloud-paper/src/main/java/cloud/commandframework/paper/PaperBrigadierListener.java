@@ -65,14 +65,14 @@ class PaperBrigadierListener<C> implements Listener {
         this.brigadierManager = new CloudBrigadierManager<>(
                 this.paperCommandManager,
                 () -> new CommandContext<>(
-                    this.paperCommandManager.getCommandSenderMapper().apply(Bukkit.getConsoleSender()),
-                    this.paperCommandManager
+                        this.paperCommandManager.senderMapper().map(Bukkit.getConsoleSender()),
+                        this.paperCommandManager
                 ),
                 paperCommandManager.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion)
         );
 
         this.brigadierManager.brigadierSenderMapper(sender ->
-                this.paperCommandManager.getCommandSenderMapper().apply(sender.getBukkitSender()));
+                this.paperCommandManager.senderMapper().map(sender.getBukkitSender()));
 
         new PaperBrigadierMapper<>(new BukkitBrigadierMapper<>(this.paperCommandManager, this.brigadierManager));
 
@@ -116,7 +116,7 @@ class PaperBrigadierListener<C> implements Listener {
                 return false;
             }
 
-            final C commandSender = this.paperCommandManager.getCommandSenderMapper().apply(sender.getBukkitSender());
+            final C commandSender = this.paperCommandManager.senderMapper().map(sender.getBukkitSender());
             return this.paperCommandManager.hasPermission(commandSender, permission);
         };
         final LiteralBrigadierNodeFactory<C, BukkitBrigadierCommandSource> literalFactory =

@@ -59,7 +59,7 @@ final class PaperCommandPreprocessor<C> implements CommandPreprocessor<C> {
     }
 
     private Executor foliaExecutorFor(final C sender) {
-        final CommandSender commandSender = this.manager.getBackwardsCommandSenderMapper().apply(sender);
+        final CommandSender commandSender = this.manager.senderMapper().reverse(sender);
         final Plugin plugin = this.manager.getOwningPlugin();
         if (commandSender instanceof Entity) {
             return task -> {

@@ -24,6 +24,7 @@
 package cloud.commandframework.paper;
 
 import cloud.commandframework.CloudCapability;
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
@@ -31,7 +32,6 @@ import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.paper.suggestions.SuggestionListener;
 import cloud.commandframework.paper.suggestions.SuggestionListenerFactory;
 import cloud.commandframework.state.RegistrationState;
-import cloud.commandframework.util.SenderMapper;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;

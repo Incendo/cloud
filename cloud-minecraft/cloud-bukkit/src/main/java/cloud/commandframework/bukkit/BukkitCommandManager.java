@@ -25,6 +25,8 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.SenderMapper;
+import cloud.commandframework.SenderMappingCommandManager;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionMapper;
@@ -65,12 +67,10 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.state.RegistrationState;
-import cloud.commandframework.util.SenderMapper;
 import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.logging.Level;
 import org.apiguardian.api.API;
 import org.bukkit.ChatColor;
@@ -90,7 +90,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @param <C> Command sender type
  */
-public class BukkitCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C, Object> {
+public class BukkitCommandManager<C> extends CommandManager<C>
+        implements BrigadierManagerHolder<C, Object>, SenderMappingCommandManager<CommandSender, C> {
 
     private static final String MESSAGE_INTERNAL_ERROR = ChatColor.RED
             + "An internal error occurred while attempting to perform this command.";
@@ -100,9 +101,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
     private final Plugin owningPlugin;
-
-    private final Function<CommandSender, C> commandSenderMapper;
-    private final Function<C, CommandSender> backwardsCommandSenderMapper;
+    private final SenderMapper<CommandSender, C> senderMapper;
 
     private boolean splitAliases = false;
 
@@ -135,8 +134,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
             throw new InitializationException("Failed to initialize command registration handler", exception);
         }
         this.owningPlugin = owningPlugin;
-        this.commandSenderMapper = commandSenderMapper::map;
-        this.backwardsCommandSenderMapper = commandSenderMapper::reverse;
+        this.senderMapper = commandSenderMapper;
 
         this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
                 FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
@@ -229,13 +227,9 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         return this.owningPlugin;
     }
 
-    /**
-     * Get the command sender mapper
-     *
-     * @return Command sender mapper
-     */
-    public final @NonNull Function<@NonNull CommandSender, @NonNull C> getCommandSenderMapper() {
-        return this.commandSenderMapper;
+    @Override
+    public final @NonNull SenderMapper<CommandSender, C> senderMapper() {
+        return this.senderMapper;
     }
 
     /**
@@ -258,7 +252,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         if (permission.isEmpty()) {
             return true;
         }
-        return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
+        return this.senderMapper.reverse(sender).hasPermission(permission);
     }
 
     protected final boolean getSplitAliases() {
@@ -377,15 +371,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     }
 
     /**
-     * Get the backwards command sender plugin
-     *
-     * @return The backwards command sender mapper
-     */
-    public final @NonNull Function<@NonNull C, @NonNull CommandSender> getBackwardsCommandSenderMapper() {
-        return this.backwardsCommandSenderMapper;
-    }
-
-    /**
      * Attempts to call the method on the provided class matching the signature
      * <p>{@code private static void registerParserSupplier(BukkitCommandManager)}</p>
      * using reflection.
@@ -405,33 +390,33 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
 
     private void registerDefaultExceptionHandlers() {
         this.exceptionController().registerHandler(Throwable.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(MESSAGE_INTERNAL_ERROR);
+            this.senderMapper.reverse(context.context().sender()).sendMessage(MESSAGE_INTERNAL_ERROR);
             this.owningPlugin.getLogger().log(
                     Level.SEVERE,
                     "An unhandled exception was thrown during command execution",
                     context.exception()
             );
         }).registerHandler(CommandExecutionException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(MESSAGE_INTERNAL_ERROR);
+            this.senderMapper.reverse(context.context().sender()).sendMessage(MESSAGE_INTERNAL_ERROR);
             this.owningPlugin.getLogger().log(
                     Level.SEVERE,
                     "Exception executing command handler",
                     context.exception().getCause()
             );
         }).registerHandler(ArgumentParseException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(
+            this.senderMapper.reverse(context.context().sender()).sendMessage(
                     ChatColor.RED + "Invalid Command Argument: " + ChatColor.GRAY + context.exception().getCause().getMessage()
             );
         }).registerHandler(NoSuchCommandException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(MESSAGE_UNKNOWN_COMMAND);
+            this.senderMapper.reverse(context.context().sender()).sendMessage(MESSAGE_UNKNOWN_COMMAND);
         }).registerHandler(NoPermissionException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(MESSAGE_NO_PERMS);
+            this.senderMapper.reverse(context.context().sender()).sendMessage(MESSAGE_NO_PERMS);
         }).registerHandler(InvalidCommandSenderException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(
+            this.senderMapper.reverse(context.context().sender()).sendMessage(
                     ChatColor.RED + context.exception().getMessage()
             );
         }).registerHandler(InvalidSyntaxException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(
+            this.senderMapper.reverse(context.context().sender()).sendMessage(
                     ChatColor.RED + "Invalid Command Syntax. Correct command syntax is: "
                             + ChatColor.GRAY + context.exception().getCorrectSyntax()
             );

@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.util;
+package cloud.commandframework;
 
 import java.util.function.Function;
 import org.apiguardian.api.API;
