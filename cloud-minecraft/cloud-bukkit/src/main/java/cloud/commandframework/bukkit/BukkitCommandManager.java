@@ -125,7 +125,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     public BukkitCommandManager(
             final @NonNull Plugin owningPlugin,
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
-            final @NonNull SenderMapper<@NonNull CommandSender, @NonNull C> commandSenderMapper
+            final @NonNull SenderMapper<CommandSender, C> commandSenderMapper
     ) throws InitializationException {
         super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler<>());
         try {

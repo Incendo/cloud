@@ -74,7 +74,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
     public PaperCommandManager(
             final @NonNull Plugin owningPlugin,
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
-            final @NonNull SenderMapper<@NonNull CommandSender, @NonNull C> commandSenderMapper
+            final @NonNull SenderMapper<CommandSender, C> commandSenderMapper
     ) throws InitializationException {
         super(owningPlugin, commandExecutionCoordinator, commandSenderMapper);
 
