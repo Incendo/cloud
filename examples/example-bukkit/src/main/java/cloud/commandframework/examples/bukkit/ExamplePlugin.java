@@ -58,7 +58,7 @@ public final class ExamplePlugin extends JavaPlugin {
         //     It is possible to execute (and parse!) commands asynchronously by using the
         //     AsynchronousCommandExecutionCoordinator.
         // (2) This function maps the Bukkit CommandSender to your custom sender type and back. If you're not using a custom
-        //     type, then BiDirectionalFunction.identity() maps CommandSender to itself.
+        //     type, then SenderMapper.identity() maps CommandSender to itself.
         //
         final BukkitCommandManager<CommandSender> manager = new PaperCommandManager<>(
                 /* Owning plugin */ this,
