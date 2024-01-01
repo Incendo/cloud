@@ -49,10 +49,9 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                                         .getConsoleCommandSource()),
                         velocityCommandManager
                 ),
-                velocityCommandManager.suggestionFactory()
+                velocityCommandManager.suggestionFactory(),
+                velocityCommandManager.senderMapper()
         );
-        this.brigadierManager.brigadierSenderMapper(this.manager.senderMapper()::map);
-        this.brigadierManager.backwardsBrigadierSenderMapper(this.manager.senderMapper()::reverse);
     }
 
     @Override

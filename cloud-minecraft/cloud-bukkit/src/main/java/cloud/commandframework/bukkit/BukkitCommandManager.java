@@ -26,7 +26,7 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.SenderMapper;
-import cloud.commandframework.SenderMappingCommandManager;
+import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionMapper;
@@ -91,7 +91,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  */
 public class BukkitCommandManager<C> extends CommandManager<C>
-        implements BrigadierManagerHolder<C, Object>, SenderMappingCommandManager<CommandSender, C> {
+        implements BrigadierManagerHolder<C, Object>, SenderMapperHolder<CommandSender, C> {
 
     private static final String MESSAGE_INTERNAL_ERROR = ChatColor.RED
             + "An internal error occurred while attempting to perform this command.";

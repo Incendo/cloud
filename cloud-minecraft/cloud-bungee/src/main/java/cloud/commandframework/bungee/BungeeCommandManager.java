@@ -25,7 +25,7 @@ package cloud.commandframework.bungee;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.SenderMapper;
-import cloud.commandframework.SenderMappingCommandManager;
+import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.bungee.arguments.PlayerParser;
 import cloud.commandframework.bungee.arguments.ServerParser;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
@@ -47,7 +47,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class BungeeCommandManager<C> extends CommandManager<C> implements SenderMappingCommandManager<CommandSender, C> {
+public class BungeeCommandManager<C> extends CommandManager<C> implements SenderMapperHolder<CommandSender, C> {
 
     private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS =

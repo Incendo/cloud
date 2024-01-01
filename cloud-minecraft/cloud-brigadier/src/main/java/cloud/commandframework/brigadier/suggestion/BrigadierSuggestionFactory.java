@@ -99,13 +99,13 @@ public final class BrigadierSuggestionFactory<C, S> {
     ) {
         final CommandContext<C> commandContext;
         String command = builder.getInput();
-        if (this.cloudBrigadierManager.brigadierSenderMapper() == null || senderContext == null) {
+        if (senderContext == null) {
             commandContext = this.dummyContextProvider.get();
             if (command.startsWith("/") /* Minecraft specific */) {
                 command = command.substring(1);
             }
         } else {
-            final C cloudSender = this.cloudBrigadierManager.brigadierSenderMapper().apply(senderContext.getSource());
+            final C cloudSender = this.cloudBrigadierManager.senderMapper().map(senderContext.getSource());
             commandContext = new CommandContext<>(
                     true,
                     cloudSender,

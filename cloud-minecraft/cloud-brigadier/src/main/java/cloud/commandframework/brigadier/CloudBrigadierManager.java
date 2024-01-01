@@ -25,6 +25,8 @@ package cloud.commandframework.brigadier;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.SenderMapper;
+import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.standard.BooleanParser;
@@ -59,12 +61,11 @@ import io.leangen.geantyref.TypeToken;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Manager used to map cloud {@link Command}
@@ -77,27 +78,29 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <S> brigadier command source type
  */
 @SuppressWarnings({"unchecked", "unused"})
-public final class CloudBrigadierManager<C, S> {
+public final class CloudBrigadierManager<C, S> implements SenderMapperHolder<S, C> {
 
     private final BrigadierMappings<C, S> brigadierMappings = BrigadierMappings.create();
     private final LiteralBrigadierNodeFactory<C, S> literalBrigadierNodeFactory;
     private final Map<@NonNull Class<?>, @NonNull ArgumentTypeFactory<?>> defaultArgumentTypeSuppliers;
     private final Configurable<BrigadierSetting> settings = Configurable.enumConfigurable(BrigadierSetting.class);
-    private Function<S, C> brigadierCommandSenderMapper;
-    private Function<C, S> backwardsBrigadierCommandSenderMapper;
+    private final SenderMapper<S, C> brigadierSourceMapper;
 
     /**
      * Create a new cloud brigadier manager
      *
-     * @param commandManager       Command manager
-     * @param dummyContextProvider Provider of dummy context for completions
-     * @param suggestionFactory    The factory that produces suggestions
+     * @param commandManager        Command manager
+     * @param dummyContextProvider  Provider of dummy context for completions
+     * @param suggestionFactory     The factory that produces suggestions
+     * @param brigadierSourceMapper Mapper between the Brigadier command source type and cloud command sender type
      */
     public CloudBrigadierManager(
             final @NonNull CommandManager<C> commandManager,
             final @NonNull Supplier<@NonNull CommandContext<C>> dummyContextProvider,
-            final @NonNull SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory
+            final @NonNull SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory,
+            final @NonNull SenderMapper<S, C> brigadierSourceMapper
     ) {
+        this.brigadierSourceMapper = Objects.requireNonNull(brigadierSourceMapper, "brigadierSourceMapper");
         this.defaultArgumentTypeSuppliers = new HashMap<>();
         this.literalBrigadierNodeFactory = new LiteralBrigadierNodeFactory<>(
                 this,
@@ -107,12 +110,10 @@ public final class CloudBrigadierManager<C, S> {
         );
         this.registerInternalMappings();
         commandManager.registerCommandPreProcessor(ctx -> {
-            if (this.backwardsBrigadierCommandSenderMapper != null) {
-                ctx.commandContext().store(
-                        WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER,
-                        this.backwardsBrigadierCommandSenderMapper.apply(ctx.commandContext().sender())
-                );
-            }
+            ctx.commandContext().store(
+                    WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER,
+                    this.brigadierSourceMapper.reverse(ctx.commandContext().sender())
+            );
         });
     }
 
@@ -215,41 +216,9 @@ public final class CloudBrigadierManager<C, S> {
         return this.settings;
     }
 
-    /**
-     * Set the mapper between the Brigadier command sender type and the Cloud command sender type
-     *
-     * @param mapper Mapper
-     * @since 1.2.0
-     */
-    @API(status = API.Status.STABLE, since = "1.2.0")
-    public void brigadierSenderMapper(
-            final @NonNull Function<@NonNull S, @Nullable C> mapper
-    ) {
-        this.brigadierCommandSenderMapper = mapper;
-    }
-
-    /**
-     * Get the mapper between Brigadier and Cloud command senders, if one exists
-     *
-     * @return Mapper
-     * @since 1.2.0
-     */
-    @API(status = API.Status.STABLE, since = "1.2.0")
-    public @Nullable Function<@NonNull S, @Nullable C> brigadierSenderMapper() {
-        return this.brigadierCommandSenderMapper;
-    }
-
-    /**
-     * Set the backwards mapper from Cloud to Brigadier command senders.
-     *
-     * <p>This is passed to completion requests for mapped argument types.</p>
-     *
-     * @param mapper the reverse brigadier sender mapper
-     * @since 1.5.0
-     */
-    @API(status = API.Status.STABLE, since = "1.5.0")
-    public void backwardsBrigadierSenderMapper(final @NonNull Function<@NonNull C, @Nullable S> mapper) {
-        this.backwardsBrigadierCommandSenderMapper = mapper;
+    @Override
+    public @NonNull SenderMapper<S, C> senderMapper() {
+        return this.brigadierSourceMapper;
     }
 
     /**

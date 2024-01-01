@@ -25,7 +25,7 @@ package cloud.commandframework.fabric;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.SenderMapper;
-import cloud.commandframework.SenderMappingCommandManager;
+import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.arguments.standard.UUIDParser;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
@@ -120,7 +120,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 1.5.0
  */
 public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider> extends CommandManager<C> implements
-        BrigadierManagerHolder<C, S>, SenderMappingCommandManager<S, C> {
+        BrigadierManagerHolder<C, S>, SenderMapperHolder<S, C> {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int MOD_PUBLIC_STATIC_FINAL = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
@@ -176,11 +176,10 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
                         this.senderMapper.map(dummyCommandSourceProvider.get()),
                         this
                 ),
-                this.suggestionFactory()
+                this.suggestionFactory(),
+                this.senderMapper
         );
 
-        this.brigadierManager.backwardsBrigadierSenderMapper(this.senderMapper::reverse);
-        this.brigadierManager.brigadierSenderMapper(this.senderMapper::map);
         this.registerNativeBrigadierMappings(this.brigadierManager);
         this.captionRegistry(new FabricCaptionRegistry<>());
         this.registerCommandPreProcessor(new FabricCommandPreprocessor<>(this));

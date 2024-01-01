@@ -25,7 +25,7 @@ package cloud.commandframework.cloudburst;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.SenderMapper;
-import cloud.commandframework.SenderMappingCommandManager;
+import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -49,7 +49,7 @@ import org.cloudburstmc.server.plugin.Plugin;
  *
  * @param <C> Command sender type
  */
-public class CloudburstCommandManager<C> extends CommandManager<C> implements SenderMappingCommandManager<CommandSender, C> {
+public class CloudburstCommandManager<C> extends CommandManager<C> implements SenderMapperHolder<CommandSender, C> {
 
     private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS =

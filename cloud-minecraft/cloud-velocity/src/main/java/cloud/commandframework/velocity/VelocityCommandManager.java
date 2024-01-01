@@ -25,7 +25,7 @@ package cloud.commandframework.velocity;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.SenderMapper;
-import cloud.commandframework.SenderMappingCommandManager;
+import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
@@ -74,7 +74,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 @Singleton
 public class VelocityCommandManager<C> extends CommandManager<C>
-        implements BrigadierManagerHolder<C, CommandSource>, SenderMappingCommandManager<CommandSource, C> {
+        implements BrigadierManagerHolder<C, CommandSource>, SenderMapperHolder<CommandSource, C> {
 
     private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS =

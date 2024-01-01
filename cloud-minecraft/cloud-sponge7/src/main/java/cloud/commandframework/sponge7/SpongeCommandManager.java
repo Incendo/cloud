@@ -25,7 +25,7 @@ package cloud.commandframework.sponge7;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.SenderMapper;
-import cloud.commandframework.SenderMappingCommandManager;
+import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -55,7 +55,7 @@ import static java.util.Objects.requireNonNull;
  * @since 1.4.0
  */
 @Singleton
-public class SpongeCommandManager<C> extends CommandManager<C> implements SenderMappingCommandManager<CommandSource, C> {
+public class SpongeCommandManager<C> extends CommandManager<C> implements SenderMapperHolder<CommandSource, C> {
 
     private static final Text MESSAGE_INTERNAL_ERROR = Text.of(
             TextColors.RED,
