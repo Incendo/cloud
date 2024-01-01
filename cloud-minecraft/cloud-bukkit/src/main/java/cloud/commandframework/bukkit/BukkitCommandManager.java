@@ -65,12 +65,12 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.state.RegistrationState;
+import cloud.commandframework.util.SenderMapper;
 import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import org.apiguardian.api.API;
 import org.bukkit.ChatColor;
@@ -120,14 +120,12 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
      *                                     {@link ExecutionCoordinator#asyncCoordinator()}.
      * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
-     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws InitializationException if construction of the manager fails
      */
     public BukkitCommandManager(
             final @NonNull Plugin owningPlugin,
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
-            final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper
+            final @NonNull SenderMapper<@NonNull CommandSender, @NonNull C> commandSenderMapper
     ) throws InitializationException {
         super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler<>());
         try {
@@ -136,8 +134,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
             throw new InitializationException("Failed to initialize command registration handler", exception);
         }
         this.owningPlugin = owningPlugin;
-        this.commandSenderMapper = commandSenderMapper;
-        this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
+        this.commandSenderMapper = commandSenderMapper::map;
+        this.backwardsCommandSenderMapper = commandSenderMapper::reverse;
 
         this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
                 FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
@@ -228,7 +226,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      * @param commandExecutionCoordinator execution coordinator instance
      * @return a new command manager
      * @throws InitializationException if construction of the manager fails
-     * @see #BukkitCommandManager(Plugin, ExecutionCoordinator, Function, Function) for a more thorough explanation
+     * @see #BukkitCommandManager(Plugin, ExecutionCoordinator, SenderMapper) for a more thorough explanation
      * @since 1.5.0
      */
     public static @NonNull BukkitCommandManager<@NonNull CommandSender> createNative(
@@ -238,8 +236,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         return new BukkitCommandManager<>(
                 owningPlugin,
                 commandExecutionCoordinator,
-                UnaryOperator.identity(),
-                UnaryOperator.identity()
+                SenderMapper.identity()
         );
     }
 
