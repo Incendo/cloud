@@ -73,9 +73,9 @@ final class SenderMapperImpl<A, B> implements SenderMapper<A, B> {
 
     @Override
     public String toString() {
-        return "SenderMapperImpl{" +
-                "map=" + this.map +
-                ", reverse=" + this.reverse +
-                '}';
+        return "SenderMapperImpl{"
+                + "map=" + this.map
+                + ", reverse=" + this.reverse
+                + '}';
     }
 }
