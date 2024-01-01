@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.jda;
 
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -53,8 +54,7 @@ public class JDA4CommandManager<C> extends JDACommandManager<C> {
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
      *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
      *                                     {@link ExecutionCoordinator#simpleCoordinator()}
-     * @param commandSenderMapper          Function that maps {@link JDACommandSender} to the command sender type
-     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link JDACommandSender}
+     * @param senderMapper          Function that maps {@link JDACommandSender} to the command sender type
      * @throws InterruptedException If the jda instance does not ready correctly
      */
     public JDA4CommandManager(
@@ -62,8 +62,7 @@ public class JDA4CommandManager<C> extends JDACommandManager<C> {
             final @NonNull Function<@NonNull C, @NonNull String> prefixMapper,
             final @Nullable BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper,
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull JDACommandSender, @NonNull C> commandSenderMapper,
-            final @NonNull Function<@NonNull C, @NonNull JDACommandSender> backwardsCommandSenderMapper
+            final @NonNull SenderMapper<JDACommandSender, C> senderMapper
     )
             throws InterruptedException {
         super(
@@ -71,8 +70,10 @@ public class JDA4CommandManager<C> extends JDACommandManager<C> {
                 prefixMapper,
                 permissionMapper,
                 commandExecutionCoordinator,
-                commandSenderMapper.compose(JDACommandSender::of),
-                backwardsCommandSenderMapper.andThen((sender) -> sender.getEvent().orElseThrow(IllegalStateException::new))
+                SenderMapper.create(
+                        sender -> senderMapper.map(JDACommandSender.of(sender)),
+                        sender -> senderMapper.reverse(sender).getEvent().orElseThrow(IllegalStateException::new)
+                )
         );
     }
 }
