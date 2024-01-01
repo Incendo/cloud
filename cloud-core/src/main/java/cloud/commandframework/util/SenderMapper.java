@@ -55,13 +55,13 @@ public interface SenderMapper<B, M> {
      *
      * @param map     mapping function
      * @param reverse reverse mapping function
-     * @param <A>     base command sender type
-     * @param <B>     mapped command sender type
+     * @param <B>     base command sender type
+     * @param <M>     mapped command sender type
      * @return new sender mapper
      */
-    static <A, B> @NonNull SenderMapper<A, B> create(
-            final @NonNull Function<@NonNull A, @NonNull B> map,
-            final @NonNull Function<@NonNull B, @NonNull A> reverse
+    static <B, M> @NonNull SenderMapper<B, M> create(
+            final @NonNull Function<@NonNull B, @NonNull M> map,
+            final @NonNull Function<@NonNull M, @NonNull B> reverse
     ) {
         return new SenderMapperImpl<>(map, reverse);
     }
@@ -69,11 +69,11 @@ public interface SenderMapper<B, M> {
     /**
      * Returns the identity mapper, a mapper that does not transform the sender.
      *
-     * @param <A> base and mapped command sender type
+     * @param <S> base and mapped command sender type
      * @return identity mapper
      */
     @SuppressWarnings("unchecked")
-    static <A> @NonNull SenderMapper<A, A> identity() {
-        return (SenderMapper<A, A>) SenderMapperImpl.IDENTITY;
+    static <S> @NonNull SenderMapper<S, S> identity() {
+        return (SenderMapper<S, S>) SenderMapperImpl.IDENTITY;
     }
 }
