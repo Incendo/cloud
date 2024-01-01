@@ -107,11 +107,9 @@ public final class RegexPreprocessor<C> implements ComponentPreprocessor<C> {
     /**
      * Exception thrown when input fails regex matching in {@link RegexPreprocessor}
      */
-    @SuppressWarnings("serial")
     @API(status = API.Status.STABLE)
     public static final class RegexValidationException extends IllegalArgumentException {
 
-        private static final long serialVersionUID = 747826566058072233L;
         private final String pattern;
         private final String failedString;
         private final Caption failureCaption;

@@ -233,7 +233,6 @@ public final class LocationParser<C> implements ArgumentParser<C, Location>, Blo
 
     static class LocationParseException extends ParserException {
 
-        private static final long serialVersionUID = -3261835227265878218L;
 
         protected LocationParseException(
                 final @NonNull CommandContext<?> context,

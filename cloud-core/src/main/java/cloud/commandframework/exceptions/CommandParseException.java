@@ -36,7 +36,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE)
 public class CommandParseException extends IllegalArgumentException {
 
-    private static final long serialVersionUID = -2415981126382517435L;
     private final Object commandSender;
     private final List<CommandComponent<?>> currentChain;
 

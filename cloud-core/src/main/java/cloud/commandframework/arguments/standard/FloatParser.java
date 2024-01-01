@@ -183,7 +183,6 @@ public final class FloatParser<C> implements ArgumentParser<C, Float> {
     @API(status = API.Status.STABLE)
     public static final class FloatParseException extends NumberParseException {
 
-        private static final long serialVersionUID = -1162983846751812292L;
 
         private final FloatParser<?> parser;
 

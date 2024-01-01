@@ -192,7 +192,6 @@ public final class ByteParser<C> implements ArgumentParser<C, Byte>, BlockingSug
     @API(status = API.Status.STABLE)
     public static final class ByteParseException extends NumberParseException {
 
-        private static final long serialVersionUID = -4724241304872989208L;
 
         private final ByteParser<?> parser;
 

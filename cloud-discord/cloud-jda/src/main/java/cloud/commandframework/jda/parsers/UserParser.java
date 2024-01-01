@@ -228,7 +228,6 @@ public final class UserParser<C> implements ArgumentParser<C, User> {
 
     public static class UserParseException extends IllegalArgumentException {
 
-        private static final long serialVersionUID = -6728909884195850077L;
         private final String input;
 
         /**
@@ -253,7 +252,6 @@ public final class UserParser<C> implements ArgumentParser<C, User> {
 
     public static final class TooManyUsersFoundParseException extends UserParseException {
 
-        private static final long serialVersionUID = 7222089412615886672L;
 
         /**
          * Construct a new user parse exception
@@ -273,7 +271,6 @@ public final class UserParser<C> implements ArgumentParser<C, User> {
 
     public static final class UserNotFoundParseException extends UserParseException {
 
-        private static final long serialVersionUID = 3689949065073643826L;
 
         /**
          * Construct a new user parse exception

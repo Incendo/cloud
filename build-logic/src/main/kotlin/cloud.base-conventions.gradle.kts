@@ -38,7 +38,7 @@ tasks {
             )
             disableWarningsInGeneratedCode.set(true)
         }
-        options.compilerArgs.addAll(listOf("-Xlint:-processing,-classfile", "-Werror"))
+        options.compilerArgs.addAll(listOf("-Xlint:-processing,-classfile,-serial", "-Werror"))
     }
 }
 

@@ -714,7 +714,6 @@ public interface CommandInput {
     }
 
     @API(status = API.Status.STABLE, since = "2.0.0")
-    @SuppressWarnings("serial")
     class CursorOutOfBoundsException extends NoSuchElementException {
 
         CursorOutOfBoundsException(

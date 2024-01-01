@@ -480,7 +480,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
 
     public static final class BrigadierFailureException extends IllegalStateException {
 
-        private static final long serialVersionUID = 7816660840063155703L;
         private final BrigadierFailureReason reason;
 
         /**
@@ -528,7 +527,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    @SuppressWarnings("serial")
     public static final class InitializationException extends IllegalStateException {
 
         /**

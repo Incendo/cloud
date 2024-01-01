@@ -93,7 +93,6 @@ public final class UserParser<C> implements ArgumentParser<C, User> {
 
     public static final class UserParseException extends ParserException {
 
-        private static final long serialVersionUID = -1758590697299611905L;
 
         private UserParseException(
                 final @NonNull CommandContext<?> context,

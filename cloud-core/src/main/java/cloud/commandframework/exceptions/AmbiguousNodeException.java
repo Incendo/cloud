@@ -41,7 +41,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @API(status = API.Status.STABLE)
 public final class AmbiguousNodeException extends IllegalStateException {
 
-    private static final long serialVersionUID = -200207173805584709L;
     private final CommandNode<?> parentNode;
     private final CommandNode<?> ambiguousNode;
     private final List<CommandNode<?>> children;

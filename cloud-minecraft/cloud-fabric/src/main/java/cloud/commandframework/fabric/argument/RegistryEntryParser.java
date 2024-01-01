@@ -190,7 +190,6 @@ public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V>, Bl
      */
     private static final class UnknownEntryException extends ParserException {
 
-        private static final long serialVersionUID = 7694424294461849903L;
 
         UnknownEntryException(
                 final CommandContext<?> context,

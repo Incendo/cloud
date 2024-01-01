@@ -110,7 +110,6 @@ public final class EnchantmentParser<C> implements ArgumentParser<C, Enchantment
 
     public static final class EnchantmentParseException extends ParserException {
 
-        private static final long serialVersionUID = 1415174766296065151L;
         private final String input;
 
         /**
