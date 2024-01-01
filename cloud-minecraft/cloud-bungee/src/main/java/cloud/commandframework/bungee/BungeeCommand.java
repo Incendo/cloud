@@ -57,7 +57,7 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
         for (final String string : strings) {
             builder.append(" ").append(string);
         }
-        final C sender = this.manager.getCommandSenderMapper().apply(commandSender);
+        final C sender = this.manager.senderMapper().map(commandSender);
         this.manager.commandExecutor().executeCommand(sender, builder.toString());
     }
 
@@ -71,7 +71,7 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
             builder.append(" ").append(string);
         }
         return this.manager.suggestionFactory().suggestImmediately(
-                this.manager.getCommandSenderMapper().apply(sender),
+                this.manager.senderMapper().map(sender),
                 builder.toString()
         ).stream().map(Suggestion::suggestion).collect(Collectors.toList());
     }

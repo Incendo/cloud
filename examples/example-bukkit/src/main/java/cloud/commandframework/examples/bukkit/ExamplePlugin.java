@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.examples.bukkit;
 
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationParserExample;
@@ -32,7 +33,6 @@ import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.paper.PaperCommandManager;
-import cloud.commandframework.SenderMapper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;

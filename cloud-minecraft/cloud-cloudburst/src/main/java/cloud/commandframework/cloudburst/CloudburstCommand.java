@@ -64,7 +64,7 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
         for (final String string : strings) {
             builder.append(" ").append(string);
         }
-        final C sender = this.manager.getCommandSenderMapper().apply(commandSender);
+        final C sender = this.manager.senderMapper().map(commandSender);
         this.manager.commandExecutor().executeCommand(sender, builder.toString());
         return true;
     }

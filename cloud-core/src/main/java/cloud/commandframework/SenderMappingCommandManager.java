@@ -27,8 +27,8 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Implemented by {@link CommandManager command managers} that are able to map between a base or platform command sender type to a
- * custom type.
+ * Implemented by {@link CommandManager command managers} that are able to map between a base or platform command sender type
+ * and a custom type.
  *
  * @param <B> base command sender type
  * @param <M> mapped command sender type
