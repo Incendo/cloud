@@ -102,7 +102,7 @@ class LiteralBrigadierNodeFactoryTest {
                 (source, permission) -> true,
                 brigadierCommand
         );
-        this.dispatcher.register(commandNode.createBuilder());
+        this.dispatcher.getRoot().addChild(commandNode);
 
         // Assert
         assertThat(commandNode).isNotNull();
