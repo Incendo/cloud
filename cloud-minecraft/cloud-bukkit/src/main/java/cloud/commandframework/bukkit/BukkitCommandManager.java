@@ -528,6 +528,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
+    @SuppressWarnings("serial")
     public static final class InitializationException extends IllegalStateException {
 
         /**
