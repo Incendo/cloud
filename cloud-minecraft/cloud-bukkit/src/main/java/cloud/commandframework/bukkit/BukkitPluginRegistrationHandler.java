@@ -58,7 +58,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
     protected BukkitPluginRegistrationHandler() {
     }
 
-    final void initialize(final @NonNull BukkitCommandManager<C> bukkitCommandManager) throws Exception {
+    final void initialize(final @NonNull BukkitCommandManager<C> bukkitCommandManager) throws ReflectiveOperationException {
         final Method getCommandMap = Bukkit.getServer().getClass().getDeclaredMethod("getCommandMap");
         getCommandMap.setAccessible(true);
         this.commandMap = (CommandMap) getCommandMap.invoke(Bukkit.getServer());

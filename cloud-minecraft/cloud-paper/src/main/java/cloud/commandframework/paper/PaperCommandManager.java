@@ -71,14 +71,14 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      *                                     are thread safe.
      * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
-     * @throws Exception If the construction of the manager fails
+     * @throws InitializationException if the construction of the manager fails
      */
     public PaperCommandManager(
             final @NonNull Plugin owningPlugin,
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
             final @NonNull Function<CommandSender, C> commandSenderMapper,
             final @NonNull Function<C, CommandSender> backwardsCommandSenderMapper
-    ) throws Exception {
+    ) throws InitializationException {
         super(owningPlugin, commandExecutionCoordinator, commandSenderMapper, backwardsCommandSenderMapper);
 
         this.registerCommandPreProcessor(new PaperCommandPreprocessor<>(this));
@@ -90,14 +90,14 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      * @param owningPlugin                plugin owning the command manager
      * @param commandExecutionCoordinator execution coordinator instance
      * @return a new command manager
-     * @throws Exception If the construction of the manager fails
+     * @throws InitializationException if the construction of the manager fails
      * @see #PaperCommandManager(Plugin, ExecutionCoordinator, Function, Function) for a more thorough explanation
      * @since 1.5.0
      */
     public static @NonNull PaperCommandManager<@NonNull CommandSender> createNative(
             final @NonNull Plugin owningPlugin,
             final @NonNull ExecutionCoordinator<CommandSender> commandExecutionCoordinator
-    ) throws Exception {
+    ) throws InitializationException {
         return new PaperCommandManager<>(
                 owningPlugin,
                 commandExecutionCoordinator,

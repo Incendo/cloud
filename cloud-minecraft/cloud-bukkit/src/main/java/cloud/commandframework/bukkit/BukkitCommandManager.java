@@ -83,6 +83,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Command manager for the Bukkit platform
@@ -120,17 +121,20 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      *                                     {@link ExecutionCoordinator#asyncCoordinator()}.
      * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
-     * @throws Exception If the construction of the manager fails
+     * @throws InitializationException if construction of the manager fails
      */
     public BukkitCommandManager(
             final @NonNull Plugin owningPlugin,
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
             final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
             final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper
-    )
-            throws Exception {
+    ) throws InitializationException {
         super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler<>());
-        ((BukkitPluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
+        try {
+            ((BukkitPluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
+        } catch (final ReflectiveOperationException exception) {
+            throw new InitializationException("Failed to initialize command registration handler", exception);
+        }
         this.owningPlugin = owningPlugin;
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
@@ -223,14 +227,14 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      * @param owningPlugin                plugin owning the command manager
      * @param commandExecutionCoordinator execution coordinator instance
      * @return a new command manager
-     * @throws Exception If the construction of the manager fails
+     * @throws InitializationException if construction of the manager fails
      * @see #BukkitCommandManager(Plugin, ExecutionCoordinator, Function, Function) for a more thorough explanation
      * @since 1.5.0
      */
     public static @NonNull BukkitCommandManager<@NonNull CommandSender> createNative(
             final @NonNull Plugin owningPlugin,
             final @NonNull ExecutionCoordinator<CommandSender> commandExecutionCoordinator
-    ) throws Exception {
+    ) throws InitializationException {
         return new BukkitCommandManager<>(
                 owningPlugin,
                 commandExecutionCoordinator,
@@ -515,6 +519,27 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
                     this.reason.name().toLowerCase(Locale.ROOT).replace("_", " "),
                     this.getCause() == null ? "" : this.getCause().getMessage()
             );
+        }
+    }
+
+    /**
+     * Exception thrown when the command manager could not be initialized.
+     *
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    @SuppressWarnings("serial")
+    public static final class InitializationException extends IllegalStateException {
+
+        /**
+         * Create a new {@link InitializationException}.
+         *
+         * @param message message
+         * @param cause   cause
+         */
+        @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
+        public InitializationException(final String message, final @Nullable Throwable cause) {
+            super(message, cause);
         }
     }
 }

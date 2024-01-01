@@ -52,29 +52,21 @@ public final class ExamplePlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        final BukkitCommandManager<CommandSender> manager;
-        try {
-            //
-            // (1) The execution coordinator determines how commands are executed. The simple execution coordinator will
-            //     run the command on the thread that is calling it. In the case of Bukkit, this is the primary server thread.
-            //     It is possible to execute (and parse!) commands asynchronously by using the
-            //     AsynchronousCommandExecutionCoordinator.
-            // (2) This functions maps the Bukkit command sender to your custom sender type. If you're not using a custom
-            //     type, then Function.identity() maps CommandSender to itself.
-            // (3) The same concept as (2), but mapping from your custom type to a Bukkit command sender.
-            //
-            manager = new PaperCommandManager<>(
-                    /* Owning plugin */ this,
-                    /* (1) */ ExecutionCoordinator.simpleCoordinator(),
-                    /* (2) */ Function.identity(),
-                    /* (3) */ Function.identity()
-            );
-        } catch (final Exception e) {
-            this.getLogger().severe("Failed to initialize the command this.manager");
-            /* Disable the plugin */
-            this.getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        //
+        // (1) The execution coordinator determines how commands are executed. The simple execution coordinator will
+        //     run the command on the thread that is calling it. In the case of Bukkit, this is the primary server thread.
+        //     It is possible to execute (and parse!) commands asynchronously by using the
+        //     AsynchronousCommandExecutionCoordinator.
+        // (2) This functions maps the Bukkit command sender to your custom sender type. If you're not using a custom
+        //     type, then Function.identity() maps CommandSender to itself.
+        // (3) The same concept as (2), but mapping from your custom type to a Bukkit command sender.
+        //
+        final BukkitCommandManager<CommandSender> manager = new PaperCommandManager<>(
+                /* Owning plugin */ this,
+                /* (1) */ ExecutionCoordinator.simpleCoordinator(),
+                /* (2) */ Function.identity(),
+                /* (3) */ Function.identity()
+        );
         //
         // Use contains to filter suggestions instead of default startsWith
         //
