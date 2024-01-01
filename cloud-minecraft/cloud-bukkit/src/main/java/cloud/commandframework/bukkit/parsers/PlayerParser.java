@@ -104,7 +104,6 @@ public final class PlayerParser<C> implements ArgumentParser<C, Player>, Blockin
      */
     public static final class PlayerParseException extends ParserException {
 
-        private static final long serialVersionUID = 927476591631527552L;
         private final String input;
 
         /**

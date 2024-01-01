@@ -31,7 +31,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE)
 public class ArgumentParseException extends CommandParseException {
 
-    private static final long serialVersionUID = -4385446899439587461L;
     private final Throwable cause;
 
     /**

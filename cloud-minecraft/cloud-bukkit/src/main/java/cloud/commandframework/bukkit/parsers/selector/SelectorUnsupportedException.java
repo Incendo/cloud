@@ -39,7 +39,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE, since = "2.0.0")
 public final class SelectorUnsupportedException extends ParserException {
 
-    private static final long serialVersionUID = -6649195171043474961L;
 
     /**
      * Create a new {@link SelectorUnsupportedException}.

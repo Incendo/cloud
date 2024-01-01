@@ -37,7 +37,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @API(status = API.Status.STABLE)
 public final class InvalidCommandSenderException extends CommandParseException {
 
-    private static final long serialVersionUID = 7372142477529875598L;
     private final Class<?> requiredSender;
     private final Command<?> command;
 

@@ -32,7 +32,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE)
 public abstract class NumberParseException extends ParserException {
 
-    private static final long serialVersionUID = 3018775374056029797L;
     private final String input;
     private final Number min;
     private final Number max;

@@ -285,7 +285,6 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
     @API(status = API.Status.STABLE)
     public static final class FlagParseException extends ParserException {
 
-        private static final long serialVersionUID = -7725389394142868549L;
         private final String input;
         private final FailureReason failureReason;
 

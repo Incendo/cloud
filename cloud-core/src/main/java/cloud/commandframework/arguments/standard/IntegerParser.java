@@ -244,7 +244,6 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
     @API(status = API.Status.STABLE)
     public static final class IntegerParseException extends NumberParseException {
 
-        private static final long serialVersionUID = -6933923056628373853L;
 
         private final IntegerParser<?> parser;
 

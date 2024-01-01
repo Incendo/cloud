@@ -70,7 +70,6 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
 
     @SuppressWarnings({"DoubleBraceInitialization"})
     private static final Map<Class<?>, Class<?>> PRIMITIVE_MAPPINGS = new HashMap<Class<?>, Class<?>>() {
-        private static final long serialVersionUID = 958977651563195489L;
 
         {
             put(char.class, Character.class);

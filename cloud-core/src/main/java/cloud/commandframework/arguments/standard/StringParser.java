@@ -271,7 +271,6 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
     @API(status = API.Status.STABLE)
     public static final class StringParseException extends ParserException {
 
-        private static final long serialVersionUID = -8903115465005472945L;
         private final String input;
         private final StringMode stringMode;
 

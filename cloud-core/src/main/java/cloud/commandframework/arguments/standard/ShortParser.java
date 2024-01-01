@@ -192,7 +192,6 @@ public final class ShortParser<C> implements ArgumentParser<C, Short>, BlockingS
     @API(status = API.Status.STABLE)
     public static final class ShortParseException extends NumberParseException {
 
-        private static final long serialVersionUID = -478674263339091032L;
 
         private final ShortParser<?> parser;
 

@@ -192,7 +192,6 @@ public final class LongParser<C> implements ArgumentParser<C, Long>, BlockingSug
     @API(status = API.Status.STABLE)
     public static final class LongParseException extends NumberParseException {
 
-        private static final long serialVersionUID = 4366856282301198232L;
 
         private final LongParser<?> parser;
 

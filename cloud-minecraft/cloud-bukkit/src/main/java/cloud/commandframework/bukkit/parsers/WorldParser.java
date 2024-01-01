@@ -88,7 +88,6 @@ public final class WorldParser<C> implements ArgumentParser<C, World>, BlockingS
 
     public static final class WorldParseException extends ParserException {
 
-        private static final long serialVersionUID = 561648144491587450L;
         private final String input;
 
         /**

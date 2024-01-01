@@ -129,7 +129,6 @@ public final class BooleanParser<C> implements ArgumentParser<C, Boolean>, Block
     @API(status = API.Status.STABLE)
     public static final class BooleanParseException extends ParserException {
 
-        private static final long serialVersionUID = -2688852086944850025L;
         private final String input;
         private final boolean liberal;
 

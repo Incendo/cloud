@@ -36,7 +36,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE)
 public final class NoSuchCommandException extends CommandParseException {
 
-    private static final long serialVersionUID = -7775865652882764771L;
     private final String suppliedCommand;
 
     /**

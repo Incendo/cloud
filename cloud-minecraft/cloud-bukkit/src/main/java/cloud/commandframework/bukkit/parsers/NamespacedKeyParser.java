@@ -220,7 +220,6 @@ public final class NamespacedKeyParser<C> implements ArgumentParser<C, Namespace
      */
     public static final class NamespacedKeyParseException extends ParserException {
 
-        private static final long serialVersionUID = -482592639358941441L;
         private final String input;
 
         /**

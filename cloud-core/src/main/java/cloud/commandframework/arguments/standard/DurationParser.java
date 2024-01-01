@@ -155,7 +155,6 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
     @API(status = API.Status.STABLE, since = "1.7.0")
     public static final class DurationParseException extends ParserException {
 
-        private static final long serialVersionUID = 7632293268451349508L;
         private final String input;
 
         /**

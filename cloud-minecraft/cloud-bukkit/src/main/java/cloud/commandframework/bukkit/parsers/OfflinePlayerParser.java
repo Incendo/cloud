@@ -113,7 +113,6 @@ public final class OfflinePlayerParser<C> implements ArgumentParser<C, OfflinePl
      */
     public static final class OfflinePlayerParseException extends ParserException {
 
-        private static final long serialVersionUID = 7632293268451349508L;
         private final String input;
 
         /**

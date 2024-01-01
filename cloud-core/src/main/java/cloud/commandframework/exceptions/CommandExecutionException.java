@@ -37,7 +37,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @API(status = API.Status.STABLE, since = "1.2.0")
 public class CommandExecutionException extends IllegalArgumentException {
 
-    private static final long serialVersionUID = -4785446899438294661L;
     private final CommandContext<?> commandContext;
 
     /**

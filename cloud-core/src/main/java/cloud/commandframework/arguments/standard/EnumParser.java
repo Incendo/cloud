@@ -113,7 +113,6 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
     @API(status = API.Status.STABLE)
     public static final class EnumParseException extends ParserException {
 
-        private static final long serialVersionUID = 3465389578951428862L;
         private final String input;
         private final Class<? extends Enum<?>> enumClass;
 

@@ -183,7 +183,6 @@ public final class DoubleParser<C> implements ArgumentParser<C, Double> {
     @API(status = API.Status.STABLE)
     public static final class DoubleParseException extends NumberParseException {
 
-        private static final long serialVersionUID = 1764554911581976586L;
 
         private final DoubleParser<?> parser;
 

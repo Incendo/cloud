@@ -82,7 +82,6 @@ public final class CharacterParser<C> implements ArgumentParser<C, Character> {
     @API(status = API.Status.STABLE)
     public static final class CharParseException extends ParserException {
 
-        private static final long serialVersionUID = 6458851071584278854L;
         private final String input;
 
         /**

@@ -120,7 +120,6 @@ public final class TeamParser<C> extends SidedArgumentParser<C, String, PlayerTe
      */
     public static final class UnknownTeamException extends ParserException {
 
-        private static final long serialVersionUID = 4249139487412603424L;
 
         UnknownTeamException(
                 final @NonNull CommandContext<?> context,

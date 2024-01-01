@@ -83,7 +83,6 @@ public final class UUIDParser<C> implements ArgumentParser<C, UUID> {
     @API(status = API.Status.STABLE)
     public static final class UUIDParseException extends ParserException {
 
-        private static final long serialVersionUID = 6399602590976540023L;
         private final String input;
 
         /**

@@ -69,10 +69,8 @@ public interface CloudCapability {
      * @since 1.7.0
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
-    @SuppressWarnings("serial")
     final class CloudCapabilityMissingException extends RuntimeException {
 
-        private static final long serialVersionUID = 8961652857372971486L;
 
         /**
          * Create a new cloud capability missing exception instance.

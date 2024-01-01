@@ -79,7 +79,6 @@ class Issue281 {
         assertThat(exception).hasCauseThat().hasCauseThat().isInstanceOf(CustomException.class);
     }
 
-    @SuppressWarnings("serial")
     private static final class CustomException extends RuntimeException {
 
     }

@@ -32,7 +32,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class PipelineException extends RuntimeException {
 
-    private static final long serialVersionUID = -7092487758537841656L;
 
     /**
      * Construct a new pipeline exception

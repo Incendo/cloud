@@ -103,7 +103,6 @@ public final class PlayerParser<C> implements ArgumentParser<C, ProxiedPlayer>, 
 
     public static final class PlayerParseException extends ParserException {
 
-        private static final long serialVersionUID = -2685136673577959929L;
 
         private PlayerParseException(
                 final @NonNull String input,

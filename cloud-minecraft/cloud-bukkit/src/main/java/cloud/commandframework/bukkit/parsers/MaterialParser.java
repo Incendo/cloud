@@ -96,7 +96,6 @@ public final class MaterialParser<C> implements ArgumentParser<C, Material>, Blo
 
     public static final class MaterialParseException extends ParserException {
 
-        private static final long serialVersionUID = 1615554107385965610L;
         private final String input;
 
         /**

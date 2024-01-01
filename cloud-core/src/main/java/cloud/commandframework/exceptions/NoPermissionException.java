@@ -38,7 +38,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE)
 public class NoPermissionException extends CommandParseException {
 
-    private static final long serialVersionUID = 7103413337750692843L;
     private final Permission missingPermission;
 
     /**

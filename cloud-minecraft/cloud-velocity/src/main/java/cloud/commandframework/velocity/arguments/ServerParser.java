@@ -106,7 +106,6 @@ public final class ServerParser<C> implements ArgumentParser<C, RegisteredServer
 
     public static final class ServerParseException extends ParserException {
 
-        private static final long serialVersionUID = 9168156226853233788L;
 
         private ServerParseException(
                 final @NonNull String input,
