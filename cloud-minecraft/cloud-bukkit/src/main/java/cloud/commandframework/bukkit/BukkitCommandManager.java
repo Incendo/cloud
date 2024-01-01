@@ -122,6 +122,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
      * @throws InitializationException if construction of the manager fails
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public BukkitCommandManager(
             final @NonNull Plugin owningPlugin,
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
@@ -217,27 +218,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
 
         this.registerDefaultExceptionHandlers();
         this.captionRegistry(new BukkitCaptionRegistryFactory<C>().create());
-    }
-
-    /**
-     * Create a command manager using Bukkit's {@link CommandSender} as the sender type.
-     *
-     * @param owningPlugin                plugin owning the command manager
-     * @param commandExecutionCoordinator execution coordinator instance
-     * @return a new command manager
-     * @throws InitializationException if construction of the manager fails
-     * @see #BukkitCommandManager(Plugin, ExecutionCoordinator, SenderMapper) for a more thorough explanation
-     * @since 1.5.0
-     */
-    public static @NonNull BukkitCommandManager<@NonNull CommandSender> createNative(
-            final @NonNull Plugin owningPlugin,
-            final @NonNull ExecutionCoordinator<CommandSender> commandExecutionCoordinator
-    ) throws InitializationException {
-        return new BukkitCommandManager<>(
-                owningPlugin,
-                commandExecutionCoordinator,
-                SenderMapper.identity()
-        );
     }
 
     /**

@@ -71,6 +71,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
      * @throws InitializationException if the construction of the manager fails
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public PaperCommandManager(
             final @NonNull Plugin owningPlugin,
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
@@ -91,6 +92,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      * @see #PaperCommandManager(Plugin, ExecutionCoordinator, SenderMapper) for a more thorough explanation
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public static @NonNull PaperCommandManager<@NonNull CommandSender> createNative(
             final @NonNull Plugin owningPlugin,
             final @NonNull ExecutionCoordinator<CommandSender> commandExecutionCoordinator

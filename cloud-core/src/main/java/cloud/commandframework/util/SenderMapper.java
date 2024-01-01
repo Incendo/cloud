@@ -24,14 +24,17 @@
 package cloud.commandframework.util;
 
 import java.util.function.Function;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Mapper than can transform command senders from a base type to another type, and back.
+ * Mapper than can transform command senders from a base type to another type and back.
  *
  * @param <B> base command sender type
  * @param <M> mapped command sender type
+ * @since 2.0.0
  */
+@API(status = API.Status.STABLE, since = "2.0.0")
 public interface SenderMapper<B, M> {
 
     /**
