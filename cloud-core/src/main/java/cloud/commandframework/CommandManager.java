@@ -70,14 +70,11 @@ import cloud.commandframework.state.Stateful;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -91,8 +88,6 @@ import org.checkerframework.common.returnsreceiver.qual.This;
 @SuppressWarnings({"unchecked", "unused"})
 @API(status = API.Status.STABLE)
 public abstract class CommandManager<C> implements Stateful<RegistrationState>, CommandBuilderSource<C> {
-
-    private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = new HashMap<>();
 
     private final Configurable<ManagerSetting> settings = Configurable.enumConfigurable(ManagerSetting.class)
             .set(ManagerSetting.ENFORCE_INTERMEDIARY_PERMISSIONS, true);
@@ -117,19 +112,13 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
     private final AtomicReference<RegistrationState> state = new AtomicReference<>(RegistrationState.BEFORE_REGISTRATION);
 
     /**
-     * Create a new command manager instance
+     * Create a new command manager instance.
      *
-     * @param executionCoordinator Execution coordinator instance. The coordinator is in charge of executing incoming
-     *                                    commands. Some considerations must be made when picking a suitable execution coordinator
-     *                                    for your platform. For example, an entirely asynchronous coordinator is not suitable
-     *                                    when the parsers used in that particular platform are not thread safe. If you have
-     *                                    commands that perform blocking operations, however, it might not be a good idea to
-     *                                    use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                    {@link ExecutionCoordinator#simpleCoordinator()} and
-     *                                    {@link ExecutionCoordinator#asyncCoordinator()}
-     * @param commandRegistrationHandler  Command registration handler. This will get called every time a new command is
-     *                                    registered to the command manager. This may be used to forward command registration
-     *                                    to the platform.
+     * @param executionCoordinator       Execution coordinator instance. When choosing the appropriate coordinator for your
+     *                                   project, be sure to consider any limitations noted by the platform documentation.
+     * @param commandRegistrationHandler Command registration handler. This will get called every time a new command is
+     *                                   registered to the command manager. This may be used to forward command registration
+     *                                   to the platform.
      */
     protected CommandManager(
             final @NonNull ExecutionCoordinator<C> executionCoordinator,

@@ -25,7 +25,6 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.keys.CloudKey;
 import io.leangen.geantyref.TypeToken;
-import java.util.Set;
 import java.util.concurrent.Executor;
 import org.apiguardian.api.API;
 import org.bukkit.command.CommandSender;
@@ -45,17 +44,6 @@ public final class BukkitCommandContextKeys {
     public static final CloudKey<CommandSender> BUKKIT_COMMAND_SENDER = CloudKey.of(
             "BukkitCommandSender",
             TypeToken.get(CommandSender.class)
-    );
-
-    /**
-     * Key used to store the active {@link CloudBukkitCapabilities} in the {@link cloud.commandframework.context.CommandContext}.
-     *
-     * @since 1.5.0
-     */
-    public static final CloudKey<Set<CloudBukkitCapabilities>> CLOUD_BUKKIT_CAPABILITIES = CloudKey.of(
-            "CloudBukkitCapabilities",
-            new TypeToken<Set<CloudBukkitCapabilities>>() {
-            }
     );
 
     /**

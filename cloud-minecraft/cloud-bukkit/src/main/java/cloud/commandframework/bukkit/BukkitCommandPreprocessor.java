@@ -37,7 +37,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Command preprocessor which decorates incoming {@link cloud.commandframework.context.CommandContext}
  * with Bukkit specific objects
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
 
@@ -75,10 +75,6 @@ final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
                 BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER,
                 this.commandManager.senderMapper().reverse(context.commandContext().sender())
         );
-        context.commandContext().store(
-                BukkitCommandContextKeys.CLOUD_BUKKIT_CAPABILITIES,
-                this.commandManager.queryCapabilities()
-        );
 
         // Store if PaperCommandManager's preprocessor didn't already
         context.commandContext().computeIfAbsent(
@@ -88,7 +84,7 @@ final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
     }
 
     private Executor mainThreadExecutor() {
-        final Plugin plugin = this.commandManager.getOwningPlugin();
+        final Plugin plugin = this.commandManager.owningPlugin();
         final Server server = plugin.getServer();
         return task -> {
             if (server.isPrimaryThread()) {

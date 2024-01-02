@@ -131,7 +131,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
     @Override
     public @NonNull Plugin getPlugin() {
-        return this.manager.getOwningPlugin();
+        return this.manager.owningPlugin();
     }
 
     @Override

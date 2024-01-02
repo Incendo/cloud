@@ -51,14 +51,12 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
     private final CloudBrigadierManager<C, Object> brigadierManager;
     private final Commodore commodore;
 
-    CloudCommodoreManager(final @NonNull BukkitCommandManager<C> commandManager)
-            throws BukkitCommandManager.BrigadierFailureException {
+    CloudCommodoreManager(final @NonNull BukkitCommandManager<C> commandManager) {
         if (!CommodoreProvider.isSupported()) {
-            throw new BukkitCommandManager.BrigadierFailureException(BukkitCommandManager
-                    .BrigadierFailureReason.COMMODORE_NOT_PRESENT);
+            throw new IllegalStateException("CommodoreProvider reports isSupported = false");
         }
         this.commandManager = commandManager;
-        this.commodore = CommodoreProvider.getCommodore(commandManager.getOwningPlugin());
+        this.commodore = CommodoreProvider.getCommodore(commandManager.owningPlugin());
         this.brigadierManager = new CloudBrigadierManager<>(
                 commandManager,
                 () -> new CommandContext<>(
