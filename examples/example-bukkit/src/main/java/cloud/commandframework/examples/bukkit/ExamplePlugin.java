@@ -24,7 +24,6 @@
 package cloud.commandframework.examples.bukkit;
 
 import cloud.commandframework.SenderMapper;
-import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationParserExample;
 import cloud.commandframework.examples.bukkit.builder.BuilderExample;
@@ -59,25 +58,20 @@ public final class ExamplePlugin extends JavaPlugin {
         // (2) This function maps the Bukkit CommandSender to your custom sender type and back. If you're not using a custom
         //     type, then SenderMapper.identity() maps CommandSender to itself.
         //
-        final BukkitCommandManager<CommandSender> manager = new PaperCommandManager<>(
+        final PaperCommandManager<CommandSender> manager = new PaperCommandManager<>(
                 /* Owning plugin */ this,
                 /* (1) */ ExecutionCoordinator.simpleCoordinator(),
                 /* (2) */ SenderMapper.identity()
         );
         //
-        // Register Brigadier mappings. The capability tells us whether Brigadier is natively available
-        // on the current server. If it is, we can safely register the Brigadier integration.
+        // Configure based on capabilities
         //
         if (manager.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
+            // Register Brigadier mappings for rich completions
             manager.registerBrigadier();
-        }
-        //
-        // Register asynchronous completions. The capability tells us whether asynchronous completions
-        // are available on the server that is running the plugin. The asynchronous completion method
-        // is only available in cloud-paper, not cloud-bukkit.
-        //
-        if (manager.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
-            ((PaperCommandManager<CommandSender>) manager).registerAsynchronousCompletions();
+        } else if (manager.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
+            // Use Paper async completions API (see Javadoc for why we don't use this with Brigadier)
+            manager.registerAsynchronousCompletions();
         }
         //
         // Create the Bukkit audiences that maps command senders to adventure audience. This is not needed

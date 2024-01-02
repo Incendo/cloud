@@ -69,7 +69,7 @@ import cloud.commandframework.state.RegistrationState;
 import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Method;
 import java.util.Locale;
-import java.util.Set;
+import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import org.apiguardian.api.API;
 import org.bukkit.ChatColor;
@@ -87,7 +87,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Command manager for the Bukkit platform
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 public class BukkitCommandManager<C> extends CommandManager<C>
         implements BrigadierManagerHolder<C, Object>, SenderMapperHolder<CommandSender, C> {
@@ -105,26 +105,27 @@ public class BukkitCommandManager<C> extends CommandManager<C>
     private boolean splitAliases = false;
 
     /**
-     * Construct a new Bukkit command manager
+     * Create a new Bukkit command manager.
      *
-     * @param owningPlugin                 Plugin that is constructing the manager. This will be used when registering the
-     *                                     commands to the Bukkit command map.
-     * @param commandExecutionCoordinator  Execution coordinator instance. The coordinator is in charge of executing incoming
-     *                                     commands. Some considerations must be made when picking a suitable execution
-     *                                     coordinator. For example, an entirely asynchronous coordinator is not suitable
-     *                                     when the parsers used in your commands are not thread safe. If you have
-     *                                     commands that perform blocking operations, however, it might not be a good idea to
-     *                                     use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
-     *                                     {@link ExecutionCoordinator#asyncCoordinator()}.
-     * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
+     * @param owningPlugin                Plugin constructing the manager. Used when registering commands to the command map,
+     *                                    registering event listeners, etc.
+     * @param commandExecutionCoordinator Execution coordinator instance. Due to Bukkit blocking the main thread for
+     *                                    suggestion requests, it's potentially unsafe to use anything other than
+     *                                    {@link ExecutionCoordinator#nonSchedulingExecutor()} for
+     *                                    {@link ExecutionCoordinator.Builder#suggestionsExecutor(Executor)}. Once the
+     *                                    coordinator, a suggestion provider, parser, or similar routes suggestion logic
+     *                                    off of the calling (main) thread, it won't be possible to schedule further logic
+     *                                    back to the main thread without a deadlock. When Brigadier support is active, this issue
+     *                                    is avoided, as it allows for non-blocking suggestions.
+     * @param senderMapper                Mapper between Bukkit's {@link CommandSender} and the command sender type {@code C}.
+     * @see #registerBrigadier()
      * @throws InitializationException if construction of the manager fails
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     public BukkitCommandManager(
             final @NonNull Plugin owningPlugin,
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
-            final @NonNull SenderMapper<CommandSender, C> commandSenderMapper
+            final @NonNull SenderMapper<CommandSender, C> senderMapper
     ) throws InitializationException {
         super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler<>());
         try {
@@ -133,7 +134,7 @@ public class BukkitCommandManager<C> extends CommandManager<C>
             throw new InitializationException("Failed to initialize command registration handler", exception);
         }
         this.owningPlugin = owningPlugin;
-        this.senderMapper = commandSenderMapper;
+        this.senderMapper = senderMapper;
 
         /* Register capabilities */
         CloudBukkitCapabilities.CAPABLE.forEach(this::registerCapability);
@@ -214,11 +215,13 @@ public class BukkitCommandManager<C> extends CommandManager<C>
     }
 
     /**
-     * Get the plugin that owns the manager
+     * Returns the plugin that owns the manager.
      *
-     * @return Owning plugin
+     * @return owning plugin
+     * @since 2.0.0
      */
-    public @NonNull Plugin getOwningPlugin() {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public final @NonNull Plugin owningPlugin() {
         return this.owningPlugin;
     }
 
@@ -250,10 +253,12 @@ public class BukkitCommandManager<C> extends CommandManager<C>
         return this.senderMapper.reverse(sender).hasPermission(permission);
     }
 
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     protected final boolean getSplitAliases() {
         return this.splitAliases;
     }
 
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     protected final void setSplitAliases(final boolean value) {
         this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.splitAliases = value;
@@ -262,27 +267,17 @@ public class BukkitCommandManager<C> extends CommandManager<C>
     /**
      * Check whether Brigadier can be used on the server instance
      *
-     * @throws BrigadierFailureException An exception is thrown if Brigadier isn't available. The exception
+     * @throws BrigadierInitializationException An exception is thrown if Brigadier isn't available. The exception
      *                                   will contain the reason for this.
      */
-    protected final void checkBrigadierCompatibility() throws BrigadierFailureException {
+    protected final void checkBrigadierCompatibility() throws BrigadierInitializationException {
         if (!this.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
-            throw new BrigadierFailureException(
-                    BrigadierFailureReason.VERSION_TOO_LOW,
-                    new IllegalArgumentException(
-                            "Brigadier does not appear to be present on the currently running server. This is usually due to "
-                                    + "running too old a version of Minecraft (Brigadier is implemented in 1.13 and newer).")
+            throw new BrigadierInitializationException(
+                    "Missing capability " + CloudBukkitCapabilities.class.getSimpleName() + "."
+                            + CloudBukkitCapabilities.BRIGADIER + " (Minecraft version too old? Brigadier was added in 1.13). "
+                            + "See the Javadocs for more details"
             );
         }
-    }
-
-    /**
-     * Check for the platform capabilities
-     *
-     * @return A set containing all capabilities of the instance
-     */
-    public final @NonNull Set<@NonNull CloudBukkitCapabilities> queryCapabilities() {
-        return CloudBukkitCapabilities.CAPABLE;
     }
 
     /**
@@ -291,22 +286,28 @@ public class BukkitCommandManager<C> extends CommandManager<C>
      * <p>Callers should check for {@link CloudBukkitCapabilities#COMMODORE_BRIGADIER} first
      * to avoid exceptions.</p>
      *
-     * @throws BrigadierFailureException If Brigadier isn't
-     *                                   supported by the platform
+     * @see #hasCapability(CloudCapability)
+     * @throws BrigadierInitializationException when the prerequisite capabilities are not present or some other issue occurs
+     * during registration of Brigadier support
      */
-    public void registerBrigadier() throws BrigadierFailureException {
+    public void registerBrigadier() throws BrigadierInitializationException {
         this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.checkBrigadierCompatibility();
         if (!this.hasCapability(CloudBukkitCapabilities.COMMODORE_BRIGADIER)) {
-            throw new BrigadierFailureException(BrigadierFailureReason.VERSION_TOO_HIGH);
+            throw new BrigadierInitializationException(
+                    "Missing capability " + CloudBukkitCapabilities.class.getSimpleName() + "."
+                            + CloudBukkitCapabilities.COMMODORE_BRIGADIER + " (Minecraft version too new). "
+                            + "See the Javadocs for more details"
+            );
         }
         try {
             final CloudCommodoreManager<C> cloudCommodoreManager = new CloudCommodoreManager<>(this);
             cloudCommodoreManager.initialize(this);
             this.commandRegistrationHandler(cloudCommodoreManager);
             this.setSplitAliases(true);
-        } catch (final Throwable e) {
-            throw new BrigadierFailureException(BrigadierFailureReason.COMMODORE_NOT_PRESENT, e);
+        } catch (final Exception e) {
+            throw new BrigadierInitializationException(
+                    "Unexpected exception initializing " + CloudCommodoreManager.class.getSimpleName(), e);
         }
     }
 
@@ -346,6 +347,7 @@ public class BukkitCommandManager<C> extends CommandManager<C>
      * @param command Command
      * @return Stripped command
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public final @NonNull String stripNamespace(final @NonNull String command) {
         @NonNull String input;
 
@@ -357,7 +359,7 @@ public class BukkitCommandManager<C> extends CommandManager<C>
         }
 
         /* Remove leading plugin namespace */
-        final String namespace = String.format("%s:", this.getOwningPlugin().getName().toLowerCase(Locale.ROOT));
+        final String namespace = String.format("%s:", this.owningPlugin().getName().toLowerCase(Locale.ROOT));
         if (input.startsWith(namespace)) {
             input = input.substring(namespace.length());
         }
@@ -424,59 +426,6 @@ public class BukkitCommandManager<C> extends CommandManager<C>
         }
     }
 
-    /**
-     * Reasons to explain why Brigadier failed to initialize
-     */
-    public enum BrigadierFailureReason {
-        COMMODORE_NOT_PRESENT,
-        VERSION_TOO_LOW,
-        VERSION_TOO_HIGH,
-        PAPER_BRIGADIER_INITIALIZATION_FAILURE
-    }
-
-
-    public static final class BrigadierFailureException extends IllegalStateException {
-
-        private final BrigadierFailureReason reason;
-
-        /**
-         * Initialize a new Brigadier failure exception
-         *
-         * @param reason Reason
-         */
-        public BrigadierFailureException(final @NonNull BrigadierFailureReason reason) {
-            this.reason = reason;
-        }
-
-        /**
-         * Initialize a new Brigadier failure exception
-         *
-         * @param reason Reason
-         * @param cause  Cause
-         */
-        public BrigadierFailureException(final @NonNull BrigadierFailureReason reason, final @NonNull Throwable cause) {
-            super(cause);
-            this.reason = reason;
-        }
-
-        /**
-         * Get the reason for the exception
-         *
-         * @return Reason
-         */
-        public @NonNull BrigadierFailureReason getReason() {
-            return this.reason;
-        }
-
-        @Override
-        public String getMessage() {
-            return String.format(
-                    "Could not initialize Brigadier mappings. Reason: %s (%s)",
-                    this.reason.name().toLowerCase(Locale.ROOT).replace("_", " "),
-                    this.getCause() == null ? "" : this.getCause().getMessage()
-            );
-        }
-    }
 
     /**
      * Exception thrown when the command manager could not be initialized.
@@ -495,6 +444,36 @@ public class BukkitCommandManager<C> extends CommandManager<C>
         @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
         public InitializationException(final String message, final @Nullable Throwable cause) {
             super(message, cause);
+        }
+    }
+
+    /**
+     * Exception thrown when Brigadier mappings fail to initialize.
+     *
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static final class BrigadierInitializationException extends IllegalStateException {
+
+        /**
+         * Creates a new Brigadier failure exception.
+         *
+         * @param reason Reason
+         */
+        @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
+        public BrigadierInitializationException(final @NonNull String reason) {
+            super(reason);
+        }
+
+        /**
+         * Creates a new Brigadier failure exception.
+         *
+         * @param reason Reason
+         * @param cause  Cause
+         */
+        @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
+        public BrigadierInitializationException(final @NonNull String reason, final @Nullable Throwable cause) {
+            super(reason, cause);
         }
     }
 }

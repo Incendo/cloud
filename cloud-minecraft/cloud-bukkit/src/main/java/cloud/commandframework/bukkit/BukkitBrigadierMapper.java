@@ -133,7 +133,7 @@ public final class BukkitBrigadierMapper<C> {
                     .getDeclaredConstructors()[0]
                     .newInstance(RegistryReflection.registryKey(RegistryReflection.registryByName("enchantment")));
         } catch (final Exception e) {
-            this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve enchantment argument", e);
+            this.commandManager.owningPlugin().getLogger().log(Level.INFO, "Failed to retrieve enchantment argument", e);
             return fallbackType();
         }
     }
@@ -154,7 +154,7 @@ public final class BukkitBrigadierMapper<C> {
                 constructor.setAccessible(true);
                 return (ArgumentType<?>) constructor.newInstance(single, playersOnly);
             } catch (final Exception e) {
-                this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Selector Argument", e);
+                this.commandManager.owningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Selector Argument", e);
                 return fallbackType();
             }
         };
@@ -166,7 +166,7 @@ public final class BukkitBrigadierMapper<C> {
                     .getDeclaredConstructor(boolean.class)
                     .newInstance(true);
         } catch (final Exception e) {
-            this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Vec3D argument", e);
+            this.commandManager.owningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Vec3D argument", e);
             return fallbackType();
         }
     }
@@ -177,7 +177,7 @@ public final class BukkitBrigadierMapper<C> {
                     .getDeclaredConstructor(boolean.class)
                     .newInstance(true);
         } catch (final Exception e) {
-            this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Vec2 argument", e);
+            this.commandManager.owningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Vec2 argument", e);
             return fallbackType();
         }
     }
@@ -246,7 +246,7 @@ public final class BukkitBrigadierMapper<C> {
             final Class<?> nmsArgument = MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft(argumentId));
             constructor = nmsArgument.getConstructor();
         } catch (final RuntimeException | ReflectiveOperationException e) {
-            this.commandManager.getOwningPlugin().getLogger().log(
+            this.commandManager.owningPlugin().getLogger().log(
                     Level.WARNING,
                     String.format("Failed to create mapping for NMS brigadier argument type '%s'.", argumentId),
                     e
@@ -258,7 +258,7 @@ public final class BukkitBrigadierMapper<C> {
                 try {
                     return (ArgumentType<?>) constructor.newInstance();
                 } catch (final ReflectiveOperationException e) {
-                    this.commandManager.getOwningPlugin().getLogger().log(
+                    this.commandManager.owningPlugin().getLogger().log(
                             Level.WARNING,
                             String.format(
                                     "Failed to create instance of brigadier argument type '%s'.",

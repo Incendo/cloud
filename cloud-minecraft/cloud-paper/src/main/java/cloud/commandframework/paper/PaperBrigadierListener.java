@@ -77,7 +77,7 @@ class PaperBrigadierListener<C> implements Listener {
         if (!(event.getCommand() instanceof PluginIdentifiableCommand)) {
             return;
         } else if (!((PluginIdentifiableCommand) event.getCommand())
-                .getPlugin().equals(this.paperCommandManager.getOwningPlugin())) {
+                .getPlugin().equals(this.paperCommandManager.owningPlugin())) {
             return;
         }
 

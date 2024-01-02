@@ -33,52 +33,50 @@ import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.paper.suggestions.SuggestionListener;
 import cloud.commandframework.paper.suggestions.SuggestionListenerFactory;
 import cloud.commandframework.state.RegistrationState;
+import java.util.concurrent.Executor;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Paper command manager that extends {@link BukkitCommandManager}
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 public class PaperCommandManager<C> extends BukkitCommandManager<C> {
 
-    private PaperBrigadierListener<C> paperBrigadierListener = null;
+    private @Nullable PaperBrigadierListener<C> paperBrigadierListener = null;
 
     /**
-     * Construct a new Paper command manager
+     * Create a new Paper command manager.
      *
-     * @param owningPlugin                 Plugin that is constructing the manager. This will be used when registering the
-     *                                     commands to the Bukkit command map.
-     * @param commandExecutionCoordinator  Execution coordinator instance. The coordinator is in charge of executing incoming
-     *                                     commands. Some considerations must be made when picking a suitable execution
-     *                                     coordinator. For example, an entirely asynchronous coordinator is not suitable
-     *                                     when the parsers used in your commands are not thread safe. If you have
-     *                                     commands that perform blocking operations, however, it might not be a good idea to
-     *                                     use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
-     *                                     {@link ExecutionCoordinator#asyncCoordinator()}.
-     *                                     <p>
-     *                                     The execution coordinator will not have an impact on command suggestions. More
-     *                                     specifically, using an asynchronous command executor does not mean that command
-     *                                     suggestions will be provided asynchronously. Instead, use
-     *                                     {@link #registerAsynchronousCompletions()} to register asynchronous completions. This
-     *                                     will only work on Paper servers. Be aware that cloud does not synchronize the command
-     *                                     suggestions for you, and this should only be used if your command suggestion providers
-     *                                     are thread safe.
-     * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
-     * @throws InitializationException if the construction of the manager fails
+     * @param owningPlugin                Plugin constructing the manager. Used when registering commands to the command map,
+     *                                    registering event listeners, etc.
+     * @param commandExecutionCoordinator Execution coordinator instance. Due to Bukkit blocking the main thread for
+     *                                    suggestion requests, it's potentially unsafe to use anything other than
+     *                                    {@link ExecutionCoordinator#nonSchedulingExecutor()} for
+     *                                    {@link ExecutionCoordinator.Builder#suggestionsExecutor(Executor)}. Once the
+     *                                    coordinator, a suggestion provider, parser, or similar routes suggestion logic
+     *                                    off of the calling (main) thread, it won't be possible to schedule further logic
+     *                                    back to the main thread without a deadlock. When Brigadier support is active, this issue
+     *                                    is avoided, as it allows for non-blocking suggestions.
+     *                                    Paper's asynchronous completion API can also
+     *                                    be used to avoid this issue: {@link #registerAsynchronousCompletions()}
+     * @param senderMapper                Mapper between Bukkit's {@link CommandSender} and the command sender type {@code C}.
+     * @see #registerBrigadier()
+     * @throws InitializationException if construction of the manager fails
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     public PaperCommandManager(
             final @NonNull Plugin owningPlugin,
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
-            final @NonNull SenderMapper<CommandSender, C> commandSenderMapper
+            final @NonNull SenderMapper<CommandSender, C> senderMapper
     ) throws InitializationException {
-        super(owningPlugin, commandExecutionCoordinator, commandSenderMapper);
+        super(owningPlugin, commandExecutionCoordinator, senderMapper);
 
         this.registerCommandPreProcessor(new PaperCommandPreprocessor<>(this));
     }
@@ -117,10 +115,12 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      * any functionality on modern
      * versions (see the documentation for {@link CloudBukkitCapabilities#COMMODORE_BRIGADIER}).</p>
      *
-     * @throws BrigadierFailureException Exception thrown if the mappings cannot be registered
+     * @see #hasCapability(CloudCapability)
+     * @throws BrigadierInitializationException when the prerequisite capabilities are not present or some other issue occurs
+     * during registration of Brigadier support
      */
     @Override
-    public void registerBrigadier() throws BrigadierFailureException {
+    public void registerBrigadier() throws BrigadierInitializationException {
         this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.checkBrigadierCompatibility();
         if (!this.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
@@ -130,11 +130,12 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
                 this.paperBrigadierListener = new PaperBrigadierListener<>(this);
                 Bukkit.getPluginManager().registerEvents(
                         this.paperBrigadierListener,
-                        this.getOwningPlugin()
+                        this.owningPlugin()
                 );
                 this.paperBrigadierListener.brigadierManager().settings().set(BrigadierSetting.FORCE_EXECUTABLE, true);
-            } catch (final Throwable e) {
-                throw new BrigadierFailureException(BrigadierFailureReason.PAPER_BRIGADIER_INITIALIZATION_FAILURE, e);
+            } catch (final Exception e) {
+                throw new BrigadierInitializationException(
+                        "Failed to register " + PaperBrigadierListener.class.getSimpleName(), e);
             }
         }
     }
@@ -168,11 +169,17 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
     }
 
     /**
-     * Register asynchronous completions. This requires all argument parsers to be thread safe, and it
-     * is up to the caller to guarantee that such is the case
+     * Registers asynchronous completions using the Paper API. This means the calling thread for suggestion queries will be a
+     * thread other than the {@link Server#isPrimaryThread() main server thread} (or, the sender's thread context on Folia).
      *
-     * @throws IllegalStateException when the server does not support asynchronous completions.
-     * @see #hasCapability(CloudCapability) Check if the capability is present
+     * <p>Requires the {@link CloudBukkitCapabilities#ASYNCHRONOUS_COMPLETION} capability to be present.</p>
+     *
+     * <p>It's not recommended to use this in combination with {@link #registerBrigadier()}, as Brigadier allows for
+     * non-blocking suggestions and the async completion API reduces the fidelity of suggestions compared to using Brigadier
+     * directly (see {@link PaperCommandManager#PaperCommandManager(Plugin, ExecutionCoordinator, SenderMapper)}).</p>
+     *
+     * @throws IllegalStateException when the server does not support asynchronous completions
+     * @see #hasCapability(CloudCapability)
      */
     public void registerAsynchronousCompletions() throws IllegalStateException {
         this.requireState(RegistrationState.BEFORE_REGISTRATION);
@@ -185,7 +192,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
 
         Bukkit.getServer().getPluginManager().registerEvents(
                 suggestionListener,
-                this.getOwningPlugin()
+                this.owningPlugin()
         );
     }
 }

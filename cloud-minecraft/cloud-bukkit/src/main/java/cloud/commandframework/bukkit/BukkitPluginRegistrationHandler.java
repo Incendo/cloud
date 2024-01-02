@@ -114,7 +114,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
 
         this.commandMap.register(
                 label,
-                this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(Locale.ROOT),
+                this.bukkitCommandManager.owningPlugin().getName().toLowerCase(Locale.ROOT),
                 bukkitCommand
         );
 
@@ -170,7 +170,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
     }
 
     private @NonNull String getNamespacedLabel(final @NonNull String label) {
-        return String.format("%s:%s", this.bukkitCommandManager.getOwningPlugin().getName(), label).toLowerCase(Locale.ROOT);
+        return String.format("%s:%s", this.bukkitCommandManager.owningPlugin().getName(), label).toLowerCase(Locale.ROOT);
     }
 
     /**
@@ -208,7 +208,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
         if (existingCommand instanceof PluginIdentifiableCommand) {
             return existingCommand.getLabel().equals(commandLabel)
                     && !((PluginIdentifiableCommand) existingCommand).getPlugin().getName()
-                    .equalsIgnoreCase(this.bukkitCommandManager.getOwningPlugin().getName());
+                    .equalsIgnoreCase(this.bukkitCommandManager.owningPlugin().getName());
         }
         return existingCommand.getLabel().equals(commandLabel);
     }
@@ -223,7 +223,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
         final org.bukkit.command.Command command = this.bukkitCommands.get(commandLabel);
         if (command instanceof PluginIdentifiableCommand) {
             return !((PluginIdentifiableCommand) command).getPlugin().getName()
-                    .equalsIgnoreCase(this.bukkitCommandManager.getOwningPlugin().getName());
+                    .equalsIgnoreCase(this.bukkitCommandManager.owningPlugin().getName());
         }
         return command != null;
     }
