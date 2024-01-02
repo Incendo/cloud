@@ -19,10 +19,10 @@ val Project.libs: LibrariesForLibs
 
 fun MavenPomDeveloperSpec.city() {
     developer {
-        id.set("Sauilitired")
+        id.set("Citymonstret")
         name.set("Alexander Söderberg")
-        url.set("https://alexander-soderberg.com")
-        email.set("contact@alexander-soderberg.com")
+        url.set("https://github.com/Citymonstret")
+        email.set("alexander.soderberg@incendo.org")
     }
 }
 
