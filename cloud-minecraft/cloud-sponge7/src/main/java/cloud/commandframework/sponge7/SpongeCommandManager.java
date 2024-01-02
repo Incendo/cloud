@@ -24,6 +24,8 @@
 package cloud.commandframework.sponge7;
 
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.SenderMapper;
+import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -35,7 +37,6 @@ import cloud.commandframework.exceptions.handling.ExceptionHandler;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.keys.CloudKey;
-import java.util.function.Function;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -54,7 +55,7 @@ import static java.util.Objects.requireNonNull;
  * @since 1.4.0
  */
 @Singleton
-public class SpongeCommandManager<C> extends CommandManager<C> {
+public class SpongeCommandManager<C> extends CommandManager<C> implements SenderMapperHolder<CommandSource, C> {
 
     private static final Text MESSAGE_INTERNAL_ERROR = Text.of(
             TextColors.RED,
@@ -73,8 +74,7 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
     );
 
     private final PluginContainer owningPlugin;
-    private final Function<CommandSource, C> forwardMapper;
-    private final Function<C, CommandSource> reverseMapper;
+    private final SenderMapper<CommandSource, C> senderMapper;
 
     /**
      * Create a new command manager instance.
@@ -88,21 +88,18 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
      *                                    use a synchronous execution coordinator. In most cases you will want to pick between
      *                                    {@link ExecutionCoordinator#simpleCoordinator()} and
      *                                    {@link ExecutionCoordinator#asyncCoordinator()}
-     * @param forwardMapper               A function converting from a native {@link CommandSource} to this manager's sender type
-     * @param reverseMapper               A function converting from this manager's sender type to a native {@link CommandSource}
+     * @param senderMapper                A function converting from a native {@link CommandSource} to this manager's sender type
      */
     @Inject
     @SuppressWarnings("unchecked")
     public SpongeCommandManager(
             final @NonNull PluginContainer container,
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
-            final Function<CommandSource, C> forwardMapper,
-            final Function<C, CommandSource> reverseMapper
+            final @NonNull SenderMapper<CommandSource, C> senderMapper
     ) {
         super(commandExecutionCoordinator, new SpongePluginRegistrationHandler<>());
         this.owningPlugin = requireNonNull(container, "container");
-        this.forwardMapper = requireNonNull(forwardMapper, "forwardMapper");
-        this.reverseMapper = requireNonNull(reverseMapper, "reverseMapper");
+        this.senderMapper = requireNonNull(senderMapper, "senderMapper");
         this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
                 FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
         ));
@@ -112,25 +109,7 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
 
     @Override
     public final boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
-        return this.reverseMapper.apply(sender).hasPermission(permission);
-    }
-
-    /**
-     * Get a mapper from a Sponge {@link CommandSource} to this manager's command source type.
-     *
-     * @return the command source mapper
-     */
-    public @NonNull Function<CommandSource, C> getCommandSourceMapper() {
-        return this.forwardMapper;
-    }
-
-    /**
-     * Get a mapper from this manager's command source type back to Sponge's {@link CommandSource}.
-     *
-     * @return the command source mapper
-     */
-    public final @NonNull Function<C, CommandSource> getReverseCommandSourceMapper() {
-        return this.reverseMapper;
+        return this.senderMapper.reverse(sender).hasPermission(permission);
     }
 
     final PluginContainer getOwningPlugin() {
@@ -193,6 +172,11 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
         } else {
             return Text.of(TextColors.GRAY, exc.getMessage());
         }
+    }
+
+    @Override
+    public final @NonNull SenderMapper<CommandSource, C> senderMapper() {
+        return this.senderMapper;
     }
 
 

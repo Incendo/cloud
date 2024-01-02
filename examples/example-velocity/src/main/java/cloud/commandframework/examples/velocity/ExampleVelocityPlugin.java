@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.examples.velocity;
 
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.velocity.CloudInjectionModule;
@@ -39,7 +40,6 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import java.util.function.Function;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -67,8 +67,7 @@ public final class ExampleVelocityPlugin {
                 new CloudInjectionModule<>(
                         CommandSource.class,
                         ExecutionCoordinator.simpleCoordinator(),
-                        Function.identity(),
-                        Function.identity()
+                        SenderMapper.identity()
                 )
         );
         final VelocityCommandManager<CommandSource> commandManager = childInjector.getInstance(

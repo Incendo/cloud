@@ -73,7 +73,7 @@ final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
         }
         context.commandContext().store(
                 BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER,
-                this.commandManager.getBackwardsCommandSenderMapper().apply(context.commandContext().sender())
+                this.commandManager.senderMapper().reverse(context.commandContext().sender())
         );
         context.commandContext().store(
                 BukkitCommandContextKeys.CLOUD_BUKKIT_CAPABILITIES,

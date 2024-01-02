@@ -24,6 +24,7 @@
 package cloud.commandframework.paper;
 
 import cloud.commandframework.CloudCapability;
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
@@ -31,8 +32,6 @@ import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.paper.suggestions.SuggestionListener;
 import cloud.commandframework.paper.suggestions.SuggestionListenerFactory;
 import cloud.commandframework.state.RegistrationState;
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -70,16 +69,15 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      *                                     suggestions for you, and this should only be used if your command suggestion providers
      *                                     are thread safe.
      * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
-     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws InitializationException if the construction of the manager fails
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public PaperCommandManager(
             final @NonNull Plugin owningPlugin,
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
-            final @NonNull Function<CommandSender, C> commandSenderMapper,
-            final @NonNull Function<C, CommandSender> backwardsCommandSenderMapper
+            final @NonNull SenderMapper<CommandSender, C> commandSenderMapper
     ) throws InitializationException {
-        super(owningPlugin, commandExecutionCoordinator, commandSenderMapper, backwardsCommandSenderMapper);
+        super(owningPlugin, commandExecutionCoordinator, commandSenderMapper);
 
         this.registerCommandPreProcessor(new PaperCommandPreprocessor<>(this));
     }
@@ -91,9 +89,10 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      * @param commandExecutionCoordinator execution coordinator instance
      * @return a new command manager
      * @throws InitializationException if the construction of the manager fails
-     * @see #PaperCommandManager(Plugin, ExecutionCoordinator, Function, Function) for a more thorough explanation
+     * @see #PaperCommandManager(Plugin, ExecutionCoordinator, SenderMapper) for a more thorough explanation
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public static @NonNull PaperCommandManager<@NonNull CommandSender> createNative(
             final @NonNull Plugin owningPlugin,
             final @NonNull ExecutionCoordinator<CommandSender> commandExecutionCoordinator
@@ -101,8 +100,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
         return new PaperCommandManager<>(
                 owningPlugin,
                 commandExecutionCoordinator,
-                UnaryOperator.identity(),
-                UnaryOperator.identity()
+                SenderMapper.identity()
         );
     }
 

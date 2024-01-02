@@ -24,6 +24,8 @@
 package cloud.commandframework.bungee;
 
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.SenderMapper;
+import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.bungee.arguments.PlayerParser;
 import cloud.commandframework.bungee.arguments.ServerParser;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
@@ -36,7 +38,6 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import io.leangen.geantyref.TypeToken;
-import java.util.function.Function;
 import java.util.logging.Level;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -46,7 +47,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class BungeeCommandManager<C> extends CommandManager<C> {
+public class BungeeCommandManager<C> extends CommandManager<C> implements SenderMapperHolder<CommandSender, C> {
 
     private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS =
@@ -65,29 +66,25 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
     public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'<input>' is not a valid server";
 
     private final Plugin owningPlugin;
-    private final Function<CommandSender, C> commandSenderMapper;
-    private final Function<C, CommandSender> backwardsCommandSenderMapper;
+    private final SenderMapper<CommandSender, C> senderMapper;
 
     /**
      * Construct a new Bungee command manager
      *
      * @param owningPlugin                 Plugin that is constructing the manager
      * @param commandExecutionCoordinator  Coordinator provider
-     * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
-     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
+     * @param senderMapper                 Function that maps {@link CommandSender} to the command sender type
      */
     @SuppressWarnings("unchecked")
     public BungeeCommandManager(
             final @NonNull Plugin owningPlugin,
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
-            final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper
+            final @NonNull SenderMapper<CommandSender, C> senderMapper
     ) {
         super(commandExecutionCoordinator, new BungeePluginRegistrationHandler<>());
         ((BungeePluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
         this.owningPlugin = owningPlugin;
-        this.commandSenderMapper = commandSenderMapper;
-        this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
+        this.senderMapper = senderMapper;
 
         this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
                 FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
@@ -127,11 +124,7 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
         if (permission.isEmpty()) {
             return true;
         }
-        return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
-    }
-
-    final @NonNull Function<@NonNull CommandSender, @NonNull C> getCommandSenderMapper() {
-        return this.commandSenderMapper;
+        return this.senderMapper.reverse(sender).hasPermission(permission);
     }
 
     /**
@@ -145,14 +138,14 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
 
     private void registerDefaultExceptionHandlers() {
         this.exceptionController().registerHandler(Throwable.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender())
+            this.senderMapper.reverse(context.context().sender())
                     .sendMessage(new ComponentBuilder(MESSAGE_INTERNAL_ERROR).color(ChatColor.RED).create());
             this.owningPlugin.getLogger().log(
                     Level.SEVERE,
                     "An unhandled exception was thrown during command execution",
                     context.exception());
         }).registerHandler(CommandExecutionException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender())
+            this.senderMapper.reverse(context.context().sender())
                     .sendMessage(new ComponentBuilder(MESSAGE_INTERNAL_ERROR)
                     .color(ChatColor.RED)
                     .create());
@@ -161,22 +154,27 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
                     "Exception executing command handler",
                     context.exception().getCause()
             );
-        }).registerHandler(ArgumentParseException.class, context -> this.backwardsCommandSenderMapper.apply(
+        }).registerHandler(ArgumentParseException.class, context -> this.senderMapper.reverse(
                 context.context().sender()).sendMessage(new ComponentBuilder("Invalid Command Argument: ")
                 .color(ChatColor.GRAY).append(context.exception().getCause().getMessage()).create())
-        ).registerHandler(NoSuchCommandException.class, context -> this.backwardsCommandSenderMapper.apply(
+        ).registerHandler(NoSuchCommandException.class, context -> this.senderMapper.reverse(
                 context.context().sender()).sendMessage(new ComponentBuilder(MESSAGE_UNKNOWN_COMMAND)
                 .color(ChatColor.WHITE).create())
-        ).registerHandler(NoPermissionException.class, context -> this.backwardsCommandSenderMapper.apply(
+        ).registerHandler(NoPermissionException.class, context -> this.senderMapper.reverse(
                 context.context().sender()).sendMessage(new ComponentBuilder(MESSAGE_NO_PERMS)
                 .color(ChatColor.WHITE).create())
-        ).registerHandler(InvalidCommandSenderException.class, context -> this.backwardsCommandSenderMapper.apply(
+        ).registerHandler(InvalidCommandSenderException.class, context -> this.senderMapper.reverse(
                 context.context().sender()).sendMessage(new ComponentBuilder(context.exception().getMessage())
                 .color(ChatColor.RED).create())
-        ).registerHandler(InvalidSyntaxException.class, context -> this.backwardsCommandSenderMapper.apply(
+        ).registerHandler(InvalidSyntaxException.class, context -> this.senderMapper.reverse(
                 context.context().sender()).sendMessage(new ComponentBuilder(
                         "Invalid Command Syntax. Correct command syntax is: ").color(ChatColor.RED).append("/")
                         .color(ChatColor.GRAY).append(context.exception().getCorrectSyntax()).color(ChatColor.GRAY).create()
         ));
+    }
+
+    @Override
+    public final @NonNull SenderMapper<CommandSender, C> senderMapper() {
+        return this.senderMapper;
     }
 }

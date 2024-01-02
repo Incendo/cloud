@@ -25,6 +25,7 @@ package cloud.commandframework.brigadier.node;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
@@ -35,10 +36,10 @@ import cloud.commandframework.context.StandardCommandContextFactory;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.types.tuples.Pair;
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
@@ -50,7 +51,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static cloud.commandframework.arguments.standard.BooleanParser.booleanParser;
@@ -63,19 +63,19 @@ import static com.google.common.truth.Truth8.assertThat;
 @ExtendWith(MockitoExtension.class)
 class LiteralBrigadierNodeFactoryTest {
 
-    @Mock
-    private CommandContext<Object> context;
-
+    private CommandDispatcher<Object> dispatcher;
     private TestCommandManager commandManager;
     private LiteralBrigadierNodeFactory<Object, Object> literalBrigadierNodeFactory;
 
     @BeforeEach
     void setup() {
+        this.dispatcher = new CommandDispatcher<>();
         this.commandManager = new TestCommandManager();
         final CloudBrigadierManager<Object, Object> cloudBrigadierManager = new CloudBrigadierManager<>(
                 this.commandManager,
                 () -> new StandardCommandContextFactory<>(this.commandManager).create(false, new Object()),
-                this.commandManager.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion)
+                this.commandManager.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion),
+                SenderMapper.identity()
         );
         this.literalBrigadierNodeFactory = cloudBrigadierManager.literalBrigadierNodeFactory();
     }
@@ -102,6 +102,7 @@ class LiteralBrigadierNodeFactoryTest {
                 (source, permission) -> true,
                 brigadierCommand
         );
+        this.dispatcher.getRoot().addChild(commandNode);
 
         // Assert
         assertThat(commandNode).isNotNull();
@@ -140,7 +141,7 @@ class LiteralBrigadierNodeFactoryTest {
         final String suggestionString = "command literal 9 ";
         final SuggestionProvider<Object> suggestionProvider = stringArgument.getCustomSuggestions();
         final Suggestions suggestions = suggestionProvider.getSuggestions(
-                this.context,
+                this.dispatcher.parse(suggestionString, new Object()).getContext().build(suggestionString),
                 new SuggestionsBuilder(suggestionString, suggestionString.length())
         ).get();
         assertThat(suggestions.getList().stream().map(com.mojang.brigadier.suggestion.Suggestion::getText))

@@ -25,6 +25,8 @@ package cloud.commandframework.jda;
 
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.SenderMapper;
+import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -59,7 +61,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @deprecated Use {@link JDA4CommandManager}
  */
 @Deprecated
-public class JDACommandManager<C> extends CommandManager<C> {
+public class JDACommandManager<C> extends CommandManager<C> implements SenderMapperHolder<MessageReceivedEvent, C> {
 
     private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_INVALID_SYNTAX = "Invalid Command Syntax. Correct command syntax is: ";
@@ -72,8 +74,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
 
     private final Function<@NonNull C, @NonNull String> prefixMapper;
     private final BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper;
-    private final Function<@NonNull MessageReceivedEvent, @NonNull C> commandSenderMapper;
-    private final Function<@NonNull C, @NonNull MessageReceivedEvent> backwardsCommandSenderMapper;
+    private final SenderMapper<MessageReceivedEvent, C> senderMapper;
 
     /**
      * Construct a new JDA Command Manager
@@ -89,8 +90,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
      *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
      *                                     {@link ExecutionCoordinator#simpleCoordinator()}
-     * @param commandSenderMapper          Function that maps {@link MessageReceivedEvent} to the command sender type
-     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link MessageReceivedEvent}
+     * @param senderMapper                 Function that maps {@link MessageReceivedEvent} to the command sender type
      * @throws InterruptedException If the jda instance does not ready correctly
      */
     public JDACommandManager(
@@ -98,16 +98,14 @@ public class JDACommandManager<C> extends CommandManager<C> {
             final @NonNull Function<@NonNull C, @NonNull String> prefixMapper,
             final @Nullable BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper,
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull MessageReceivedEvent, @NonNull C> commandSenderMapper,
-            final @NonNull Function<@NonNull C, @NonNull MessageReceivedEvent> backwardsCommandSenderMapper
+            final @NonNull SenderMapper<MessageReceivedEvent, C> senderMapper
     )
             throws InterruptedException {
         super(commandExecutionCoordinator, CommandRegistrationHandler.nullCommandRegistrationHandler());
         this.jda = jda;
         this.prefixMapper = prefixMapper;
         this.permissionMapper = permissionMapper;
-        this.commandSenderMapper = commandSenderMapper;
-        this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
+        this.senderMapper = senderMapper;
         jda.addEventListener(new JDACommandListener<>(this));
         jda.awaitReady();
         this.botId = jda.getSelfUser().getIdLong();
@@ -155,24 +153,6 @@ public class JDACommandManager<C> extends CommandManager<C> {
     }
 
     /**
-     * Get the command sender mapper
-     *
-     * @return Command sender mapper
-     */
-    public final @NonNull Function<@NonNull MessageReceivedEvent, @NonNull C> getCommandSenderMapper() {
-        return this.commandSenderMapper;
-    }
-
-    /**
-     * Get the backwards command sender plugin
-     *
-     * @return The backwards command sender mapper
-     */
-    public final @NonNull Function<@NonNull C, @NonNull MessageReceivedEvent> getBackwardsCommandSenderMapper() {
-        return this.backwardsCommandSenderMapper;
-    }
-
-    /**
      * Get the bots discord id
      *
      * @return Bots discord id
@@ -191,7 +171,8 @@ public class JDACommandManager<C> extends CommandManager<C> {
             return this.permissionMapper.apply(sender, permission);
         }
 
-        final JDACommandSender jdaSender = this.backwardsCommandSenderMapper.andThen(JDACommandSender::of).apply(sender);
+        final JDACommandSender jdaSender =
+                JDACommandSender.of(this.senderMapper.reverse(sender));
 
         if (!(jdaSender instanceof JDAGuildSender)) {
             return true;
@@ -233,6 +214,11 @@ public class JDACommandManager<C> extends CommandManager<C> {
             final @NonNull JDAExceptionHandler<C, T> exceptionHandler
     ) {
         this.exceptionController().registerHandler(exceptionClass, exceptionHandler);
+    }
+
+    @Override
+    public final @NonNull SenderMapper<MessageReceivedEvent, C> senderMapper() {
+        return this.senderMapper;
     }
 
 

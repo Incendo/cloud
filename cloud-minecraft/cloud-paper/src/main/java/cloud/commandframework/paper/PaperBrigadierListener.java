@@ -24,6 +24,7 @@
 package cloud.commandframework.paper;
 
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.brigadier.node.LiteralBrigadierNodeFactory;
 import cloud.commandframework.brigadier.permission.BrigadierPermissionChecker;
@@ -65,19 +66,17 @@ class PaperBrigadierListener<C> implements Listener {
         this.brigadierManager = new CloudBrigadierManager<>(
                 this.paperCommandManager,
                 () -> new CommandContext<>(
-                    this.paperCommandManager.getCommandSenderMapper().apply(Bukkit.getConsoleSender()),
-                    this.paperCommandManager
+                        this.paperCommandManager.senderMapper().map(Bukkit.getConsoleSender()),
+                        this.paperCommandManager
                 ),
-                paperCommandManager.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion)
+                paperCommandManager.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion),
+                SenderMapper.create(
+                        sender -> this.paperCommandManager.senderMapper().map(sender.getBukkitSender()),
+                        new BukkitBackwardsBrigadierSenderMapper<>(this.paperCommandManager)
+                )
         );
 
-        this.brigadierManager.brigadierSenderMapper(sender ->
-                this.paperCommandManager.getCommandSenderMapper().apply(sender.getBukkitSender()));
-
         new PaperBrigadierMapper<>(new BukkitBrigadierMapper<>(this.paperCommandManager, this.brigadierManager));
-
-        this.brigadierManager
-                .backwardsBrigadierSenderMapper(new BukkitBackwardsBrigadierSenderMapper<>(this.paperCommandManager));
     }
 
     protected @NonNull CloudBrigadierManager<C, BukkitBrigadierCommandSource> brigadierManager() {
@@ -116,7 +115,7 @@ class PaperBrigadierListener<C> implements Listener {
                 return false;
             }
 
-            final C commandSender = this.paperCommandManager.getCommandSenderMapper().apply(sender.getBukkitSender());
+            final C commandSender = this.paperCommandManager.senderMapper().map(sender.getBukkitSender());
             return this.paperCommandManager.hasPermission(commandSender, permission);
         };
         final LiteralBrigadierNodeFactory<C, BukkitBrigadierCommandSource> literalFactory =

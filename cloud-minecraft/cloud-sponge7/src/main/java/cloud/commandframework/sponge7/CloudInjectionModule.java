@@ -23,12 +23,12 @@
 //
 package cloud.commandframework.sponge7;
 
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.util.Types;
 import java.lang.reflect.Type;
-import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.command.CommandSource;
 
@@ -42,27 +42,23 @@ public final class CloudInjectionModule<C> extends AbstractModule {
 
     private final Class<C> commandSenderType;
     private final ExecutionCoordinator<C> executionCoordinator;
-    private final Function<@NonNull CommandSource, @NonNull C> commandSenderMapper;
-    private final Function<@NonNull C, @NonNull CommandSource> backwardsCommandSenderMapper;
+    private final SenderMapper<CommandSource, C> senderMapper;
 
     /**
      * Create a new child injection module
      *
-     * @param commandSenderType            Your command sender type
-     * @param executionCoordinator         execution coordinator
-     * @param commandSenderMapper          Mapper from command source to the custom command sender type
-     * @param backwardsCommandSenderMapper Mapper from the custom command sender type to a velocity command source
+     * @param commandSenderType    Your command sender type
+     * @param executionCoordinator execution coordinator
+     * @param senderMapper         Mapper from command source to the custom command sender type
      */
     public CloudInjectionModule(
             final @NonNull Class<C> commandSenderType,
             final @NonNull ExecutionCoordinator<C> executionCoordinator,
-            final @NonNull Function<@NonNull CommandSource, @NonNull C> commandSenderMapper,
-            final @NonNull Function<@NonNull C, @NonNull CommandSource> backwardsCommandSenderMapper
+            final @NonNull SenderMapper<CommandSource, C> senderMapper
     ) {
         this.commandSenderType = commandSenderType;
         this.executionCoordinator = executionCoordinator;
-        this.commandSenderMapper = commandSenderMapper;
-        this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
+        this.senderMapper = senderMapper;
     }
 
     @Override
@@ -74,15 +70,10 @@ public final class CloudInjectionModule<C> extends AbstractModule {
         );
         final Key executorFunctionKey = Key.get(commandExecutionCoordinatorType);
         this.bind(executorFunctionKey).toInstance(this.executionCoordinator);
-        final Type commandSenderMapperFunction = Types.newParameterizedType(Function.class, CommandSource.class,
+        final Type commandSenderMapperFunction = Types.newParameterizedType(SenderMapper.class, CommandSource.class,
                 this.commandSenderType
         );
         final Key commandSenderMapperFunctionKey = Key.get(commandSenderMapperFunction);
-        this.bind(commandSenderMapperFunctionKey).toInstance(this.commandSenderMapper);
-        final Type backwardsCommandSenderMapperFunction = Types.newParameterizedType(Function.class, this.commandSenderType,
-                CommandSource.class
-        );
-        final Key backwardsCommandSenderMapperFunctionKey = Key.get(backwardsCommandSenderMapperFunction);
-        this.bind(backwardsCommandSenderMapperFunctionKey).toInstance(this.backwardsCommandSenderMapper);
+        this.bind(commandSenderMapperFunctionKey).toInstance(this.senderMapper);
     }
 }

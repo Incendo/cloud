@@ -96,7 +96,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
             builder.append(" ").append(string);
         }
         return this.manager.suggestionFactory().suggestImmediately(
-                this.manager.getCommandSenderMapper().apply(sender),
+                this.manager.senderMapper().map(sender),
                 builder.toString()
         ).stream().map(Suggestion::suggestion).collect(Collectors.toList());
     }
@@ -112,7 +112,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         for (final String string : strings) {
             builder.append(" ").append(string);
         }
-        final C sender = this.manager.getCommandSenderMapper().apply(commandSender);
+        final C sender = this.manager.senderMapper().map(commandSender);
         this.manager.commandExecutor().executeCommand(sender, builder.toString());
         return true;
     }
@@ -146,7 +146,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
                 .nodeMeta()
                 .getOrDefault("permission", Permission.empty());
 
-        return this.manager.hasPermission(this.manager.getCommandSenderMapper().apply(target), permission);
+        return this.manager.hasPermission(this.manager.senderMapper().map(target), permission);
     }
 
     @API(status = API.Status.INTERNAL, since = "1.7.0")

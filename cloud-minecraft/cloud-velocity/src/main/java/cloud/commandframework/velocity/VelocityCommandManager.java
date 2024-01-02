@@ -24,6 +24,8 @@
 package cloud.commandframework.velocity;
 
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.SenderMapper;
+import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
@@ -51,7 +53,6 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import io.leangen.geantyref.TypeToken;
-import java.util.function.Function;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -72,7 +73,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  */
 @Singleton
-public class VelocityCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C, CommandSource> {
+public class VelocityCommandManager<C> extends CommandManager<C>
+        implements BrigadierManagerHolder<C, CommandSource>, SenderMapperHolder<CommandSource, C> {
 
     private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS =
@@ -91,8 +93,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
     public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'<input>' is not a valid server";
 
     private final ProxyServer proxyServer;
-    private final Function<CommandSource, C> commandSenderMapper;
-    private final Function<C, CommandSource> backwardsCommandSenderMapper;
+    private final SenderMapper<CommandSource, C> senderMapper;
     private final SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory;
 
     /**
@@ -101,8 +102,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
      * @param plugin                       Container for the owning plugin
      * @param proxyServer                  ProxyServer instance
      * @param commandExecutionCoordinator  Coordinator provider
-     * @param commandSenderMapper          Function that maps {@link CommandSource} to the command sender type
-     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSource}
+     * @param senderMapper                 Function that maps {@link CommandSource} to the command sender type
      */
     @Inject
     @SuppressWarnings("unchecked")
@@ -110,14 +110,12 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
             final @NonNull PluginContainer plugin,
             final @NonNull ProxyServer proxyServer,
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull CommandSource, @NonNull C> commandSenderMapper,
-            final @NonNull Function<@NonNull C, @NonNull CommandSource> backwardsCommandSenderMapper
+            final @NonNull SenderMapper<CommandSource, C> senderMapper
     ) {
         super(commandExecutionCoordinator, new VelocityPluginRegistrationHandler<>());
         ((VelocityPluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
         this.proxyServer = proxyServer;
-        this.commandSenderMapper = commandSenderMapper;
-        this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
+        this.senderMapper = senderMapper;
 
         this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
                 FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
@@ -152,7 +150,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
         });
         this.parameterInjectorRegistry().registerInjector(
                 CommandSource.class,
-                (context, annotations) -> this.backwardsCommandSenderMapper.apply(context.sender())
+                (context, annotations) -> this.senderMapper.reverse(context.sender())
         );
 
         this.registerDefaultExceptionHandlers();
@@ -160,7 +158,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
 
     @Override
     public final boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
-        return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
+        return this.senderMapper.reverse(sender).hasPermission(permission);
     }
 
     /**
@@ -198,14 +196,6 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
 
     final @NonNull ProxyServer proxyServer() {
         return this.proxyServer;
-    }
-
-    final @NonNull Function<@NonNull CommandSource, @NonNull C> commandSenderMapper() {
-        return this.commandSenderMapper;
-    }
-
-    final @NonNull Function<@NonNull C, @NonNull CommandSource> backwardsCommandSenderMapper() {
-        return this.backwardsCommandSenderMapper;
     }
 
     private void registerDefaultExceptionHandlers() {
@@ -260,6 +250,11 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
             final @NonNull VelocityExceptionHandler<C, T> handler
     ) {
         this.exceptionController().registerHandler(exceptionType, handler);
+    }
+
+    @Override
+    public final @NonNull SenderMapper<CommandSource, C> senderMapper() {
+        return this.senderMapper;
     }
 
 

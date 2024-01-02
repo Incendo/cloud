@@ -21,28 +21,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.fabric;
+package cloud.commandframework;
 
-import com.mojang.brigadier.Command;
-import com.mojang.brigadier.context.CommandContext;
-import net.minecraft.commands.SharedSuggestionProvider;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class FabricExecutor<C, S extends SharedSuggestionProvider> implements Command<S> {
+/**
+ * A holder of a {@link SenderMapper}.
+ *
+ * @param <B> base command sender type
+ * @param <M> mapped command sender type
+ * @since 2.0.0
+ */
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface SenderMapperHolder<B, M> {
 
-    private final FabricCommandManager<C, S> manager;
-
-    FabricExecutor(final @NonNull FabricCommandManager<C, S> manager) {
-        this.manager = manager;
-    }
-
-    @Override
-    public int run(final @NonNull CommandContext<S> ctx) {
-        final S source = ctx.getSource();
-        final String input = ctx.getInput().substring(ctx.getLastChild().getNodes().get(0).getRange().getStart());
-        final C sender = this.manager.senderMapper().map(source);
-
-        this.manager.commandExecutor().executeCommand(sender, input);
-        return com.mojang.brigadier.Command.SINGLE_SUCCESS;
-    }
+    /**
+     * Returns the mapper between the base command sender type {@code B} and the mapped command sender type {@code M}.
+     *
+     * @return the sender mapper
+     */
+    @NonNull SenderMapper<B, M> senderMapper();
 }

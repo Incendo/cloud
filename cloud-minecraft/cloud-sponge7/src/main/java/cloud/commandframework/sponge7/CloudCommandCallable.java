@@ -57,7 +57,7 @@ final class CloudCommandCallable<C> implements CommandCallable {
 
     @Override
     public CommandResult process(final @NonNull CommandSource source, final @NonNull String arguments) {
-        final C cloudSender = this.manager.getCommandSourceMapper().apply(source);
+        final C cloudSender = this.manager.senderMapper().map(source);
 
         this.manager.commandExecutor().executeCommand(cloudSender, this.formatCommand(arguments), ctx ->
                         ctx.store(SpongeCommandManager.SPONGE_COMMAND_SOURCE_KEY, source));
@@ -72,7 +72,7 @@ final class CloudCommandCallable<C> implements CommandCallable {
     ) {
         return this.manager.suggestionFactory()
                 .suggestImmediately(
-                        this.manager.getCommandSourceMapper().apply(source),
+                        this.manager.senderMapper().map(source),
                         this.formatCommand(arguments)
                 ).stream()
                 .map(Suggestion::suggestion)
@@ -90,7 +90,7 @@ final class CloudCommandCallable<C> implements CommandCallable {
     @Override
     public boolean testPermission(final @NonNull CommandSource source) {
         return this.manager.hasPermission(
-                this.manager.getCommandSourceMapper().apply(source),
+                this.manager.senderMapper().map(source),
                 this.cloudCommand.commandPermission()
         );
     }

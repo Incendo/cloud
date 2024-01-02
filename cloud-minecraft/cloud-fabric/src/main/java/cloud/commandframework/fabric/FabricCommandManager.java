@@ -24,6 +24,8 @@
 package cloud.commandframework.fabric;
 
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.SenderMapper;
+import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.arguments.standard.UUIDParser;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
@@ -118,7 +120,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 1.5.0
  */
 public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider> extends CommandManager<C> implements
-        BrigadierManagerHolder<C, S> {
+        BrigadierManagerHolder<C, S>, SenderMapperHolder<S, C> {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int MOD_PUBLIC_STATIC_FINAL = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
@@ -131,8 +133,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
     private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
 
-    private final Function<S, C> commandSourceMapper;
-    private final Function<C, S> backwardsCommandSourceMapper;
+    private final SenderMapper<S, C> senderMapper;
     private final CloudBrigadierManager<C, S> brigadierManager;
     private final SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory;
     private final FabricExceptionHandlerFactory<C, S> exceptionHandlerFactory = new FabricExceptionHandlerFactory<>(this);
@@ -149,23 +150,21 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
      *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
      *                                     {@link ExecutionCoordinator#asyncCoordinator()}
-     * @param commandSourceMapper          Function that maps {@link SharedSuggestionProvider} to the command sender type
-     * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link SharedSuggestionProvider}
+     * @param senderMapper                 Function that maps {@link SharedSuggestionProvider} to the command sender type
      * @param registrationHandler          the handler accepting command registrations
      * @param dummyCommandSourceProvider   a provider of a dummy command source, for use with brigadier registration
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @SuppressWarnings("unchecked")
     FabricCommandManager(
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
-            final @NonNull Function<S, C> commandSourceMapper,
-            final @NonNull Function<C, S> backwardsCommandSourceMapper,
+            final @NonNull SenderMapper<S, C> senderMapper,
             final @NonNull FabricCommandRegistrationHandler<C, S> registrationHandler,
             final @NonNull Supplier<S> dummyCommandSourceProvider
     ) {
         super(commandExecutionCoordinator, registrationHandler);
-        this.commandSourceMapper = commandSourceMapper;
-        this.backwardsCommandSourceMapper = backwardsCommandSourceMapper;
+        this.senderMapper = senderMapper;
         this.suggestionFactory = super.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion);
 
         // We're always brigadier
@@ -174,14 +173,13 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
                 () -> new CommandContext<>(
                         // This looks ugly, but it's what the server does when loading datapack functions in 1.16+
                         // See net.minecraft.server.function.FunctionLoader.reload for reference
-                        this.commandSourceMapper.apply(dummyCommandSourceProvider.get()),
+                        this.senderMapper.map(dummyCommandSourceProvider.get()),
                         this
                 ),
-                this.suggestionFactory()
+                this.suggestionFactory(),
+                this.senderMapper
         );
 
-        this.brigadierManager.backwardsBrigadierSenderMapper(this.backwardsCommandSourceMapper);
-        this.brigadierManager.brigadierSenderMapper(this.commandSourceMapper);
         this.registerNativeBrigadierMappings(this.brigadierManager);
         this.captionRegistry(new FabricCaptionRegistry<>());
         this.registerCommandPreProcessor(new FabricCommandPreprocessor<>(this));
@@ -338,29 +336,14 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         this.parserRegistry().registerParserSupplier(type, params -> new WrappedBrigadierParser<>(argument));
     }
 
-    /**
-     * Gets the mapper from a game {@link SharedSuggestionProvider} to the manager's {@code C} type.
-     *
-     * @return Command source mapper
-     * @since 1.5.0
-     */
-    public final @NonNull Function<@NonNull S, @NonNull C> commandSourceMapper() {
-        return this.commandSourceMapper;
+    @Override
+    public final @NonNull SenderMapper<S, C> senderMapper() {
+        return this.senderMapper;
     }
 
     @Override
     public final @NonNull SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory() {
         return this.suggestionFactory;
-    }
-
-    /**
-     * Gets the mapper from the manager's {@code C} type to a game {@link SharedSuggestionProvider}.
-     *
-     * @return Command source mapper
-     * @since 1.5.0
-     */
-    public final @NonNull Function<@NonNull C, @NonNull S> backwardsCommandSourceMapper() {
-        return this.backwardsCommandSourceMapper;
     }
 
     /**
@@ -403,8 +386,8 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
      * @since 1.5.0
      */
     public @NonNull PredicatePermission<C> permissionLevel(final int permissionLevel) {
-        return sender -> this.backwardsCommandSourceMapper()
-                .apply(sender)
+        return sender -> this.senderMapper()
+                .reverse(sender)
                 .hasPermission(permissionLevel);
     }
 

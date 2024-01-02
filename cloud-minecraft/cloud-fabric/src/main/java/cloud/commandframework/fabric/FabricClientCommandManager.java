@@ -23,13 +23,14 @@
 //
 package cloud.commandframework.fabric;
 
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.permission.PredicatePermission;
-import java.util.function.Function;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -49,13 +50,14 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      *
      * @param execCoordinator Execution coordinator instance.
      * @return a new command manager
-     * @see #FabricClientCommandManager(ExecutionCoordinator, Function, Function) for a more thorough explanation
+     * @see #FabricClientCommandManager(ExecutionCoordinator, SenderMapper) for a more thorough explanation
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public static @NonNull FabricClientCommandManager<@NonNull FabricClientCommandSource> createNative(
             final @NonNull ExecutionCoordinator<FabricClientCommandSource> execCoordinator
     ) {
-        return new FabricClientCommandManager<>(execCoordinator, Function.identity(), Function.identity());
+        return new FabricClientCommandManager<>(execCoordinator, SenderMapper.identity());
     }
 
     /**
@@ -69,19 +71,17 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
      *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
      *                                     {@link ExecutionCoordinator#asyncCoordinator()}
-     * @param commandSourceMapper          Function that maps {@link FabricClientCommandSource} to the command sender type
-     * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link FabricClientCommandSource}
+     * @param senderMapper                 Function that maps {@link FabricClientCommandSource} to the command sender type
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public FabricClientCommandManager(
             final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull FabricClientCommandSource, @NonNull C> commandSourceMapper,
-            final @NonNull Function<@NonNull C, @NonNull FabricClientCommandSource> backwardsCommandSourceMapper
+            final @NonNull SenderMapper<FabricClientCommandSource, C> senderMapper
     ) {
         super(
                 commandExecutionCoordinator,
-                commandSourceMapper,
-                backwardsCommandSourceMapper,
+                senderMapper,
                 new FabricCommandRegistrationHandler.Client<>(),
                 () -> (FabricClientCommandSource) new ClientSuggestionProvider(
                         Minecraft.getInstance().getConnection(),

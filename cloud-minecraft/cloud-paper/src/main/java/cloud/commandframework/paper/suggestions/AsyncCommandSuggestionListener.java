@@ -61,7 +61,7 @@ class AsyncCommandSuggestionListener<C> implements SuggestionListener<C> {
 
         this.setSuggestions(
                 event,
-                this.paperCommandManager.getCommandSenderMapper().apply(event.getSender()),
+                this.paperCommandManager.senderMapper().map(event.getSender()),
                 this.paperCommandManager.stripNamespace(event.getBuffer())
         );
 

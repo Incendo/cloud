@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.examples.bukkit;
 
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationParserExample;
@@ -32,7 +33,6 @@ import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.paper.PaperCommandManager;
-import java.util.function.Function;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
@@ -57,15 +57,13 @@ public final class ExamplePlugin extends JavaPlugin {
         //     run the command on the thread that is calling it. In the case of Bukkit, this is the primary server thread.
         //     It is possible to execute (and parse!) commands asynchronously by using the
         //     AsynchronousCommandExecutionCoordinator.
-        // (2) This functions maps the Bukkit command sender to your custom sender type. If you're not using a custom
-        //     type, then Function.identity() maps CommandSender to itself.
-        // (3) The same concept as (2), but mapping from your custom type to a Bukkit command sender.
+        // (2) This function maps the Bukkit CommandSender to your custom sender type and back. If you're not using a custom
+        //     type, then SenderMapper.identity() maps CommandSender to itself.
         //
         final BukkitCommandManager<CommandSender> manager = new PaperCommandManager<>(
                 /* Owning plugin */ this,
                 /* (1) */ ExecutionCoordinator.simpleCoordinator(),
-                /* (2) */ Function.identity(),
-                /* (3) */ Function.identity()
+                /* (2) */ SenderMapper.identity()
         );
         //
         // Use contains to filter suggestions instead of default startsWith

@@ -25,6 +25,7 @@ package cloud.commandframework.examples.bungee;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.Description;
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.bungee.BungeeCommandManager;
 import cloud.commandframework.bungee.arguments.PlayerParser;
 import cloud.commandframework.bungee.arguments.ServerParser;
@@ -33,7 +34,6 @@ import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.RichDescription;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.CommandSender;
@@ -53,19 +53,11 @@ public final class ExamplePlugin extends Plugin {
 
     @Override
     public void onEnable() {
-        final Function<CommandSender, CommandSender> mapperFunction = Function.identity();
-
-        try {
-            this.manager = new BungeeCommandManager<>(
-                    this,
-                    ExecutionCoordinator.simpleCoordinator(),
-                    mapperFunction,
-                    mapperFunction
-            );
-        } catch (final Exception e) {
-            this.getLogger().severe("Failed to initialize the command manager");
-            return;
-        }
+        this.manager = new BungeeCommandManager<>(
+                this,
+                ExecutionCoordinator.simpleCoordinator(),
+                SenderMapper.identity()
+        );
 
         this.bungeeAudiences = BungeeAudiences.create(this);
 

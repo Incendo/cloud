@@ -50,7 +50,7 @@ public class JDACommandListener<C> extends ListenerAdapter {
     @Override
     public final void onMessageReceived(final @NonNull MessageReceivedEvent event) {
         final Message message = event.getMessage();
-        final C sender = this.commandManager.getCommandSenderMapper().apply(event);
+        final C sender = this.commandManager.senderMapper().map(event);
 
         if (this.commandManager.getBotId() == event.getAuthor().getIdLong()) {
             return;

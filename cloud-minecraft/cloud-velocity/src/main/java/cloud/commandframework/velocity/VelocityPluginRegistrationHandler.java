@@ -44,17 +44,14 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
         this.brigadierManager = new CloudBrigadierManager<>(
                 velocityCommandManager,
                 () -> new CommandContext<>(
-                        velocityCommandManager.commandSenderMapper()
-                                .apply(velocityCommandManager.proxyServer()
+                        velocityCommandManager.senderMapper()
+                                .map(velocityCommandManager.proxyServer()
                                         .getConsoleCommandSource()),
                         velocityCommandManager
                 ),
-                velocityCommandManager.suggestionFactory()
+                velocityCommandManager.suggestionFactory(),
+                velocityCommandManager.senderMapper()
         );
-        this.brigadierManager.brigadierSenderMapper(
-                sender -> this.manager.commandSenderMapper().apply(sender)
-        );
-        this.brigadierManager.backwardsBrigadierSenderMapper(this.manager.backwardsCommandSenderMapper());
     }
 
     @Override
@@ -67,7 +64,7 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                         command.rootComponent().name(),
                         command,
                         (c, p) -> this.manager.hasPermission(
-                                this.manager.commandSenderMapper().apply(c),
+                                this.manager.senderMapper().map(c),
                                 p
                         ),
                         new VelocityExecutor<>(this.manager)
