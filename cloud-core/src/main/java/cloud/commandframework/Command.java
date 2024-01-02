@@ -479,6 +479,17 @@ public class Command<C> {
         }
 
         /**
+         * Returns the current {@link CommandMeta command meta} value.
+         *
+         * @return current command meta
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull CommandMeta meta() {
+            return this.commandMeta;
+        }
+
+        /**
          * Applies the provided {@link Applicable} to this {@link Builder}, and returns the result.
          *
          * @param applicable operation
