@@ -36,13 +36,10 @@ import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import io.leangen.geantyref.TypeToken;
 import java.util.logging.Level;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -89,10 +86,9 @@ public class BungeeCommandManager<C> extends CommandManager<C> implements Sender
         this.registerCommandPreProcessor(new BungeeCommandPreprocessor<>(this));
 
         /* Register Bungee Parsers */
-        this.parserRegistry().registerParserSupplier(TypeToken.get(ProxiedPlayer.class), parserParameters ->
-                new PlayerParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(ServerInfo.class), parserParameters ->
-                new ServerParser<>());
+        this.parserRegistry()
+                .registerParser(PlayerParser.playerParser())
+                .registerParser(ServerParser.serverParser());
 
         /* Register default captions */
         if (this.captionRegistry() instanceof FactoryDelegatingCaptionRegistry) {

@@ -39,7 +39,6 @@ import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.pircbotx.arguments.UserParser;
-import io.leangen.geantyref.TypeToken;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.apiguardian.api.API;
@@ -134,10 +133,7 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
             );
         }
         this.registerCommandPreProcessor(context -> context.commandContext().store(PIRCBOTX_META_KEY, pircBotX));
-        this.parserRegistry().registerParserSupplier(
-                TypeToken.get(User.class),
-                parameters -> new UserParser<>()
-        );
+        this.parserRegistry().registerParser(UserParser.userParser());
 
         // No "native" command system means that we can delete commands just fine.
         this.registerCapability(CloudCapability.StandardCapabilities.ROOT_COMMAND_DELETION);

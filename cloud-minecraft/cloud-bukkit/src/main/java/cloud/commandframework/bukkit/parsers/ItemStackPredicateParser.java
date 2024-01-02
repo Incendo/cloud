@@ -38,7 +38,6 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.StringRange;
-import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -182,10 +181,7 @@ public final class ItemStackPredicateParser<C> implements ArgumentParser.FutureA
      */
     @SuppressWarnings("unused")
     private static <C> void registerParserSupplier(final @NonNull BukkitCommandManager<C> commandManager) {
-        commandManager.parserRegistry().registerParserSupplier(
-                TypeToken.get(ItemStackPredicate.class),
-                params -> new ItemStackPredicateParser<>()
-        );
+        commandManager.parserRegistry().registerParser(ItemStackPredicateParser.itemStackPredicateParser());
     }
 
     @Override
