@@ -29,7 +29,6 @@ import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationParserExample;
 import cloud.commandframework.examples.bukkit.builder.BuilderExample;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.paper.PaperCommandManager;
@@ -65,12 +64,6 @@ public final class ExamplePlugin extends JavaPlugin {
                 /* (1) */ ExecutionCoordinator.simpleCoordinator(),
                 /* (2) */ SenderMapper.identity()
         );
-        //
-        // Use contains to filter suggestions instead of default startsWith
-        //
-        manager.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
-                FilteringCommandSuggestionProcessor.Filter.<CommandSender>contains(true).andTrimBeforeLastSpace()
-        ));
         //
         // Register Brigadier mappings. The capability tells us whether Brigadier is natively available
         // on the current server. If it is, we can safely register the Brigadier integration.

@@ -36,7 +36,6 @@ import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import io.leangen.geantyref.TypeToken;
 import java.util.logging.Level;
 import net.md_5.bungee.api.ChatColor;
@@ -85,10 +84,6 @@ public class BungeeCommandManager<C> extends CommandManager<C> implements Sender
         ((BungeePluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
         this.owningPlugin = owningPlugin;
         this.senderMapper = senderMapper;
-
-        this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
-                FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
-        ));
 
         /* Register Bungee Preprocessor */
         this.registerCommandPreProcessor(new BungeeCommandPreprocessor<>(this));

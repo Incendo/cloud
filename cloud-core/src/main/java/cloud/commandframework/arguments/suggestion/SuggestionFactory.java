@@ -27,7 +27,6 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import org.apiguardian.api.API;
@@ -78,7 +77,7 @@ public interface SuggestionFactory<C, S extends Suggestion> {
      * @param input   input provided by the sender
      * @return the suggestions
      */
-    @NonNull CompletableFuture<List<@NonNull S>> suggest(
+    @NonNull CompletableFuture<@NonNull Suggestions<C, S>> suggest(
             @NonNull CommandContext<C> context,
             @NonNull String input
     );
@@ -91,7 +90,7 @@ public interface SuggestionFactory<C, S extends Suggestion> {
      * @param input  input provided by the sender
      * @return the suggestions
      */
-    @NonNull CompletableFuture<List<@NonNull S>> suggest(
+    @NonNull CompletableFuture<@NonNull Suggestions<C, S>> suggest(
             @NonNull C sender,
             @NonNull String input
     );
@@ -104,7 +103,7 @@ public interface SuggestionFactory<C, S extends Suggestion> {
      * @param input  input provided by the sender
      * @return the suggestions
      */
-    default @NonNull List<@NonNull S> suggestImmediately(
+    default @NonNull Suggestions<C, S> suggestImmediately(
             final @NonNull C sender,
             final @NonNull String input
     ) {

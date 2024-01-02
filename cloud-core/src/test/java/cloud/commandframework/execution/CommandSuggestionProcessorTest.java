@@ -62,7 +62,7 @@ class CommandSuggestionProcessorTest {
         final List<? extends Suggestion> suggestions = this.commandManager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 "test "
-        );
+        ).list();
 
         // Assert
         assertThat(suggestions).containsExactly(Suggestion.simple("test-suggestion"));
@@ -84,7 +84,7 @@ class CommandSuggestionProcessorTest {
         final List<? extends Suggestion> suggestions = this.commandManager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 "test "
-        );
+        ).list();
 
         // Assert
         assertThat(suggestions).isEmpty();

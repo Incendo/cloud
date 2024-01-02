@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.Suggestions;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.ParsingContext;
@@ -39,7 +40,6 @@ import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoCommandInLeafException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
-import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.SuggestionContext;
 import cloud.commandframework.permission.Permission;
@@ -272,23 +272,20 @@ public final class CommandTree<C> {
                 final CommandComponent<C> component = Objects.requireNonNull(child.component());
                 final ParsingContext<C> parsingContext = commandContext.createParsingContext(component);
 
+                // Skip a single space (argument delimiter)
+                commandInput.skipWhitespace(1);
                 // Copy the current queue so that we can deduce the captured input.
                 final CommandInput currentInput = commandInput.copy();
 
                 parsingContext.markStart();
                 commandContext.currentComponent(component);
 
-                return component.parser().parseFuture(commandContext, commandInput)
+                return component.parser()
+                        .parseFuture(commandContext, commandInput)
                         .thenComposeAsync(result -> {
-                            // Skip a single space (argument delimiter)
-                            commandInput.skipWhitespace(1);
-
                             parsingContext.markEnd();
                             parsingContext.success(!result.failure().isPresent());
-
-                            final List<String> consumedTokens = tokenize(currentInput);
-                            consumedTokens.removeAll(tokenize(commandInput));
-                            parsingContext.consumedInput(consumedTokens);
+                            parsingContext.consumedInput(currentInput, commandInput);
 
                             if (result.parsedValue().isPresent()) {
                                 parsedArguments.add(component);
@@ -547,19 +544,15 @@ public final class CommandTree<C> {
 
         commandContext.currentComponent(node.component());
 
+        // Skip a single space (argument delimiter)
+        commandInput.skipWhitespace(1);
         // Copy the current queue so that we can deduce the captured input.
         final CommandInput currentInput = commandInput.copy();
 
-        return node.component().parser().parseFuture(commandContext, commandInput)
+        return node.component().parser()
+                .parseFuture(commandContext, commandInput)
                 .thenComposeAsync(result -> {
-                    // Skip a single space (argument delimiter)
-                    commandInput.skipWhitespace(1);
-
-                    // We remove all remaining queue, and then we'll have a list of the captured input.
-                    final List<String> consumedInput = tokenize(currentInput);
-                    consumedInput.removeAll(tokenize(commandInput));
-                    parsingContext.consumedInput(consumedInput);
-
+                    parsingContext.consumedInput(currentInput, commandInput);
                     parsingContext.markEnd();
                     parsingContext.success(false);
 
@@ -591,7 +584,7 @@ public final class CommandTree<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull CompletableFuture<List<@NonNull Suggestion>> getSuggestions(
+    public @NonNull CompletableFuture<@NonNull Suggestions<C, ?>> getSuggestions(
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput,
             final @NonNull Executor executor
@@ -599,7 +592,7 @@ public final class CommandTree<C> {
         return CompletableFutures.scheduleOn(executor, () -> this.getSuggestionsDirect(context, commandInput, executor));
     }
 
-    private @NonNull CompletableFuture<List<@NonNull Suggestion>> getSuggestionsDirect(
+    private @NonNull CompletableFuture<@NonNull Suggestions<C, ?>> getSuggestionsDirect(
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput,
             final @NonNull Executor executor
@@ -610,7 +603,7 @@ public final class CommandTree<C> {
                 commandInput
         );
         return this.getSuggestions(suggestionContext, commandInput, this.internalTree, executor)
-                .thenApply(SuggestionContext::suggestions);
+                .thenApply(s -> Suggestions.create(s.commandContext(), s.suggestions(), commandInput));
     }
 
     @SuppressWarnings("MixedMutabilityReturnType")
@@ -631,6 +624,10 @@ public final class CommandTree<C> {
                 .filter(n -> n.component().type() == CommandComponent.ComponentType.LITERAL)
                 .collect(Collectors.toList());
 
+        if (!commandInput.isEmpty()) {
+            commandInput.skipWhitespace(1);
+        }
+
         // Try to see if any of the static literals can be parsed (matches exactly)
         // If so, enter that node of the command tree for deeper suggestions
         if (!staticArguments.isEmpty() && !commandInput.isEmpty(true /* ignoringWhitespace */)) {
@@ -644,9 +641,8 @@ public final class CommandTree<C> {
                 context.commandContext().currentComponent(childComponent);
                 final ArgumentParseResult<?> result = childComponent.parser().parse(
                         context.commandContext(),
-                        commandInput.skipWhitespace(1)
+                        commandInput
                 );
-                commandInput.skipWhitespace(1);
 
                 if (result.failure().isPresent()) {
                     commandInput.cursor(commandInputCopy.cursor());
@@ -708,7 +704,7 @@ public final class CommandTree<C> {
         final CommandComponent<C> component = Objects.requireNonNull(node.component());
         context.commandContext().currentComponent(component);
         return component.suggestionProvider()
-                .suggestionsFuture(context.commandContext(), input.copy().skipWhitespace(1, false))
+                .suggestionsFuture(context.commandContext(), input.copy())
                 .thenApply(suggestionsToAdd -> {
                     final String string = input.peekString();
                     for (Suggestion suggestion : suggestionsToAdd) {
@@ -746,9 +742,7 @@ public final class CommandTree<C> {
             }
         }
 
-        if (commandInput.isEmpty()) {
-            return CompletableFuture.completedFuture(context);
-        } else if (commandInput.remainingTokens() == 1
+        if (commandInput.isEmpty() || commandInput.remainingTokens() == 1
                 || (child.isLeaf() && child.component().parser() instanceof AggregateCommandParser)) {
             return this.addArgumentSuggestions(context, child, commandInput, executor);
         }
@@ -759,7 +753,7 @@ public final class CommandTree<C> {
         // START: Preprocessing
         final ArgumentParseResult<Boolean> preParseResult = component.preprocess(
                 context.commandContext(),
-                commandInput.skipWhitespace(1)
+                commandInput
         );
         final boolean preParseSuccess = !preParseResult.failure().isPresent()
                 && preParseResult.parsedValue().orElse(false);
@@ -770,12 +764,14 @@ public final class CommandTree<C> {
             parsingFuture = CompletableFuture.completedFuture(null);
         } else {
             // START: Parsing
+            final ParsingContext<C> parsingContext = context.commandContext().createParsingContext(child.component());
+            parsingContext.markStart();
             context.commandContext().currentComponent(child.component());
             final CommandInput preParseInput = commandInput.copy();
 
             parsingFuture = child.component()
                     .parser()
-                    .parseFuture(context.commandContext(), commandInput.skipWhitespace(1))
+                    .parseFuture(context.commandContext(), commandInput)
                     .thenComposeAsync(result -> {
                         final Optional<?> parsedValue = result.parsedValue();
                         final boolean parseSuccess = parsedValue.isPresent();
@@ -801,6 +797,7 @@ public final class CommandTree<C> {
                             }
                             // the current argument at the position is parsable and there are more arguments following
                             context.commandContext().store(child.component().name(), parsedValue.get());
+                            parsingContext.success(true);
                             return this.getSuggestions(context, commandInput, child, executor);
                         } else if (!parseSuccess && commandInputOriginal.remainingTokens() > 1) {
                             // at this point there should normally be no need to reset the command queue as we expect
@@ -889,7 +886,7 @@ public final class CommandTree<C> {
     ) {
         context.commandContext().currentComponent(component);
         return component.suggestionProvider()
-                .suggestionsFuture(context.commandContext(), input.copy().skipWhitespace(1, false))
+                .suggestionsFuture(context.commandContext(), input.copy())
                 .thenAcceptAsync(context::addSuggestions, executor)
                 .thenApply(in -> context);
     }
@@ -1245,9 +1242,5 @@ public final class CommandTree<C> {
         } else {
             Objects.requireNonNull(node.parent(), "parent").removeChild(node);
         }
-    }
-
-    private static @NonNull List<@NonNull String> tokenize(final @NonNull CommandInput commandInput) {
-        return new CommandInputTokenizer(commandInput.remainingInput()).tokenize();
     }
 }

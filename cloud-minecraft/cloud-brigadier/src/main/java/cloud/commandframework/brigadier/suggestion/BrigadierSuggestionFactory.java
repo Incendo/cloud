@@ -120,31 +120,29 @@ public final class BrigadierSuggestionFactory<C, S> {
             command = command.substring(leading.split(":")[0].length() + 1);
         }
 
-        return this.suggestionFactory.suggest(commandContext.sender(), command).thenCompose(suggestionsUnfiltered -> {
+        return this.suggestionFactory.suggest(commandContext.sender(), command).thenApply(suggestionsResult -> {
             /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
-            final List<TooltipSuggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
+            final List<TooltipSuggestion> suggestions = new ArrayList<>(suggestionsResult.list());
             if (parentNode != null) {
                 final Set<String> siblingLiterals = parentNode.children().stream()
                         .map(cloud.commandframework.internal.CommandNode::component)
                         .filter(Objects::nonNull)
+                        .filter(c -> c.type() == CommandComponent.ComponentType.LITERAL)
                         .flatMap(commandComponent -> commandComponent.aliases().stream())
                         .collect(Collectors.toSet());
 
                 suggestions.removeIf(suggestion -> siblingLiterals.contains(suggestion.suggestion()));
             }
 
-            SuggestionsBuilder suggestionsBuilder = builder;
-
-            final int lastIndexOfSpaceInRemainingString = builder.getRemaining().lastIndexOf(' ');
-            if (lastIndexOfSpaceInRemainingString != -1) {
-                suggestionsBuilder = builder.createOffset(builder.getStart() + lastIndexOfSpaceInRemainingString + 1);
-            }
+            final int trimmed = builder.getInput().length() - suggestionsResult.commandInput().length();
+            final int rawOffset = suggestionsResult.commandInput().cursor();
+            final SuggestionsBuilder suggestionsBuilder = builder.createOffset(rawOffset + trimmed);
 
             for (final TooltipSuggestion suggestion : suggestions) {
-                suggestionsBuilder = suggestionsBuilder.suggest(suggestion.suggestion(), suggestion.tooltip());
+                suggestionsBuilder.suggest(suggestion.suggestion(), suggestion.tooltip());
             }
 
-            return suggestionsBuilder.buildFuture();
+            return suggestionsBuilder.build();
         });
     }
 
@@ -181,6 +179,7 @@ public final class BrigadierSuggestionFactory<C, S> {
     // Inner class to prevent attempting to load ParsedCommandNode when it doesn't exist
     @SuppressWarnings("unchecked")
     private static final class ParsedCommandNodeHandler {
+
         private ParsedCommandNodeHandler() {
         }
 

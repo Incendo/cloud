@@ -25,9 +25,7 @@ package cloud.commandframework.context;
 
 import cloud.commandframework.CommandComponent;
 import java.time.Duration;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -36,21 +34,22 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class ParsingContext<C> {
 
     private final CommandComponent<@NonNull C> component;
-    private final List<String> consumedInput = new LinkedList<>();
+    private @Nullable String consumed = null;
+    private long startTime = -1;
+    private long endTime = -1;
+    private int consumedFrom = -1;
+    private int consumedTo = -1;
+    private boolean success;
 
     /**
      * Construct an ParsingContext object with the given argument.
      *
      * @param component the command component to be assigned to the ParsingContext
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public ParsingContext(final @NonNull CommandComponent<@NonNull C> component) {
         this.component = component;
     }
-
-    private long startTime = -1;
-    private long endTime = -1;
-
-    private boolean success;
 
     /**
      * Return the associated component.
@@ -78,6 +77,7 @@ public final class ParsingContext<C> {
     /**
      * Set the start time.
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public void markStart() {
         this.startTime = System.nanoTime();
     }
@@ -85,6 +85,7 @@ public final class ParsingContext<C> {
     /**
      * Set the end time.
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public void markEnd() {
         this.endTime = System.nanoTime();
     }
@@ -111,26 +112,36 @@ public final class ParsingContext<C> {
      *
      * @param success {@code true} if the value was parsed successfully, {@code false} if not
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public void success(final boolean success) {
         this.success = success;
     }
 
     /**
-     * Add the given input to the list of consumed input.
+     * Store information about consumed input post-parsing.
      *
-     * @param consumedInput the consumed input
+     * @param original pre-parse input
+     * @param postParse post-parse input
      */
-    public void consumedInput(final @NonNull List<@NonNull String> consumedInput) {
-        this.consumedInput.addAll(consumedInput);
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
+    public void consumedInput(final @NonNull CommandInput original, final @NonNull CommandInput postParse) {
+        if (this.consumed != null) {
+            throw new IllegalStateException();
+        }
+        this.consumed = original.difference(postParse);
+        this.consumedFrom = original.cursor();
+        this.consumedTo = original.cursor() + this.consumed.length();
     }
 
     /**
-     * Return the list of consumed input.
+     * Returns the consumed input.
      *
-     * @return the list of consumed input
+     * @return the consumed input
+     * @since 2.0.0
      */
-    public @NonNull List<@NonNull String> consumedInput() {
-        return Collections.unmodifiableList(this.consumedInput);
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull String consumedInput() {
+        return Objects.requireNonNull(this.consumed);
     }
 
     /**
@@ -143,6 +154,28 @@ public final class ParsingContext<C> {
         if (!this.success || this.component.type() != CommandComponent.ComponentType.LITERAL) {
             return null;
         }
-        return this.consumedInput.get(0);
+        return this.consumed;
+    }
+
+    /**
+     * Index the parser consumed from.
+     *
+     * @return consumed from index
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public int consumedFrom() {
+        return this.consumedFrom;
+    }
+
+    /**
+     * Index the parser consumed to.
+     *
+     * @return consumed to index
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public int consumedTo() {
+        return this.consumedTo;
     }
 }

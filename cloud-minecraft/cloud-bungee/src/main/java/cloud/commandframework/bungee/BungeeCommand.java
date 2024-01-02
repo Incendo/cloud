@@ -25,6 +25,9 @@ package cloud.commandframework.bungee;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.Suggestions;
+import cloud.commandframework.util.StringUtils;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
@@ -70,9 +73,14 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
         for (final String string : args) {
             builder.append(" ").append(string);
         }
-        return this.manager.suggestionFactory().suggestImmediately(
+        final Suggestions<C, ?> result = this.manager.suggestionFactory().suggestImmediately(
                 this.manager.senderMapper().map(sender),
                 builder.toString()
-        ).stream().map(Suggestion::suggestion).collect(Collectors.toList());
+        );
+        return result.list().stream()
+                .map(Suggestion::suggestion)
+                .map(suggestion -> StringUtils.trimBeforeLastSpace(suggestion, result.commandInput()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 }

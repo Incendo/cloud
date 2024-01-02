@@ -63,7 +63,7 @@ class SuspendingArgumentParserTest {
         }
 
         manager.commandExecutor().executeCommand(TestCommandSender(), "test 123").await()
-        assertThat(manager.suggestionFactory().suggest(TestCommandSender(), "test ").await()).containsExactly(
+        assertThat(manager.suggestionFactory().suggest(TestCommandSender(), "test ").await().list()).containsExactly(
             Suggestion.simple("1"),
             Suggestion.simple("2"),
             Suggestion.simple("3")

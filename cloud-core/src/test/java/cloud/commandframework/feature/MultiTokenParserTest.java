@@ -96,7 +96,7 @@ class MultiTokenParserTest {
         final Iterable<? extends Suggestion> result = this.commandManager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 "command "
-        );
+        ).list();
 
         // Assert
         assertThat(result).containsExactly(
@@ -119,7 +119,7 @@ class MultiTokenParserTest {
         final Iterable<? extends Suggestion> result = this.commandManager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 "command Goofy"
-        );
+        ).list();
 
         // Assert
         assertThat(result).containsExactly(
@@ -142,7 +142,7 @@ class MultiTokenParserTest {
         final Iterable<? extends Suggestion> result = this.commandManager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 "command Goofy banana "
-        );
+        ).list();
 
         // Assert
         assertThat(result).containsExactly(
@@ -165,7 +165,7 @@ class MultiTokenParserTest {
         final Iterable<? extends Suggestion> result = this.commandManager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 "command Goofy banana 5 "
-        );
+        ).list();
 
         // Assert
         assertThat(result).containsExactly(

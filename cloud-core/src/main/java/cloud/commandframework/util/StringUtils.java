@@ -23,12 +23,15 @@
 //
 package cloud.commandframework.util;
 
+import cloud.commandframework.context.CommandInput;
+import java.util.Locale;
 import java.util.function.Function;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * String utilities
@@ -83,5 +86,44 @@ public final class StringUtils {
             return sb.toString();
         }
         return string;
+    }
+
+    /**
+     * Trims before the last space from suggestion, if it matches input tokens.
+     *
+     * @param suggestion suggestion text
+     * @param input      current input
+     * @return filtered suggestion text
+     */
+    public static @Nullable String trimBeforeLastSpace(final String suggestion, final String input) {
+        final int lastSpace = input.lastIndexOf(' ');
+        // No spaces in input, don't do anything
+        if (lastSpace == -1) {
+            return suggestion;
+        }
+
+        if (suggestion.toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT).substring(0, lastSpace))) {
+            return suggestion.substring(lastSpace + 1);
+        }
+
+        return null;
+    }
+
+    /**
+     * Trims before the last space from suggestion, if it matches input tokens.
+     *
+     * @param suggestion   suggestion
+     * @param commandInput command input
+     * @return filtered suggestion text
+     */
+    public static @Nullable String trimBeforeLastSpace(final String suggestion, final CommandInput commandInput) {
+        // get the input similarly to FilteringCommandSuggestionProcessor
+        final String input;
+        if (commandInput.isEmpty(true /* ignoreWhitespace */)) {
+            input = "";
+        } else {
+            input = commandInput.copy().skipWhitespace().remainingInput();
+        }
+        return trimBeforeLastSpace(suggestion, input);
     }
 }

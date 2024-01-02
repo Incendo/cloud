@@ -26,8 +26,11 @@ package cloud.commandframework.sponge7;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.Suggestions;
+import cloud.commandframework.util.StringUtils;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -70,12 +73,14 @@ final class CloudCommandCallable<C> implements CommandCallable {
             final @NonNull String arguments,
             final @Nullable Location<World> targetPosition
     ) {
-        return this.manager.suggestionFactory()
-                .suggestImmediately(
-                        this.manager.senderMapper().map(source),
-                        this.formatCommand(arguments)
-                ).stream()
+        final Suggestions<C, ?> result = this.manager.suggestionFactory().suggestImmediately(
+                this.manager.senderMapper().map(source),
+                this.formatCommand(arguments)
+        );
+        return result.list().stream()
                 .map(Suggestion::suggestion)
+                .map(suggestion -> StringUtils.trimBeforeLastSpace(suggestion, result.commandInput()))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 

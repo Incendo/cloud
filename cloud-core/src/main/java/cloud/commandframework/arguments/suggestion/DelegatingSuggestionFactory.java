@@ -71,22 +71,22 @@ final class DelegatingSuggestionFactory<C, S extends Suggestion> implements Sugg
     }
 
     @Override
-    public @NonNull CompletableFuture<List<@NonNull S>> suggest(
+    public @NonNull CompletableFuture<@NonNull Suggestions<C, S>> suggest(
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {
-        return this.suggestFromTree(context, input).thenApply(suggestions -> suggestions.stream()
-                .map(this.suggestionMapper::map)
-                .collect(Collectors.toList())
-        );
+        return this.suggestFromTree(context, input)
+                .thenApply(suggestions -> Suggestions.create(suggestions.commandContext(), suggestions.list().stream()
+                        .map(this.suggestionMapper::map)
+                        .collect(Collectors.toList()), suggestions.commandInput()));
     }
 
     @Override
-    public @NonNull CompletableFuture<List<@NonNull S>> suggest(final @NonNull C sender, final @NonNull String input) {
+    public @NonNull CompletableFuture<@NonNull Suggestions<C, S>> suggest(final @NonNull C sender, final @NonNull String input) {
         return this.suggest(this.contextFactory.create(true /* suggestions */, sender), input);
     }
 
-    private @NonNull CompletableFuture<List<? extends @NonNull Suggestion>> suggestFromTree(
+    private @NonNull CompletableFuture<@NonNull Suggestions<C, ?>> suggestFromTree(
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {
@@ -96,14 +96,14 @@ final class DelegatingSuggestionFactory<C, S extends Suggestion> implements Sugg
 
         if (this.commandManager.preprocessContext(context, commandInput) != State.ACCEPTED) {
             if (this.commandManager.settings().get(ManagerSetting.FORCE_SUGGESTION)) {
-                return CompletableFuture.completedFuture(SINGLE_EMPTY_SUGGESTION);
+                return CompletableFuture.completedFuture(Suggestions.create(context, SINGLE_EMPTY_SUGGESTION, commandInput));
             }
-            return CompletableFuture.completedFuture(Collections.emptyList());
+            return CompletableFuture.completedFuture(Suggestions.create(context, Collections.emptyList(), commandInput));
         }
 
         return this.executionCoordinator.coordinateSuggestions(this.commandTree, context, commandInput).thenApply(suggestions -> {
-            if (this.commandManager.settings().get(ManagerSetting.FORCE_SUGGESTION) && suggestions.isEmpty()) {
-                return SINGLE_EMPTY_SUGGESTION;
+            if (this.commandManager.settings().get(ManagerSetting.FORCE_SUGGESTION) && suggestions.list().isEmpty()) {
+                return Suggestions.create(suggestions.commandContext(), SINGLE_EMPTY_SUGGESTION, commandInput);
             }
             return suggestions;
         });

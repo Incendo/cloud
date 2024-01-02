@@ -27,8 +27,10 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandDescription;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.Suggestions;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.permission.Permission;
+import cloud.commandframework.util.StringUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -95,10 +97,15 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         for (final String string : args) {
             builder.append(" ").append(string);
         }
-        return this.manager.suggestionFactory().suggestImmediately(
+        final Suggestions<C, ?> result = this.manager.suggestionFactory().suggestImmediately(
                 this.manager.senderMapper().map(sender),
                 builder.toString()
-        ).stream().map(Suggestion::suggestion).collect(Collectors.toList());
+        );
+        return result.list().stream()
+                .map(Suggestion::suggestion)
+                .map(suggestion -> StringUtils.trimBeforeLastSpace(suggestion, result.commandInput()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -24,7 +24,6 @@
 package cloud.commandframework.arguments.suggestion;
 
 import cloud.commandframework.context.CommandContext;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
@@ -33,11 +32,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.INTERNAL, since = "2.0.0", consumers = "cloud.commandframework.*")
 final class MappingSuggestionFactory<C, S extends Suggestion> implements SuggestionFactory<C, S> {
 
-    private final SuggestionFactory<C, ? extends Suggestion> other;
+    private final SuggestionFactory<C, ?> other;
     private final SuggestionMapper<S> suggestionMapper;
 
     MappingSuggestionFactory(
-            final @NonNull SuggestionFactory<C, ? extends Suggestion> other,
+            final @NonNull SuggestionFactory<C, ?> other,
             final @NonNull SuggestionMapper<S> suggestionMapper
     ) {
         this.other = other;
@@ -45,7 +44,7 @@ final class MappingSuggestionFactory<C, S extends Suggestion> implements Suggest
     }
 
     @Override
-    public @NonNull CompletableFuture<List<@NonNull S>> suggest(
+    public @NonNull CompletableFuture<@NonNull Suggestions<C, S>> suggest(
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {
@@ -53,13 +52,17 @@ final class MappingSuggestionFactory<C, S extends Suggestion> implements Suggest
     }
 
     @Override
-    public @NonNull CompletableFuture<List<@NonNull S>> suggest(final @NonNull C sender, final @NonNull String input) {
+    public @NonNull CompletableFuture<@NonNull Suggestions<C, S>> suggest(final @NonNull C sender, final @NonNull String input) {
         return this.map(this.other.suggest(sender, input));
     }
 
-    private @NonNull CompletableFuture<List<@NonNull S>> map(
-            final @NonNull CompletableFuture<? extends @NonNull List<? extends @NonNull Suggestion>> future
+    private <S1 extends Suggestion> @NonNull CompletableFuture<@NonNull Suggestions<C, S>> map(
+            final @NonNull CompletableFuture<Suggestions<C, S1>> future
     ) {
-        return future.thenApply(suggestions -> suggestions.stream().map(this.suggestionMapper::map).collect(Collectors.toList()));
+        return future.thenApply(suggestions -> Suggestions.create(
+                suggestions.commandContext(),
+                suggestions.list().stream().map(this.suggestionMapper::map).collect(Collectors.toList()),
+                suggestions.commandInput()
+        ));
     }
 }

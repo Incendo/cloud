@@ -24,15 +24,18 @@
 package cloud.commandframework.paper.suggestions;
 
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
+import cloud.commandframework.arguments.suggestion.Suggestions;
 import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.paper.suggestions.tooltips.CompletionMapper;
 import cloud.commandframework.paper.suggestions.tooltips.CompletionMapperFactory;
+import cloud.commandframework.util.StringUtils;
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
-import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.bukkit.event.EventHandler;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 class BrigadierAsyncCommandSuggestionListener<C> extends AsyncCommandSuggestionListener<C> {
 
@@ -51,7 +54,10 @@ class BrigadierAsyncCommandSuggestionListener<C> extends AsyncCommandSuggestionL
     }
 
     @Override
-    protected List<? extends TooltipSuggestion> querySuggestions(final @NonNull C commandSender, final @NonNull String input) {
+    protected Suggestions<C, ? extends TooltipSuggestion> querySuggestions(
+            final @NonNull C commandSender,
+            final @NonNull String input
+    ) {
         return this.suggestionFactory.suggestImmediately(commandSender, input);
     }
 
@@ -62,7 +68,18 @@ class BrigadierAsyncCommandSuggestionListener<C> extends AsyncCommandSuggestionL
             final @NonNull String input
     ) {
         final CompletionMapper completionMapper = this.completionMapperFactory.createMapper();
-        final List<? extends TooltipSuggestion> suggestions = this.querySuggestions(commandSender, input);
-        event.completions(suggestions.stream().map(completionMapper::map).collect(Collectors.toList()));
+        final Suggestions<C, ? extends TooltipSuggestion> suggestions = this.querySuggestions(commandSender, input);
+        event.completions(suggestions.list().stream()
+                .map(suggestion -> {
+                    final @Nullable String trim = StringUtils.trimBeforeLastSpace(
+                            suggestion.suggestion(), suggestions.commandInput());
+                    if (trim == null) {
+                        return null;
+                    }
+                    return suggestion.withSuggestion(trim);
+                })
+                .filter(Objects::nonNull)
+                .map(completionMapper::map)
+                .collect(Collectors.toList()));
     }
 }

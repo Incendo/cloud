@@ -80,7 +80,7 @@ class CommandDeletionTest {
         );
         assertThat(completionException).hasCauseThat().isInstanceOf(NoSuchCommandException.class);
 
-        assertThat(this.commandManager.suggestionFactory().suggestImmediately(new TestCommandSender(), "")).isEmpty();
+        assertThat(this.commandManager.suggestionFactory().suggestImmediately(new TestCommandSender(), "").list()).isEmpty();
         assertThat(this.commandManager.commandTree().rootNodes()).isEmpty();
     }
 
@@ -162,7 +162,7 @@ class CommandDeletionTest {
         );
         assertThat(completionException).hasCauseThat().isInstanceOf(NoSuchCommandException.class);
 
-        assertThat(this.commandManager.suggestionFactory().suggestImmediately(new TestCommandSender(), ""))
+        assertThat(this.commandManager.suggestionFactory().suggestImmediately(new TestCommandSender(), "").list())
                 .contains(Suggestion.simple("test"));
         assertThat(this.commandManager.commandTree().rootNodes()).hasSize(1);
     }

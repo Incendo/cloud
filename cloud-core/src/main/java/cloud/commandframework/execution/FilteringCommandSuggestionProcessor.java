@@ -25,6 +25,9 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
+import cloud.commandframework.internal.CommandInputTokenizer;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -127,18 +130,6 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
         }
 
         /**
-         * Returns a new {@link Filter} that tests this filter, and then
-         * uses {@link #trimBeforeLastSpace()} if the result is non-null.
-         *
-         * @return combined filter
-         * @since 1.8.0
-         */
-        @API(status = API.Status.STABLE, since = "1.8.0")
-        default Filter<C> andTrimBeforeLastSpace() {
-            return this.and(trimBeforeLastSpace());
-        }
-
-        /**
          * Create a filter using {@link String#startsWith(String)} that can optionally ignore case.
          *
          * @param ignoreCase whether to ignore case
@@ -171,32 +162,48 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
         }
 
         /**
-         * Create a filter which does extra processing when the input contains spaces.
+         * Filter that requires every token of input to be a partial or full match for a single corresponding token in the
+         * suggestion.
          *
-         * <p>Will return the portion of the suggestion which is after the last space in
-         * the input.</p>
-         *
-         * @param <C> sender type
+         * @param ignoreCase whether to ignore case
+         * @param <C>        command sender type
          * @return new filter
-         * @since 1.8.0
+         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
-        static <C> @NonNull Filter<C> trimBeforeLastSpace() {
-            return (context, suggestion, input) -> {
-                final int lastSpace = input.lastIndexOf(' ');
-                // No spaces in input, don't do anything
-                if (lastSpace == -1) {
-                    return suggestion;
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        static <C> @NonNull Simple<C> partialTokenMatches(final boolean ignoreCase) {
+            return Simple.contextFree((suggestion, input) -> {
+                final List<String> suggestionTokens = new CommandInputTokenizer(suggestion).tokenize();
+                final List<String> inputTokens = new CommandInputTokenizer(input).tokenize();
+
+                boolean passed = true;
+
+                for (String inputToken : inputTokens) {
+                    if (ignoreCase) {
+                        inputToken = inputToken.toLowerCase(Locale.ROOT);
+                    }
+
+                    boolean foundMatch = false;
+
+                    for (final Iterator<String> iterator = suggestionTokens.iterator(); iterator.hasNext();) {
+                        final String suggestionToken = iterator.next();
+                        final String suggestionTokenLower =
+                                ignoreCase ? suggestionToken.toLowerCase(Locale.ROOT) : suggestionToken;
+                        if (suggestionTokenLower.contains(inputToken)) {
+                            iterator.remove();
+                            foundMatch = true;
+                            break;
+                        }
+                    }
+
+                    if (!foundMatch) {
+                        passed = false;
+                        break;
+                    }
                 }
 
-                // Always use case-insensitive here. If case-sensitive filtering is desired it should
-                // be done in another filter which this is appended to using #and/#andTrimBeforeLastSpace.
-                if (suggestion.toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT).substring(0, lastSpace))) {
-                    return suggestion.substring(lastSpace + 1);
-                }
-
-                return null;
-            };
+                return passed;
+            });
         }
 
         /**

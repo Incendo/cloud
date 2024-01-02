@@ -65,7 +65,6 @@ import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.state.RegistrationState;
 import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Method;
@@ -135,10 +134,6 @@ public class BukkitCommandManager<C> extends CommandManager<C>
         }
         this.owningPlugin = owningPlugin;
         this.senderMapper = commandSenderMapper;
-
-        this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
-                FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
-        ));
 
         /* Register capabilities */
         CloudBukkitCapabilities.CAPABLE.forEach(this::registerCapability);

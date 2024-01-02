@@ -162,11 +162,11 @@ class CommandTreeTest {
         );
 
         // Act
-        final List<Suggestion> results = this.commandManager.commandTree().getSuggestions(
+        final List<? extends Suggestion> results = this.commandManager.commandTree().getSuggestions(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 CommandInput.of("test "),
                 ExecutionCoordinator.nonSchedulingExecutor()
-        ).join();
+        ).join().list();
 
         // Assert
         assertThat(results).containsExactly(Suggestion.simple("a"), Suggestion.simple("b"));
