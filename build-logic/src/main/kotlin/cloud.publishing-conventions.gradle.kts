@@ -17,12 +17,8 @@ indra {
     configurePublications {
         pom {
             developers {
-                developer {
-                    id.set("Sauilitired")
-                    name.set("Alexander Söderberg")
-                    url.set("https://alexander-soderberg.com")
-                    email.set("contact@alexander-soderberg.com")
-                }
+                city()
+                jmp()
             }
         }
     }
