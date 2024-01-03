@@ -10,10 +10,6 @@ val Project.ci: Provider<Boolean>
         .map { it.toBoolean() }
         .orElse(false)
 
-val Project.compileExamples: Boolean
-    get() = providers.gradleProperty("compile-examples")
-        .isPresent
-
 val Project.libs: LibrariesForLibs
     get() = the()
 

@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
     // loom needs this version of asm, for some reason we have an older one on the classpath without this
-    implementation("org.ow2.asm:asm:9.5")
+    implementation("org.ow2.asm:asm:9.6")
     implementation(libs.indraCommon)
     implementation(libs.indraPublishingSonatype)
     implementation(libs.gradleErrorprone)
@@ -33,5 +33,9 @@ spotless {
                     "ktlint_standard_trailing-comma-on-declaration-site" to "disabled",
                 )
             )
+
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
     }
 }

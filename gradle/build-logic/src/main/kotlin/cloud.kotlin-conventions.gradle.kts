@@ -40,16 +40,3 @@ tasks {
         from(dokkaHtml)
     }
 }
-
-spotless {
-    kotlin {
-        ktlint(libs.versions.ktlint.get())
-            .editorConfigOverride(
-                mapOf(
-                    "ktlint_standard_filename" to "disabled",
-                    "ktlint_standard_trailing-comma-on-call-site" to "disabled",
-                    "ktlint_standard_trailing-comma-on-declaration-site" to "disabled",
-                )
-            )
-    }
-}

@@ -10,7 +10,7 @@ run-waterfall = { id = "xyz.jpenilla.run-waterfall", version.ref = "run-task" }
 run-task = "2.2.2"
 checkstyle = "10.5.0"
 stylecheck = "0.2.1"
-checkerQual = "3.41.0"
+checkerQual = "3.42.0"
 errorprone = "2.23.0"
 geantyref = "1.3.14"
 jmh = "1.37"
@@ -61,7 +61,7 @@ compileTesting = "0.21.0"
 
 # build-logic
 indra = "3.1.3"
-gradleErrorprone = "3.0.1"
+gradleErrorprone = "3.1.0"
 spotless = "6.23.3"
 revapi = "1.7.0"
 
@@ -132,3 +132,14 @@ revapi = { group = "com.palantir.gradle.revapi", name = "gradle-revapi", version
 
 [bundles]
 coroutines = ["coroutinesCore", "coroutinesJdk8"]
+annotations = ["checkerQual", "apiguardian"]
+immutables = ["immutables", "immutablesAnnotate"]
+baseTestingDependencies = [
+    "jupiterEngine",
+    "jupiterParams",
+    "mockitoCore",
+    "mockitoKotlin",
+    "mockitoJupiter",
+    "truth",
+    "truthJava8",
+]

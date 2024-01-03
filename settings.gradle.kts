@@ -12,7 +12,7 @@ pluginManagement {
             mavenContent { snapshotsOnly() }
         }
     }
-    includeBuild("build-logic")
+    includeBuild("gradle/build-logic")
 }
 
 plugins {
