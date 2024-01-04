@@ -27,6 +27,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
+import cloud.commandframework.annotations.injection.ParameterInjector;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
@@ -57,6 +58,10 @@ class MethodSuggestionProviderTest {
         this.annotationParser = new AnnotationParser<>(
                 this.commandManager,
                 TestCommandSender.class
+        );
+        this.commandManager.parameterInjectorRegistry().registerInjector(
+                InjectedValue.class,
+                ParameterInjector.constantInjector(new InjectedValue("foo"))
         );
     }
 
@@ -89,7 +94,8 @@ class MethodSuggestionProviderTest {
                 new TestClassStream(),
                 new TestClassIterable(),
                 new TestClassListString(),
-                new TestClassCommandInput()
+                new TestClassCommandInput(),
+                new TestInjectedValue()
         );
     }
 
@@ -157,6 +163,29 @@ class MethodSuggestionProviderTest {
                 final @NonNull CommandInput input
         ) {
             return Collections.singletonList("foo");
+        }
+    }
+
+    public static final class TestInjectedValue {
+
+        @Suggestions("suggestions")
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull InjectedValue injectedValue
+        ) {
+            return Collections.singletonList(injectedValue.value());
+        }
+    }
+
+    public static class InjectedValue {
+
+        private final String value;
+
+        public InjectedValue(final String value) {
+            this.value = value;
+        }
+
+        public @NonNull String value() {
+            return this.value;
         }
     }
 }
