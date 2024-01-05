@@ -10,7 +10,7 @@ cloud-buildLogic-rootProject-spotless = { id = "org.incendo.cloud-build-logic.sp
 
 [versions]
 run-task = "2.2.2"
-checkstyle = "10.5.0"
+checkstyle = "10.12.5"
 stylecheck = "0.2.1"
 checkerQual = "3.42.0"
 errorprone = "2.23.0"

@@ -338,7 +338,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
      * and flag values. On failure the intermediate results
      * can be obtained, which are used for providing suggestions.
      */
-    private class FlagParser {
+    private final class FlagParser {
 
         private String lastParsedFlag;
 
