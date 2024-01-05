@@ -1,4 +1,5 @@
 plugins {
+    id("org.incendo.cloud-build-logic")
     id("cloud.example-conventions")
     alias(libs.plugins.shadow)
     alias(libs.plugins.run.waterfall)

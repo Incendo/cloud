@@ -11,6 +11,7 @@ pluginManagement {
             name = "jmpSnapshots"
             mavenContent { snapshotsOnly() }
         }
+        mavenLocal()
     }
     includeBuild("gradle/build-logic")
 }

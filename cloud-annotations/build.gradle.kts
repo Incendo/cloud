@@ -2,6 +2,7 @@ import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
     id("cloud.base-conventions")
+    id("cloud.publishing-conventions")
     id("com.palantir.revapi")
 }
 
