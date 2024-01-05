@@ -1,7 +1,7 @@
 plugins {
     id("cloud.base-conventions")
     id("cloud.publishing-conventions")
-    id("com.palantir.revapi")
+    alias(libs.plugins.revapi)
 }
 
 dependencies {
