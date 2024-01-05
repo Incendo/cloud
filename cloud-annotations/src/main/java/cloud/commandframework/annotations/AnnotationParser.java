@@ -47,7 +47,6 @@ import cloud.commandframework.captions.Caption;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.execution.CommandExecutionHandler;
-import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.CommandMetaBuilder;
@@ -885,9 +884,6 @@ public final class AnnotationParser<C> {
         final Method method = commandDescriptor.method();
         final CommandManager<C> manager = this.manager;
         final CommandMetaBuilder metaBuilder = CommandMeta.builder().with(this.metaFactory.apply(method));
-        if (methodOrClassHasAnnotation(method, Confirmation.class)) {
-            metaBuilder.with(CommandConfirmationManager.META_CONFIRMATION_REQUIRED, true);
-        }
 
         Command.Builder<C> builder = manager.commandBuilder(
                 commandDescriptor.commandToken(),

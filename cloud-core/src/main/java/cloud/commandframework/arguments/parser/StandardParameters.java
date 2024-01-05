@@ -42,10 +42,6 @@ public final class StandardParameters {
      */
     public static final ParserParameter<Number> RANGE_MAX = create("max", TypeToken.get(Number.class));
     /**
-     * Command confirmation
-     */
-    public static final ParserParameter<Boolean> CONFIRMATION = create("confirmation", TypeToken.get(Boolean.class));
-    /**
      * The command should be hidden from help menus, etc
      */
     public static final ParserParameter<Boolean> HIDDEN = create("hidden", TypeToken.get(Boolean.class));
