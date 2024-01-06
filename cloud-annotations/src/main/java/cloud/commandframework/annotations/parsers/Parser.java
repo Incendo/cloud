@@ -24,6 +24,8 @@
 package cloud.commandframework.annotations.parsers;
 
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -31,13 +33,16 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation allows you to create annotated methods that behave like argument parsers.
- * The method must have this exact signature: <pre>{@code
- * ﹫Parser("name") // Name may be left out
- * public ParsedType methodName(CommandContext<YourSender> sender, Queue<String> input) {
- * }}</pre>
- * <p>
- * The method can throw exceptions, and the thrown exceptions will automatically be
- * wrapped by a {@link cloud.commandframework.arguments.parser.ArgumentParseResult#failure(Throwable)}
+ *
+ * <p>The method parameters can be any combination of: <ul>
+ *  <li>{@link CommandContext}</li>
+ *  <li>{@link CommandInput}</li>
+ *  <li>the command sender type</li>
+ *  <li>any type that can be injected using {@link CommandContext#inject(Class)}</li>
+ * </ul>
+ *
+ * <p>The method can throw exceptions, and the thrown exceptions will automatically be
+ * wrapped by a {@link cloud.commandframework.arguments.parser.ArgumentParseResult#failure(Throwable)}.</p>
  *
  * @since 1.3.0
  */
@@ -46,22 +51,26 @@ import java.lang.annotation.Target;
 public @interface Parser {
 
     /**
-     * The name of the parser. If this is left empty, the parser will
-     * be registered as a default parser for the return type of the method
+     * Returns name of the parser.
+     *
+     * <p>If this is left empty, the parser will
+     * be registered as a default parser for the return type of the method.</p>
      *
      * @return Parser name
      */
     String name() default "";
 
     /**
-     * Name of the suggestion provider to use. If the string is left empty, the default
+     * Returns the of the suggestion provider to use.
+     *
+     * <p>If the string is left empty, the default
      * provider for the {@link cloud.commandframework.annotations.Argument} will be used. Otherwise,
      * the {@link cloud.commandframework.arguments.parser.ParserRegistry} instance in the
-     * {@link cloud.commandframework.CommandManager} will be queried for a matching suggestion provider.
-     * <p>
-     * For this to work, the suggestion needs to be registered in the parser registry. To do this, use
+     * {@link cloud.commandframework.CommandManager} will be queried for a matching suggestion provider.</p>
+     *
+     * <p>For this to work, the suggestion needs to be registered in the parser registry. To do this, use
      * {@link cloud.commandframework.arguments.parser.ParserRegistry#registerSuggestionProvider(String, SuggestionProvider)}.
-     * The registry instance can be retrieved using {@link cloud.commandframework.CommandManager#parserRegistry()}.
+     * The registry instance can be retrieved using {@link cloud.commandframework.CommandManager#parserRegistry()}.</p>
      *
      * @return The name of the suggestion provider, or {@code ""}
      */

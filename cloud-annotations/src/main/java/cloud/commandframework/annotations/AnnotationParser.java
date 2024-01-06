@@ -44,8 +44,6 @@ import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.preprocessor.RegexPreprocessor;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.Caption;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.meta.CommandMeta;
@@ -730,7 +728,6 @@ public final class AnnotationParser<C> {
         return commands;
     }
 
-    @SuppressWarnings("deprecation")
     private <T> void parseSuggestions(final @NonNull T instance) {
         for (final Method method : instance.getClass().getMethods()) {
             final Suggestions suggestions = method.getAnnotation(Suggestions.class);
@@ -741,26 +738,11 @@ public final class AnnotationParser<C> {
                 method.setAccessible(true);
             }
 
-            boolean valid;
-            if (method.getParameterCount() != 2 && method.getParameterCount() != 3) {
-                valid = false;
-            } else if (method.getParameterCount() == 3) {
-                valid = method.getParameters()[0].getType().equals(CommandContext.class)
-                        && (method.getParameters()[1].getType().equals(String.class)
-                            || method.getParameters()[1].getType().equals(CommandInput.class))
-                        && method.getParameters()[2].getType().getSimpleName().equals("Continuation");
-            } else {
-                valid = method.getParameters()[0].getType().equals(CommandContext.class)
-                        && (method.getParameters()[1].getType().equals(String.class)
-                            || method.getParameters()[1].getType().equals(CommandInput.class));
-            }
-
-            valid = valid
-                    && (Iterable.class.isAssignableFrom(method.getReturnType())
+            final boolean valid = Iterable.class.isAssignableFrom(method.getReturnType())
                     || method.getReturnType().equals(Stream.class)
                     || method.getReturnType().equals(CompletableFuture.class)
                     || method.getReturnType().getSimpleName().equals("Sequence")
-                    || method.getParameterCount() == 3 /* TODO(City): Fix this... */);
+                    || method.getParameterCount() == 3; /* TODO(City): Fix this... */
 
             if (!valid) {
                 throw new IllegalArgumentException(String.format(
@@ -774,7 +756,11 @@ public final class AnnotationParser<C> {
 
                 this.manager.parserRegistry().registerSuggestionProvider(
                         this.processString(suggestions.value()),
-                        this.suggestionProviderFactory.createSuggestionProvider(instance, method)
+                        this.suggestionProviderFactory.createSuggestionProvider(
+                                instance,
+                                method,
+                                this.manager.parameterInjectorRegistry()
+                        )
                 );
             } catch (final Exception e) {
                 throw new RuntimeException(e);
@@ -796,7 +782,11 @@ public final class AnnotationParser<C> {
             try {
                 this.manager.exceptionController().registerHandler(
                         (Class<Throwable>) exceptionHandler.value(),
-                        this.exceptionHandlerFactory.createExceptionHandler(instance, method)
+                        this.exceptionHandlerFactory.createExceptionHandler(
+                                instance,
+                                method,
+                                this.manager.parameterInjectorRegistry()
+                        )
                 );
             } catch (final Exception e) {
                 throw new RuntimeException(e);
@@ -804,26 +794,11 @@ public final class AnnotationParser<C> {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private <T> void parseParsers(final @NonNull T instance) {
         for (final Method method : instance.getClass().getMethods()) {
             final Parser parser = method.getAnnotation(Parser.class);
             if (parser == null) {
                 continue;
-            }
-            if (!method.isAccessible()) {
-                method.setAccessible(true);
-            }
-            if (method.getParameterCount() != 2
-                    || method.getReturnType().equals(Void.class)
-                    || !method.getParameters()[0].getType().equals(CommandContext.class)
-                    || !method.getParameters()[1].getType().equals(CommandInput.class)
-            ) {
-                throw new IllegalArgumentException(String.format(
-                        "@Parser annotated method '%s' in class '%s' does not have the correct signature",
-                        method.getName(),
-                        instance.getClass().getCanonicalName()
-                ));
             }
             try {
                 final String suggestions = this.processString(parser.suggestions());
@@ -842,7 +817,8 @@ public final class AnnotationParser<C> {
                 final MethodArgumentParser<C, ?> methodArgumentParser = new MethodArgumentParser<>(
                         suggestionProvider,
                         instance,
-                        method
+                        method,
+                        this.manager.parameterInjectorRegistry()
                 );
                 final Function<ParserParameters, ArgumentParser<C, ?>> parserFunction =
                         parameters -> methodArgumentParser;

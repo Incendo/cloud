@@ -25,19 +25,29 @@ package cloud.commandframework.annotations.suggestions;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * This annotation allows you to create annotated methods that behave like suggestion providers.
- * <p>
- * The method must take in the following parameters in the given order: {@link CommandContext} and either
- * {@link cloud.commandframework.context.CommandInput} or {@link String}. The method must return a collection or stream of either
- * {@link String} or {@link Suggestion}.
- * Example signatures: <pre>{@code
+ *
+ * <p>The method parameters can be any combination of: <ul>
+ *  <li>{@link CommandContext}</li>
+ *  <li>{@link CommandInput}</li>
+ *  <li>{@link String}, which receives {@link CommandInput#lastRemainingToken()}</li>
+ *  <li>the command sender type</li>
+ *  <li>any type that can be injected using {@link CommandContext#inject(Class)}</li>
+ * </ul>
+ *
+ * <p>The return type must be an {@link Iterable} or a {@link Stream} of {@link String} or {@link Suggestion}
+ * or a future that completes with any of the supported return types.</p>
+ *
+ * <p>Example signatures: <pre>{@code
  * ﹫Suggestions("name")
  * public List<String> methodName(CommandContext<YourSender> sender, CommandInput input)}</pre>
  * <pre>{@code
@@ -54,9 +64,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public @interface Suggestions {
 
     /**
-     * Name of the suggestion provider. This should be the same as the name specified in your command arguments
+     * Returns the name of the suggestion provider.
      *
-     * @return Suggestion provider name
+     * <p>This should be the same as the name specified in your command arguments.</p>
+     *
+     * @return suggestion provider name
      */
     @NonNull String value();
 }
