@@ -52,7 +52,7 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     public FilteringCommandSuggestionProcessor() {
-        this(Filter.startsWith(false));
+        this(Filter.partialTokenMatches(true));
     }
 
     /**
