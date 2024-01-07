@@ -23,14 +23,16 @@
 //
 package cloud.commandframework.annotations.suggestions;
 
+import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
+import cloud.commandframework.annotations.method.AnnotatedMethodHandler;
+import cloud.commandframework.annotations.method.ParameterValue;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -45,27 +47,21 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 1.3.0
  */
-public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> {
-
-    private final MethodHandle methodHandle;
-    private final boolean passString;
+public final class MethodSuggestionProvider<C> extends AnnotatedMethodHandler<C> implements SuggestionProvider<C> {
 
     /**
-     * Create a new provider
+     * Creates a new provider.
      *
-     * @param instance Instance that owns the method
-     * @param method   The annotated method
+     * @param instance         instance that owns the method
+     * @param method           the annotated method
+     * @param injectorRegistry injector registry
      */
     public MethodSuggestionProvider(
             final @NonNull Object instance,
-            final @NonNull Method method
+            final @NonNull Method method,
+            final @NonNull ParameterInjectorRegistry<C> injectorRegistry
     ) {
-        try {
-            this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);
-            this.passString = method.getParameterTypes()[1] == String.class;
-        } catch (final IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        super(method, instance, injectorRegistry);
     }
 
     @Override
@@ -74,13 +70,10 @@ public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> 
             final @NonNull CommandInput input
     ) {
         try {
-            final Object output;
-            if (this.passString) {
-                output = this.methodHandle.invokeWithArguments(context, input.lastRemainingToken());
-            } else {
-                output = this.methodHandle.invokeWithArguments(context, input);
-            }
-            return mapSuggestions(output);
+            final List<Object> arguments = this.createParameterValues(
+                    context, this.parameters(), Arrays.asList(context, input, input.lastRemainingToken())
+            ).stream().map(ParameterValue::value).collect(Collectors.toList());
+            return mapSuggestions(this.methodHandle().invokeWithArguments(arguments));
         } catch (final Throwable t) {
             throw new RuntimeException(t);
         }

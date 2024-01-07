@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.annotations.suggestions;
 
+import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import java.lang.reflect.Method;
 import org.apiguardian.api.API;
@@ -45,10 +46,15 @@ public interface SuggestionProviderFactory<C> {
     /**
      * Creates a suggestion provider using the given {@code method}.
      *
-     * @param instance the parsed instance
-     * @param method   the suggestion method
+     * @param instance         parsed instance
+     * @param method           suggestion method
+     * @param injectorRegistry injector registry
      * @return the suggestion provider
      * @since 2.0.0
      */
-    @NonNull SuggestionProvider<C> createSuggestionProvider(@NonNull Object instance, @NonNull Method method);
+    @NonNull SuggestionProvider<C> createSuggestionProvider(
+            @NonNull Object instance,
+            @NonNull Method method,
+            @NonNull ParameterInjectorRegistry<C> injectorRegistry
+    );
 }
