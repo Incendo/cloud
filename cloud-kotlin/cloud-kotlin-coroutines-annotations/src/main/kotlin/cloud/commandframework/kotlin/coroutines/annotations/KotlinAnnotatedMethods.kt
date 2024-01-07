@@ -25,6 +25,8 @@ package cloud.commandframework.kotlin.coroutines.annotations
 
 import cloud.commandframework.annotations.AnnotationParser
 import cloud.commandframework.annotations.MethodCommandExecutionHandler
+import cloud.commandframework.annotations.injection.ParameterInjectorRegistry
+import cloud.commandframework.annotations.method.ParameterValue
 import cloud.commandframework.annotations.suggestions.MethodSuggestionProvider
 import cloud.commandframework.annotations.suggestions.SuggestionProviderFactory
 import cloud.commandframework.arguments.suggestion.Suggestion
@@ -100,7 +102,6 @@ private class KotlinMethodCommandExecutionHandler<C>(
         if (valueParameters.values.none(KParameter::isOptional)) {
             val params = createParameterValues(
                 commandContext,
-                commandContext.flags(),
                 paramsWithoutContinuation
             ).map(ParameterValue::value)
             return coroutineScope.future(this@KotlinMethodCommandExecutionHandler.coroutineContext) {
@@ -121,7 +122,6 @@ private class KotlinMethodCommandExecutionHandler<C>(
         // by comparing the types of the parameters.
         val params = createParameterValues(
             commandContext,
-            commandContext.flags(),
             paramsWithoutContinuation
         ).associate { parameterValue ->
             val descriptor = parameterValue.descriptor()
@@ -162,9 +162,13 @@ private class KotlinSuggestionProviderFactory<C>(
     private val coroutineContext: CoroutineContext
 ) : SuggestionProviderFactory<C> {
 
-    override fun createSuggestionProvider(instance: Any, method: Method): SuggestionProvider<C> {
+    override fun createSuggestionProvider(
+        instance: Any,
+        method: Method,
+        injectorRegistry: ParameterInjectorRegistry<C>
+    ): SuggestionProvider<C> {
         if (method.kotlinFunction == null) {
-            return SuggestionProviderFactory.defaultFactory<C>().createSuggestionProvider(instance, method)
+            return SuggestionProviderFactory.defaultFactory<C>().createSuggestionProvider(instance, method, injectorRegistry)
         }
         val kFunction = requireNotNull(method.kotlinFunction)
         return KotlinSuggestionProvider(coroutineScope, coroutineContext, kFunction, instance)
