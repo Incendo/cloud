@@ -631,7 +631,7 @@ class CommandSuggestionsTest {
         assertThat(suggestions2).containsExactlyElementsIn(suggestionList("hello"));
         assertThat(suggestions3).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
         assertThat(suggestions4).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
-        assertThat(suggestions5).containsExactlyElementsIn(suggestionList("-f"));
+        assertThat(suggestions5).containsExactlyElementsIn(suggestionList("--flag2", "-f"));
         assertThat(suggestions6).isEmpty();
     }
 
@@ -659,7 +659,7 @@ class CommandSuggestionsTest {
         assertThat(suggestions2).isEmpty();
         assertThat(suggestions3).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
         assertThat(suggestions4).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
-        assertThat(suggestions5).containsExactlyElementsIn(suggestionList("-f"));
+        assertThat(suggestions5).containsExactlyElementsIn(suggestionList("--flag2", "-f"));
         assertThat(suggestions6).isEmpty();
     }
 
@@ -726,7 +726,7 @@ class CommandSuggestionsTest {
         assertThat(suggestions2).containsExactlyElementsIn(suggestionList("hello"));
         assertThat(suggestions3).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
         assertThat(suggestions4).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
-        assertThat(suggestions5).containsExactlyElementsIn(suggestionList("-f"));
+        assertThat(suggestions5).containsExactlyElementsIn(suggestionList("--flag2", "-f"));
         assertThat(suggestions6).isEmpty();
     }
 
@@ -755,7 +755,7 @@ class CommandSuggestionsTest {
         assertThat(suggestions2).isEmpty();
         assertThat(suggestions3).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
         assertThat(suggestions4).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
-        assertThat(suggestions5).containsExactlyElementsIn(suggestionList("-f"));
+        assertThat(suggestions5).containsExactlyElementsIn(suggestionList("--flag2", "-f"));
         assertThat(suggestions6).isEmpty();
     }
 
@@ -784,7 +784,7 @@ class CommandSuggestionsTest {
                 arguments("command --", suggestionList("--flag", "--flog")),
                 arguments("command --f", suggestionList("--flag", "--flog")),
                 arguments("command --fla", suggestionList("--flag")),
-                arguments("command -f", suggestionList("-f")),
+                arguments("command -f", suggestionList("--flog", "-f")),
                 arguments("command -", suggestionList("--flag", "--flog", "-f")),
                 arguments("command -f ", suggestionList("foo", "bar")),
                 arguments("command -f b", suggestionList("bar"))
