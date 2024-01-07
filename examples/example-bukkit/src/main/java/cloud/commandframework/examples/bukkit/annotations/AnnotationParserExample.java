@@ -31,6 +31,7 @@ import cloud.commandframework.examples.bukkit.annotations.feature.CommandContain
 import cloud.commandframework.examples.bukkit.annotations.feature.EnumExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.FlagExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.HelpExample;
+import cloud.commandframework.examples.bukkit.annotations.feature.InjectionExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.PermissionExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.RegexExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.RootCommandDeletionExample;
@@ -55,6 +56,7 @@ public final class AnnotationParserExample {
             new EnumExample(),
             new FlagExample(),
             new HelpExample(),
+            new InjectionExample(),
             new PermissionExample(),
             new RegexExample(),
             new RootCommandDeletionExample(),
