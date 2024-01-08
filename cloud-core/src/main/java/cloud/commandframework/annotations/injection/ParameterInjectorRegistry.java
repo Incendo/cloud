@@ -25,6 +25,7 @@ package cloud.commandframework.annotations.injection;
 
 import cloud.commandframework.annotations.AnnotationAccessor;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.InjectionException;
 import cloud.commandframework.services.ServicePipeline;
 import cloud.commandframework.types.tuples.Pair;
 import io.leangen.geantyref.GenericTypeReflector;
@@ -162,6 +163,7 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      * @param annotationAccessor annotation accessor for the injection. If the object is requested without access to annotations,
      *                           use {@link AnnotationAccessor#empty()}
      * @return the injected value, if an injector was able to provide a value
+     * @throws InjectionException if any of the {@link InjectionService injection services} throws an exception
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
@@ -188,6 +190,13 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
             return Optional.of(result);
         } catch (final IllegalStateException ignored) {
             return Optional.empty();
+        } catch (final InjectionException injectionException) {
+            throw injectionException;
+        } catch (final Exception e) {
+            throw new InjectionException(
+                    String.format("Failed to inject type %s", type.getType().getTypeName()),
+                    e
+            );
         }
     }
 
