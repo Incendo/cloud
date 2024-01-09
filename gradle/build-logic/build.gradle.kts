@@ -5,7 +5,10 @@ plugins {
 
 repositories {
     gradlePluginPortal()
-    mavenLocal()
+    maven("https://oss.sonatype.org/content/repositories/snapshots/") {
+        name = "sonatypeOssSnapshots"
+        mavenContent { snapshotsOnly() }
+    }
 }
 
 dependencies {
