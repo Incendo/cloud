@@ -29,8 +29,10 @@ import cloud.commandframework.internal.CommandInputTokenizer;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.stream.Stream;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -39,7 +41,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Command suggestion processor filters suggestions based on the remaining unconsumed input in the
  * queue.
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.STABLE)
 public final class FilteringCommandSuggestionProcessor<C> implements CommandSuggestionProcessor<C> {
@@ -67,9 +69,9 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
     }
 
     @Override
-    public @Nullable Suggestion process(
+    public @NonNull Stream<@NonNull Suggestion> process(
             final @NonNull CommandPreprocessingContext<C> context,
-            final @NonNull Suggestion suggestion
+            final @NonNull Stream<@NonNull Suggestion> suggestions
     ) {
         final String input;
         if (context.commandInput().isEmpty(true /* ignoreWhitespace */)) {
@@ -77,17 +79,19 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
         } else {
             input = context.commandInput().skipWhitespace().remainingInput();
         }
-        final String filtered = this.filter.filter(context, suggestion.suggestion(), input);
-        if (filtered == null) {
-            return null;
-        }
-        return suggestion.withSuggestion(filtered);
+        return suggestions.map(suggestion -> {
+            final String filtered = this.filter.filter(context, suggestion.suggestion(), input);
+            if (filtered == null) {
+                return null;
+            }
+            return suggestion.withSuggestion(filtered);
+        }).filter(Objects::nonNull);
     }
 
     /**
      * Filter function that tests (and potentially changes) each suggestion against the input and context.
      *
-     * @param <C> sender type
+     * @param <C> command sender type
      * @since 1.8.0
      */
     @API(status = API.Status.STABLE, since = "1.8.0")

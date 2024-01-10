@@ -47,9 +47,9 @@ class CommandSuggestionProcessorTest {
     @Test
     void testModifying() {
         // Arrange
-        this.commandManager.commandSuggestionProcessor((ctx, suggestion) -> suggestion.withSuggestion(
-                        String.format("test-%s", suggestion.suggestion()))
-        );
+        this.commandManager.commandSuggestionProcessor((ctx, suggestions) -> suggestions.map(s -> s.withSuggestion(
+                String.format("test-%s", s.suggestion()))
+        ));
         this.commandManager.command(
                 this.commandManager.commandBuilder("test").required(
                         "arg",
@@ -71,7 +71,7 @@ class CommandSuggestionProcessorTest {
     @Test
     void testFiltering() {
         // Arrange
-        this.commandManager.commandSuggestionProcessor((ctx, suggestion) -> null);
+        this.commandManager.commandSuggestionProcessor((ctx, suggestions) -> suggestions.limit(0));
         this.commandManager.command(
                 this.commandManager.commandBuilder("test").required(
                         "arg",
