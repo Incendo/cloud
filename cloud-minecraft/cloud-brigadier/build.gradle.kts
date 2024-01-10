@@ -1,5 +1,6 @@
 plugins {
     id("cloud.base-conventions")
+    id("cloud.publishing-conventions")
 }
 
 dependencies {

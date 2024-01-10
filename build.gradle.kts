@@ -1,12 +1,7 @@
 plugins {
-    id("cloud.parent-build-logic")
+    alias(libs.plugins.cloud.buildLogic.rootProject.publishing)
+    alias(libs.plugins.cloud.buildLogic.rootProject.spotless)
     alias(libs.plugins.versions)
-}
-
-subprojects {
-    if (!name.startsWith("example-")) {
-        apply(plugin = "cloud.publishing-conventions")
-    }
 }
 
 spotlessPredeclare {
