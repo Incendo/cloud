@@ -28,8 +28,11 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.keys.CloudKey;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -97,12 +100,28 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
                         if (result != null && result.failure().isPresent()) {
                             return ArgumentParseResult.failureFuture(result.failure().get());
                         }
+                        // Skip whitespace between arguments.
+                        commandInput.skipWhitespace(1);
+                        // Fail if there's no remaining input.
+                        if (commandInput.isEmpty()) {
+                            return ArgumentParseResult.failureFuture(new AggregateParseException(
+                                    commandContext,
+                                    component
+                            ));
+                        }
                         return component.parser()
-                                .parseFuture(commandContext, commandInput.skipWhitespace(1))
+                                .parseFuture(commandContext, commandInput)
                                 .thenApply(value -> {
                                     if (value.parsedValue().isPresent()) {
                                         final CloudKey key = CloudKey.of(component.name(), component.valueType());
                                         aggregateCommandContext.store(key, value.parsedValue().get());
+                                    } else if (value.failure().isPresent()) {
+                                        return ArgumentParseResult.failure(new AggregateParseException(
+                                                commandContext,
+                                                "",
+                                                component,
+                                                value.failure().get()
+                                        ));
                                     }
                                     return (ArgumentParseResult<Object>) value;
                                 });
@@ -124,5 +143,39 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
     @Override
     default @NonNull ArgumentParser<C, O> parser() {
         return this;
+    }
+
+
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    final class AggregateParseException extends ParserException {
+
+        private AggregateParseException(
+                final @NonNull CommandContext<?> context,
+                final @NonNull String input,
+                final @NonNull CommandComponent<?> component,
+                final @NonNull Throwable cause
+        ) {
+            super(
+                    cause,
+                    AggregateCommandParser.class,
+                    context,
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE,
+                    CaptionVariable.of("input", input),
+                    CaptionVariable.of("component", component.name()),
+                    CaptionVariable.of("failure", cause.getMessage())
+            );
+        }
+
+        private AggregateParseException(
+                final @NonNull CommandContext<?> context,
+                final @NonNull CommandComponent<?> component
+        ) {
+            super(
+                    AggregateCommandParser.class,
+                    context,
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_MISSING_INPUT,
+                    CaptionVariable.of("component", component.name())
+            );
+        }
     }
 }

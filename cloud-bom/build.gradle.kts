@@ -1,5 +1,6 @@
 plugins {
     `java-platform`
+    id("cloud.publishing-conventions")
 }
 
 indra {

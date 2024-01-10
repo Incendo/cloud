@@ -1,5 +1,6 @@
 plugins {
     id("cloud.base-conventions")
+    id("cloud.publishing-conventions")
 }
 
 java {
@@ -11,5 +12,4 @@ dependencies {
     compileOnly(libs.paperApi)
     compileOnly(libs.paperMojangApi)
     compileOnly(libs.jetbrainsAnnotations)
-    compileOnly(libs.guava)
 }

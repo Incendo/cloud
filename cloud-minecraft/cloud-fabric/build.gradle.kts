@@ -4,6 +4,7 @@ import net.ltgt.gradle.errorprone.errorprone
 plugins {
     id("quiet-fabric-loom")
     id("cloud.base-conventions")
+    id("cloud.publishing-conventions")
 }
 
 indra {
