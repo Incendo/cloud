@@ -47,12 +47,12 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
     private final @NonNull Filter<C> filter;
 
     /**
-     * Create a new {@link FilteringCommandSuggestionProcessor} filtering with {@link String#startsWith(String)} that does
-     * not ignore case.
+     * Create a new {@link FilteringCommandSuggestionProcessor} filtering with {@link Filter#partialTokenMatches(boolean)} that
+     * ignores case.
      */
-    @API(status = API.Status.STABLE)
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public FilteringCommandSuggestionProcessor() {
-        this(Filter.startsWith(false));
+        this(Filter.partialTokenMatches(true));
     }
 
     /**

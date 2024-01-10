@@ -103,8 +103,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
 
     private CaptionFormatter<C, String> captionVariableReplacementHandler = CaptionFormatter.placeholderReplacing();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
-    private CommandSuggestionProcessor<C> commandSuggestionProcessor =
-            new FilteringCommandSuggestionProcessor<>(FilteringCommandSuggestionProcessor.Filter.startsWith(true));
+    private CommandSuggestionProcessor<C> commandSuggestionProcessor = new FilteringCommandSuggestionProcessor<>();
     private CommandRegistrationHandler<C> commandRegistrationHandler;
     private CaptionRegistry<C> captionRegistry;
     private SuggestionMapper<? extends Suggestion> suggestionMapper = SuggestionMapper.identity();
