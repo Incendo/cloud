@@ -11,6 +11,10 @@ pluginManagement {
             name = "jmpSnapshots"
             mavenContent { snapshotsOnly() }
         }
+        maven("https://oss.sonatype.org/content/repositories/snapshots/") {
+            name = "sonatypeOssSnapshots"
+            mavenContent { snapshotsOnly() }
+        }
     }
     includeBuild("gradle/build-logic")
 }

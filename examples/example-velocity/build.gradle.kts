@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.shadow)
+    id("cloud.base-conventions")
     id("cloud.example-conventions")
     alias(libs.plugins.run.velocity)
 }
