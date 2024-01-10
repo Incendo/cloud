@@ -83,31 +83,20 @@ Cloud by default ships with implementations and mappings for the most common Min
 Discord bots, PircBotX for IRC and [cloud-spring](https://github.com/incendo/cloud-spring) for Spring Shell.
 The core module allows you to use Cloud anywhere, simply by implementing the CommandManager for the platform of your choice.
 
-## modules
-- **cloud-core**: Core module containing most of the cloud API, and shared implementations
-- **cloud-annotations**: Annotation parsing code that allows you to use annotated methods rather than builders - Now also 
-  includes several compile-time annotation processors
-- **cloud-services**: Services for cloud
-- **cloud-kotlin/cloud-kotlin-extensions**: Kotlin extensions for cloud
-- **cloud-kotlin/cloud-kotlin-coroutines**: Coroutine support for cloud
-- **cloud-kotlin/cloud-kotlin-coroutines-annotations**: Coroutine support for cloud-annotations
-- **cloud-minecraft/cloud-brigadier**: Brigadier mappings for cloud
-- **cloud-minecraft/cloud-bukkit**: Bukkit 1.8.8+ implementation of cloud
-- **cloud-minecraft/cloud-paper**: Module that extends cloud-bukkit to add special support for Paper 1.8.8+
-- **cloud-minecraft/cloud-bungee**: BungeeCord 1.8.8+ implementation of Cloud
-- **cloud-minecraft/cloud-velocity**: Velocity v1.1.0 implementation of cloud
-- **cloud-minecraft/cloud-cloudburst**: Cloudburst v1.0.0+ implementation of cloud
-- **cloud-minecraft/cloud-fabric**: Fabric implementation of Cloud
-- **cloud-minecraft/cloud-minecraft-extras**: Opinionated Extra Features for cloud-minecraft
-- **cloud-discord/cloud-jda**: JDA v4.2.0_209+ implementation of cloud
-- **cloud-discord/cloud-javacord**: Javacord v3.1.1+ implementation of cloud
-- **cloud-irc/cloud-pircbotx**: PircBotX 2.0+ implementation of cloud
-
 ## links  
 
 - JavaDoc: https://javadoc.io/doc/cloud.commandframework
 - Docs: https://cloud.incendo.org
-- Discord: https://discord.gg/aykZu32
+- Incendo Discord: https://discord.gg/aykZu32
+
+### repositories
+
+- [cloud](https://github.com/incendo/cloud) - main repository
+- [cloud-processors](https://github.com/incendo/cloud-processors) - extra pre- & postprocessors
+- [cloud-neoforge](https://github.com/incendo/cloud-neoforge) - cloud implementation for neoforge
+- [cloud-spring](https://github.com/incendo/cloud-spring) - cloud implementation for spring-shell
+- [cloud-build-logic](https://github.com/incendo/cloud-build-logic) - gradle plugin for building cloud
+- [cloud-docs](https://github.com/incendo/cloud-docs) - documentation sources
   
 ## develop &amp; build  
   

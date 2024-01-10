@@ -30,6 +30,7 @@ import cloud.commandframework.context.CommandContext;
 import java.util.Arrays;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("serial")
 @API(status = API.Status.STABLE)
@@ -41,15 +42,26 @@ public class ParserException extends IllegalArgumentException {
     private final CaptionVariable[] captionVariables;
 
     protected ParserException(
+            final @Nullable Throwable cause,
             final @NonNull Class<?> argumentParser,
             final @NonNull CommandContext<?> context,
             final @NonNull Caption errorCaption,
             final @NonNull CaptionVariable... captionVariables
     ) {
+        super(cause);
         this.argumentParser = argumentParser;
         this.context = context;
         this.errorCaption = errorCaption;
         this.captionVariables = captionVariables;
+    }
+
+    protected ParserException(
+            final @NonNull Class<?> argumentParser,
+            final @NonNull CommandContext<?> context,
+            final @NonNull Caption errorCaption,
+            final @NonNull CaptionVariable... captionVariables
+    ) {
+        this(null /* cause */, argumentParser, context, errorCaption, captionVariables);
     }
 
     @Override

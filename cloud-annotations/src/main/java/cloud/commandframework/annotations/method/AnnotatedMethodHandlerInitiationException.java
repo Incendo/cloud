@@ -21,18 +21,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.method;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Require confirmation for the command
+ * Exception thrown when a {@link AnnotatedMethodHandler} fails to initiate.
+ *
+ * @since 2.0.0
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
-public @interface Confirmation {
+@API(status = API.Status.INTERNAL, since = "2.0.0")
+public final class AnnotatedMethodHandlerInitiationException extends RuntimeException {
 
+    AnnotatedMethodHandlerInitiationException(final @Nullable Throwable cause) {
+        super(cause);
+    }
 }

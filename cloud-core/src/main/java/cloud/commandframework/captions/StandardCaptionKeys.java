@@ -97,6 +97,15 @@ public final class StandardCaptionKeys {
      * Variables: {@code <input>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_DURATION = of("argument.parse.failure.duration");
+    /**
+     * Variables: {@code <input>}, {@code <component>}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_AGGREGATE_MISSING_INPUT = of("argument.parse.failure.aggregate.missing");
+    /**
+     * Variables: {@code <input>}, {@code <component>}, {@code <failure>}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE = of(
+            "argument.parse.failure.aggregate.failure");
 
     private StandardCaptionKeys() {
     }

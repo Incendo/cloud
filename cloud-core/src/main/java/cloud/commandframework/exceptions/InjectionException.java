@@ -21,40 +21,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations.suggestions;
+package cloud.commandframework.exceptions;
 
-import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
-import java.lang.reflect.Method;
-import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@FunctionalInterface
-@API(status = API.Status.STABLE, since = "2.0.0")
-public interface SuggestionProviderFactory<C> {
+/**
+ * Exception thrown when an {@link cloud.commandframework.annotations.injection.InjectionService} fails exceptionally.
+ */
+public class InjectionException extends RuntimeException {
 
     /**
-     * Returns a factory that produces {@link MethodSuggestionProvider} instances.
+     * Creates a new injection exception.
      *
-     * @param <C> the command sender type
-     * @return the created factory
+     * @param message message describing the exception
+     * @param cause   cause of the exception
      */
-    static <C> @NonNull SuggestionProviderFactory<C> defaultFactory() {
-        return MethodSuggestionProvider::new;
+    public InjectionException(final @NonNull String message, final @NonNull Throwable cause) {
+        super(message, cause);
     }
-
-    /**
-     * Creates a suggestion provider using the given {@code method}.
-     *
-     * @param instance         parsed instance
-     * @param method           suggestion method
-     * @param injectorRegistry injector registry
-     * @return the suggestion provider
-     * @since 2.0.0
-     */
-    @NonNull SuggestionProvider<C> createSuggestionProvider(
-            @NonNull Object instance,
-            @NonNull Method method,
-            @NonNull ParameterInjectorRegistry<C> injectorRegistry
-    );
 }

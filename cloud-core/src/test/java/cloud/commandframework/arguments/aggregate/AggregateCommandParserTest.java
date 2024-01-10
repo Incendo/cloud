@@ -23,35 +23,44 @@
 //
 package cloud.commandframework.arguments.aggregate;
 
+import cloud.commandframework.CommandManager;
+import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.context.StandardCommandContextFactory;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.Arrays;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 import static cloud.commandframework.truth.ArgumentParseResultSubject.assertThat;
+import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class AggregateCommandParserTest {
 
-    @Mock
-    private CommandContext<Object> commandContext;
+    private CommandContext<TestCommandSender> commandContext;
+
+    @BeforeEach
+    void setup() {
+        final CommandManager<TestCommandSender> commandManager = createManager();
+        this.commandContext = new StandardCommandContextFactory<>(commandManager).create(false, new TestCommandSender());
+    }
 
     @Test
     void testParsing() {
         // Arrange
-        final AggregateCommandParser<Object, OutputType> parser = AggregateCommandParser.builder()
+        final AggregateCommandParser<TestCommandSender, OutputType> parser = AggregateCommandParser.<TestCommandSender>builder()
                 .withComponent("number", integerParser())
                 .withComponent("string", stringParser())
                 .withMapper(
@@ -72,7 +81,7 @@ class AggregateCommandParserTest {
     @Test
     void testExceptionForwarding() {
         // Arrange
-        final AggregateCommandParser<Object, OutputType> parser = AggregateCommandParser.builder()
+        final AggregateCommandParser<TestCommandSender, OutputType> parser = AggregateCommandParser.<TestCommandSender>builder()
                 .withComponent("number", integerParser())
                 .withComponent("string", stringParser())
                 .withMapper(
@@ -86,13 +95,14 @@ class AggregateCommandParserTest {
                 parser.parseFuture(this.commandContext, CommandInput.of("abc abc")).join();
 
         // Assert
-        assertThat(outputType).hasFailureThat().isInstanceOf(IntegerParser.IntegerParseException.class);
+        assertThat(outputType).hasFailureThat().isInstanceOf(AggregateCommandParser.AggregateParseException.class);
+        assertThat(outputType).hasFailureThat().hasCauseThat().isInstanceOf(IntegerParser.IntegerParseException.class);
     }
 
     @Test
     void testMultiLevelAggregateParsing() {
         // Arrange
-        final AggregateCommandParser<Object, OutputType> inner = AggregateCommandParser.builder()
+        final AggregateCommandParser<TestCommandSender, OutputType> inner = AggregateCommandParser.<TestCommandSender>builder()
                 .withComponent("number", integerParser())
                 .withComponent("string", stringParser())
                 .withMapper(
@@ -101,7 +111,7 @@ class AggregateCommandParserTest {
                                 ArgumentParseResult.successFuture(
                                         new OutputType(context.get("number"), context.get("string")))
                 ).build();
-        final AggregateCommandParser<Object, OutputType> parser = AggregateCommandParser.builder()
+        final AggregateCommandParser<TestCommandSender, OutputType> parser = AggregateCommandParser.<TestCommandSender>builder()
                 .withComponent("inner", inner)
                 .withMapper(
                         OutputType.class,
@@ -120,7 +130,7 @@ class AggregateCommandParserTest {
     @Test
     void testSuggestionsFirstArgument() {
         // Arrange
-        final AggregateCommandParser<Object, OutputType> parser = AggregateCommandParser.builder()
+        final AggregateCommandParser<TestCommandSender, OutputType> parser = AggregateCommandParser.<TestCommandSender>builder()
                 .withComponent("number", integerParser(), SuggestionProvider.blocking((ctx, in) -> Arrays.asList(
                         Suggestion.simple("1"),
                         Suggestion.simple("2"),
@@ -148,7 +158,7 @@ class AggregateCommandParserTest {
     @Test
     void testSuggestionsSecondArgument() {
         // Arrange
-        final AggregateCommandParser<Object, OutputType> parser = AggregateCommandParser.builder()
+        final AggregateCommandParser<TestCommandSender, OutputType> parser = AggregateCommandParser.<TestCommandSender>builder()
                 .withComponent("number", integerParser())
                 .withComponent("string", stringParser(), SuggestionProvider.blocking((ctx, in) -> Arrays.asList(
                         Suggestion.simple("a"),
@@ -172,6 +182,53 @@ class AggregateCommandParserTest {
                 Suggestion.simple("123 b"),
                 Suggestion.simple("123 c")
         );
+    }
+
+    @Test
+    void testFailureMissingInput() {
+        // Arrange
+        final AggregateCommandParser<TestCommandSender, OutputType> parser = AggregateCommandParser.<TestCommandSender>builder()
+                .withComponent("number", integerParser())
+                .withComponent("string", stringParser())
+                .withMapper(
+                        OutputType.class,
+                        (commandContext, context) -> ArgumentParseResult.successFuture(
+                                new OutputType(context.get("number"), context.get("string"))))
+                .build();
+
+        // Act
+        final ArgumentParseResult<OutputType> outputType =
+                parser.parseFuture(this.commandContext, CommandInput.empty()).join();
+
+        // Assert
+        assertThat(outputType).hasFailureThat().isInstanceOf(AggregateCommandParser.AggregateParseException.class);
+        final ParserException parserException = (ParserException) outputType.failure().get();
+        assertThat(parserException.errorCaption()).isEqualTo(StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_MISSING_INPUT);
+        assertThat(parserException.getMessage()).isEqualTo("Missing component 'number'");
+    }
+
+    @Test
+    void testFailureComponentParsingFailure() {
+        // Arrange
+        final AggregateCommandParser<TestCommandSender, OutputType> parser = AggregateCommandParser.<TestCommandSender>builder()
+                .withComponent("number", integerParser())
+                .withComponent("string", stringParser())
+                .withMapper(
+                        OutputType.class,
+                        (commandContext, context) -> ArgumentParseResult.successFuture(
+                                new OutputType(context.get("number"), context.get("string"))))
+                .build();
+
+        // Act
+        final ArgumentParseResult<OutputType> outputType =
+                parser.parseFuture(this.commandContext, CommandInput.of("abc")).join();
+
+        // Assert
+        assertThat(outputType).hasFailureThat().isInstanceOf(AggregateCommandParser.AggregateParseException.class);
+        final ParserException parserException = (ParserException) outputType.failure().get();
+        assertThat(parserException.errorCaption())
+                .isEqualTo(StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE);
+        assertThat(parserException.getMessage()).startsWith("Invalid component 'number':");
     }
 
 

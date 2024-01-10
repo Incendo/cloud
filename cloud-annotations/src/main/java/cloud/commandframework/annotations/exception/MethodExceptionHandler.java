@@ -23,13 +23,15 @@
 //
 package cloud.commandframework.annotations.exception;
 
+import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
+import cloud.commandframework.annotations.method.AnnotatedMethodHandler;
+import cloud.commandframework.annotations.method.ParameterValue;
 import cloud.commandframework.exceptions.handling.ExceptionContext;
 import cloud.commandframework.exceptions.handling.ExceptionHandler;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -40,46 +42,30 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public final class MethodExceptionHandler<C> implements ExceptionHandler<C, Throwable> {
-
-    private final Class<?>[] parameters;
-    private final MethodHandle methodHandle;
+public final class MethodExceptionHandler<C> extends AnnotatedMethodHandler<C> implements ExceptionHandler<C, Throwable> {
 
     /**
      * Creates a new handler.
      *
-     * @param instance the parsed instance
-     * @param method   the method
+     * @param instance         parsed instance
+     * @param method           method
+     * @param injectorRegistry injector registry
      */
     public MethodExceptionHandler(
             final @NonNull Object instance,
-            final @NonNull Method method
+            final @NonNull Method method,
+            final @NonNull ParameterInjectorRegistry<C> injectorRegistry
     ) {
-        this.parameters = method.getParameterTypes();
-        try {
-            this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);
-        } catch (final IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        super(method, instance, injectorRegistry);
     }
 
     @Override
     public void handle(final @NonNull ExceptionContext<C, Throwable> context) throws Throwable {
-        final List<Object> arguments = new ArrayList<>(this.parameters.length);
-        for (final Class<?> argument : this.parameters) {
-            if (argument.isInstance(context)) {
-                arguments.add(context);
-            } else if (argument.isInstance(context.exception())) {
-                arguments.add(context.exception());
-            } else if (argument.isInstance(context.context())) {
-                arguments.add(context.context());
-            } else if (argument.isInstance(context.context().sender())) {
-                arguments.add(context.context().sender());
-            } else {
-                arguments.add(context.context().inject(argument).orElseThrow(() ->
-                        new IllegalArgumentException("Can't map argument of type " + argument.getName())));
-            }
-        }
-        this.methodHandle.invokeWithArguments(arguments);
+        final List<Object> arguments = this.createParameterValues(
+                context.context(),
+                this.parameters(),
+                Arrays.asList(context, context.exception())
+        ).stream().map(ParameterValue::value).collect(Collectors.toList());
+        this.methodHandle().invokeWithArguments(arguments);
     }
 }
