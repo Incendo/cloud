@@ -73,13 +73,13 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
             final @NonNull CommandPreprocessingContext<C> context,
             final @NonNull Stream<@NonNull Suggestion> suggestions
     ) {
+        final String input;
+        if (context.commandInput().isEmpty(true /* ignoreWhitespace */)) {
+            input = "";
+        } else {
+            input = context.commandInput().skipWhitespace().remainingInput();
+        }
         return suggestions.map(suggestion -> {
-            final String input;
-            if (context.commandInput().isEmpty(true /* ignoreWhitespace */)) {
-                input = "";
-            } else {
-                input = context.commandInput().skipWhitespace().remainingInput();
-            }
             final String filtered = this.filter.filter(context, suggestion.suggestion(), input);
             if (filtered == null) {
                 return null;
