@@ -37,7 +37,6 @@ jda = "4.2.1_257"
 pircbotx = "12f5639c5d"
 
 # minecraft
-guava = "21.0-jre"
 brigadier = "1.0.18"
 bukkit = "1.13.2-R0.1-SNAPSHOT"
 commodore = "2.2"
@@ -93,7 +92,6 @@ jda = { group = "net.dv8tion", name = "JDA", version.ref = "jda" }
 pircbotx = { group = "com.github.pircbotx", name = "pircbotx", version.ref = "pircbotx" }
 
 # minecraft
-guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 brigadier = { group = "com.mojang", name = "brigadier", version.ref = "brigadier" }
 bukkit = { group = "org.bukkit", name = "bukkit", version.ref = "bukkit" }
 commodore = { group = "me.lucko", name = "commodore", version.ref = "commodore" }
