@@ -151,11 +151,11 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
         /* Check if we have a last flag stored */
         final String lastArg = Objects.requireNonNull(commandContext.getOrDefault(FLAG_META_KEY, ""));
         if (!lastArg.startsWith("-")) {
-            final String rawInput = commandContext.rawInput().input();
+            final String readInput = input.readInput();
             /* Collection containing all used flags */
             final List<CommandFlag<?>> usedFlags = new LinkedList<>();
             /* Find all "primary" flags, using --flag */
-            final Matcher primaryMatcher = FLAG_PRIMARY_PATTERN.matcher(rawInput);
+            final Matcher primaryMatcher = FLAG_PRIMARY_PATTERN.matcher(readInput);
             while (primaryMatcher.find()) {
                 final String name = primaryMatcher.group("name");
                 for (final CommandFlag<?> flag : this.flags) {
@@ -166,7 +166,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                 }
             }
             /* Find all alias flags */
-            final Matcher aliasMatcher = FLAG_ALIAS_PATTERN.matcher(rawInput);
+            final Matcher aliasMatcher = FLAG_ALIAS_PATTERN.matcher(readInput);
             while (aliasMatcher.find()) {
                 final String name = aliasMatcher.group("name");
                 for (final CommandFlag<?> flag : this.flags) {
@@ -178,6 +178,13 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                         }
                     }
                 }
+            }
+            final String nextToken = input.peekString();
+            final String currentFlag;
+            if (nextToken.length() > 1) {
+                currentFlag = nextToken.substring(1);
+            } else {
+                currentFlag = "";
             }
             /* Suggestions */
             final List<Suggestion> suggestions = new LinkedList<>();
@@ -193,7 +200,6 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                 suggestions.add(Suggestion.simple(String.format("--%s", flag.getName())));
             }
             /* Recommend aliases */
-            final String nextToken = input.peekString();
             final boolean suggestCombined = nextToken.length() > 1 && nextToken.startsWith("-") && !nextToken.startsWith("--");
             for (final CommandFlag<?> flag : this.flags) {
                 if (usedFlags.contains(flag) && flag.mode() != CommandFlag.FlagMode.REPEATABLE) {
@@ -204,6 +210,9 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                 }
 
                 for (final String alias : flag.getAliases()) {
+                    if (alias.equalsIgnoreCase(currentFlag)) {
+                        continue;
+                    }
                     if (suggestCombined && flag.commandComponent() == null) {
                         suggestions.add(Suggestion.simple(String.format("%s%s", input.peekString(), alias)));
                     } else {
