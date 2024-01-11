@@ -250,7 +250,7 @@ public final class CommandTree<C> {
                 return CompletableFutures.failedFuture(
                         new InvalidSyntaxException(
                                 this.commandManager.commandSyntaxFormatter()
-                                        .apply(parsedArguments, root),
+                                        .apply(commandContext.sender(), parsedArguments, root),
                                 commandContext.sender(), this.getComponentChain(root)
                         )
                 );
@@ -339,7 +339,7 @@ public final class CommandTree<C> {
                     return CompletableFutures.failedFuture(
                             new InvalidSyntaxException(
                                     this.commandManager.commandSyntaxFormatter()
-                                            .apply(parsedArguments, root),
+                                            .apply(commandContext.sender(), parsedArguments, root),
                                     commandContext.sender(), this.getComponentChain(root)
                             )
                     );
@@ -431,7 +431,8 @@ public final class CommandTree<C> {
                     ).components();
                     return CompletableFutures.failedFuture(
                             new InvalidSyntaxException(
-                                    this.commandManager.commandSyntaxFormatter().apply(components, child),
+                                    this.commandManager.commandSyntaxFormatter()
+                                            .apply(commandContext.sender(), components, child),
                                     commandContext.sender(),
                                     this.getComponentChain(root)
                             )
@@ -457,7 +458,7 @@ public final class CommandTree<C> {
                     return CompletableFutures.failedFuture(
                             new InvalidSyntaxException(
                                     this.commandManager.commandSyntaxFormatter()
-                                            .apply(parsedArguments, root),
+                                            .apply(commandContext.sender(), parsedArguments, root),
                                     commandContext.sender(),
                                     this.getComponentChain(root)
                             )
@@ -504,7 +505,8 @@ public final class CommandTree<C> {
                }
                return CompletableFutures.failedFuture(
                        new InvalidSyntaxException(
-                               this.commandManager.commandSyntaxFormatter().apply(parsedArguments, child),
+                               this.commandManager.commandSyntaxFormatter()
+                                       .apply(commandContext.sender(), parsedArguments, child),
                                commandContext.sender(),
                                this.getComponentChain(root)
                        )
@@ -1019,11 +1021,13 @@ public final class CommandTree<C> {
     private void propagateRequirements(final @NonNull CommandNode<C> leafNode) {
         // noinspection all
         final Permission commandPermission = leafNode.component().owningCommand().commandPermission();
-        final Class<?> senderType = leafNode.component().owningCommand().senderType().orElse(null);
+        Class<?> senderType = leafNode.component().owningCommand().senderType().orElse(null);
+        if (senderType == null) {
+            senderType = Object.class;
+        }
         /* All leaves must necessarily have an owning command */
         leafNode.nodeMeta().put(CommandNode.META_KEY_PERMISSION, commandPermission);
-        leafNode.nodeMeta().put(CommandNode.META_KEY_SENDER_TYPES,
-                senderType == null ? new HashSet<>() : new HashSet<>(Collections.singletonList(senderType)));
+        leafNode.nodeMeta().put(CommandNode.META_KEY_SENDER_TYPES, new HashSet<>(Collections.singletonList(senderType)));
         // Get chain and order it tail->head then skip the tail (leaf node)
         List<CommandNode<C>> chain = this.getChain(leafNode);
         Collections.reverse(chain);
@@ -1053,9 +1057,7 @@ public final class CommandTree<C> {
 
             final Set<Class<?>> senderTypes = (Set<Class<?>>) commandArgumentNode.nodeMeta()
                     .computeIfAbsent(CommandNode.META_KEY_SENDER_TYPES, $ -> new HashSet<>());
-            if (senderType != null) {
-                senderTypes.add(senderType);
-            }
+            senderTypes.add(senderType);
         }
     }
 

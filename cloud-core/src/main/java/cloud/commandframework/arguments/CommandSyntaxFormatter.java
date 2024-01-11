@@ -42,6 +42,7 @@ public interface CommandSyntaxFormatter<C> {
     /**
      * Format the command arguments into a syntax string
      *
+     * @param sender            The sender to format syntax for.
      * @param commandComponents Command arguments that have been unambiguously specified up until this point. This
      *                          should include the "current" command, if such a command exists.
      * @param node              The current command node. The children of this node will be appended onto the
@@ -51,6 +52,7 @@ public interface CommandSyntaxFormatter<C> {
      * @return The formatted syntax string
      */
     @NonNull String apply(
+            @Nullable C sender,
             @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             @Nullable CommandNode<C> node
     );

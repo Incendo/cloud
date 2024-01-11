@@ -24,12 +24,17 @@
 package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.internal.CommandNode;
+import cloud.commandframework.permission.Permission;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -40,20 +45,64 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *     <li>static arguments are serialized as their name, without a bracket</li>
  *     <li>required arguments are serialized as their name, surrounded by angle brackets</li>
  *     <li>optional arguments are serialized as their name, surrounded by square brackets</li>
+ *     <li>does not render arguments the sender does not have access to (either due to permission or sender type requirements)
+ *     </li>
  * </ul>
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter<C> {
 
+    private final CommandManager<C> manager;
+
+    /**
+     * Creates a new {@link StandardCommandSyntaxFormatter}.
+     *
+     * @param manager command manager
+     */
+    public StandardCommandSyntaxFormatter(final CommandManager<C> manager) {
+        this.manager = manager;
+    }
+
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     @Override
     public final @NonNull String apply(
+            final @Nullable C sender,
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @Nullable CommandNode<C> node
+    ) {
+        return this.apply(commandComponents, node, n -> {
+            if (sender == null) {
+                return true;
+            }
+            final Permission permission = (Permission) n.nodeMeta().getOrDefault(
+                    CommandNode.META_KEY_PERMISSION,
+                    Permission.empty()
+            );
+            final Set<Class<?>> senderTypes = (Set<Class<?>>) n.nodeMeta().getOrDefault(
+                    CommandNode.META_KEY_SENDER_TYPES,
+                    Collections.emptySet()
+            );
+            if (senderTypes.isEmpty()) {
+                return this.manager.hasPermission(sender, permission);
+            }
+            for (final Class<?> senderType : senderTypes) {
+                if (senderType.isInstance(sender)) {
+                    return this.manager.hasPermission(sender, permission);
+                }
+            }
+            return false;
+        });
+    }
+
+    private @NonNull String apply(
+            final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
+            final @Nullable CommandNode<C> node,
+            final @NonNull Predicate<@NonNull CommandNode<C>> filter
     ) {
         final FormattingInstance formattingInstance = this.createInstance();
         final Iterator<CommandComponent<C>> iterator = commandComponents.iterator();
@@ -78,10 +127,10 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
             }
         }
         CommandNode<C> tail = node;
-        while (tail != null && !tail.isLeaf()) {
+        while (tail != null && !tail.isLeaf() && filter.test(tail)) {
             if (tail.children().size() > 1) {
                 formattingInstance.appendBlankSpace();
-                final Iterator<CommandNode<C>> childIterator = tail.children().iterator();
+                final Iterator<CommandNode<C>> childIterator = tail.children().stream().filter(filter).iterator();
                 while (childIterator.hasNext()) {
                     final CommandNode<C> child = childIterator.next();
 
@@ -107,6 +156,9 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                         formattingInstance.appendPipe();
                     }
                 }
+                break;
+            }
+            if (!filter.test(tail.children().get(0))) {
                 break;
             }
             final CommandComponent<C> component = tail.children().get(0).component();

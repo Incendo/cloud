@@ -120,7 +120,7 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
                     query,
                     availableCommands.stream()
                             .map(command -> CommandEntry.of(command, this.commandManager.commandSyntaxFormatter()
-                                    .apply(command.components(), null)))
+                                    .apply(query.sender(), command.components(), null)))
                             .sorted()
                             .filter(entry -> this.commandManager.hasPermission(query.sender(), entry.command().commandPermission()))
                             .collect(Collectors.toList())
@@ -150,7 +150,7 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
                                 CommandEntry.of(
                                         head.component().owningCommand(),
                                         this.commandManager.commandSyntaxFormatter()
-                                                .apply(head.component().owningCommand().components(), null)
+                                                .apply(query.sender(), head.component().owningCommand().components(), null)
                                 )
                         );
                     }
@@ -182,7 +182,8 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
                         continue;
                     }
                 }
-                final String currentDescription = this.commandManager.commandSyntaxFormatter().apply(traversedNodes, null);
+                final String currentDescription = this.commandManager.commandSyntaxFormatter()
+                        .apply(query.sender(), traversedNodes, null);
                 /* Attempt to parse the longest possible description for the children */
                 final List<String> childSuggestions = new LinkedList<>();
                 for (final CommandNode<C> child : head.children()) {
@@ -197,7 +198,8 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
                             child.component().owningCommand().commandPermission()
                     )) {
                         traversedNodesSub.add(child.component());
-                        childSuggestions.add(this.commandManager.commandSyntaxFormatter().apply(traversedNodesSub, child));
+                        childSuggestions.add(this.commandManager.commandSyntaxFormatter()
+                                .apply(query.sender(), traversedNodesSub, child));
                     }
                 }
                 return MultipleCommandResult.of(query, currentDescription, childSuggestions);
@@ -223,7 +225,8 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
                 .filter(command -> this.commandManager.hasPermission(sender, command.commandPermission()))
                 .map(command -> CommandEntry.of(
                         command,
-                        this.commandManager.commandSyntaxFormatter().apply(command.components(), null))
+                        this.commandManager.commandSyntaxFormatter()
+                                .apply(sender, command.components(), null))
                 ).sorted()
                 .collect(Collectors.toList());
     }

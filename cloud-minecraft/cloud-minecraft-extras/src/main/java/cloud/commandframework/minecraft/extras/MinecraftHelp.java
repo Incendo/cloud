@@ -509,7 +509,7 @@ public abstract class MinecraftHelp<C> {
         audience.sendMessage(this.basicHeader(sender));
         audience.sendMessage(this.showingResults(sender, query));
         final String command = this.commandManager().commandSyntaxFormatter()
-                .apply(helpTopic.entry().command().components(), null);
+                .apply(sender, helpTopic.entry().command().components(), null);
         audience.sendMessage(text()
                 .append(this.lastBranch())
                 .append(space())
@@ -558,7 +558,7 @@ public abstract class MinecraftHelp<C> {
                 final CommandComponent<C> component = iterator.next();
 
                 final String syntax = this.commandManager().commandSyntaxFormatter()
-                        .apply(Collections.singletonList(component), null);
+                        .apply(sender, Collections.singletonList(component), null);
 
                 final TextComponent.Builder textComponent = text()
                         .append(text("       "))
