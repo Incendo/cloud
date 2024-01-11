@@ -151,7 +151,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
         final Permission permission = (Permission) node
                 .nodeMeta()
-                .getOrDefault("permission", Permission.empty());
+                .getOrDefault(CommandNode.META_KEY_PERMISSION, Permission.empty());
 
         return this.manager.hasPermission(this.manager.senderMapper().map(target), permission);
     }

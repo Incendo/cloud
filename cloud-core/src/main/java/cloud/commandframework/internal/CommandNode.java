@@ -45,6 +45,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "2.0.0")
 public final class CommandNode<C> {
 
+    public static final String META_KEY_PERMISSION = "permission";
+    public static final String META_KEY_SENDER_TYPES = "senderTypes";
+
     private final Map<String, Object> nodeMeta = new HashMap<>();
     private final List<CommandNode<C>> children = new LinkedList<>();
     private final CommandComponent<C> component;

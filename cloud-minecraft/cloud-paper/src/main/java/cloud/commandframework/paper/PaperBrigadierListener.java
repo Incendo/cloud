@@ -95,14 +95,13 @@ class PaperBrigadierListener<C> implements Listener {
             return;
         }
 
-        final BrigadierPermissionChecker<BukkitBrigadierCommandSource> permissionChecker = (sender, permission) -> {
+        final BrigadierPermissionChecker<C> permissionChecker = (sender, permission) -> {
             // We need to check that the command still exists...
             if (commandTree.getNamedNode(label) == null) {
                 return false;
             }
 
-            final C commandSender = this.paperCommandManager.senderMapper().map(sender.getBukkitSender());
-            return this.paperCommandManager.hasPermission(commandSender, permission);
+            return this.paperCommandManager.hasPermission(sender, permission);
         };
         final LiteralBrigadierNodeFactory<C, BukkitBrigadierCommandSource> literalFactory =
                 this.brigadierManager.literalBrigadierNodeFactory();

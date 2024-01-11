@@ -45,7 +45,7 @@ public interface BrigadierNodeFactory<C, S, N extends CommandNode<S>> {
             @NonNull String label,
             cloud.commandframework.internal.@NonNull CommandNode<C> cloudCommand,
             @NonNull Command<S> executor,
-            @NonNull BrigadierPermissionChecker<S> permissionChecker
+            @NonNull BrigadierPermissionChecker<C> permissionChecker
     );
 
     /**
@@ -61,7 +61,7 @@ public interface BrigadierNodeFactory<C, S, N extends CommandNode<S>> {
             @NonNull String label,
             cloud.commandframework.@NonNull Command<C> cloudCommand,
             @NonNull Command<S> executor,
-            @NonNull BrigadierPermissionChecker<S> permissionChecker
+            @NonNull BrigadierPermissionChecker<C> permissionChecker
     );
 
     /**

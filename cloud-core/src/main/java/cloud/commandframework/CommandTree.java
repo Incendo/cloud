@@ -976,33 +976,11 @@ public final class CommandTree<C> {
             final @NonNull C sender,
             final @NonNull CommandNode<C> node
     ) {
-        final Permission permission = (Permission) node.nodeMeta().get("permission");
+        final Permission permission = (Permission) node.nodeMeta().get(CommandNode.META_KEY_PERMISSION);
         if (permission != null) {
             return this.commandManager.hasPermission(sender, permission) ? null : permission;
         }
-        if (node.isLeaf()) {
-            final CommandComponent<C> component = Objects.requireNonNull(node.component(), "component");
-            final Command<C> command = Objects.requireNonNull(component.owningCommand(), "command");
-            return this.commandManager.hasPermission(
-                    sender,
-                    command.commandPermission()
-            ) ? null : command.commandPermission();
-        }
-        /*
-          if any of the children would permit the execution, then the sender has a valid
-           chain to execute, and so we allow them to execute the root
-         */
-        final List<Permission> missingPermissions = new LinkedList<>();
-        for (final CommandNode<C> child : node.children()) {
-            final Permission check = this.findMissingPermission(sender, child);
-            if (check == null) {
-                return null;
-            } else {
-                missingPermissions.add(check);
-            }
-        }
-
-        return Permission.anyOf(missingPermissions);
+        throw new IllegalStateException("Expected permissions to be propagated");
     }
 
     /**
@@ -1028,27 +1006,31 @@ public final class CommandTree<C> {
             }
         });
 
-        this.getLeavesRaw(this.internalTree).forEach(this::updatePermission);
+        this.getLeavesRaw(this.internalTree).forEach(this::propagateRequirements);
     }
 
     /**
-     * Updates the permission of the given {@code node} by traversing the command tree and calculating the applicable permission.
+     * Propagates permission and sender type requirements from the {@link Command} owning the {@code leafNode}'s component down
+     * the tree, merging as is appropriate for nodes shared by multiple chains.
      *
-     * @param node the command node
+     * @param leafNode leafNode
      */
-    private void updatePermission(final @NonNull CommandNode<C> node) {
+    @SuppressWarnings("unchecked")
+    private void propagateRequirements(final @NonNull CommandNode<C> leafNode) {
         // noinspection all
-        final Permission commandPermission = node.component().owningCommand().commandPermission();
+        final Permission commandPermission = leafNode.component().owningCommand().commandPermission();
+        final Class<?> senderType = leafNode.component().owningCommand().senderType().orElse(null);
         /* All leaves must necessarily have an owning command */
-        node.nodeMeta().put("permission", commandPermission);
+        leafNode.nodeMeta().put(CommandNode.META_KEY_PERMISSION, commandPermission);
+        leafNode.nodeMeta().put(CommandNode.META_KEY_SENDER_TYPES,
+                senderType == null ? new HashSet<>() : new HashSet<>(Collections.singletonList(senderType)));
         // Get chain and order it tail->head then skip the tail (leaf node)
-        List<CommandNode<C>> chain = this.getChain(node);
+        List<CommandNode<C>> chain = this.getChain(leafNode);
         Collections.reverse(chain);
         chain = chain.subList(1, chain.size());
         // Go through all nodes from the tail upwards until a collision occurs
         for (final CommandNode<C> commandArgumentNode : chain) {
-            final Permission existingPermission = (Permission) commandArgumentNode.nodeMeta()
-                    .get("permission");
+            final Permission existingPermission = (Permission) commandArgumentNode.nodeMeta().get(CommandNode.META_KEY_PERMISSION);
 
             Permission permission;
             if (existingPermission != null) {
@@ -1067,7 +1049,13 @@ public final class CommandTree<C> {
                 }
             }
 
-            commandArgumentNode.nodeMeta().put("permission", permission);
+            commandArgumentNode.nodeMeta().put(CommandNode.META_KEY_PERMISSION, permission);
+
+            final Set<Class<?>> senderTypes = (Set<Class<?>>) commandArgumentNode.nodeMeta()
+                    .computeIfAbsent(CommandNode.META_KEY_SENDER_TYPES, $ -> new HashSet<>());
+            if (senderType != null) {
+                senderTypes.add(senderType);
+            }
         }
     }
 
