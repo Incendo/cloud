@@ -21,28 +21,47 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.velocity;
+package cloud.commandframework.brigadier;
 
+import cloud.commandframework.CommandManager;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
-import com.velocitypowered.api.command.CommandSource;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class VelocityExecutor<C> implements Command<CommandSource> {
+/**
+ * Brigadier {@link Command} implementation that delegates to cloud.
+ *
+ * @param <C> command sender type
+ * @param <S> brigadier command source type
+ */
+@API(status = API.Status.INTERNAL)
+public final class CloudBrigadierCommand<C, S> implements Command<S> {
 
-    private final VelocityCommandManager<C> manager;
+    private final CommandManager<C> commandManager;
+    private final CloudBrigadierManager<C, S> brigadierManager;
 
-    VelocityExecutor(final @NonNull VelocityCommandManager<C> commandManager) {
-        this.manager = commandManager;
+    /**
+     * Creates a new {@link CloudBrigadierCommand}.
+     *
+     * @param commandManager   command manager
+     * @param brigadierManager brigadier manager
+     */
+    public CloudBrigadierCommand(
+            final @NonNull CommandManager<C> commandManager,
+            final @NonNull CloudBrigadierManager<C, S> brigadierManager
+    ) {
+        this.commandManager = commandManager;
+        this.brigadierManager = brigadierManager;
     }
 
     @Override
-    public int run(final @NonNull CommandContext<CommandSource> commandContext) {
-        final CommandSource source = commandContext.getSource();
-        final String input = commandContext.getInput();
-        final C sender = this.manager.senderMapper().map(
-                source);
-        this.manager.commandExecutor().executeCommand(sender, input);
+    public int run(final @NonNull CommandContext<S> ctx) {
+        final S source = ctx.getSource();
+        final String input = ctx.getInput().substring(ctx.getLastChild().getNodes().get(0).getRange().getStart());
+        final C sender = this.brigadierManager.senderMapper().map(source);
+
+        this.commandManager.commandExecutor().executeCommand(sender, input);
         return com.mojang.brigadier.Command.SINGLE_SUCCESS;
     }
 }

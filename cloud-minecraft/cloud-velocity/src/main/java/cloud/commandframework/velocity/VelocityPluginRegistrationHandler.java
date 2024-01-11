@@ -25,6 +25,7 @@ package cloud.commandframework.velocity;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.brigadier.CloudBrigadierCommand;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.internal.CommandRegistrationHandler;
@@ -63,7 +64,7 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                 this.brigadierManager.literalBrigadierNodeFactory().createNode(
                         command.rootComponent().name(),
                         command,
-                        new VelocityExecutor<>(this.manager)
+                        new CloudBrigadierCommand<>(this.manager, this.brigadierManager)
                 )
         );
         final CommandMeta commandMeta = this.manager.proxyServer().getCommandManager()
