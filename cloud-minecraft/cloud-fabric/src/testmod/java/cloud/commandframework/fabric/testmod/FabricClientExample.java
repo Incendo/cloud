@@ -29,12 +29,12 @@ import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.fabric.FabricClientCommandManager;
 import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
+import cloud.commandframework.fabric.testmod.mixin.PauseScreenAccess;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.realmsclient.RealmsMainScreen;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -44,9 +44,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
-import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
@@ -137,19 +135,8 @@ public final class FabricClientExample implements ClientModInitializer {
     }
 
     private static void disconnectClient(final @NonNull Minecraft client) {
-        final boolean singlePlayer = client.hasSingleplayerServer();
-        client.level.disconnect();
-        if (singlePlayer) {
-            client.clearLevel(new GenericDirtMessageScreen(Component.translatable("menu.savingLevel")));
-        } else {
-            client.clearLevel();
-        }
-        if (singlePlayer) {
-            client.setScreen(new TitleScreen());
-        } else if (client.isConnectedToRealms()) {
-            client.setScreen(new RealmsMainScreen(new TitleScreen()));
-        } else {
-            client.setScreen(new JoinMultiplayerScreen(new TitleScreen()));
-        }
+        final PauseScreen pauseScreen = new PauseScreen(true);
+        pauseScreen.init(client, 0, 0);
+        ((PauseScreenAccess) pauseScreen).disconnect();
     }
 }

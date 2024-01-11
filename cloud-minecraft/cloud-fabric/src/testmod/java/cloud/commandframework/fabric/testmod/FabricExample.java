@@ -88,12 +88,12 @@ public final class FabricExample implements ModInitializer {
                 .required(name, stringParser())
                 .optional(hugs, integerParser(), DefaultValue.constant(1))
                 .handler(ctx -> {
-                    ctx.sender().sendSuccess(Component.literal("Hello, ")
+                    ctx.sender().sendSuccess(() -> Component.literal("Hello, ")
                             .append(ctx.get(name))
                             .append(", hope you're doing well!")
                             .withStyle(style -> style.withColor(TextColor.fromRgb(0xAA22BB))), false);
 
-                    ctx.sender().sendSuccess(Component.literal("Cloud would like to give you ")
+                    ctx.sender().sendSuccess(() -> Component.literal("Cloud would like to give you ")
                             .append(Component.literal(String.valueOf(ctx.get(hugs)))
                                     .withStyle(style -> style.withColor(TextColor.fromRgb(0xFAB3DA))))
                             .append(" hug(s) <3")
@@ -109,7 +109,7 @@ public final class FabricExample implements ModInitializer {
                 .literal("land")
                 .required("biome", biomeArgument)
                 .handler(ctx -> {
-                    ctx.sender().sendSuccess(Component.literal("Yes, the biome ")
+                    ctx.sender().sendSuccess(() -> Component.literal("Yes, the biome ")
                             .append(Component.literal(
                                             ctx.sender().registryAccess()
                                                     .registryOrThrow(Registries.BIOME)
@@ -136,7 +136,7 @@ public final class FabricExample implements ModInitializer {
                                             .append(ctx.sender().getDisplayName())
                             ));
                     ctx.sender().sendSuccess(
-                            Component.literal(String.format("Waved at %d players (%s)", selected.size(),
+                            () -> Component.literal(String.format("Waved at %d players (%s)", selected.size(),
                                     selector.inputString()
                             )),
                             false
@@ -166,7 +166,7 @@ public final class FabricExample implements ModInitializer {
             final List<ModMetadata> modList = FabricLoader.getInstance().getAllMods().stream()
                     .map(ModContainer::getMetadata)
                     .sorted(Comparator.comparing(ModMetadata::getId))
-                    .collect(Collectors.toList());
+                    .toList();
             final MutableComponent text = Component.literal("");
             text.append(Component.literal("Loaded Mods")
                     .withStyle(style -> style.withColor(ChatFormatting.BLUE).applyFormat(ChatFormatting.BOLD)));
@@ -197,7 +197,7 @@ public final class FabricExample implements ModInitializer {
                     text.append(Component.literal(", ").withStyle(style -> style.withColor(ChatFormatting.GRAY)));
                 }
             }
-            ctx.sender().sendSuccess(text, false);
+            ctx.sender().sendSuccess(() -> text, false);
         }));
 
         final TypedCommandComponent<CommandSourceStack, ModMetadata> modMetadata = manager.componentBuilder(
@@ -248,7 +248,7 @@ public final class FabricExample implements ModInitializer {
                         text.append(Component.literal("\n license: " + String.join(", ", meta.getLicense())));
                     }
                     ctx.sender().sendSuccess(
-                            text,
+                            () -> text,
                             false
                     );
                 }));
@@ -272,7 +272,7 @@ public final class FabricExample implements ModInitializer {
                     try {
                         player = ctx.sender().getPlayerOrException();
                     } catch (final CommandSyntaxException e) {
-                        ctx.sender().sendSuccess(ComponentUtils.fromMessage(e.getRawMessage()), false);
+                        ctx.sender().sendSuccess(() -> ComponentUtils.fromMessage(e.getRawMessage()), false);
                         return;
                     }
                     final Vec3 vec = ctx.<ColumnCoordinates>get("chunk_position").position();

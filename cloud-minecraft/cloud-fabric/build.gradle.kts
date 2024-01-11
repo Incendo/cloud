@@ -56,9 +56,10 @@ dependencies {
     minecraft(libs.fabricMinecraft)
     mappings(loom.officialMojangMappings())
     modImplementation(libs.fabricLoader)
-    modImplementation(fabricApi.module("fabric-command-api-v2", libs.versions.fabricApi.get()))
-    modImplementation(fabricApi.module("fabric-networking-api-v1", libs.versions.fabricApi.get()))
-    modImplementation(fabricApi.module("fabric-lifecycle-events-v1", libs.versions.fabricApi.get()))
+    modImplementation(platform(libs.fabricApi.bom))
+    modImplementation(libs.fabricApi.command.api.v2)
+    modImplementation(libs.fabricApi.networking.api.v1)
+    modImplementation(libs.fabricApi.lifecycle.events.v1)
 
     modApi(libs.fabricPermissionsApi)
     include(libs.fabricPermissionsApi)
