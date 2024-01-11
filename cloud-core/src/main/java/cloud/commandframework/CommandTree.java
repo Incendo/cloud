@@ -1041,7 +1041,6 @@ public final class CommandTree<C> {
      */
     @SuppressWarnings("unchecked")
     private void propagateRequirements(final @NonNull CommandNode<C> leafNode) {
-        // noinspection all
         final Permission commandPermission = leafNode.component().owningCommand().commandPermission();
         Class<?> senderType = leafNode.component().owningCommand().senderType().orElse(null);
         if (senderType == null) {
