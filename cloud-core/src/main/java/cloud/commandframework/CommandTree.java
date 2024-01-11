@@ -616,7 +616,7 @@ public final class CommandTree<C> {
             final @NonNull Executor executor
     ) {
         // If the sender isn't allowed to access the root node, no suggestions are needed
-        if (this.findMissingPermission(context.commandContext().sender(), root) != null) {
+        if (!this.canAccess(context.commandContext().sender(), root)) {
             return CompletableFuture.completedFuture(context);
         }
 
@@ -700,7 +700,7 @@ public final class CommandTree<C> {
             final @NonNull CommandNode<C> node,
             final @NonNull CommandInput input
     ) {
-        if (this.findMissingPermission(context.commandContext().sender(), node) != null) {
+        if (!this.canAccess(context.commandContext().sender(), node)) {
             return CompletableFuture.completedFuture(context);
         }
         final CommandComponent<C> component = Objects.requireNonNull(node.component());
@@ -983,6 +983,28 @@ public final class CommandTree<C> {
             return this.commandManager.hasPermission(sender, permission) ? null : permission;
         }
         throw new IllegalStateException("Expected permissions to be propagated");
+    }
+
+    /**
+     * Returns {@code true} if the sender matches the type requirements for the node, and
+     * {@link #findMissingPermission(Object, CommandNode)} returns null.
+     *
+     * @param sender command sender
+     * @param node   command node
+     * @return whether the sender can access the node
+     */
+    @SuppressWarnings("unchecked")
+    private boolean canAccess(final @NonNull C sender, final @NonNull CommandNode<C> node) {
+        final Set<Class<?>> types = (Set<Class<?>>) node.nodeMeta().get(CommandNode.META_KEY_SENDER_TYPES);
+        if (types == null) {
+            throw new IllegalStateException("Expected sender type requirements to be propagated");
+        }
+        for (final Class<?> type : types) {
+            if (type.isInstance(sender)) {
+                return this.findMissingPermission(sender, node) == null;
+            }
+        }
+        return false;
     }
 
     /**

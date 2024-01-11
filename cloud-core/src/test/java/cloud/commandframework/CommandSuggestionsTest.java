@@ -29,7 +29,9 @@ import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.StringParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
+import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.setting.ManagerSetting;
 import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
@@ -791,6 +793,88 @@ class CommandSuggestionsTest {
         );
     }
 
+    @ParameterizedTest
+    @MethodSource
+    void respectsSenderTypeRequirement(
+            final TestCommandSender sender,
+            final String input,
+            final List<Suggestion> expectedSuggestions
+    ) {
+        // Arrange
+        this.manager = createTestManager();
+
+        // 1)
+        this.manager.command(this.manager.commandBuilder("test-specific-sender").senderType(SpecificSender.class));
+        // 2)
+        this.manager.command(this.manager.commandBuilder("literal").literal("test-specific-sender").senderType(SpecificSender.class));
+
+        // Act
+        final List<? extends Suggestion> list = this.manager.suggestionFactory().suggestImmediately(sender, input).list();
+
+        // Assert
+        assertThat(list).containsExactlyElementsIn(expectedSuggestions);
+    }
+
+    static Stream<Arguments> respectsSenderTypeRequirement() {
+        return Stream.of(
+                // 1)
+                arguments(new TestCommandSender(), "test-", suggestionList()),
+                arguments(new SpecificSender(), "test-", suggestionList("test-specific-sender")),
+                // 2)
+                arguments(new TestCommandSender(), "l", suggestionList()),
+                arguments(new SpecificSender(), "l", suggestionList("literal")),
+                arguments(new TestCommandSender(), "literal ", suggestionList()),
+                arguments(new SpecificSender(), "literal ", suggestionList("test-specific-sender"))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void respectsPermissionRequirement(
+            final TestCommandSender sender,
+            final String input,
+            final List<Suggestion> expectedSuggestions
+    ) {
+        // Arrange
+        this.manager = createTestManager();
+
+        // 1)
+        this.manager.command(this.manager.commandBuilder("test-permitted").permission("some-permission"));
+        // 2)
+        this.manager.command(this.manager.commandBuilder("literal").literal("test-permitted").permission("some-permission"));
+
+        // Act
+        final List<? extends Suggestion> list = this.manager.suggestionFactory().suggestImmediately(sender, input).list();
+
+        // Assert
+        assertThat(list).containsExactlyElementsIn(expectedSuggestions);
+    }
+
+    static Stream<Arguments> respectsPermissionRequirement() {
+        return Stream.of(
+                // 1)
+                arguments(new TestCommandSender(), "test-", suggestionList()),
+                arguments(new TestCommandSender("some-permission"), "test-", suggestionList("test-permitted")),
+                // 2)
+                arguments(new TestCommandSender(), "l", suggestionList()),
+                arguments(new TestCommandSender("some-permission"), "l", suggestionList("literal")),
+                arguments(new TestCommandSender(), "literal ", suggestionList()),
+                arguments(new TestCommandSender("some-permission"), "literal ", suggestionList("test-permitted"))
+        );
+    }
+
+    private static CommandManager<TestCommandSender> createTestManager() {
+        return new CommandManager<TestCommandSender>(
+                ExecutionCoordinator.simpleCoordinator(),
+                CommandRegistrationHandler.nullCommandRegistrationHandler()
+        ) {
+            @Override
+            public boolean hasPermission(final TestCommandSender sender, final String permission) {
+                return sender.hasPermisison(permission);
+            }
+        };
+    }
+
 
     private List<? extends Suggestion> suggest(CommandManager<TestCommandSender> manager, String command) {
         return manager.suggestionFactory().suggestImmediately(new TestCommandSender(), command).list();
@@ -799,5 +883,9 @@ class CommandSuggestionsTest {
     public enum TestEnum {
         FOO,
         BAR
+    }
+
+    static class SpecificSender extends TestCommandSender {
+
     }
 }
