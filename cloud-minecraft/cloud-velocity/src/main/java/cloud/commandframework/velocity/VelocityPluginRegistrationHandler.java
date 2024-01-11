@@ -63,10 +63,6 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                 this.brigadierManager.literalBrigadierNodeFactory().createNode(
                         command.rootComponent().name(),
                         command,
-                        (c, p) -> this.manager.hasPermission(
-                                this.manager.senderMapper().map(c),
-                                p
-                        ),
                         new VelocityExecutor<>(this.manager)
                 )
         );

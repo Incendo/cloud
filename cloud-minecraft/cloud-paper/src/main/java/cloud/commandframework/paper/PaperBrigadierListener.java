@@ -107,9 +107,8 @@ class PaperBrigadierListener<C> implements Listener {
         final LiteralBrigadierNodeFactory<C, BukkitBrigadierCommandSource> literalFactory =
                 this.brigadierManager.literalBrigadierNodeFactory();
         event.setLiteral(literalFactory.createNode(
+                event.getLiteral().getLiteral(),
                 node,
-                event.getLiteral(),
-                event.getBrigadierCommand(),
                 event.getBrigadierCommand(),
                 permissionChecker
         ));

@@ -25,7 +25,6 @@ package cloud.commandframework.fabric;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.brigadier.permission.BrigadierPermissionChecker;
 import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import com.mojang.brigadier.CommandDispatcher;
@@ -167,10 +166,6 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                     .createNode(
                             component.name(),
                             command,
-                            (src, perm) -> this.commandManager().hasPermission(
-                                    this.commandManager().senderMapper().map(src),
-                                    perm
-                            ),
                             new FabricExecutor<>(this.commandManager())
                     );
 
@@ -228,19 +223,14 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         private void registerCommand(final RootCommandNode<CommandSourceStack> dispatcher, final Command<C> command) {
             final CommandComponent<C> component = command.rootComponent();
             final FabricExecutor<C, CommandSourceStack> executor = new FabricExecutor<>(this.commandManager());
-            final BrigadierPermissionChecker<CommandSourceStack> permission = (src, perm) -> this.commandManager().hasPermission(
-                    this.commandManager().senderMapper().map(src),
-                    perm
-            );
             final CommandNode<CommandSourceStack> baseNode = this.commandManager()
                     .brigadierManager()
                     .literalBrigadierNodeFactory()
                     .createNode(
-                        component.name(),
-                        command,
-                        permission,
-                        executor
-            );
+                            component.name(),
+                            command,
+                            executor
+                    );
 
             dispatcher.addChild(baseNode);
 

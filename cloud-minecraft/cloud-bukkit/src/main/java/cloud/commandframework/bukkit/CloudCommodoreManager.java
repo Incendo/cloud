@@ -99,7 +99,7 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
             final @NonNull Command<C> command
     ) {
         final LiteralCommandNode<?> literalCommandNode = this.brigadierManager.literalBrigadierNodeFactory()
-                .createNode(label, command, (commandSourceStack, commandPermission) -> {
+                .createNode(label, command, o -> 1, (commandSourceStack, commandPermission) -> {
                     // We need to check that the command still exists...
                     if (this.commandManager.commandTree().getNamedNode(label) == null) {
                         return false;
@@ -110,7 +110,7 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
                             this.commandManager.senderMapper().map(bukkitSender),
                             commandPermission
                     );
-                }, o -> 1);
+                });
         final CommandNode existingNode = this.getDispatcher().findNode(Collections.singletonList(label));
         if (existingNode != null) {
             this.mergeChildren(existingNode, literalCommandNode);

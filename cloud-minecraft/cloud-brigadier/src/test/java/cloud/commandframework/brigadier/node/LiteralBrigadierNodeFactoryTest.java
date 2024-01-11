@@ -99,7 +99,6 @@ class LiteralBrigadierNodeFactoryTest {
         final LiteralCommandNode<Object> commandNode = this.literalBrigadierNodeFactory.createNode(
                 "command",
                 command,
-                (source, permission) -> true,
                 brigadierCommand
         );
         this.dispatcher.getRoot().addChild(commandNode);
@@ -175,7 +174,6 @@ class LiteralBrigadierNodeFactoryTest {
         final LiteralCommandNode<Object> commandNode = this.literalBrigadierNodeFactory.createNode(
                 "command",
                 command,
-                (source, permission) -> true,
                 brigadierCommand
         );
 
