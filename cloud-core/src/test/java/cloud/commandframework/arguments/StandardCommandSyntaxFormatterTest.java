@@ -31,15 +31,19 @@ import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import java.util.Collections;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 
 class StandardCommandSyntaxFormatterTest {
 
-    @Test
-    void accountsForSenderType() {
-        final CommandManager<TestCommandSender> commandManager = new CommandManager<TestCommandSender>(
+    private CommandManager<TestCommandSender> manager;
+    private CommandSyntaxFormatter<TestCommandSender> formatter;
+
+    @BeforeEach
+    void setup() {
+        this.manager = new CommandManager<TestCommandSender>(
                 ExecutionCoordinator.simpleCoordinator(),
                 CommandRegistrationHandler.nullCommandRegistrationHandler()
         ) {
@@ -48,31 +52,56 @@ class StandardCommandSyntaxFormatterTest {
                     final @NonNull TestCommandSender sender,
                     final @NonNull String permission
             ) {
-                return true;
+                return sender.hasPermisison(permission);
             }
         };
+        this.formatter = new StandardCommandSyntaxFormatter<>(this.manager);
+    }
 
-        final Command.Builder<TestCommandSender> root = commandManager.commandBuilder("root");
-        commandManager.command(
+    @Test
+    void accountsForSenderType() {
+        final Command.Builder<TestCommandSender> root = this.manager.commandBuilder("root");
+        this.manager.command(
                 root.literal("all")
                         .handler(ctx -> {})
         );
-        commandManager.command(
+        this.manager.command(
                 root.literal("specific_only")
                         .senderType(SpecificTestCommandSender.class)
                         .handler(ctx -> {})
         );
 
-        final StandardCommandSyntaxFormatter<TestCommandSender> formatter =
-                new StandardCommandSyntaxFormatter<>(commandManager);
+        final CommandNode<TestCommandSender> rootNode = this.manager.commandTree().getNamedNode("root");
 
-        final CommandNode<TestCommandSender> rootNode = commandManager.commandTree().getNamedNode("root");
-
-        final String specificFormatted = formatter.apply(
+        final String specificFormatted = this.formatter.apply(
                 new SpecificTestCommandSender(), Collections.emptyList(), rootNode);
         assertThat(specificFormatted).isEqualTo(" all|specific_only");
 
-        final String formatted = formatter.apply(
+        final String formatted = this.formatter.apply(
+                new TestCommandSender(), Collections.emptyList(), rootNode);
+        assertThat(formatted).isEqualTo(" all");
+    }
+
+    @Test
+    void respectsPermissions() {
+        final Command.Builder<TestCommandSender> root = this.manager.commandBuilder("root");
+        this.manager.command(
+                root.literal("all")
+                        .handler(ctx -> {})
+        );
+        this.manager.command(
+                root.literal("permitted_only")
+                        .permission("some_permission")
+                        .handler(ctx -> {})
+        );
+
+        final CommandNode<TestCommandSender> rootNode = this.manager.commandTree().getNamedNode("root");
+
+        final String permittedFormatted = this.formatter.apply(
+                new TestCommandSender("some_permission"), Collections.emptyList(), rootNode);
+        assertThat(permittedFormatted).isEqualTo(" all|permitted_only");
+
+        final String formatted = this.formatter.apply(
                 new TestCommandSender(), Collections.emptyList(), rootNode);
         assertThat(formatted).isEqualTo(" all");
     }
