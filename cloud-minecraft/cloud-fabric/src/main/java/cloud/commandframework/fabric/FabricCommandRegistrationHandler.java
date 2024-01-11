@@ -25,6 +25,7 @@ package cloud.commandframework.fabric;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.brigadier.CloudBrigadierCommand;
 import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import com.mojang.brigadier.CommandDispatcher;
@@ -166,7 +167,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                     .createNode(
                             component.name(),
                             command,
-                            new FabricExecutor<>(this.commandManager())
+                            new CloudBrigadierCommand<>(this.commandManager(), this.commandManager().brigadierManager())
                     );
 
             rootNode.addChild(baseNode);
@@ -222,14 +223,13 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
 
         private void registerCommand(final RootCommandNode<CommandSourceStack> dispatcher, final Command<C> command) {
             final CommandComponent<C> component = command.rootComponent();
-            final FabricExecutor<C, CommandSourceStack> executor = new FabricExecutor<>(this.commandManager());
             final CommandNode<CommandSourceStack> baseNode = this.commandManager()
                     .brigadierManager()
                     .literalBrigadierNodeFactory()
                     .createNode(
                             component.name(),
                             command,
-                            executor
+                            new CloudBrigadierCommand<>(this.commandManager(), this.commandManager().brigadierManager())
                     );
 
             dispatcher.addChild(baseNode);
