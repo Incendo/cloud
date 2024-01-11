@@ -41,6 +41,12 @@ public final class CloudBrigadierCommand<C, S> implements Command<S> {
     private final CommandManager<C> commandManager;
     private final CloudBrigadierManager<C, S> brigadierManager;
 
+    /**
+     * Creates a new {@link CloudBrigadierCommand}.
+     *
+     * @param commandManager   command manager
+     * @param brigadierManager brigadier manager
+     */
     public CloudBrigadierCommand(
             final @NonNull CommandManager<C> commandManager,
             final @NonNull CloudBrigadierManager<C, S> brigadierManager
