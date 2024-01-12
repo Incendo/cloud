@@ -24,6 +24,8 @@
 package cloud.commandframework.annotations;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
+import cloud.commandframework.annotations.descriptor.FlagDescriptor;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.method.AnnotatedMethodHandler;
 import cloud.commandframework.annotations.method.ParameterValue;

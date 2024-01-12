@@ -21,45 +21,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.descriptor;
 
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Processor that intercepts all cloud annotation strings.
- *
- * @since 1.7.0
- */
-@FunctionalInterface
-public interface StringProcessor {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface Descriptor {
 
     /**
-     * Returns a string processor that simply returns the input string.
+     * Returns the name of the object described by {@code this} descriptor.
      *
-     * @return no-op string processor
+     * @return the name
      */
-    static @NonNull StringProcessor noOp() {
-        return new NoOpStringProcessor();
-    }
-
-    /**
-     * Processes the {@code input} string and returns the processed result.
-     * <p>
-     * This should always return a non-{@code null} result. If the input string
-     * isn't applicable to the processor implementation, the original string should
-     * be returned.
-     *
-     * @param input the input string
-     * @return the processed string
-     */
-    @NonNull String processString(@NonNull String input);
-
-
-    final class NoOpStringProcessor implements StringProcessor {
-
-        @Override
-        public @NonNull String processString(final @NonNull String input) {
-            return input;
-        }
-    }
+    @NonNull String name();
 }

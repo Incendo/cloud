@@ -25,7 +25,7 @@ package cloud.commandframework.annotations.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
@@ -65,7 +65,7 @@ class RepeatableFlagTest {
 
     public static final class TestClassA {
 
-        @CommandMethod("test")
+        @Command("test")
         public void command(@Flag(value = "flag", repeatable = true) Collection<String> flags) {
         }
     }

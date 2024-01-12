@@ -23,48 +23,38 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.internal.ImmutableBuilder;
-import java.lang.reflect.Method;
-import java.util.List;
-import org.apiguardian.api.API;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.immutables.value.Value;
 
-@ImmutableBuilder
-@Value.Immutable
-@API(status = API.Status.STABLE, since = "2.0.0")
-public interface CommandDescriptor extends Descriptor {
+/**
+ * Method that indicates that a method is a command method.
+ * <p>
+ * This method is repeatable, and each instance will result in a unique command.
+ */
+@Repeatable(Commands.class)
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface Command {
 
-    /**
-     * Returns the command method.
-     *
-     * @return the command method
-     */
-    @NonNull Method method();
-
-    @Override
-    default @NonNull String name() {
-        return this.commandToken();
-    }
+    String ANNOTATION_PATH = "cloud.commandframework.annotations.Command";
 
     /**
-     * Returns an unmodifiable view of the syntax fragments.
+     * Returns the command syntax string.
      *
-     * @return the syntax fragments
+     * @return the command syntax string
      */
-    @NonNull List<@NonNull SyntaxFragment> syntax();
-
-    /**
-     * Returns the root command name.
-     *
-     * @return the name of the root command
-     */
-    @NonNull String commandToken();
+    @NonNull String value();
 
     /**
      * Returns the required sender type.
+     * <p>
+     * If the type is set to {@link Object} no specific sender type will be enforced.
      *
      * @return the required sender type
      */
-    @NonNull Class<?> requiredSender();
+    @NonNull Class<?> requiredSender() default Object.class;
 }

@@ -25,7 +25,7 @@ package cloud.commandframework.annotations.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
 import cloud.commandframework.context.CommandContext;
@@ -37,9 +37,9 @@ import org.junit.jupiter.api.Test;
 import static com.google.common.truth.Truth.assertThat;
 
 /**
- * Test that verifies that {@link CommandMethod} is repeatable.
+ * Test that verifies that {@link Command} is repeatable.
  */
-class RepeatableCommandMethodTest {
+class RepeatableCommandTest {
 
     private CommandManager<TestCommandSender> commandManager;
     private AnnotationParser<TestCommandSender> annotationParser;
@@ -69,8 +69,8 @@ class RepeatableCommandMethodTest {
 
     final static class TestClass {
 
-        @CommandMethod("test foo")
-        @CommandMethod("test")
+        @Command("test foo")
+        @Command("test")
         public void commandTest(final @NonNull CommandContext<TestCommandSender> context) {
             context.set("handled", true);
         }

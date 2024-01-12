@@ -21,25 +21,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.assembler;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import cloud.commandframework.CommandComponent;
+import cloud.commandframework.annotations.SyntaxFragment;
+import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Equivalent to {@link cloud.commandframework.Command.Builder#permission(String)}
+ * Assembles {@link CommandComponent command componets} from {@link ArgumentDescriptor argument descriptors}.
+ *
+ * @param <C> the command sender type
+ * @since 2.0.0
  */
-@Target({ElementType.METHOD, ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface CommandPermission {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface ArgumentAssembler<C> {
 
     /**
-     * Get the command permission
+     * Assembles a command component from the given {@code descriptor}.
      *
-     * @return Command permission
+     * @param syntaxFragment the syntax fragment for the argument
+     * @param descriptor     the descriptor
+     * @return the assembled command component
      */
-    @NonNull String value() default "";
+    @NonNull CommandComponent<C> assembleArgument(
+            @NonNull SyntaxFragment syntaxFragment,
+            @NonNull ArgumentDescriptor descriptor
+    );
 }

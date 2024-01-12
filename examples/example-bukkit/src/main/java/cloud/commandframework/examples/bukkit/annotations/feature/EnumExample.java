@@ -25,7 +25,7 @@ package cloud.commandframework.examples.bukkit.annotations.feature;
 
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
 import org.bukkit.Location;
@@ -48,7 +48,7 @@ public final class EnumExample implements AnnotationFeature {
         annotationParser.parse(this);
     }
 
-    @CommandMethod("annotations summon <type>")
+    @Command("annotations summon <type>")
     public void commandSummon(
             final @NonNull Player player,
             @Argument("type") final @NonNull EntityType type

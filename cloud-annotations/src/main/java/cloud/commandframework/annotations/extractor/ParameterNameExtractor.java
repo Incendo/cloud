@@ -21,23 +21,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.extractor;
 
-import java.util.Collection;
+import java.lang.reflect.Parameter;
+import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Extracts {@link CommandDescriptor command descriptors} from command class instances.
- */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface CommandExtractor {
+public interface ParameterNameExtractor {
 
     /**
-     * Extracts the commands from the given {@code instance}.
+     * Returns a parameter name extractor that returns {@link Parameter#getName()} without any transformations.
      *
-     * @param instance the class instance
-     * @return the extracted commands
+     * @return the extractor
      */
-    @NonNull Collection<@NonNull CommandDescriptor> extractCommands(@NonNull Object instance);
+    static @NonNull ParameterNameExtractor simple() {
+        return Parameter::getName;
+    }
+
+    /**
+     * Returns a parameter name extractor that transforms {@link Parameter#getName()} using the given {@code transformation}.
+     *
+     * @param transformation the name transformation
+     * @return the transformed name
+     */
+    static @NonNull ParameterNameExtractor withTransformation(@NonNull Function<String, String> transformation) {
+        return parameter -> transformation.apply(parameter.getName());
+    }
+
+    /**
+     * Extracts the name from the given {@code parameter}.
+     *
+     * @param parameter the parameter
+     * @return the extracted name
+     */
+    @NonNull String extract(@NonNull Parameter parameter);
 }

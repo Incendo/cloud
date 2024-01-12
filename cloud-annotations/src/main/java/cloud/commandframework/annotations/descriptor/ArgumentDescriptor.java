@@ -21,14 +21,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.descriptor;
 
 import cloud.commandframework.Description;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.internal.ImmutableBuilder;
-import cloud.commandframework.permission.Permission;
 import java.lang.reflect.Parameter;
-import java.util.Collection;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -37,15 +35,15 @@ import org.immutables.value.Value;
 @ImmutableBuilder
 @Value.Immutable
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface FlagDescriptor extends Descriptor {
+public interface ArgumentDescriptor extends Descriptor {
 
     /**
      * Creates a new builder.
      *
      * @return the created builder
      */
-    static ImmutableFlagDescriptor.@NonNull Builder builder() {
-        return ImmutableFlagDescriptor.builder();
+    static ImmutableArgumentDescriptor.@NonNull Builder builder() {
+        return ImmutableArgumentDescriptor.builder();
     }
 
     /**
@@ -56,19 +54,12 @@ public interface FlagDescriptor extends Descriptor {
     @NonNull Parameter parameter();
 
     /**
-     * Returns the flag name.
+     * Returns the argument name
      *
-     * @return the flag name
+     * @return the argument name
      */
     @Override
     @NonNull String name();
-
-    /**
-     * Returns an unmodifiable view of the flag aliases.
-     *
-     * @return the flag aliases
-     */
-    @NonNull Collection<@NonNull String> aliases();
 
     /**
      * Returns the name of the parser to use. If {@code null} the default parser for the parameter type will be used.
@@ -92,23 +83,16 @@ public interface FlagDescriptor extends Descriptor {
     @Nullable String suggestions();
 
     /**
-     * Returns the permission of the flag.
+     * Returns the default value.
      *
-     * @return the flag permission, or {@code null}
+     * @return the default value, or {@code null}
      */
-    @Nullable Permission permission();
+    @Nullable String defaultValue();
 
     /**
-     * Returns the description of the flag.
+     * Returns the description of the argument.
      *
-     * @return the flag description, or {@code null}
+     * @return the argument description, or {@code null}
      */
     @Nullable Description description();
-
-    /**
-     * Returns whether the flag is repeatable.
-     *
-     * @return whether the flag is repeatable
-     */
-    boolean repeatable();
 }

@@ -23,26 +23,23 @@
 //
 package cloud.commandframework.annotations;
 
-import java.lang.reflect.Method;
-import java.util.Collection;
-import org.apiguardian.api.API;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Extractor that extracts {@link FlagDescriptor flag descriptors} from command methods.
- * <p>
- * The flag instances are then assembled by a {@link FlagAssembler}.
- *
- * @since 2.0.0
+ * Equivalent to {@link cloud.commandframework.Command.Builder#permission(String)}
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
-public interface FlagExtractor {
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Permission {
 
     /**
-     * Extracts the flags from the given {@code method}.
+     * Get the command permission
      *
-     * @param method the method
-     * @return the extracted flags
+     * @return Command permission
      */
-    @NonNull Collection<@NonNull FlagDescriptor> extractFlags(@NonNull Method method);
+    @NonNull String value() default "";
 }

@@ -21,40 +21,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.string;
 
-import java.lang.reflect.Parameter;
-import java.util.function.Function;
-import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.STABLE, since = "2.0.0")
-public interface ParameterNameExtractor {
+/**
+ * Processor that intercepts all cloud annotation strings.
+ *
+ * @since 1.7.0
+ */
+@FunctionalInterface
+public interface StringProcessor {
 
     /**
-     * Returns a parameter name extractor that returns {@link Parameter#getName()} without any transformations.
+     * Returns a string processor that simply returns the input string.
      *
-     * @return the extractor
+     * @return no-op string processor
      */
-    static @NonNull ParameterNameExtractor simple() {
-        return Parameter::getName;
+    static @NonNull StringProcessor noOp() {
+        return new NoOpStringProcessor();
     }
 
     /**
-     * Returns a parameter name extractor that transforms {@link Parameter#getName()} using the given {@code transformation}.
+     * Processes the {@code input} string and returns the processed result.
+     * <p>
+     * This should always return a non-{@code null} result. If the input string
+     * isn't applicable to the processor implementation, the original string should
+     * be returned.
      *
-     * @param transformation the name transformation
-     * @return the transformed name
+     * @param input the input string
+     * @return the processed string
      */
-    static @NonNull ParameterNameExtractor withTransformation(@NonNull Function<String, String> transformation) {
-        return parameter -> transformation.apply(parameter.getName());
-    }
+    @NonNull String processString(@NonNull String input);
 
-    /**
-     * Extracts the name from the given {@code parameter}.
-     *
-     * @param parameter the parameter
-     * @return the extracted name
-     */
-    @NonNull String extract(@NonNull Parameter parameter);
+
+    final class NoOpStringProcessor implements StringProcessor {
+
+        @Override
+        public @NonNull String processString(final @NonNull String input) {
+            return input;
+        }
+    }
 }

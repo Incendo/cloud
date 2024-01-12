@@ -31,7 +31,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Injector that injects parameters into CommandMethod annotated
+ * Injector that injects parameters into Command annotated
  * methods
  *
  * @param <C> Command sender type
@@ -57,7 +57,7 @@ public interface ParameterInjector<C, T> {
     }
 
     /**
-     * Attempts to create a value that should then be injected into the CommandMethod
+     * Attempts to create a value that should then be injected into the Command
      * annotated method.
      *
      * <p>If the injector cannot (or shouldn't) create a value, it is free to return {@code null}.</p>

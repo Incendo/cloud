@@ -27,7 +27,7 @@ import cloud.commandframework.CommandDescription;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.BuilderDecorator;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
 import cloud.commandframework.permission.Permission;
@@ -81,7 +81,7 @@ class BuilderDecoratorTest {
 
     static class TestClass {
 
-        @CommandMethod("command")
+        @Command("command")
         public void command() {
         }
     }

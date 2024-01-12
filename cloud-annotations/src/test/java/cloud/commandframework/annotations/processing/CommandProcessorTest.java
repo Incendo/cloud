@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 
-public class CommandMethodProcessorTest {
+public class CommandProcessorTest {
 
     @Test
     void testValidCommandMethodParsing() {
@@ -59,7 +59,7 @@ public class CommandMethodProcessorTest {
 
         // Assert
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("@CommandMethod annotated methods should be non-static (commandMethod)");
+        assertThat(compilation).hadErrorContaining("@Command annotated methods should be non-static (commandMethod)");
     }
 
     @Test
@@ -91,7 +91,7 @@ public class CommandMethodProcessorTest {
 
         // Assert
         assertThat(compilation).succeeded();
-        assertThat(compilation).hadWarningContaining("@CommandMethod annotated methods should be public (commandMethod)");
+        assertThat(compilation).hadWarningContaining("@Command annotated methods should be public (commandMethod)");
     }
 
     @Test
@@ -106,7 +106,7 @@ public class CommandMethodProcessorTest {
 
         // Assert
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("@Argument(\"required\") is missing from @CommandMethod (commandMethod)");
+        assertThat(compilation).hadErrorContaining("@Argument(\"required\") is missing from @Command (commandMethod)");
     }
 
     @Test
@@ -121,7 +121,7 @@ public class CommandMethodProcessorTest {
 
         // Assert
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("Argument 'optional' is missing from the @CommandMethod syntax (commandMethod)");
+        assertThat(compilation).hadErrorContaining("Argument 'optional' is missing from the @Command syntax (commandMethod)");
     }
 
     @Test

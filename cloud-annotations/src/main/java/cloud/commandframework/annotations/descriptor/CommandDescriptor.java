@@ -21,30 +21,51 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.descriptor;
 
-import cloud.commandframework.CommandComponent;
+import cloud.commandframework.annotations.SyntaxFragment;
+import cloud.commandframework.internal.ImmutableBuilder;
+import java.lang.reflect.Method;
+import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
-/**
- * Assembles {@link CommandComponent command componets} from {@link ArgumentDescriptor argument descriptors}.
- *
- * @param <C> the command sender type
- * @since 2.0.0
- */
+@ImmutableBuilder
+@Value.Immutable
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface ArgumentAssembler<C> {
+public interface CommandDescriptor extends Descriptor {
 
     /**
-     * Assembles a command component from the given {@code descriptor}.
+     * Returns the command method.
      *
-     * @param syntaxFragment the syntax fragment for the argument
-     * @param descriptor     the descriptor
-     * @return the assembled command component
+     * @return the command method
      */
-    @NonNull CommandComponent<C> assembleArgument(
-            @NonNull SyntaxFragment syntaxFragment,
-            @NonNull ArgumentDescriptor descriptor
-    );
+    @NonNull Method method();
+
+    @Override
+    default @NonNull String name() {
+        return this.commandToken();
+    }
+
+    /**
+     * Returns an unmodifiable view of the syntax fragments.
+     *
+     * @return the syntax fragments
+     */
+    @NonNull List<@NonNull SyntaxFragment> syntax();
+
+    /**
+     * Returns the root command name.
+     *
+     * @return the name of the root command
+     */
+    @NonNull String commandToken();
+
+    /**
+     * Returns the required sender type.
+     *
+     * @return the required sender type
+     */
+    @NonNull Class<?> requiredSender();
 }

@@ -24,8 +24,8 @@
 package cloud.commandframework.examples.bukkit.annotations.feature;
 
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.annotations.CommandPermission;
+import cloud.commandframework.annotations.Command;
+import cloud.commandframework.annotations.Permission;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
 import org.bukkit.Bukkit;
@@ -48,8 +48,8 @@ public final class PermissionExample implements AnnotationFeature {
         annotationParser.parse(this);
     }
 
-    @CommandPermission("example.annotation.disableplugin")
-    @CommandMethod("annotations disableplugin")
+    @Permission("example.annotation.disableplugin")
+    @Command("annotations disableplugin")
     public void disablePlugin() {
         Bukkit.getServer().getPluginManager().disablePlugin(this.examplePlugin);
     }

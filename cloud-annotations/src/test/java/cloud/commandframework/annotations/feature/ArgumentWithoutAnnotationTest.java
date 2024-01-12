@@ -25,11 +25,11 @@ package cloud.commandframework.annotations.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.annotations.ParameterNameExtractor;
-import cloud.commandframework.annotations.StandardArgumentExtractor;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
+import cloud.commandframework.annotations.extractor.ParameterNameExtractor;
+import cloud.commandframework.annotations.extractor.StandardArgumentExtractor;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandResult;
 import com.google.common.base.CaseFormat;
@@ -74,7 +74,7 @@ class ArgumentWithoutAnnotationTest {
 
     static class TestClass {
 
-        @CommandMethod("command <required> [optional] [optional_but_weird]")
+        @Command("command <required> [optional] [optional_but_weird]")
         public void command(TestCommandSender sender, String required, int optional, boolean optionalButWeird) {
         }
     }

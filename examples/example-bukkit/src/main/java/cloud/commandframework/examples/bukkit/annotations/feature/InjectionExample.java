@@ -25,7 +25,7 @@ package cloud.commandframework.examples.bukkit.annotations.feature;
 
 import cloud.commandframework.annotations.AnnotationAccessor;
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.injection.ParameterInjector;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
@@ -71,7 +71,7 @@ public final class InjectionExample implements AnnotationFeature, ParameterInjec
         annotationParser.parse(this);
     }
 
-    @CommandMethod("annotations whatismygamemode")
+    @Command("annotations whatismygamemode")
     public void gameModeCommand(
             final @NonNull CommandSender sender,
             final @NonNull GameMode gameMode

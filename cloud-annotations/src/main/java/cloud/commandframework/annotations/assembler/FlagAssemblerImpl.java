@@ -21,11 +21,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.assembler;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
+import cloud.commandframework.annotations.descriptor.FlagDescriptor;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserRegistry;
@@ -36,13 +37,20 @@ import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class FlagAssemblerImpl implements FlagAssembler {
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.annotations.*")
+public final class FlagAssemblerImpl implements FlagAssembler {
 
     private final CommandManager<?> commandManager;
 
-    FlagAssemblerImpl(final @NonNull CommandManager<?> commandManager) {
+    /**
+     * Creates a new flag assembler.
+     *
+     * @param commandManager command manager
+     */
+    public FlagAssemblerImpl(final @NonNull CommandManager<?> commandManager) {
         this.commandManager = commandManager;
     }
 

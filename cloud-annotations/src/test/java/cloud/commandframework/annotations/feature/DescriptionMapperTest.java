@@ -27,8 +27,8 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.CommandDescription;
-import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
 import cloud.commandframework.internal.CommandNode;
@@ -70,7 +70,7 @@ class DescriptionMapperTest {
     static class TestClass {
 
         @CommandDescription("some epic description")
-        @CommandMethod("command <argument>")
+        @Command("command <argument>")
         public void command(@Argument(description = "another epic description") String argument) {
         }
     }

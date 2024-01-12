@@ -25,8 +25,8 @@ package cloud.commandframework.examples.bukkit.annotations.feature;
 
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.CommandDescription;
-import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
@@ -54,7 +54,7 @@ public final class FlagExample implements AnnotationFeature {
         annotationParser.parse(this);
     }
 
-    @CommandMethod("annotations give <material> <amount>")
+    @Command("annotations give <material> <amount>")
     @CommandDescription("Give yourself an item")
     public void commandGive(
             final @NonNull Player player,

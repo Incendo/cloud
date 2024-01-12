@@ -21,18 +21,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.assembler;
 
+import cloud.commandframework.annotations.descriptor.FlagDescriptor;
+import cloud.commandframework.arguments.flags.CommandFlag;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+/**
+ * Assembles {@link CommandFlag flags} from {@link FlagDescriptor flag descriptors}.
+ *
+ * @since 2.0.0
+ */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface Descriptor {
+public interface FlagAssembler {
 
     /**
-     * Returns the name of the object described by {@code this} descriptor.
+     * Assembles a flag from the given {@code descriptor}.
      *
-     * @return the name
+     * @param descriptor the descriptor
+     * @return the assembled flag
      */
-    @NonNull String name();
+    @NonNull CommandFlag<?> assembleFlag(@NonNull FlagDescriptor descriptor);
 }

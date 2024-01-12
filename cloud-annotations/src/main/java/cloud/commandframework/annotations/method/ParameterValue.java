@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.annotations.method;
 
-import cloud.commandframework.annotations.Descriptor;
+import cloud.commandframework.annotations.descriptor.Descriptor;
 import cloud.commandframework.internal.ImmutableImpl;
 import java.lang.reflect.Parameter;
 import org.apiguardian.api.API;

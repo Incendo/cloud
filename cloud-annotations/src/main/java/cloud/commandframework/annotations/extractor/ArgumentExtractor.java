@@ -21,8 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.extractor;
 
+import cloud.commandframework.annotations.SyntaxFragment;
+import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;

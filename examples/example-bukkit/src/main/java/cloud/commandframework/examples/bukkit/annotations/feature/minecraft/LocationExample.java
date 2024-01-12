@@ -25,7 +25,7 @@ package cloud.commandframework.examples.bukkit.annotations.feature.minecraft;
 
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.Default;
 import cloud.commandframework.bukkit.parsers.location.Location2D;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
@@ -49,7 +49,7 @@ public final class LocationExample implements AnnotationFeature {
         annotationParser.parse(this);
     }
 
-    @CommandMethod("annotations teleport location <location> [announce]")
+    @Command("annotations teleport location <location> [announce]")
     public void teleportComplex(
             final @NonNull Player sender,
             final @Argument("location") @NonNull Location location,
@@ -61,7 +61,7 @@ public final class LocationExample implements AnnotationFeature {
         }
     }
 
-    @CommandMethod("annotations teleport chunk <chunk>")
+    @Command("annotations teleport chunk <chunk>")
     public void teleportComplex(
             final @NonNull Player sender,
             final @Argument("chunk") @NonNull Location2D chunkCoordinates

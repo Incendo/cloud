@@ -26,7 +26,7 @@ package cloud.commandframework.examples.bukkit.annotations.feature;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
@@ -39,7 +39,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Example of the deletion of root commands. Us showcasing this does NOT mean that we recommend this. Do this at your own risk.
  */
-@CommandMethod("annotations")
+@Command("annotations")
 public final class RootCommandDeletionExample implements AnnotationFeature {
 
     private CommandManager<CommandSender> manager;
@@ -53,7 +53,7 @@ public final class RootCommandDeletionExample implements AnnotationFeature {
         annotationParser.parse(this);
     }
 
-    @CommandMethod("removeall")
+    @Command("removeall")
     public void removeAll(
             final @NonNull CommandSender sender
     ) {
@@ -61,7 +61,7 @@ public final class RootCommandDeletionExample implements AnnotationFeature {
         sender.sendMessage("All root commands have been deleted :)");
     }
 
-    @CommandMethod("removesingle <command>")
+    @Command("removesingle <command>")
     public void removeSingle(
             final @NonNull CommandSender sender,
             final @Argument(value = "command", suggestions = "commands") String command

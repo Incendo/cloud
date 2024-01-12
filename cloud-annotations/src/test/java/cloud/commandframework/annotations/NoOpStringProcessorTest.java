@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
+import cloud.commandframework.annotations.string.StringProcessor;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
