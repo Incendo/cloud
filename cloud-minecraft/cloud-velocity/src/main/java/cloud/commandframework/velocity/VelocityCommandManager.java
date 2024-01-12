@@ -109,11 +109,11 @@ public class VelocityCommandManager<C> extends CommandManager<C>
             final @NonNull SenderMapper<CommandSource, C> senderMapper
     ) {
         super(commandExecutionCoordinator, new VelocityPluginRegistrationHandler<>());
-        ((VelocityPluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
         this.proxyServer = proxyServer;
         this.senderMapper = senderMapper;
-
         this.suggestionFactory = super.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion);
+
+        ((VelocityPluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
 
         /* Register Velocity Preprocessor */
         this.registerCommandPreProcessor(new VelocityCommandPreprocessor<>(this));
