@@ -574,6 +574,32 @@ public class Command<C> {
         }
 
         /**
+         * Returns the result of invoking {@link #commandDescription(CommandDescription)} with the result of
+         * {@link CommandDescription#commandDescription(Description)}.
+         *
+         * @param commandDescription the new command description
+         * @return new builder instance using the provided command description
+         */
+        public @NonNull Builder<C> commandDescription(final @NonNull Description commandDescription) {
+            return this.commandDescription(CommandDescription.commandDescription(commandDescription));
+        }
+
+        /**
+         * Returns the result of invoking {@link #commandDescription(CommandDescription)} with the result of
+         * {@link CommandDescription#commandDescription(Description, Description)}.
+         *
+         * @param commandDescription        the new command description
+         * @param verboseCommandDescription the new verbose command description
+         * @return new builder instance using the provided command description
+         */
+        public @NonNull Builder<C> commandDescription(
+                final @NonNull Description commandDescription,
+                final @NonNull Description verboseCommandDescription
+        ) {
+            return this.commandDescription(CommandDescription.commandDescription(commandDescription, verboseCommandDescription));
+        }
+
+        /**
          * Inserts a required literal into the command chain.
          *
          * @param main    main argument name
