@@ -21,8 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.extractor;
 
+import cloud.commandframework.annotations.AnnotationParser;
+import cloud.commandframework.annotations.Argument;
+import cloud.commandframework.annotations.ArgumentMode;
+import cloud.commandframework.annotations.Default;
+import cloud.commandframework.annotations.DescriptionMapper;
+import cloud.commandframework.annotations.SyntaxFragment;
 import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
 import cloud.commandframework.internal.ImmutableBuilder;
 import java.lang.reflect.Method;
@@ -94,7 +100,7 @@ public abstract class StandardArgumentExtractor implements ArgumentExtractor {
 
     /**
      * Returns the {@link ParameterNameExtractor} which is responsible for mapping parameters to syntax
-     * fragments in the case that a named {@link Argument} annotation is not present.
+     * fragments in the case that a named {@literal @Argument} annotation is not present.
      *
      * @return the parameter name extractor
      */

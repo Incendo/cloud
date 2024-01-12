@@ -21,9 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.assembler;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.annotations.SyntaxFragment;
 import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;

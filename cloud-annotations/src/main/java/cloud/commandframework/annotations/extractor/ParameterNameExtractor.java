@@ -21,32 +21,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.extractor;
 
-import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.List;
+import java.lang.reflect.Parameter;
+import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Extracts {@link ArgumentDescriptor argument descriptors} from {@link Method methods}.
- *
- * @since 2.0.0
- */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface ArgumentExtractor {
+public interface ParameterNameExtractor {
 
     /**
-     * Extracts the arguments from the given {@code method}.
+     * Returns a parameter name extractor that returns {@link Parameter#getName()} without any transformations.
      *
-     * @param syntax the syntax of the command
-     * @param method the method
-     * @return the extracted arguments
+     * @return the extractor
      */
-    @NonNull Collection<@NonNull ArgumentDescriptor> extractArguments(
-            @NonNull List<@NonNull SyntaxFragment> syntax,
-            @NonNull Method method
-    );
+    static @NonNull ParameterNameExtractor simple() {
+        return Parameter::getName;
+    }
+
+    /**
+     * Returns a parameter name extractor that transforms {@link Parameter#getName()} using the given {@code transformation}.
+     *
+     * @param transformation the name transformation
+     * @return the transformed name
+     */
+    static @NonNull ParameterNameExtractor withTransformation(@NonNull Function<String, String> transformation) {
+        return parameter -> transformation.apply(parameter.getName());
+    }
+
+    /**
+     * Extracts the name from the given {@code parameter}.
+     *
+     * @param parameter the parameter
+     * @return the extracted name
+     */
+    @NonNull String extract(@NonNull Parameter parameter);
 }

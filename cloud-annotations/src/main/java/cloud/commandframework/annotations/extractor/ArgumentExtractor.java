@@ -21,26 +21,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.extractor;
 
-import cloud.commandframework.annotations.descriptor.FlagDescriptor;
-import cloud.commandframework.arguments.flags.CommandFlag;
+import cloud.commandframework.annotations.SyntaxFragment;
+import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Assembles {@link CommandFlag flags} from {@link FlagDescriptor flag descriptors}.
+ * Extracts {@link ArgumentDescriptor argument descriptors} from {@link Method methods}.
  *
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface FlagAssembler {
+public interface ArgumentExtractor {
 
     /**
-     * Assembles a flag from the given {@code descriptor}.
+     * Extracts the arguments from the given {@code method}.
      *
-     * @param descriptor the descriptor
-     * @return the assembled flag
+     * @param syntax the syntax of the command
+     * @param method the method
+     * @return the extracted arguments
      */
-    @NonNull CommandFlag<?> assembleFlag(@NonNull FlagDescriptor descriptor);
+    @NonNull Collection<@NonNull ArgumentDescriptor> extractArguments(
+            @NonNull List<@NonNull SyntaxFragment> syntax,
+            @NonNull Method method
+    );
 }

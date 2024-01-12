@@ -21,40 +21,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.extractor;
 
-import java.lang.reflect.Parameter;
-import java.util.function.Function;
+import cloud.commandframework.annotations.assembler.FlagAssembler;
+import cloud.commandframework.annotations.descriptor.FlagDescriptor;
+import java.lang.reflect.Method;
+import java.util.Collection;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+/**
+ * Extractor that extracts {@link FlagDescriptor flag descriptors} from command methods.
+ * <p>
+ * The flag instances are then assembled by a {@link FlagAssembler}.
+ *
+ * @since 2.0.0
+ */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface ParameterNameExtractor {
+public interface FlagExtractor {
 
     /**
-     * Returns a parameter name extractor that returns {@link Parameter#getName()} without any transformations.
+     * Extracts the flags from the given {@code method}.
      *
-     * @return the extractor
+     * @param method the method
+     * @return the extracted flags
      */
-    static @NonNull ParameterNameExtractor simple() {
-        return Parameter::getName;
-    }
-
-    /**
-     * Returns a parameter name extractor that transforms {@link Parameter#getName()} using the given {@code transformation}.
-     *
-     * @param transformation the name transformation
-     * @return the transformed name
-     */
-    static @NonNull ParameterNameExtractor withTransformation(@NonNull Function<String, String> transformation) {
-        return parameter -> transformation.apply(parameter.getName());
-    }
-
-    /**
-     * Extracts the name from the given {@code parameter}.
-     *
-     * @param parameter the parameter
-     * @return the extracted name
-     */
-    @NonNull String extract(@NonNull Parameter parameter);
+    @NonNull Collection<@NonNull FlagDescriptor> extractFlags(@NonNull Method method);
 }

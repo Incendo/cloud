@@ -26,17 +26,28 @@ package cloud.commandframework.annotations;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
+import cloud.commandframework.annotations.assembler.ArgumentAssembler;
+import cloud.commandframework.annotations.assembler.ArgumentAssemblerImpl;
+import cloud.commandframework.annotations.assembler.FlagAssembler;
+import cloud.commandframework.annotations.assembler.FlagAssemblerImpl;
 import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
 import cloud.commandframework.annotations.descriptor.CommandDescriptor;
 import cloud.commandframework.annotations.descriptor.FlagDescriptor;
 import cloud.commandframework.annotations.exception.ExceptionHandler;
 import cloud.commandframework.annotations.exception.ExceptionHandlerFactory;
+import cloud.commandframework.annotations.extractor.ArgumentExtractor;
+import cloud.commandframework.annotations.extractor.CommandExtractor;
+import cloud.commandframework.annotations.extractor.CommandExtractorImpl;
+import cloud.commandframework.annotations.extractor.FlagExtractor;
+import cloud.commandframework.annotations.extractor.FlagExtractorImpl;
+import cloud.commandframework.annotations.extractor.StandardArgumentExtractor;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.injection.RawArgs;
 import cloud.commandframework.annotations.parsers.MethodArgumentParser;
 import cloud.commandframework.annotations.parsers.Parser;
 import cloud.commandframework.annotations.processing.CommandContainer;
 import cloud.commandframework.annotations.processing.CommandContainerProcessor;
+import cloud.commandframework.annotations.string.StringProcessor;
 import cloud.commandframework.annotations.suggestions.SuggestionProviderFactory;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.flags.CommandFlag;
@@ -732,6 +743,17 @@ public final class AnnotationParser<C> {
         return commands;
     }
 
+    /**
+     * Maps the given {@code string} into a {@link Description}.
+     *
+     * @param string description literal
+     * @return the description
+     */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.annotations.*")
+    public @NonNull Description mapDescription(final @NonNull String string) {
+        return this.descriptionMapper.map(this.processString(string));
+    }
+
     private <T> void parseSuggestions(final @NonNull T instance) {
         for (final Method method : instance.getClass().getMethods()) {
             final Suggestions suggestions = method.getAnnotation(Suggestions.class);
@@ -917,9 +939,9 @@ public final class AnnotationParser<C> {
             }
         }
 
-        final CommandPermission commandPermission = getMethodOrClassAnnotation(method, CommandPermission.class);
-        if (commandPermission != null) {
-            builder = builder.permission(this.processString(commandPermission.value()));
+        final Permission permission = getMethodOrClassAnnotation(method, Permission.class);
+        if (permission != null) {
+            builder = builder.permission(this.processString(permission.value()));
         }
 
         if (commandDescriptor.requiredSender() != Object.class) {
@@ -1022,10 +1044,6 @@ public final class AnnotationParser<C> {
                 .filter(fragment -> fragment.getMajor().equals(argumentName))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Argument is not declared in syntax: " + argumentName));
-    }
-
-    @NonNull Description mapDescription(final @NonNull String string) {
-        return this.descriptionMapper.map(this.processString(string));
     }
 
     @NonNull Map<@NonNull Class<@NonNull ? extends Annotation>, AnnotationMapper<?>> annotationMappers() {

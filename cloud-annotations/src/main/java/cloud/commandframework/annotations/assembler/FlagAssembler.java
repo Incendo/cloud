@@ -21,25 +21,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.assembler;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import cloud.commandframework.annotations.descriptor.FlagDescriptor;
+import cloud.commandframework.arguments.flags.CommandFlag;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Equivalent to {@link cloud.commandframework.Command.Builder#permission(String)}
+ * Assembles {@link CommandFlag flags} from {@link FlagDescriptor flag descriptors}.
+ *
+ * @since 2.0.0
  */
-@Target({ElementType.METHOD, ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface CommandPermission {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface FlagAssembler {
 
     /**
-     * Get the command permission
+     * Assembles a flag from the given {@code descriptor}.
      *
-     * @return Command permission
+     * @param descriptor the descriptor
+     * @return the assembled flag
      */
-    @NonNull String value() default "";
+    @NonNull CommandFlag<?> assembleFlag(@NonNull FlagDescriptor descriptor);
 }

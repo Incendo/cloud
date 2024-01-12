@@ -21,9 +21,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.assembler;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.annotations.AnnotationParser;
+import cloud.commandframework.annotations.ArgumentMode;
+import cloud.commandframework.annotations.PreprocessorMapper;
+import cloud.commandframework.annotations.SyntaxFragment;
 import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
 import cloud.commandframework.annotations.specifier.Completions;
 import cloud.commandframework.arguments.ComponentPreprocessor;
@@ -40,14 +44,21 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @SuppressWarnings("unchecked")
-final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.annotations.*")
+public final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
 
     private final AnnotationParser<C> annotationParser;
 
-    ArgumentAssemblerImpl(final @NonNull AnnotationParser<C> annotationParser) {
+    /**
+     * Creates a new argument assembler.
+     *
+     * @param annotationParser annotation parser instance
+     */
+    public ArgumentAssemblerImpl(final @NonNull AnnotationParser<C> annotationParser) {
         this.annotationParser = annotationParser;
     }
 

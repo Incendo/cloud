@@ -21,29 +21,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.string;
 
-import cloud.commandframework.annotations.descriptor.FlagDescriptor;
-import java.lang.reflect.Method;
-import java.util.Collection;
-import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Extractor that extracts {@link FlagDescriptor flag descriptors} from command methods.
- * <p>
- * The flag instances are then assembled by a {@link FlagAssembler}.
+ * Processor that intercepts all cloud annotation strings.
  *
- * @since 2.0.0
+ * @since 1.7.0
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
-public interface FlagExtractor {
+@FunctionalInterface
+public interface StringProcessor {
 
     /**
-     * Extracts the flags from the given {@code method}.
+     * Returns a string processor that simply returns the input string.
      *
-     * @param method the method
-     * @return the extracted flags
+     * @return no-op string processor
      */
-    @NonNull Collection<@NonNull FlagDescriptor> extractFlags(@NonNull Method method);
+    static @NonNull StringProcessor noOp() {
+        return new NoOpStringProcessor();
+    }
+
+    /**
+     * Processes the {@code input} string and returns the processed result.
+     * <p>
+     * This should always return a non-{@code null} result. If the input string
+     * isn't applicable to the processor implementation, the original string should
+     * be returned.
+     *
+     * @param input the input string
+     * @return the processed string
+     */
+    @NonNull String processString(@NonNull String input);
+
+
+    final class NoOpStringProcessor implements StringProcessor {
+
+        @Override
+        public @NonNull String processString(final @NonNull String input) {
+            return input;
+        }
+    }
 }

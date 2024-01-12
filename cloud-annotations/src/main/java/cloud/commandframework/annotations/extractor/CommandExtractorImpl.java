@@ -21,21 +21,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.extractor;
 
+import cloud.commandframework.annotations.AnnotationAccessor;
+import cloud.commandframework.annotations.AnnotationParser;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.descriptor.CommandDescriptor;
 import cloud.commandframework.annotations.descriptor.ImmutableCommandDescriptor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class CommandExtractorImpl implements CommandExtractor {
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.annotations.*")
+public final class CommandExtractorImpl implements CommandExtractor {
 
     private final AnnotationParser<?> annotationParser;
 
-    CommandExtractorImpl(final @NonNull AnnotationParser<?> annotationParser) {
+    /**
+     * Creates a new command extractor.
+     *
+     * @param annotationParser annotation parser
+     */
+    public CommandExtractorImpl(final @NonNull AnnotationParser<?> annotationParser) {
         this.annotationParser = annotationParser;
     }
 

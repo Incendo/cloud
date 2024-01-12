@@ -21,8 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.annotations.extractor;
 
+import cloud.commandframework.annotations.AnnotationParser;
+import cloud.commandframework.annotations.DescriptionMapper;
+import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.annotations.descriptor.FlagDescriptor;
 import cloud.commandframework.permission.Permission;
 import java.lang.reflect.Method;
@@ -30,10 +33,12 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-final class FlagExtractorImpl implements FlagExtractor {
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.annotations.*")
+public final class FlagExtractorImpl implements FlagExtractor {
 
     private static @Nullable String nullIfEmpty(final @NonNull String string) {
         if (string.isEmpty()) {
@@ -45,7 +50,12 @@ final class FlagExtractorImpl implements FlagExtractor {
     private final AnnotationParser<?> annotationParser;
     private final DescriptionMapper descriptionMapper;
 
-    FlagExtractorImpl(final @NonNull AnnotationParser<?> annotationParser) {
+    /**
+     * Creates a new flag extractor.
+     *
+     * @param annotationParser annotation parser
+     */
+    public FlagExtractorImpl(final @NonNull AnnotationParser<?> annotationParser) {
         this.annotationParser = annotationParser;
         this.descriptionMapper = this.annotationParser::mapDescription;
     }

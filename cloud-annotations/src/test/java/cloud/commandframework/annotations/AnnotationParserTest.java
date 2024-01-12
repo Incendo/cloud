@@ -129,13 +129,13 @@ class AnnotationParserTest {
         Assertions.assertNotNull(commandDescription);
         Assertions.assertEquals("Hello World!", commandDescription.value());
 
-        System.out.println("Looking for @CommandPermission");
-        final CommandPermission commandPermission = AnnotationParser.getMethodOrClassAnnotation(
+        System.out.println("Looking for @Permission");
+        final Permission permission = AnnotationParser.getMethodOrClassAnnotation(
                 annotatedMethod,
-                CommandPermission.class
+                Permission.class
         );
-        Assertions.assertNotNull(commandPermission);
-        Assertions.assertEquals("some.permission", commandPermission.value());
+        Assertions.assertNotNull(permission);
+        Assertions.assertEquals("some.permission", permission.value());
 
         System.out.println("Looking for @Command");
         final Command command = AnnotationParser.getMethodOrClassAnnotation(
@@ -270,7 +270,7 @@ class AnnotationParserTest {
         }
     }
 
-    @CommandPermission("some.permission")
+    @Permission("some.permission")
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     private @interface AnnotatedAnnotation {

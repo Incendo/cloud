@@ -25,9 +25,7 @@ package cloud.commandframework.annotations.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.ArgumentExtractor;
 import cloud.commandframework.annotations.ArgumentMode;
-import cloud.commandframework.annotations.CommandExtractor;
 import cloud.commandframework.annotations.SyntaxFragment;
 import cloud.commandframework.annotations.SyntaxParser;
 import cloud.commandframework.annotations.TestCommandManager;
@@ -35,6 +33,8 @@ import cloud.commandframework.annotations.TestCommandSender;
 import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
 import cloud.commandframework.annotations.descriptor.CommandDescriptor;
 import cloud.commandframework.annotations.descriptor.ImmutableCommandDescriptor;
+import cloud.commandframework.annotations.extractor.ArgumentExtractor;
+import cloud.commandframework.annotations.extractor.CommandExtractor;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

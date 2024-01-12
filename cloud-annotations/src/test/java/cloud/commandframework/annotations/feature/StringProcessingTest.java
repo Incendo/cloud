@@ -28,11 +28,11 @@ import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.CommandDescription;
-import cloud.commandframework.annotations.CommandPermission;
 import cloud.commandframework.annotations.Flag;
-import cloud.commandframework.annotations.PropertyReplacingStringProcessor;
+import cloud.commandframework.annotations.Permission;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
+import cloud.commandframework.annotations.string.PropertyReplacingStringProcessor;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.meta.CommandMeta;
@@ -64,7 +64,7 @@ class StringProcessingTest {
     }
 
     @Test
-    @DisplayName("Tests @Command, @CommandPermission, @CommandDescription, @Argument & @Flag")
+    @DisplayName("Tests @Command, @Permission, @CommandDescription, @Argument & @Flag")
     @SuppressWarnings("unchecked")
     void testStringProcessing() {
         // Arrange
@@ -117,7 +117,7 @@ class StringProcessingTest {
     private static class TestClassA {
 
         @CommandDescription("${property.test}")
-        @CommandPermission("${property.test}")
+        @Permission("${property.test}")
         @Command("${property.test} <argument>")
         public void commandA(
                 final TestCommandSender sender,
