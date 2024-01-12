@@ -60,8 +60,8 @@ public final class CompoundArgumentExample implements BuilderFeature {
                         TypeToken.get(Vector.class),
                         Triplet.of("x", "y", "z"),
                         Triplet.of(Integer.class, Integer.class, Integer.class),
-                        (sender, triplet) -> new Vector(triplet.getFirst(), triplet.getSecond(),
-                                triplet.getThird()
+                        (sender, triplet) -> new Vector(triplet.first(), triplet.second(),
+                                triplet.third()
                         ),
                         Description.of("Coordinates")
                 )

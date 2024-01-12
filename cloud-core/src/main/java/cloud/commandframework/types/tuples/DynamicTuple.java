@@ -49,7 +49,7 @@ public final class DynamicTuple implements Tuple {
     }
 
     @Override
-    public int getSize() {
+    public int size() {
         return this.internalArray.length;
     }
 

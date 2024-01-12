@@ -148,20 +148,20 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
         }
 
         /**
-         * Get the input provided by the sender
+         * Returns the input provided by the sender.
          *
-         * @return Input
+         * @return input
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
 
         /**
-         * Get the enum class that was attempted to be parsed
+         * Returns the enum class that was attempted to be parsed.
          *
-         * @return Enum class
+         * @return enum class
          */
-        public @NonNull Class<? extends Enum<?>> getEnumClass() {
+        public @NonNull Class<? extends Enum<?>> enumClass() {
             return this.enumClass;
         }
 

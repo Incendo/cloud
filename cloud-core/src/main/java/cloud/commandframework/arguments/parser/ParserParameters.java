@@ -115,11 +115,11 @@ public final class ParserParameters {
     }
 
     /**
-     * Get an immutable view of the internal map
+     * Returns an immutable view of the internal map.
      *
-     * @return Immutable map
+     * @return immutable map containing all stored parameters
      */
-    public @NonNull Map<@NonNull ParserParameter<?>, @NonNull Object> getAll() {
+    public @NonNull Map<@NonNull ParserParameter<?>, @NonNull Object> parameters() {
         return Collections.unmodifiableMap(this.internalMap);
     }
 }

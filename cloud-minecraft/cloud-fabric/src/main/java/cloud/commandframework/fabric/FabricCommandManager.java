@@ -442,7 +442,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
                 (source, sender, throwable) -> sendError.accept(
                         source,
                         Component.literal("Invalid Command Syntax. Correct command syntax is: ")
-                                .append(Component.literal(String.format("/%s", throwable.getCorrectSyntax()))
+                                .append(Component.literal(String.format("/%s", throwable.correctSyntax()))
                                         .withStyle(style -> style.withColor(ChatFormatting.GRAY)))
                 )
         ));

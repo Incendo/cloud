@@ -140,20 +140,20 @@ public final class FloatParser<C> implements ArgumentParser<C, Float> {
     }
 
     /**
-     * Get the minimum value accepted by this parser
+     * Returns the minimum value accepted by this parser.
      *
-     * @return Min value
+     * @return min value
      */
-    public float getMin() {
+    public float min() {
         return this.min;
     }
 
     /**
-     * Get the maximum value accepted by this parser
+     * Returns the maximum value accepted by this parser.
      *
-     * @return Max value
+     * @return max value
      */
-    public float getMax() {
+    public float max() {
         return this.max;
     }
 
@@ -215,7 +215,7 @@ public final class FloatParser<C> implements ArgumentParser<C, Float> {
         }
 
         @Override
-        public @NonNull String getNumberType() {
+        public @NonNull String numberType() {
             return "float";
         }
 

@@ -107,20 +107,20 @@ public class ParserException extends IllegalArgumentException {
     }
 
     /**
-     * Get the argument parser
+     * Returns the argument parser class.
      *
-     * @return Argument parser
+     * @return argument parser class
      */
-    public final @NonNull Class<?> getArgumentParserClass() {
+    public final @NonNull Class<?> argumentParserClass() {
         return this.argumentParser;
     }
 
     /**
-     * Get the command context
+     * Returns the command context.
      *
-     * @return Command context
+     * @return command context
      */
-    public final @NonNull CommandContext<?> getContext() {
+    public final @NonNull CommandContext<?> context() {
         return this.context;
     }
 }

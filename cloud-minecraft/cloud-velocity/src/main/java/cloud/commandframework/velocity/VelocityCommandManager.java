@@ -231,7 +231,7 @@ public class VelocityCommandManager<C> extends CommandManager<C>
                         Identity.nil(),
                         Component.text()
                                 .append(Component.text("Invalid Command Syntax. Correct command syntax is: ", NamedTextColor.RED))
-                                .append(Component.text(exception.getCorrectSyntax(), NamedTextColor.GRAY))
+                                .append(Component.text(exception.correctSyntax(), NamedTextColor.GRAY))
                                 .build()
                 )
         );

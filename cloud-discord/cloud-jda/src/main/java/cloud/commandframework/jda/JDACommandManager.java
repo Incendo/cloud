@@ -204,7 +204,7 @@ public class JDACommandManager<C> extends CommandManager<C> implements SenderMap
         this.exceptionController().registerHandler(InvalidSyntaxException.class, context -> {
             final String prefix = this.getPrefixMapper().apply(context.context().sender());
             context.context().<MessageChannel>get("MessageChannel").sendMessage(
-                    MESSAGE_INVALID_SYNTAX + prefix + context.exception().getCorrectSyntax()
+                    MESSAGE_INVALID_SYNTAX + prefix + context.exception().correctSyntax()
             ).queue();
         });
     }

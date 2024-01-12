@@ -141,20 +141,20 @@ public final class ShortParser<C> implements ArgumentParser<C, Short>, BlockingS
     }
 
     /**
-     * Get the minimum value accepted by this parser
+     * Returns the minimum value accepted by this parser.
      *
-     * @return Min value
+     * @return min value
      */
-    public short getMin() {
+    public short min() {
         return this.min;
     }
 
     /**
-     * Get the maximum value accepted by this parser
+     * Returns the maximum value accepted by this parser.
      *
-     * @return Max value
+     * @return min value
      */
-    public short getMax() {
+    public short max() {
         return this.max;
     }
 
@@ -224,7 +224,7 @@ public final class ShortParser<C> implements ArgumentParser<C, Short>, BlockingS
         }
 
         @Override
-        public @NonNull String getNumberType() {
+        public @NonNull String numberType() {
             return "short";
         }
 

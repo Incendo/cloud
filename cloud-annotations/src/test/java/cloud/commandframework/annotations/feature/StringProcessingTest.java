@@ -111,7 +111,7 @@ class StringProcessingTest {
 
         final List<CommandFlag<?>> flags = new ArrayList<>(flagParser.flags());
         assertThat(flags).hasSize(1);
-        assertThat(flags.get(0).getName()).isEqualTo(testFlagName);
+        assertThat(flags.get(0).name()).isEqualTo(testFlagName);
     }
 
 

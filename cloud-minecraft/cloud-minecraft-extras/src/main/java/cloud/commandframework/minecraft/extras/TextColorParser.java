@@ -115,17 +115,17 @@ public final class TextColorParser<C> implements ArgumentParser<C, TextColor>, B
             commandInput.moveCursor(1);
             final char code = Character.toLowerCase(commandInput.read());
             for (final Pair<Character, NamedTextColor> pair : COLORS) {
-                if (pair.getFirst() == code) {
-                    return ArgumentParseResult.success(pair.getSecond());
+                if (pair.first() == code) {
+                    return ArgumentParseResult.success(pair.second());
                 }
             }
             // If we didn't match the input, we move back.
             commandInput.moveCursor(-2);
         }
         for (final Pair<Character, NamedTextColor> pair : COLORS) {
-            if (pair.getSecond().toString().equalsIgnoreCase(commandInput.peekString())) {
+            if (pair.second().toString().equalsIgnoreCase(commandInput.peekString())) {
                 commandInput.readString();
-                return ArgumentParseResult.success(pair.getSecond());
+                return ArgumentParseResult.success(pair.second());
             }
         }
         if (HEX_PREDICATE.matcher(commandInput.peekString()).matches()) {

@@ -59,7 +59,7 @@ public final class NoSuchCommandException extends CommandParseException {
     @Override
     public String getMessage() {
         final StringBuilder builder = new StringBuilder();
-        for (final CommandComponent<?> commandComponent : this.getCurrentChain()) {
+        for (final CommandComponent<?> commandComponent : this.currentChain()) {
             if (commandComponent == null) {
                 continue;
             }
@@ -69,11 +69,11 @@ public final class NoSuchCommandException extends CommandParseException {
     }
 
     /**
-     * Get the supplied command
+     * Returns the supplied command.
      *
-     * @return Supplied command
+     * @return supplied command
      */
-    public @NonNull String getSuppliedCommand() {
+    public @NonNull String suppliedCommand() {
         return this.suppliedCommand;
     }
 

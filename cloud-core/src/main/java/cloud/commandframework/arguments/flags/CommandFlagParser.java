@@ -159,7 +159,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
             while (primaryMatcher.find()) {
                 final String name = primaryMatcher.group("name");
                 for (final CommandFlag<?> flag : this.flags) {
-                    if (flag.getName().equalsIgnoreCase(name)) {
+                    if (flag.name().equalsIgnoreCase(name)) {
                         usedFlags.add(flag);
                         break;
                     }
@@ -170,7 +170,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
             while (aliasMatcher.find()) {
                 final String name = aliasMatcher.group("name");
                 for (final CommandFlag<?> flag : this.flags) {
-                    for (final String alias : flag.getAliases()) {
+                    for (final String alias : flag.aliases()) {
                         /* Aliases are single-char strings */
                         if (name.contains(alias)) {
                             usedFlags.add(flag);
@@ -197,7 +197,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                     continue;
                 }
 
-                suggestions.add(Suggestion.simple(String.format("--%s", flag.getName())));
+                suggestions.add(Suggestion.simple(String.format("--%s", flag.name())));
             }
             /* Recommend aliases */
             final boolean suggestCombined = nextToken.length() > 1 && nextToken.startsWith("-") && !nextToken.startsWith("--");
@@ -209,7 +209,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                     continue;
                 }
 
-                for (final String alias : flag.getAliases()) {
+                for (final String alias : flag.aliases()) {
                     if (alias.equalsIgnoreCase(currentFlag)) {
                         continue;
                     }
@@ -230,7 +230,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
             if (lastArg.startsWith("--")) { // --long
                 final String flagName = lastArg.substring(2);
                 for (final CommandFlag<?> flag : this.flags) {
-                    if (flagName.equalsIgnoreCase(flag.getName())) {
+                    if (flagName.equalsIgnoreCase(flag.name())) {
                         currentFlag = flag;
                         break;
                     }
@@ -239,7 +239,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                 final String flagName = lastArg.substring(1);
                 outer:
                 for (final CommandFlag<?> flag : this.flags) {
-                    for (final String alias : flag.getAliases()) {
+                    for (final String alias : flag.aliases()) {
                         if (alias.equalsIgnoreCase(flagName)) {
                             currentFlag = flag;
                             break outer;
@@ -278,11 +278,11 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
         }
 
         /**
-         * Get the caption used for this failure reason
+         * Returns the caption used for this failure reason.
          *
-         * @return The caption
+         * @return the caption
          */
-        public @NonNull Caption getCaption() {
+        public @NonNull Caption caption() {
             return this.caption;
         }
     }
@@ -312,7 +312,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
             super(
                     CommandFlagParser.class,
                     context,
-                    failureReason.getCaption(),
+                    failureReason.caption(),
                     CaptionVariable.of("input", input),
                     CaptionVariable.of("flag", input)
             );
@@ -321,11 +321,11 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
         }
 
         /**
-         * Get the supplied input
+         * Returns the supplied input.
          *
-         * @return String value
+         * @return input
          */
-        public String getInput() {
+        public String input() {
             return this.input;
         }
 
@@ -392,7 +392,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
 
                     if (string.startsWith("--")) {
                         for (final CommandFlag<?> flagCandidate : CommandFlagParser.this.flags) {
-                            if (flagName.equalsIgnoreCase(flagCandidate.getName())) {
+                            if (flagName.equalsIgnoreCase(flagCandidate.name())) {
                                 flag = flagCandidate;
                                 break;
                             }
@@ -400,7 +400,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                     } else if (flagName.length() == 1) {
                         outer:
                         for (final CommandFlag<?> flagCandidate : CommandFlagParser.this.flags) {
-                            for (final String alias : flagCandidate.getAliases()) {
+                            for (final String alias : flagCandidate.aliases()) {
                                 if (alias.equalsIgnoreCase(flagName)) {
                                     flag = flagCandidate;
                                     break outer;
@@ -417,7 +417,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                                     continue;
                                 }
 
-                                if (!candidateFlag.getAliases().contains(parsedFlag)) {
+                                if (!candidateFlag.aliases().contains(parsedFlag)) {
                                     continue;
                                 }
 
@@ -505,7 +505,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                     if (commandInput.isEmpty(true /* ignoreWhitespace */)) {
                         return this.fail(
                                 new FlagParseException(
-                                        flag.getName(),
+                                        flag.name(),
                                         FailureReason.MISSING_ARGUMENT,
                                         commandContext
                                 )

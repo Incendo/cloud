@@ -105,11 +105,11 @@ public final class UUIDParser<C> implements ArgumentParser<C, UUID> {
         }
 
         /**
-         * Get the supplied input
+         * Returns the supplied input.
          *
-         * @return String value
+         * @return string value
          */
-        public String getInput() {
+        public String input() {
             return this.input;
         }
 

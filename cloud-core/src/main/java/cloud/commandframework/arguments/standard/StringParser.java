@@ -244,11 +244,11 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
     }
 
     /**
-     * Get the string mode
+     * Returns the string mode of the parser.
      *
-     * @return String mode
+     * @return string mode
      */
-    public StringParser.@NonNull StringMode getStringMode() {
+    public @NonNull StringMode stringMode() {
         return this.stringMode;
     }
 
@@ -299,20 +299,20 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
 
 
         /**
-         * Get the input provided by the sender
+         * Returns the input provided by the sender.
          *
-         * @return Input
+         * @return input
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
 
         /**
-         * Get the string mode
+         * Returns the string mode.
          *
-         * @return String mode
+         * @return string mode
          */
-        public StringParser.@NonNull StringMode getStringMode() {
+        public @NonNull StringMode stringMode() {
             return this.stringMode;
         }
     }

@@ -165,7 +165,7 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
         );
         this.registerHandler(InvalidSyntaxException.class, (commandSender, throwable) ->
                 commandSender.sendErrorMessage("Invalid Command Syntax. Correct command syntax is: `"
-                        + throwable.getCorrectSyntax() + "`")
+                        + throwable.correctSyntax() + "`")
         );
     }
 

@@ -111,7 +111,7 @@ public final class BrigadierSuggestionFactory<C, S> {
                     cloudSender,
                     this.commandManager
             );
-            command = command.substring(getNodes(senderContext.getLastChild()).get(0).getSecond().getStart());
+            command = command.substring(getNodes(senderContext.getLastChild()).get(0).second().getStart());
         }
 
         /* Remove namespace */

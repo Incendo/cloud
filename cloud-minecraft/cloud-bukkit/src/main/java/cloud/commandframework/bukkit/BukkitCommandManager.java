@@ -396,7 +396,7 @@ public class BukkitCommandManager<C> extends CommandManager<C>
         }).registerHandler(InvalidSyntaxException.class, context -> {
             this.senderMapper.reverse(context.context().sender()).sendMessage(
                     ChatColor.RED + "Invalid Command Syntax. Correct command syntax is: "
-                            + ChatColor.GRAY + context.exception().getCorrectSyntax()
+                            + ChatColor.GRAY + context.exception().correctSyntax()
             );
         });
     }

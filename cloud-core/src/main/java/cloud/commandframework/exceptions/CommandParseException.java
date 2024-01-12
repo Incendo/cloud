@@ -55,20 +55,20 @@ public class CommandParseException extends IllegalArgumentException {
     }
 
     /**
-     * Get the command sender
+     * Returns the command sender.
      *
-     * @return Command sender
+     * @return command sender
      */
-    public @NonNull Object getCommandSender() {
+    public @NonNull Object commandSender() {
         return this.commandSender;
     }
 
     /**
-     * Get the command chain leading up to the exception
+     * Returns the command chain leading up to the exception.
      *
-     * @return Unmodifiable list of command arguments
+     * @return unmodifiable list of command arguments
      */
-    public @NonNull List<@NonNull CommandComponent<?>> getCurrentChain() {
+    public @NonNull List<@NonNull CommandComponent<?>> currentChain() {
         return Collections.unmodifiableList(this.currentChain);
     }
 }

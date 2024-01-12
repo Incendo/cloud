@@ -86,13 +86,13 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
     ) {
         final ParserRegistry<C> parserRegistry = manager.parserRegistry();
         final ArgumentParser<C, U> firstParser = parserRegistry.createParser(
-                TypeToken.get(types.getFirst()),
+                TypeToken.get(types.first()),
                 ParserParameters.empty()
         ).orElseThrow(() ->
                 new IllegalArgumentException(
                         "Could not create parser for primary type"));
         final ArgumentParser<C, V> secondaryParser = parserRegistry.createParser(
-                TypeToken.get(types.getSecond()),
+                TypeToken.get(types.second()),
                 ParserParameters.empty()
         ).orElseThrow(() ->
                 new IllegalArgumentException(

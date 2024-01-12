@@ -55,8 +55,8 @@ public final class ItemStackExample implements BuilderFeature {
                                 Pair.of("item", "amount"),
                                 Pair.of(ProtoItemStack.class, Integer.class),
                                 (sender, pair) -> {
-                                    final ProtoItemStack proto = pair.getFirst();
-                                    final int amount = pair.getSecond();
+                                    final ProtoItemStack proto = pair.first();
+                                    final int amount = pair.second();
                                     return proto.createItemStack(amount, true);
                                 },
                                 Description.of("The ItemStack to give")

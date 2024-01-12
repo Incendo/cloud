@@ -89,7 +89,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      *
      * @return First value
      */
-    public final @NonNull U getFirst() {
+    public final @NonNull U first() {
         return this.first;
     }
 
@@ -98,7 +98,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      *
      * @return Second value
      */
-    public final @NonNull V getSecond() {
+    public final @NonNull V second() {
         return this.second;
     }
 
@@ -107,7 +107,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      *
      * @return Third value
      */
-    public final @NonNull W getThird() {
+    public final @NonNull W third() {
         return this.third;
     }
 
@@ -116,7 +116,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      *
      * @return Fourth value
      */
-    public final @NonNull X getFourth() {
+    public final @NonNull X fourth() {
         return this.fourth;
     }
 
@@ -125,7 +125,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      *
      * @return Fifth value
      */
-    public final @NonNull Y getFifth() {
+    public final @NonNull Y fifth() {
         return this.fifth;
     }
 
@@ -134,20 +134,20 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
         final Quintet<?, ?, ?, ?, ?> quintet = (Quintet<?, ?, ?, ?, ?>) o;
-        return Objects.equals(this.getFirst(), quintet.getFirst())
-                && Objects.equals(this.getSecond(), quintet.getSecond())
-                && Objects.equals(this.getThird(), quintet.getThird())
-                && Objects.equals(this.getFourth(), quintet.getFourth())
-                && Objects.equals(this.getFifth(), quintet.getFifth());
+        return Objects.equals(this.first(), quintet.first())
+                && Objects.equals(this.second(), quintet.second())
+                && Objects.equals(this.third(), quintet.third())
+                && Objects.equals(this.fourth(), quintet.fourth())
+                && Objects.equals(this.fifth(), quintet.fifth());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(this.getFirst(), this.getSecond(), this.getThird(), this.getFourth(), this.getFifth());
+        return Objects.hash(this.first(), this.second(), this.third(), this.fourth(), this.fifth());
     }
 
     @Override
@@ -156,7 +156,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
     }
 
     @Override
-    public final int getSize() {
+    public final int size() {
         return 5;
     }
 

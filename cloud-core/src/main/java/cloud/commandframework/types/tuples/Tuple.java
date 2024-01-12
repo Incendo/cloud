@@ -33,16 +33,16 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface Tuple {
 
     /**
-     * Get the tuple size
+     * Returns the tuple size.
      *
-     * @return Tuple size
+     * @return tuple size
      */
-    int getSize();
+    int size();
 
     /**
-     * Turn the tuple into a type erased array
+     * Turns the tuple into a type erased array.
      *
-     * @return Created array
+     * @return created array
      */
-    @NonNull Object @NonNull [] toArray();
+    @NonNull Object @NonNull[] toArray();
 }

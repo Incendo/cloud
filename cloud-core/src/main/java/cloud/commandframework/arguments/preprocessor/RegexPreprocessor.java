@@ -143,20 +143,20 @@ public final class RegexPreprocessor<C> implements ComponentPreprocessor<C> {
         }
 
         /**
-         * Get the string that failed the verification
+         * Returns the input that failed the verification.
          *
-         * @return Failed string
+         * @return failed input
          */
-        public @NonNull String getFailedString() {
+        public @NonNull String failedInput() {
             return this.failedString;
         }
 
         /**
-         * Get the pattern that caused the string to fail
+         * Returns the pattern that caused the string to fail.
          *
-         * @return Pattern
+         * @return the un-compiled pattern
          */
-        public @NonNull String getPattern() {
+        public @NonNull String pattern() {
             return this.pattern;
         }
     }
