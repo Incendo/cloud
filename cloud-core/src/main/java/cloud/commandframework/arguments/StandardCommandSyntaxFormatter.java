@@ -61,7 +61,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
      *
      * @param manager command manager
      */
-    public StandardCommandSyntaxFormatter(final CommandManager<C> manager) {
+    public StandardCommandSyntaxFormatter(final @NonNull CommandManager<C> manager) {
         this.manager = manager;
     }
 
