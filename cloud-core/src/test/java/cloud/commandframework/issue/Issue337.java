@@ -60,7 +60,7 @@ class Issue337 {
         // Assert
         assertThat(exception).hasCauseThat().isInstanceOf(NoSuchCommandException.class);
         final NoSuchCommandException noSuchCommandException = (NoSuchCommandException) exception.getCause();
-        assertThat(noSuchCommandException.getSuppliedCommand()).isEqualTo("test");
+        assertThat(noSuchCommandException.suppliedCommand()).isEqualTo("test");
         assertThat(noSuchCommandException).hasCauseThat().isNull();
     }
 }

@@ -991,7 +991,7 @@ public final class AnnotationParser<C> {
                         this.findSyntaxFragment(commandDescriptor.syntax(), this.processString(argumentDescriptor.name())),
                         argumentDescriptor
                 )).map(component -> Pair.of(component.name(), component))
-                .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+                .collect(Collectors.toMap(Pair::first, Pair::second));
     }
 
     private @NonNull Command<C> constructProxy(

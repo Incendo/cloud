@@ -178,7 +178,7 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
                 event.respondWith(throwable.getMessage())
         );
         this.registerHandler(InvalidSyntaxException.class, (event, throwable) ->
-                event.respondWith(MESSAGE_INVALID_SYNTAX + this.getCommandPrefix() + throwable.getCorrectSyntax())
+                event.respondWith(MESSAGE_INVALID_SYNTAX + this.getCommandPrefix() + throwable.correctSyntax())
         );
     }
 

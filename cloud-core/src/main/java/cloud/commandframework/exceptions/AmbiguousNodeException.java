@@ -26,6 +26,7 @@ package cloud.commandframework.exceptions;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.internal.CommandNode;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import org.apiguardian.api.API;
@@ -64,30 +65,30 @@ public final class AmbiguousNodeException extends IllegalStateException {
     }
 
     /**
-     * Get the parent node
+     * Returns the parent node.
      *
-     * @return Parent node
+     * @return parent node
      */
-    public @Nullable CommandNode<?> getParentNode() {
+    public @Nullable CommandNode<?> parentNode() {
         return this.parentNode;
     }
 
     /**
-     * Get the ambiguous node
+     * Returns the ambiguous node.
      *
-     * @return Ambiguous node
+     * @return ambiguous node
      */
-    public @NonNull CommandNode<?> getAmbiguousNode() {
+    public @NonNull CommandNode<?> ambiguousNode() {
         return this.ambiguousNode;
     }
 
     /**
-     * Get all children of the parent
+     * Returns all children of the parent.
      *
-     * @return Child nodes
+     * @return child nodes
      */
-    public @NonNull List<@NonNull CommandNode<?>> getChildren() {
-        return this.children;
+    public @NonNull List<@NonNull CommandNode<?>> children() {
+        return Collections.unmodifiableList(this.children);
     }
 
     @Override

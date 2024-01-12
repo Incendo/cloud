@@ -114,12 +114,12 @@ public final class AggregateCommandExample implements BuilderFeature {
                         .senderType(Player.class)
                         .handler(commandContext -> {
                             final Pair<Integer, String> name = commandContext.get("name");
-                            final ItemStack stack = commandContext.sender().getInventory().getItem(name.getFirst());
+                            final ItemStack stack = commandContext.sender().getInventory().getItem(name.first());
                             if (stack == null) {
                                 return;
                             }
                             final ItemMeta meta = stack.getItemMeta();
-                            meta.setDisplayName(name.getSecond());
+                            meta.setDisplayName(name.second());
                             stack.setItemMeta(meta);
                         })
         );

@@ -49,7 +49,7 @@ final class SimpleSuggestion implements Suggestion {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
         final SimpleSuggestion that = (SimpleSuggestion) o;

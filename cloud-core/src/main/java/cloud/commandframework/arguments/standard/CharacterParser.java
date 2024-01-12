@@ -101,11 +101,11 @@ public final class CharacterParser<C> implements ArgumentParser<C, Character> {
         }
 
         /**
-         * Get the supplied input
+         * Returns the supplied input.
          *
-         * @return Input value
+         * @return the input
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
 

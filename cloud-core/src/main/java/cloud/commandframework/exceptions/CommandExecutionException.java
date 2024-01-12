@@ -63,13 +63,13 @@ public class CommandExecutionException extends IllegalArgumentException {
     }
 
     /**
-     * Get the CommandContext which led to this exception
+     * Returns the command context which caused this exception.
      *
      * @return Command
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public @Nullable CommandContext<?> getCommandContext() {
+    public @Nullable CommandContext<?> context() {
         return this.commandContext;
     }
 }

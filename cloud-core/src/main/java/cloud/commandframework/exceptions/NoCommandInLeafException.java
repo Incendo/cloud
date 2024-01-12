@@ -50,11 +50,11 @@ public final class NoCommandInLeafException extends IllegalStateException {
     }
 
     /**
-     * Get the command argument
+     * Returns the command component.
      *
-     * @return Command argument
+     * @return command component
      */
-    public @NonNull CommandComponent<?> getCommandComponent() {
+    public @NonNull CommandComponent<?> commandComponent() {
         return this.commandComponent;
     }
 }

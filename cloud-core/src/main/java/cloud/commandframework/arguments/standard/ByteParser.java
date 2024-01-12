@@ -141,20 +141,20 @@ public final class ByteParser<C> implements ArgumentParser<C, Byte>, BlockingSug
     }
 
     /**
-     * Get the minimum value accepted by this parser
+     * Returns the minimum value accepted by this parser.
      *
-     * @return Min value
+     * @return min value
      */
-    public byte getMin() {
+    public byte min() {
         return this.min;
     }
 
     /**
-     * Get the maximum value accepted by this parser
+     * Returns the maximum value accepted by this parser.
      *
-     * @return Max value
+     * @return max value
      */
-    public byte getMax() {
+    public byte max() {
         return this.max;
     }
 
@@ -224,7 +224,7 @@ public final class ByteParser<C> implements ArgumentParser<C, Byte>, BlockingSug
         }
 
         @Override
-        public @NonNull String getNumberType() {
+        public @NonNull String numberType() {
             return "byte";
         }
 

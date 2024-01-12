@@ -100,7 +100,7 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
                     return Pair.of(command, passedPostprocessing);
                 }, this.parsingExecutor)
                 .thenComposeAsync(preprocessResult -> {
-                    if (!preprocessResult.getSecond()) {
+                    if (!preprocessResult.second()) {
                         return CompletableFuture.completedFuture(CommandResult.of(commandContext));
                     }
 
@@ -114,7 +114,7 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
 
                     CompletableFuture<CommandResult<C>> commandResultFuture = null;
                     try {
-                        commandResultFuture = preprocessResult.getFirst()
+                        commandResultFuture = preprocessResult.first()
                                 .commandExecutionHandler()
                                 .executeFuture(commandContext)
                                 .exceptionally(exception -> {

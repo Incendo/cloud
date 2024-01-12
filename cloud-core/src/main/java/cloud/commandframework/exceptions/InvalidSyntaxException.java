@@ -55,14 +55,13 @@ public class InvalidSyntaxException extends CommandParseException {
     }
 
     /**
-     * Get the correct syntax of the command
+     * Returns the correct syntax of the command.
      *
-     * @return Correct command syntax
+     * @return correct command syntax
      */
-    public @NonNull String getCorrectSyntax() {
+    public @NonNull String correctSyntax() {
         return this.correctSyntax;
     }
-
 
     @Override
     public final String getMessage() {

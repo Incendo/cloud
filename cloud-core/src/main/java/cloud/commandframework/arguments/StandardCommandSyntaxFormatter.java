@@ -236,8 +236,8 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 final @NonNull CommandComponent<?> component,
                 final @NonNull AggregateCommandParser<?, ?> parser
         ) {
-            final String prefix = component.required() ? this.getRequiredPrefix() : this.getOptionalPrefix();
-            final String suffix = component.required() ? this.getRequiredSuffix() : this.getOptionalSuffix();
+            final String prefix = component.required() ? this.requiredPrefix() : this.optionalPrefix();
+            final String suffix = component.required() ? this.requiredSuffix() : this.optionalSuffix();
             this.builder.append(prefix);
 
             final Iterator<? extends CommandComponent<?>> innerComponents = parser.components().iterator();
@@ -259,7 +259,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
          * @param flagParser flag parser
          */
         public void appendFlag(final @NonNull CommandFlagParser<?> flagParser) {
-            this.builder.append(this.getOptionalPrefix());
+            this.builder.append(this.optionalPrefix());
 
             final Iterator<CommandFlag<?>> flagIterator = flagParser
                     .flags()
@@ -267,13 +267,13 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
 
             while (flagIterator.hasNext()) {
                 final CommandFlag<?> flag = flagIterator.next();
-                this.appendName(String.format("--%s", flag.getName()));
+                this.appendName(String.format("--%s", flag.name()));
 
                 if (flag.commandComponent() != null) {
                     this.builder.append(' ');
-                    this.builder.append(this.getOptionalPrefix());
+                    this.builder.append(this.optionalPrefix());
                     this.appendName(flag.commandComponent().name());
-                    this.builder.append(this.getOptionalSuffix());
+                    this.builder.append(this.optionalSuffix());
                 }
 
                 if (flagIterator.hasNext()) {
@@ -283,7 +283,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 }
             }
 
-            this.builder.append(this.getOptionalSuffix());
+            this.builder.append(this.optionalSuffix());
         }
 
         /**
@@ -292,9 +292,9 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
          * @param argument Required argument
          */
         public void appendRequired(final @NonNull CommandComponent<?> argument) {
-            this.builder.append(this.getRequiredPrefix());
+            this.builder.append(this.requiredPrefix());
             this.appendName(argument.name());
-            this.builder.append(this.getRequiredSuffix());
+            this.builder.append(this.requiredSuffix());
         }
 
         /**
@@ -303,9 +303,9 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
          * @param argument Optional argument
          */
         public void appendOptional(final @NonNull CommandComponent<?> argument) {
-            this.builder.append(this.getOptionalPrefix());
+            this.builder.append(this.optionalPrefix());
             this.appendName(argument.name());
-            this.builder.append(this.getOptionalSuffix());
+            this.builder.append(this.optionalSuffix());
         }
 
         /**
@@ -329,7 +329,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
          *
          * @return Required argument prefix
          */
-        public @NonNull String getRequiredPrefix() {
+        public @NonNull String requiredPrefix() {
             return "<";
         }
 
@@ -338,7 +338,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
          *
          * @return Required argument suffix
          */
-        public @NonNull String getRequiredSuffix() {
+        public @NonNull String requiredSuffix() {
             return ">";
         }
 
@@ -347,7 +347,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
          *
          * @return Optional argument prefix
          */
-        public @NonNull String getOptionalPrefix() {
+        public @NonNull String optionalPrefix() {
             return "[";
         }
 
@@ -356,7 +356,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
          *
          * @return Optional argument suffix
          */
-        public @NonNull String getOptionalSuffix() {
+        public @NonNull String optionalSuffix() {
             return "]";
         }
 

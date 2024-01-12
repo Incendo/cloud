@@ -160,7 +160,7 @@ public class BungeeCommandManager<C> extends CommandManager<C> implements Sender
         ).registerHandler(InvalidSyntaxException.class, context -> this.senderMapper.reverse(
                 context.context().sender()).sendMessage(new ComponentBuilder(
                         "Invalid Command Syntax. Correct command syntax is: ").color(ChatColor.RED).append("/")
-                        .color(ChatColor.GRAY).append(context.exception().getCorrectSyntax()).color(ChatColor.GRAY).create()
+                        .color(ChatColor.GRAY).append(context.exception().correctSyntax()).color(ChatColor.GRAY).create()
         ));
     }
 

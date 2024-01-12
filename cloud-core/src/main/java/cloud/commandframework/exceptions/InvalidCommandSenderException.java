@@ -78,11 +78,11 @@ public final class InvalidCommandSenderException extends CommandParseException {
     }
 
     /**
-     * Get the required sender type
+     * Returns the required sender type.
      *
-     * @return Required sender type
+     * @return required sender type
      */
-    public @NonNull Class<?> getRequiredSender() {
+    public @NonNull Class<?> requiredSender() {
         return this.requiredSender;
     }
 
@@ -90,19 +90,19 @@ public final class InvalidCommandSenderException extends CommandParseException {
     public String getMessage() {
         return String.format(
                 "%s is not allowed to execute that command. Must be of type %s",
-                getCommandSender().getClass().getSimpleName(),
+                commandSender().getClass().getSimpleName(),
                 this.requiredSender.getSimpleName()
         );
     }
 
     /**
-     * Get the Command which the sender is invalid for
+     * Returns the Command which the sender is invalid for.
      *
-     * @return Command
+     * @return command
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public @Nullable Command<?> getCommand() {
+    public @Nullable Command<?> command() {
         return this.command;
     }
 }

@@ -156,20 +156,20 @@ public final class BooleanParser<C> implements ArgumentParser<C, Boolean>, Block
 
 
         /**
-         * Get the supplied input
+         * Returns the supplied input.
          *
-         * @return String value
+         * @return supplied input
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
 
         /**
-         * Get the liberal boolean value
+         * Returns whether the parser is liberal.
          *
-         * @return Liberal value
+         * @return {@code true} if the parser is liberal, {@code false} if not
          */
-        public boolean isLiberal() {
+        public boolean liberal() {
             return this.liberal;
         }
 

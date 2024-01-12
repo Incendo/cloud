@@ -178,12 +178,12 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
         }
 
         /**
-         * Get the supplied input string.
+         * Returns the supplied input string.
          *
          * @return input string
          * @since 1.7.0
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
     }

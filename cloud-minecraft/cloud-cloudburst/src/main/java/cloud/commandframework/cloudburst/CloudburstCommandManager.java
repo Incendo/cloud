@@ -144,7 +144,7 @@ public class CloudburstCommandManager<C> extends CommandManager<C> implements Se
                 commandSender.sendMessage(throwable.getMessage())
         );
         this.registerHandler(InvalidSyntaxException.class, (commandSender, throwable) ->
-                commandSender.sendMessage("Invalid Command Syntax. Correct command syntax is: /" + throwable.getCorrectSyntax())
+                commandSender.sendMessage("Invalid Command Syntax. Correct command syntax is: /" + throwable.correctSyntax())
         );
     }
 

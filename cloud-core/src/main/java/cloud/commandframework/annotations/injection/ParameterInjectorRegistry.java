@@ -215,8 +215,8 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
 
     private synchronized <T> @NonNull Collection<@NonNull ParameterInjector<C, ?>> injectors(final @NonNull TypeToken<T> type) {
         return Collections.unmodifiableCollection(this.injectors.stream()
-                .filter(pair -> pair.getFirst().test(type))
-                .map(Pair::getSecond)
+                .filter(pair -> pair.first().test(type))
+                .map(Pair::second)
                 .collect(Collectors.toList()));
     }
 }

@@ -143,7 +143,7 @@ public class SpongeCommandManager<C> extends CommandManager<C> implements Sender
                 source.sendMessage(Text.of(
                         TextColors.RED,
                         "Invalid Command Syntax. Correct command syntax is: ",
-                        Text.of(TextColors.GRAY, throwable.getCorrectSyntax())
+                        Text.of(TextColors.GRAY, throwable.correctSyntax())
                 ))
         );
     }

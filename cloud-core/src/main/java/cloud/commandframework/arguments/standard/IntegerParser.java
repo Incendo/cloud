@@ -193,20 +193,20 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
     }
 
     /**
-     * Get the minimum value accepted by this parser
+     * Returns the minimum value accepted by this parser.
      *
-     * @return Min value
+     * @return min value
      */
-    public int getMin() {
+    public int min() {
         return this.min;
     }
 
     /**
-     * Get the maximum value accepted by this parser
+     * Returns the maximum value accepted by this parser.
      *
-     * @return Max value
+     * @return max value
      */
-    public int getMax() {
+    public int max() {
         return this.max;
     }
 
@@ -276,7 +276,7 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
         }
 
         @Override
-        public @NonNull String getNumberType() {
+        public @NonNull String numberType() {
             return "integer";
         }
 

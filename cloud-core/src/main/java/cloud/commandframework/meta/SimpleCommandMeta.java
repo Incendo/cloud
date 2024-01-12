@@ -93,7 +93,7 @@ public class SimpleCommandMeta extends CommandMeta {
         if (this == other) {
             return true;
         }
-        if (other == null || getClass() != other.getClass()) {
+        if (other == null || this.getClass() != other.getClass()) {
             return false;
         }
         final SimpleCommandMeta that = (SimpleCommandMeta) other;
