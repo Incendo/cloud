@@ -137,6 +137,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     @Override
     public @NonNull String getUsage() {
         return this.manager.commandSyntaxFormatter().apply(
+                null,
                 Collections.singletonList(Objects.requireNonNull(this.namedNode().component())),
                 this.namedNode()
         );
@@ -151,7 +152,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
         final Permission permission = (Permission) node
                 .nodeMeta()
-                .getOrDefault("permission", Permission.empty());
+                .getOrDefault(CommandNode.META_KEY_PERMISSION, Permission.empty());
 
         return this.manager.hasPermission(this.manager.senderMapper().map(target), permission);
     }

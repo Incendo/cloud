@@ -123,6 +123,7 @@ final class CloudCommandCallable<C> implements CommandCallable {
     @Override
     public Text getUsage(final @NonNull CommandSource source) {
         return Text.of(this.manager.commandSyntaxFormatter().apply(
+                this.manager.senderMapper().map(source),
                 Collections.emptyList(),
                 this.manager.commandTree().getNamedNode(this.command.name())
         ));

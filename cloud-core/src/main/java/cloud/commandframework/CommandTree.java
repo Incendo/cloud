@@ -250,7 +250,7 @@ public final class CommandTree<C> {
                 return CompletableFutures.failedFuture(
                         new InvalidSyntaxException(
                                 this.commandManager.commandSyntaxFormatter()
-                                        .apply(parsedArguments, root),
+                                        .apply(commandContext.sender(), parsedArguments, root),
                                 commandContext.sender(), this.getComponentChain(root)
                         )
                 );
@@ -339,7 +339,7 @@ public final class CommandTree<C> {
                     return CompletableFutures.failedFuture(
                             new InvalidSyntaxException(
                                     this.commandManager.commandSyntaxFormatter()
-                                            .apply(parsedArguments, root),
+                                            .apply(commandContext.sender(), parsedArguments, root),
                                     commandContext.sender(), this.getComponentChain(root)
                             )
                     );
@@ -431,7 +431,8 @@ public final class CommandTree<C> {
                     ).components();
                     return CompletableFutures.failedFuture(
                             new InvalidSyntaxException(
-                                    this.commandManager.commandSyntaxFormatter().apply(components, child),
+                                    this.commandManager.commandSyntaxFormatter()
+                                            .apply(commandContext.sender(), components, child),
                                     commandContext.sender(),
                                     this.getComponentChain(root)
                             )
@@ -457,7 +458,7 @@ public final class CommandTree<C> {
                     return CompletableFutures.failedFuture(
                             new InvalidSyntaxException(
                                     this.commandManager.commandSyntaxFormatter()
-                                            .apply(parsedArguments, root),
+                                            .apply(commandContext.sender(), parsedArguments, root),
                                     commandContext.sender(),
                                     this.getComponentChain(root)
                             )
@@ -504,7 +505,8 @@ public final class CommandTree<C> {
                }
                return CompletableFutures.failedFuture(
                        new InvalidSyntaxException(
-                               this.commandManager.commandSyntaxFormatter().apply(parsedArguments, child),
+                               this.commandManager.commandSyntaxFormatter()
+                                       .apply(commandContext.sender(), parsedArguments, child),
                                commandContext.sender(),
                                this.getComponentChain(root)
                        )
@@ -614,7 +616,7 @@ public final class CommandTree<C> {
             final @NonNull Executor executor
     ) {
         // If the sender isn't allowed to access the root node, no suggestions are needed
-        if (this.findMissingPermission(context.commandContext().sender(), root) != null) {
+        if (!this.canAccess(context.commandContext().sender(), root)) {
             return CompletableFuture.completedFuture(context);
         }
 
@@ -698,7 +700,7 @@ public final class CommandTree<C> {
             final @NonNull CommandNode<C> node,
             final @NonNull CommandInput input
     ) {
-        if (this.findMissingPermission(context.commandContext().sender(), node) != null) {
+        if (!this.canAccess(context.commandContext().sender(), node)) {
             return CompletableFuture.completedFuture(context);
         }
         final CommandComponent<C> component = Objects.requireNonNull(node.component());
@@ -976,33 +978,33 @@ public final class CommandTree<C> {
             final @NonNull C sender,
             final @NonNull CommandNode<C> node
     ) {
-        final Permission permission = (Permission) node.nodeMeta().get("permission");
+        final Permission permission = (Permission) node.nodeMeta().get(CommandNode.META_KEY_PERMISSION);
         if (permission != null) {
             return this.commandManager.hasPermission(sender, permission) ? null : permission;
         }
-        if (node.isLeaf()) {
-            final CommandComponent<C> component = Objects.requireNonNull(node.component(), "component");
-            final Command<C> command = Objects.requireNonNull(component.owningCommand(), "command");
-            return this.commandManager.hasPermission(
-                    sender,
-                    command.commandPermission()
-            ) ? null : command.commandPermission();
+        throw new IllegalStateException("Expected permissions to be propagated");
+    }
+
+    /**
+     * Returns {@code true} if the sender matches the type requirements for the node, and
+     * {@link #findMissingPermission(Object, CommandNode)} returns null.
+     *
+     * @param sender command sender
+     * @param node   command node
+     * @return whether the sender can access the node
+     */
+    @SuppressWarnings("unchecked")
+    private boolean canAccess(final @NonNull C sender, final @NonNull CommandNode<C> node) {
+        final Set<Class<?>> types = (Set<Class<?>>) node.nodeMeta().get(CommandNode.META_KEY_SENDER_TYPES);
+        if (types == null) {
+            throw new IllegalStateException("Expected sender type requirements to be propagated");
         }
-        /*
-          if any of the children would permit the execution, then the sender has a valid
-           chain to execute, and so we allow them to execute the root
-         */
-        final List<Permission> missingPermissions = new LinkedList<>();
-        for (final CommandNode<C> child : node.children()) {
-            final Permission check = this.findMissingPermission(sender, child);
-            if (check == null) {
-                return null;
-            } else {
-                missingPermissions.add(check);
+        for (final Class<?> type : types) {
+            if (type.isInstance(sender)) {
+                return this.findMissingPermission(sender, node) == null;
             }
         }
-
-        return Permission.anyOf(missingPermissions);
+        return false;
     }
 
     /**
@@ -1028,27 +1030,32 @@ public final class CommandTree<C> {
             }
         });
 
-        this.getLeavesRaw(this.internalTree).forEach(this::updatePermission);
+        this.getLeavesRaw(this.internalTree).forEach(this::propagateRequirements);
     }
 
     /**
-     * Updates the permission of the given {@code node} by traversing the command tree and calculating the applicable permission.
+     * Propagates permission and sender type requirements from the {@link Command} owning the {@code leafNode}'s component down
+     * the tree, merging as is appropriate for nodes shared by multiple chains.
      *
-     * @param node the command node
+     * @param leafNode leafNode
      */
-    private void updatePermission(final @NonNull CommandNode<C> node) {
-        // noinspection all
-        final Permission commandPermission = node.component().owningCommand().commandPermission();
+    @SuppressWarnings("unchecked")
+    private void propagateRequirements(final @NonNull CommandNode<C> leafNode) {
+        final Permission commandPermission = leafNode.component().owningCommand().commandPermission();
+        Class<?> senderType = leafNode.component().owningCommand().senderType().orElse(null);
+        if (senderType == null) {
+            senderType = Object.class;
+        }
         /* All leaves must necessarily have an owning command */
-        node.nodeMeta().put("permission", commandPermission);
+        leafNode.nodeMeta().put(CommandNode.META_KEY_PERMISSION, commandPermission);
+        leafNode.nodeMeta().put(CommandNode.META_KEY_SENDER_TYPES, new HashSet<>(Collections.singletonList(senderType)));
         // Get chain and order it tail->head then skip the tail (leaf node)
-        List<CommandNode<C>> chain = this.getChain(node);
+        List<CommandNode<C>> chain = this.getChain(leafNode);
         Collections.reverse(chain);
         chain = chain.subList(1, chain.size());
         // Go through all nodes from the tail upwards until a collision occurs
         for (final CommandNode<C> commandArgumentNode : chain) {
-            final Permission existingPermission = (Permission) commandArgumentNode.nodeMeta()
-                    .get("permission");
+            final Permission existingPermission = (Permission) commandArgumentNode.nodeMeta().get(CommandNode.META_KEY_PERMISSION);
 
             Permission permission;
             if (existingPermission != null) {
@@ -1067,7 +1074,11 @@ public final class CommandTree<C> {
                 }
             }
 
-            commandArgumentNode.nodeMeta().put("permission", permission);
+            commandArgumentNode.nodeMeta().put(CommandNode.META_KEY_PERMISSION, permission);
+
+            final Set<Class<?>> senderTypes = (Set<Class<?>>) commandArgumentNode.nodeMeta()
+                    .computeIfAbsent(CommandNode.META_KEY_SENDER_TYPES, $ -> new HashSet<>());
+            senderTypes.add(senderType);
         }
     }
 
