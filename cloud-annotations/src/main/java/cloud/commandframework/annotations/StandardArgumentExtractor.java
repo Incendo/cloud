@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
+import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
 import cloud.commandframework.internal.ImmutableBuilder;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;

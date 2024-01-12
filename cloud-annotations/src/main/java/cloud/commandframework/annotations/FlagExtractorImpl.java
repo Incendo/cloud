@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
+import cloud.commandframework.annotations.descriptor.FlagDescriptor;
 import cloud.commandframework.permission.Permission;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;

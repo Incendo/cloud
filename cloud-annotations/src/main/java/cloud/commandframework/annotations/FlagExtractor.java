@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
+import cloud.commandframework.annotations.descriptor.FlagDescriptor;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import org.apiguardian.api.API;

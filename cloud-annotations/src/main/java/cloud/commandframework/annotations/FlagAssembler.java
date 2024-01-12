@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
+import cloud.commandframework.annotations.descriptor.FlagDescriptor;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;

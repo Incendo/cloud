@@ -24,6 +24,7 @@
 package cloud.commandframework.annotations;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

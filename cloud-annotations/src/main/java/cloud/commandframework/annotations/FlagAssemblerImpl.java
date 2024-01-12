@@ -26,6 +26,7 @@ package cloud.commandframework.annotations;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
+import cloud.commandframework.annotations.descriptor.FlagDescriptor;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserRegistry;

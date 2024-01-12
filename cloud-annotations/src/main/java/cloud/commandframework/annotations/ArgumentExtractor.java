@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
+import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;

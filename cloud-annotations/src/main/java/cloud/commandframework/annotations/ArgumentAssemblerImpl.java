@@ -24,6 +24,7 @@
 package cloud.commandframework.annotations;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
 import cloud.commandframework.annotations.specifier.Completions;
 import cloud.commandframework.arguments.ComponentPreprocessor;
 import cloud.commandframework.arguments.DefaultValue;
