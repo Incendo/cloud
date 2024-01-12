@@ -38,7 +38,6 @@ import cloud.commandframework.arguments.standard.LongParser;
 import cloud.commandframework.arguments.standard.ShortParser;
 import cloud.commandframework.arguments.standard.StringArrayParser;
 import cloud.commandframework.arguments.standard.StringParser;
-import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.ArgumentTypeFactory;
 import cloud.commandframework.brigadier.argument.BrigadierMapping;
@@ -91,13 +90,11 @@ public final class CloudBrigadierManager<C, S> implements SenderMapperHolder<S, 
      *
      * @param commandManager        Command manager
      * @param dummyContextProvider  Provider of dummy context for completions
-     * @param suggestionFactory     The factory that produces suggestions
      * @param brigadierSourceMapper Mapper between the Brigadier command source type and cloud command sender type
      */
     public CloudBrigadierManager(
             final @NonNull CommandManager<C> commandManager,
             final @NonNull Supplier<@NonNull CommandContext<C>> dummyContextProvider,
-            final @NonNull SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory,
             final @NonNull SenderMapper<S, C> brigadierSourceMapper
     ) {
         this.brigadierSourceMapper = Objects.requireNonNull(brigadierSourceMapper, "brigadierSourceMapper");
@@ -106,7 +103,7 @@ public final class CloudBrigadierManager<C, S> implements SenderMapperHolder<S, 
                 this,
                 commandManager,
                 dummyContextProvider,
-                suggestionFactory
+                commandManager.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion)
         );
         this.registerInternalMappings();
         commandManager.registerCommandPreProcessor(ctx -> {

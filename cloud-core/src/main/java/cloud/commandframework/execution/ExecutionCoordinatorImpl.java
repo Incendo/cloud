@@ -24,6 +24,7 @@
 package cloud.commandframework.execution;
 
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.Suggestions;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -149,7 +150,7 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
     }
 
     @Override
-    public @NonNull CompletableFuture<@NonNull Suggestions<C, ?>> coordinateSuggestions(
+    public @NonNull CompletableFuture<@NonNull Suggestions<C, Suggestion>> coordinateSuggestions(
             final @NonNull CommandTree<C> commandTree,
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput

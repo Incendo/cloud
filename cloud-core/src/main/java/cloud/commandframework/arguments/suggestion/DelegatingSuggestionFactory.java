@@ -34,7 +34,6 @@ import cloud.commandframework.setting.ManagerSetting;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -42,51 +41,55 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Command suggestion engine that delegates to a {@link cloud.commandframework.CommandTree}
  *
  * @param <C> command sender type
- * @param <S> suggestion type
  */
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-final class DelegatingSuggestionFactory<C, S extends Suggestion> implements SuggestionFactory<C, S> {
+public final class DelegatingSuggestionFactory<C> implements SuggestionFactory<C, Suggestion> {
 
     private static final List<Suggestion> SINGLE_EMPTY_SUGGESTION =
             Collections.singletonList(Suggestion.simple(""));
 
     private final CommandManager<C> commandManager;
     private final CommandTree<C> commandTree;
-    private final SuggestionMapper<S> suggestionMapper;
     private final CommandContextFactory<C> contextFactory;
     private final ExecutionCoordinator<C> executionCoordinator;
 
-    DelegatingSuggestionFactory(
+    /**
+     * Creates a new {@link DelegatingSuggestionFactory}.
+     *
+     * @param commandManager       the command manager
+     * @param commandTree          the command tree
+     * @param contextFactory       the context factory
+     * @param executionCoordinator the execution coordinator
+     */
+    public DelegatingSuggestionFactory(
             final @NonNull CommandManager<C> commandManager,
             final @NonNull CommandTree<C> commandTree,
-            final @NonNull SuggestionMapper<S> suggestionMapper,
             final @NonNull CommandContextFactory<C> contextFactory,
             final @NonNull ExecutionCoordinator<C> executionCoordinator
     ) {
         this.commandManager = commandManager;
         this.commandTree = commandTree;
-        this.suggestionMapper = suggestionMapper;
         this.contextFactory = contextFactory;
         this.executionCoordinator = executionCoordinator;
     }
 
     @Override
-    public @NonNull CompletableFuture<@NonNull Suggestions<C, S>> suggest(
+    public @NonNull CompletableFuture<@NonNull Suggestions<C, Suggestion>> suggest(
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {
-        return this.suggestFromTree(context, input)
-                .thenApply(suggestions -> Suggestions.create(suggestions.commandContext(), suggestions.list().stream()
-                        .map(this.suggestionMapper::map)
-                        .collect(Collectors.toList()), suggestions.commandInput()));
+        return this.suggestFromTree(context, input);
     }
 
     @Override
-    public @NonNull CompletableFuture<@NonNull Suggestions<C, S>> suggest(final @NonNull C sender, final @NonNull String input) {
+    public @NonNull CompletableFuture<@NonNull Suggestions<C, Suggestion>> suggest(
+            final @NonNull C sender,
+            final @NonNull String input
+    ) {
         return this.suggest(this.contextFactory.create(true /* suggestions */, sender), input);
     }
 
-    private @NonNull CompletableFuture<@NonNull Suggestions<C, ?>> suggestFromTree(
+    private @NonNull CompletableFuture<@NonNull Suggestions<C, Suggestion>> suggestFromTree(
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {

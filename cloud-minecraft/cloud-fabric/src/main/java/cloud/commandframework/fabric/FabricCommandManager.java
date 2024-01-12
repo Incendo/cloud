@@ -175,7 +175,6 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
                         this.senderMapper.map(dummyCommandSourceProvider.get()),
                         this
                 ),
-                this.suggestionFactory(),
                 this.senderMapper
         );
 

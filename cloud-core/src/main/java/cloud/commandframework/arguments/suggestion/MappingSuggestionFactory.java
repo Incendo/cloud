@@ -56,6 +56,12 @@ final class MappingSuggestionFactory<C, S extends Suggestion> implements Suggest
         return this.map(this.other.suggest(sender, input));
     }
 
+    @Override
+    public @NonNull <S2 extends Suggestion> SuggestionFactory<C, S2> mapped(final @NonNull SuggestionMapper<S2> mapper) {
+        final SuggestionMapper<S> mapper0 = this.suggestionMapper;
+        return new MappingSuggestionFactory<>(this.other, s -> mapper.map(mapper0.map(s)));
+    }
+
     private <S1 extends Suggestion> @NonNull CompletableFuture<@NonNull Suggestions<C, S>> map(
             final @NonNull CompletableFuture<Suggestions<C, S1>> future
     ) {

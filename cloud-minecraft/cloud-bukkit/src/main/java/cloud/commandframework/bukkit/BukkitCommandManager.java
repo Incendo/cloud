@@ -28,11 +28,8 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.SenderMapper;
 import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionMapper;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
-import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.bukkit.annotation.specifier.AllowEmptySelection;
 import cloud.commandframework.bukkit.annotation.specifier.DefaultNamespace;
 import cloud.commandframework.bukkit.annotation.specifier.RequireExplicitNamespace;
@@ -209,21 +206,6 @@ public class BukkitCommandManager<C> extends CommandManager<C>
     @Override
     public final @NonNull SenderMapper<CommandSender, C> senderMapper() {
         return this.senderMapper;
-    }
-
-    /**
-     * Sets the suggestion mapper.
-     * <p>
-     * If you're using Brigadier and you want to be able to use suggestions with tooltips, then
-     * your suggestion mapper should output {@link TooltipSuggestion}.
-     *
-     * @param <S>              the custom type
-     * @param suggestionMapper the suggestion mapper
-     * @since 2.0.0
-     */
-    @Override
-    public <S extends Suggestion> void suggestionMapper(final @NonNull SuggestionMapper<S> suggestionMapper) {
-        super.suggestionMapper(suggestionMapper);
     }
 
     @Override

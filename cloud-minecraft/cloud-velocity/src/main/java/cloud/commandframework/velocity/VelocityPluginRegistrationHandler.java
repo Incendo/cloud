@@ -50,7 +50,6 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                                         .getConsoleCommandSource()),
                         velocityCommandManager
                 ),
-                velocityCommandManager.suggestionFactory(),
                 velocityCommandManager.senderMapper()
         );
     }
