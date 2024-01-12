@@ -50,7 +50,7 @@ spongeApi7 = "7.3.0"
 jetbrainsAnnotations = "24.1.0"
 fabricMinecraft = "1.20.4"
 fabricLoader = "0.15.3"
-fabricApi = "0.93.0+1.20.4"
+fabricApi = "0.93.1+1.20.4"
 fabricPermissionsApi = "0.2-SNAPSHOT"
 
 # testing
