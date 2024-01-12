@@ -24,6 +24,7 @@
 package cloud.commandframework.annotations.processing;
 
 import cloud.commandframework.annotations.AnnotationParser;
+import cloud.commandframework.annotations.Command;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -31,7 +32,7 @@ import java.lang.annotation.Target;
 
 /**
  * Indicates that the class contains
- * {@link cloud.commandframework.annotations.CommandMethod command metods}.
+ * {@link Command command metods}.
  * <p>
  * If using <i>cloud-annotations</i> as an annotation processor, then the class will
  * be listed in a special file under META-INF. These containers can be collectively

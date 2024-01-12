@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.annotations.processing;
 
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -33,7 +33,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 
-@SupportedAnnotationTypes(CommandMethod.ANNOTATION_PATH)
+@SupportedAnnotationTypes(Command.ANNOTATION_PATH)
 public final class CommandMethodProcessor extends AbstractProcessor {
 
     @Override
@@ -41,14 +41,14 @@ public final class CommandMethodProcessor extends AbstractProcessor {
             final Set<? extends TypeElement> annotations,
             final RoundEnvironment roundEnv
     ) {
-        final Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(CommandMethod.class);
+        final Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Command.class);
         if (elements.isEmpty()) {
             return false; // Nothing to process...
         }
 
         for (final Element element : elements) {
             if (element.getKind() != ElementKind.METHOD) {
-                // @CommandMethod can also be used on classes, but there's
+                // @Command can also be used on classes, but there's
                 // essentially nothing to process there...
                 continue;
             }

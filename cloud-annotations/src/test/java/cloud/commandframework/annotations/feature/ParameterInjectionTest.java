@@ -25,7 +25,7 @@ package cloud.commandframework.annotations.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
 import cloud.commandframework.annotations.injection.ParameterInjector;
@@ -77,7 +77,7 @@ class ParameterInjectionTest {
 
     static class TestClass {
 
-        @CommandMethod("command")
+        @Command("command")
         public void injectedMethod(
                 final @NonNull CommandContext<?> context,
                 final Integer integer,

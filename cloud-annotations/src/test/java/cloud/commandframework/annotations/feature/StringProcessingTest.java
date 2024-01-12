@@ -23,12 +23,11 @@
 //
 package cloud.commandframework.annotations.feature;
 
-import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.CommandDescription;
-import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.CommandPermission;
 import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.annotations.PropertyReplacingStringProcessor;
@@ -65,7 +64,7 @@ class StringProcessingTest {
     }
 
     @Test
-    @DisplayName("Tests @CommandMethod, @CommandPermission, @CommandDescription, @Argument & @Flag")
+    @DisplayName("Tests @Command, @CommandPermission, @CommandDescription, @Argument & @Flag")
     @SuppressWarnings("unchecked")
     void testStringProcessing() {
         // Arrange
@@ -94,10 +93,10 @@ class StringProcessingTest {
         this.annotationParser.parse(testClassA);
 
         // Assert
-        final List<Command<TestCommandSender>> commands = new ArrayList<>(this.commandManager.commands());
+        final List<cloud.commandframework.Command<TestCommandSender>> commands = new ArrayList<>(this.commandManager.commands());
         assertThat(commands).hasSize(1);
 
-        final Command<TestCommandSender> command = commands.get(0);
+        final cloud.commandframework.Command<TestCommandSender> command = commands.get(0);
         assertThat(command.toString()).isEqualTo(String.format("%s argument flags", testProperty));
         assertThat(command.commandPermission().permissionString()).isEqualTo(testProperty);
         assertThat(command.commandDescription().description().textDescription()).isEqualTo(testProperty);
@@ -119,7 +118,7 @@ class StringProcessingTest {
 
         @CommandDescription("${property.test}")
         @CommandPermission("${property.test}")
-        @CommandMethod("${property.test} <argument>")
+        @Command("${property.test} <argument>")
         public void commandA(
                 final TestCommandSender sender,
                 @Argument("${property.arg}") final String arg,

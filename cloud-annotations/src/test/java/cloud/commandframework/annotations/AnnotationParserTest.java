@@ -23,7 +23,6 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.parsers.Parser;
 import cloud.commandframework.annotations.specifier.Greedy;
@@ -66,7 +65,7 @@ class AnnotationParserTest {
 
     private CommandManager<TestCommandSender> manager;
     private AnnotationParser<TestCommandSender> annotationParser;
-    private Collection<Command<TestCommandSender>> commands;
+    private Collection<cloud.commandframework.Command<TestCommandSender>> commands;
 
     @BeforeAll
     void setup() {
@@ -138,13 +137,13 @@ class AnnotationParserTest {
         Assertions.assertNotNull(commandPermission);
         Assertions.assertEquals("some.permission", commandPermission.value());
 
-        System.out.println("Looking for @CommandMethod");
-        final CommandMethod commandMethod = AnnotationParser.getMethodOrClassAnnotation(
+        System.out.println("Looking for @Command");
+        final Command command = AnnotationParser.getMethodOrClassAnnotation(
                 annotatedMethod,
-                CommandMethod.class
+                Command.class
         );
-        Assertions.assertNotNull(commandMethod);
-        Assertions.assertEquals("method", commandMethod.value());
+        Assertions.assertNotNull(command);
+        Assertions.assertEquals("method", command.value());
 
         System.out.println("Looking for @Regex");
         @SuppressWarnings("unused") final Regex regex = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod, Regex.class);
@@ -184,10 +183,10 @@ class AnnotationParserTest {
     @Test
     @SuppressWarnings("unchecked_cast")
     void testMultiAliasedCommands() {
-        final Collection<Command<TestCommandSender>> commands = annotationParser.parse(new AliasedCommands());
+        final Collection<cloud.commandframework.Command<TestCommandSender>> commands = annotationParser.parse(new AliasedCommands());
 
         // Find the root command that we are looking for.
-        for (final Command<TestCommandSender> command : commands) {
+        for (final cloud.commandframework.Command<TestCommandSender> command : commands) {
             if (command.rootComponent().aliases().contains("acommand")) {
                 assertThat(command.rootComponent().aliases()).containsExactly("acommand", "analias", "anotheralias");
 
@@ -214,13 +213,13 @@ class AnnotationParserTest {
     }
 
     @IntegerArgumentInjector
-    @CommandMethod("injected")
+    @Command("injected")
     public void injectedCommand(final CommandContext<TestCommandSender> context) {
         System.out.printf("Got an integer: %d\n", context.<Integer>get("number"));
     }
 
     @ProxiedBy("proxycommand")
-    @CommandMethod("test|t literal <int> [string]")
+    @Command("test|t literal <int> [string]")
     public void testCommand(
             final TestCommandSender sender,
             @Argument("int") @Range(max = "100") final int argument,
@@ -229,7 +228,7 @@ class AnnotationParserTest {
         System.out.printf("Received int: %d and string '%s'\n", argument, string);
     }
 
-    @CommandMethod("flagcommand")
+    @Command("flagcommand")
     public void testFlags(
             final TestCommandSender sender,
             @Flag(value = "print", aliases = "p") final boolean print,
@@ -240,7 +239,7 @@ class AnnotationParserTest {
         }
     }
 
-    @CommandMethod("parserflagcommand")
+    @Command("parserflagcommand")
     public void testQuotedFlags(
             final TestCommandSender sender,
             @Flag(value = "sentence", aliases = "s") @Quoted final String sentence,
@@ -249,23 +248,23 @@ class AnnotationParserTest {
         System.out.println(sentence + (otherStuff == null ? "" : " " + otherStuff));
     }
 
-    @CommandMethod("namedsuggestions <input>")
+    @Command("namedsuggestions <input>")
     public void testNamedSuggestionProviders(
             @Argument(value = "input", suggestions = "some-name") final String argument
     ) {
     }
 
-    @CommandMethod("inject")
+    @Command("inject")
     public void testInjectedParameters(
             final InjectableValue injectableValue
     ) {
         System.out.printf("Injected value: %s\n", injectableValue.toString());
     }
 
-    @CommandMethod("class")
+    @Command("class")
     private static class ClassCommandMethod {
 
-        @CommandMethod("method")
+        @Command("method")
         public void annotatedMethod() {
             System.out.println("kekw");
         }
@@ -283,7 +282,7 @@ class AnnotationParserTest {
     @CommandDescription("Hello World!")
     private static class AnnotatedClass {
 
-        @CommandMethod("method")
+        @Command("method")
         @AnnotatedAnnotation
         public static void annotatedMethod() {
         }
@@ -353,15 +352,15 @@ class AnnotationParserTest {
 
         private static final String COMMAND_ALIASES = "acommand|analias|anotheralias";
 
-        @CommandMethod("acommand")
+        @Command("acommand")
         public void commandOne() {
         }
 
-        @CommandMethod(COMMAND_ALIASES + " sub1")
+        @Command(COMMAND_ALIASES + " sub1")
         public void commandTwo() {
         }
 
-        @CommandMethod(COMMAND_ALIASES + " sub2")
+        @Command(COMMAND_ALIASES + " sub2")
         public void commandThree() {
         }
     }

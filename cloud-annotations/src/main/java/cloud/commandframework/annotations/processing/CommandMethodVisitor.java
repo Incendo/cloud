@@ -26,7 +26,7 @@ package cloud.commandframework.annotations.processing;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.ArgumentMode;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.SyntaxFragment;
 import cloud.commandframework.annotations.SyntaxParserImpl;
 import java.util.ArrayList;
@@ -86,7 +86,7 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
             this.processingEnvironment.getMessager().printMessage(
                     Diagnostic.Kind.WARNING,
                     String.format(
-                            "@CommandMethod annotated methods should be public (%s)",
+                            "@Command annotated methods should be public (%s)",
                             e.getSimpleName()
                     ),
                     e
@@ -97,7 +97,7 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
             this.processingEnvironment.getMessager().printMessage(
                     Diagnostic.Kind.ERROR,
                     String.format(
-                            "@CommandMethod annotated methods should be non-static (%s)",
+                            "@Command annotated methods should be non-static (%s)",
                             e.getSimpleName()
                     ),
                     e
@@ -108,7 +108,7 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
             this.processingEnvironment.getMessager().printMessage(
                     Diagnostic.Kind.ERROR,
                     String.format(
-                            "@CommandMethod annotated methods should return void (%s)",
+                            "@Command annotated methods should return void (%s)",
                             e.getSimpleName()
                     ),
                     e
@@ -116,8 +116,8 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
         }
 
 
-        final CommandMethod[] commandMethods = e.getAnnotationsByType(CommandMethod.class);
-        for (final CommandMethod commandMethod : commandMethods) {
+        final Command[] commands = e.getAnnotationsByType(Command.class);
+        for (final Command command : commands) {
             final List<String> annotatedArgumentNames = e.getParameters()
                     .stream()
                     .map(parameter -> parameter.getAnnotation(Argument.class))
@@ -137,7 +137,7 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
                     .forEach(parameterArgumentNames::add);
 
             final List<String> parsedArgumentNames = new ArrayList<>(parameterArgumentNames.size());
-            final List<SyntaxFragment> syntaxFragments = this.syntaxParser.parseSyntax(null, commandMethod.value());
+            final List<SyntaxFragment> syntaxFragments = this.syntaxParser.parseSyntax(null, command.value());
 
             boolean foundOptional = false;
             for (final SyntaxFragment fragment : syntaxFragments) {
@@ -149,7 +149,7 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
                     this.processingEnvironment.getMessager().printMessage(
                             Diagnostic.Kind.ERROR,
                             String.format(
-                                    "@Argument(\"%s\") is missing from @CommandMethod (%s)",
+                                    "@Argument(\"%s\") is missing from @Command (%s)",
                                     fragment.getMajor(),
                                     e.getSimpleName()
                             ),
@@ -181,7 +181,7 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
                     this.processingEnvironment.getMessager().printMessage(
                             Diagnostic.Kind.ERROR,
                             String.format(
-                                    "Argument '%s' is missing from the @CommandMethod syntax (%s)",
+                                    "Argument '%s' is missing from the @Command syntax (%s)",
                                     argument,
                                     e.getSimpleName()
                             ),

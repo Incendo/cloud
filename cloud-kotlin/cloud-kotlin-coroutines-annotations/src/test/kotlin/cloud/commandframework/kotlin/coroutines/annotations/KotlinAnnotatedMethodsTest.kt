@@ -26,7 +26,7 @@ package cloud.commandframework.kotlin.coroutines.annotations
 import cloud.commandframework.CommandManager
 import cloud.commandframework.annotations.AnnotationParser
 import cloud.commandframework.annotations.Argument
-import cloud.commandframework.annotations.CommandMethod
+import cloud.commandframework.annotations.Command
 import cloud.commandframework.annotations.suggestions.Suggestions
 import cloud.commandframework.arguments.suggestion.Suggestion
 import cloud.commandframework.context.CommandContext
@@ -145,16 +145,16 @@ class KotlinAnnotatedMethodsTest {
 
     public class CommandMethods {
 
-        @CommandMethod("test")
+        @Command("test")
         public suspend fun suspendingCommand(): Unit =
             withContext(Dispatchers.Default) {
                 println("called from thread: ${Thread.currentThread().name}")
             }
 
-        @CommandMethod("test-exception")
+        @Command("test-exception")
         public suspend fun suspendingCommandWithException(): Unit = throw IllegalStateException()
 
-        @CommandMethod("with-default [value]")
+        @Command("with-default [value]")
         public fun commandWithDefault(@Argument("value") value: Int = 5, context: CommandContext<TestCommandSender>) {
             context["the-value"] = value
         }

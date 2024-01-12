@@ -25,8 +25,8 @@ package cloud.commandframework.examples.bukkit.annotations.feature;
 
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.CommandDescription;
-import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.Regex;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionProvider;
@@ -61,7 +61,7 @@ public final class RegexExample implements AnnotationFeature {
         ));
     }
 
-    @CommandMethod("annotations pay <money>")
+    @Command("annotations pay <money>")
     @CommandDescription("Command to test the preprocessing system")
     public void commandPay(
             final @NonNull CommandSender sender,

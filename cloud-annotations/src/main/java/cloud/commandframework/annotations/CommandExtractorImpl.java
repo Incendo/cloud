@@ -42,19 +42,19 @@ final class CommandExtractorImpl implements CommandExtractor {
     @Override
     public @NonNull Collection<@NonNull CommandDescriptor> extractCommands(final @NonNull Object instance) {
         final AnnotationAccessor classAnnotations = AnnotationAccessor.of(instance.getClass());
-        final CommandMethod classCommandMethod = classAnnotations.annotation(CommandMethod.class);
+        final Command classCommand = classAnnotations.annotation(Command.class);
 
         final String syntaxPrefix;
-        if (classCommandMethod == null) {
+        if (classCommand == null) {
             syntaxPrefix = "";
         } else {
-            syntaxPrefix = this.annotationParser.processString(classCommandMethod.value()) + " ";
+            syntaxPrefix = this.annotationParser.processString(classCommand.value()) + " ";
         }
 
         final Method[] methods = instance.getClass().getDeclaredMethods();
         final Collection<CommandDescriptor> commandDescriptors = new ArrayList<>();
         for (final Method method : methods) {
-            final CommandMethod[] commands = method.getAnnotationsByType(CommandMethod.class);
+            final Command[] commands = method.getAnnotationsByType(Command.class);
             if (commands.length == 0) {
                 continue;
             }
@@ -64,19 +64,19 @@ final class CommandExtractorImpl implements CommandExtractor {
             }
             if (Modifier.isStatic(method.getModifiers())) {
                 throw new IllegalArgumentException(String.format(
-                        "@CommandMethod annotated method '%s' is static! @CommandMethod annotated methods should not be static.",
+                        "@Command annotated method '%s' is static! @Command annotated methods should not be static.",
                         method.getName()
                 ));
             }
 
-            for (final CommandMethod commandMethod : commands) {
-                final String syntax = syntaxPrefix + this.annotationParser.processString(commandMethod.value());
+            for (final Command command : commands) {
+                final String syntax = syntaxPrefix + this.annotationParser.processString(command.value());
                 commandDescriptors.add(
                         ImmutableCommandDescriptor.builder()
                                 .method(method)
                                 .syntax(this.annotationParser.syntaxParser().parseSyntax(method, syntax))
                                 .commandToken(syntax.split(" ")[0].split("\\|")[0])
-                                .requiredSender(commandMethod.requiredSender())
+                                .requiredSender(command.requiredSender())
                                 .build()
                 );
             }

@@ -51,7 +51,7 @@ manager.buildAndRegister("command", aliases = arrayOf("alias")) {
 
 or using annotated methods, in Java:
 ```java
-@CommandMethod("command literal <number> [string]")
+@Command("command literal <number> [string]")
 public void yourCommand(
         CommandSender sender,
         int number, // @Argument is optional!
@@ -62,7 +62,7 @@ public void yourCommand(
 ```
 or in Kotlin:
 ```kotlin
-@CommandMethod("command literal <number> [string]")
+@Command("command literal <number> [string]")
 public suspend fun yourCommand(
     sender: CommandSender,
     number: Int, // @Argument is optional!

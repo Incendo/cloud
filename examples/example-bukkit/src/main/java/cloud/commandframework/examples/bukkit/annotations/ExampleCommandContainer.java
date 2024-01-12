@@ -25,7 +25,7 @@ package cloud.commandframework.examples.bukkit.annotations;
 
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.processing.CommandContainer;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -54,7 +54,7 @@ public final class ExampleCommandContainer {
      * @param sender the sender
      * @param arg    a string
      */
-    @CommandMethod("annotations container [arg]")
+    @Command("annotations container [arg]")
     public void containerCommand(
             final CommandSender sender,
             @Argument(suggestions = "container-suggestions") final @Nullable String arg

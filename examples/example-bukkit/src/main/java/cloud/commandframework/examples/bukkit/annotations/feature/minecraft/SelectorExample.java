@@ -25,7 +25,7 @@ package cloud.commandframework.examples.bukkit.annotations.feature.minecraft;
 
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.bukkit.data.SingleEntitySelector;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
@@ -37,7 +37,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Example showcasing how to work with entity selectors.
  */
-@CommandMethod("annotations teleport")
+@Command("annotations teleport")
 public final class SelectorExample implements AnnotationFeature {
 
     @Override
@@ -48,7 +48,7 @@ public final class SelectorExample implements AnnotationFeature {
         annotationParser.parse(this);
     }
 
-    @CommandMethod("entity <entity> here")
+    @Command("entity <entity> here")
     public void teleportEntity(
             final @NonNull Player player,
             @Argument(value = "entity", description = "The entity to teleport")

@@ -25,7 +25,7 @@ package cloud.commandframework.annotations.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import io.leangen.geantyref.TypeToken;
@@ -86,7 +86,7 @@ class RequiredSenderDeductionTest {
 
     private static class TestClassA {
 
-        @CommandMethod("teststring")
+        @Command("teststring")
         public void command(final StringSender sender) {
         }
     }

@@ -38,9 +38,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @Repeatable(Commands.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
-public @interface CommandMethod {
+public @interface Command {
 
-    String ANNOTATION_PATH = "cloud.commandframework.annotations.CommandMethod";
+    String ANNOTATION_PATH = "cloud.commandframework.annotations.Command";
 
     /**
      * Returns the command syntax string.

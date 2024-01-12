@@ -25,7 +25,7 @@ package cloud.commandframework.examples.bukkit.annotations.feature.minecraft;
 
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.context.CommandContext;
@@ -49,7 +49,7 @@ public final class NamespacedKeyExample implements AnnotationFeature {
         annotationParser.parse(this);
     }
 
-    @CommandMethod("annotations namespaced <key> [rest]")
+    @Command("annotations namespaced <key> [rest]")
     public void namespacedKeyCommand(
             final @NonNull CommandSender sender,
             @Argument(value = "key", suggestions = "namespaced-suggestions") final @NonNull NamespacedKey key,
