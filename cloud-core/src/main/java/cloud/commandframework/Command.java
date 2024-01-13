@@ -2253,10 +2253,6 @@ public class Command<C> {
             if (this.permission.permissionString().isEmpty()) {
                 builder = builder.permission(command.commandPermission());
             }
-            final Class<? extends C> senderType = command.senderType().orElse(null);
-            if (senderType != null) {
-                builder = builder.senderType(senderType);
-            }
             return builder.handler(command.commandExecutionHandler);
         }
 
