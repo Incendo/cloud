@@ -349,8 +349,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
     }
 
     /**
-     * Checks if the command sender has the required permission. If the permission node is
-     * empty, this should return {@code true}.
+     * Checks if the command sender has the required permission and returns the result.
      *
      * @param sender     the command sender
      * @param permission the permission
