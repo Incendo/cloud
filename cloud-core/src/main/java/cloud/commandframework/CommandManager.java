@@ -361,9 +361,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
             final @NonNull C sender,
             final @NonNull Permission permission
     ) {
-        if (permission.isEmpty()) {
-            return true;
-        } else if (permission instanceof PredicatePermission) {
+        if (permission instanceof PredicatePermission) {
             return ((PredicatePermission<C>) permission).hasPermission(sender);
         } else if (permission instanceof OrPermission) {
             for (final Permission innerPermission : permission.permissions()) {
@@ -380,7 +378,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
             }
             return true; // all returned true
         }
-        return this.hasPermission(sender, permission.permissionString());
+        return permission.isEmpty() || this.hasPermission(sender, permission.permissionString());
     }
 
     /**
@@ -398,9 +396,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
             final @NonNull C sender,
             final @NonNull Permission permission
     ) {
-        if (permission.isEmpty()) {
-            return PermissionResult.succeeded(permission);
-        } else if (permission instanceof PredicatePermission) {
+        if (permission instanceof PredicatePermission) {
             return ((PredicatePermission<C>) permission).testPermission(sender);
         } else if (permission instanceof OrPermission) {
             for (final Permission innerPermission : permission.permissions()) {
@@ -419,8 +415,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
             }
             return PermissionResult.succeeded(permission); // all returned true
         }
-
-        return PermissionResult.of(this.hasPermission(sender, permission.permissionString()), permission);
+        return PermissionResult.of(permission.isEmpty() || this.hasPermission(sender, permission.permissionString()), permission);
     }
 
     /**
