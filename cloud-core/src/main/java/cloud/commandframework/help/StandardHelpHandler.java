@@ -192,8 +192,8 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
                     }
 
                     final List<CommandComponent<C>> traversedNodesSub = new LinkedList<>(traversedNodes);
-                    if (child.component() == null || child.command == null
-                            || this.commandManager.testPermission(query.sender(), 
+                    if (child.component() == null || child.command() == null
+                            || this.commandManager.testPermission(query.sender(),
                             child.command().commandPermission()).allowed()
                     ) {
                         traversedNodesSub.add(child.component());

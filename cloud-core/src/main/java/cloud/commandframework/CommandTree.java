@@ -319,7 +319,7 @@ public final class CommandTree<C> {
 
                     // If we couldn't match a child, check if there's a command attached and execute it
                     final CommandComponent<C> rootComponent = root.component();
-                    if (rootComponent != null && rootComponent.owningCommand() != null && commandInput.isEmpty()) {
+                    if (rootComponent != null && root.command() != null && commandInput.isEmpty()) {
                         final Command<C> command = root.command();
                         final PermissionResult check = this.commandManager.testPermission(
                                 commandContext.sender(),
