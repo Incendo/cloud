@@ -43,9 +43,9 @@ public interface PermissionLevelResult extends PermissionResult {
     /**
      * Creates a new PermissionLevelResult.
      *
-     * @param result                  {@code true}if the command may be executed, {@code false} otherwise
-     * @param permission              the permission that this result came from
-     * @param requiredPermissionLevel the minecraft permission level that was required for the permission check to pass
+     * @param result                  {@code true} if the command may be executed, {@code false} otherwise
+     * @param permission              permission that this result came from
+     * @param requiredPermissionLevel minecraft permission level that was required for the permission check to pass
      * @return the created result
      */
     static @NonNull PermissionLevelResult of(

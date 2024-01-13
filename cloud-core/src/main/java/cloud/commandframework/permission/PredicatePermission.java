@@ -32,7 +32,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * A functional {@link Permission} implementation
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  * @since 1.4.0
  */
 @FunctionalInterface
@@ -40,23 +40,23 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface PredicatePermission<C> extends Permission, CloudKeyHolder<Void> {
 
     /**
-     * Create a new predicate permission
+     * Creates a new predicate permission
      *
-     * @param key       Key that identifies the permission node
-     * @param predicate Predicate that determines whether the sender has the permission
-     * @param <C>       Command sender type
-     * @return Created permission node
+     * @param key       key that identifies the permission node
+     * @param predicate predicate that determines whether the sender has the permission
+     * @param <C>       command sender type
+     * @return created permission node
      */
     static <C> PredicatePermission<C> of(final @NonNull CloudKey<Void> key, final @NonNull Predicate<C> predicate) {
         return new WrappingPredicatePermission<>(key, predicate);
     }
 
     /**
-     * Create a new predicate permission
+     * Creates a new predicate permission
      *
-     * @param predicate Predicate that determines whether the sender has the permission
-     * @param <C>       Command sender type
-     * @return Created permission node
+     * @param predicate predicate that determines whether the sender has the permission
+     * @param <C>       command sender type
+     * @return created permission node
      */
     static <C> PredicatePermission<C> of(final @NonNull Predicate<C> predicate) {
         return new PredicatePermission<C>() {
@@ -81,7 +81,7 @@ public interface PredicatePermission<C> extends Permission, CloudKeyHolder<Void>
     /**
      * Checks whether the given sender has this permission
      *
-     * @param sender Sender to check for
+     * @param sender sender to check for
      * @return a {@link PermissionResult} representing the check result
      * @since 2.0.0
      */
