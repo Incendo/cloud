@@ -222,7 +222,7 @@ public final class CommandTree<C> {
             final @NonNull Executor executor
     ) {
         final PermissionResult permissionResult = this.determinePermissionResult(commandContext.sender(), root);
-        if (permissionResult.failed()) {
+        if (permissionResult.denied()) {
             return CompletableFutures.failedFuture(
                     new NoPermissionException(
                             permissionResult,
@@ -325,7 +325,7 @@ public final class CommandTree<C> {
                                 commandContext.sender(),
                                 command.commandPermission()
                         );
-                        if (check.failed()) {
+                        if (check.denied()) {
                             return CompletableFutures.failedFuture(
                                     new NoPermissionException(
                                             check,
@@ -377,7 +377,7 @@ public final class CommandTree<C> {
 
         // Check if we're allowed to execute the child command. If not, exit
         final PermissionResult childCheck = this.determinePermissionResult(sender, child);
-        if (!commandInput.isEmpty() && childCheck.failed()) {
+        if (!commandInput.isEmpty() && childCheck.denied()) {
             return CompletableFutures.failedFuture(
                     new NoPermissionException(
                             childCheck,
@@ -444,7 +444,7 @@ public final class CommandTree<C> {
 
                 final Command<C> command = rootComponent.owningCommand();
                 final PermissionResult check = this.commandManager().testPermission(sender, command.commandPermission());
-                if (check.succeeded()) {
+                if (check.allowed()) {
                     return CompletableFuture.completedFuture(command);
                 }
                 return CompletableFutures.failedFuture(
@@ -472,7 +472,7 @@ public final class CommandTree<C> {
                 // If the sender has permission to use the command, then we're completely done
                 final Command<C> command = Objects.requireNonNull(rootComponent.owningCommand());
                 final PermissionResult check = this.commandManager().testPermission(sender, command.commandPermission());
-                if (check.succeeded()) {
+                if (check.allowed()) {
                     return CompletableFuture.completedFuture(command);
                 }
 
@@ -977,25 +977,6 @@ public final class CommandTree<C> {
      *
      * @param sender command sender
      * @param node   command node
-     * @return {@code true} if the {@code sender} is allowed to execute the command, otherwise {@code false}
-     */
-    private boolean hasPermission(
-            final @NonNull C sender,
-            final @NonNull CommandNode<C> node
-    ) {
-        final Permission permission = (Permission) node.nodeMeta().get(CommandNode.META_KEY_PERMISSION);
-        if (permission != null) {
-            return this.commandManager.hasPermission(sender, permission);
-        }
-        throw new IllegalStateException("Expected permissions to be propagated");
-    }
-
-    /**
-     * Determines the permission result describing whether the given {@code sender} can execute the command attached to the
-     * given {@code node}.
-     *
-     * @param sender command sender
-     * @param node   command node
      * @return a permission result for the given sender and node
      */
     private @NonNull PermissionResult determinePermissionResult(
@@ -1011,7 +992,7 @@ public final class CommandTree<C> {
 
     /**
      * Returns {@code true} if the sender matches the type requirements for the node, and
-     * {@link #hasPermission(Object, CommandNode)} returns null.
+     * {@link #determinePermissionResult(Object, CommandNode)}} returns {@code true}.
      *
      * @param sender command sender
      * @param node   command node
@@ -1025,7 +1006,7 @@ public final class CommandTree<C> {
         }
         for (final Class<?> type : types) {
             if (type.isInstance(sender)) {
-                return this.hasPermission(sender, node);
+                return this.determinePermissionResult(sender, node).allowed();
             }
         }
         return false;

@@ -94,10 +94,10 @@ final class CloudCommandCallable<C> implements CommandCallable {
 
     @Override
     public boolean testPermission(final @NonNull CommandSource source) {
-        return this.manager.hasPermission(
+        return this.manager.testPermission(
                 this.manager.senderMapper().map(source),
                 this.cloudCommand.commandPermission()
-        );
+        ).allowed();
     }
 
     @Override

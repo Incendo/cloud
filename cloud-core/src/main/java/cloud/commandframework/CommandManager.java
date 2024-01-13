@@ -354,39 +354,6 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      *
      * @param sender     the command sender
      * @param permission the permission
-     * @return {@code true} if the sender has the permission, else {@code false}
-     */
-    @SuppressWarnings("unchecked")
-    public boolean hasPermission(
-            final @NonNull C sender,
-            final @NonNull Permission permission
-    ) {
-        if (permission instanceof PredicatePermission) {
-            return ((PredicatePermission<C>) permission).hasPermission(sender);
-        } else if (permission instanceof OrPermission) {
-            for (final Permission innerPermission : permission.permissions()) {
-                if (this.hasPermission(sender, innerPermission)) {
-                    return true; // short circuit the first true result
-                }
-            }
-            return false; // none returned true
-        } else if (permission instanceof AndPermission) {
-            for (final Permission innerPermission : permission.permissions()) {
-                if (!this.hasPermission(sender, innerPermission)) {
-                    return false; // short circuit the first false result
-                }
-            }
-            return true; // all returned true
-        }
-        return permission.isEmpty() || this.hasPermission(sender, permission.permissionString());
-    }
-
-    /**
-     * Checks if the command sender has the required permission. If the permission node is
-     * empty, this should return {@code true}.
-     *
-     * @param sender     the command sender
-     * @param permission the permission
      * @return a {@link PermissionResult} representing whether the sender has the permission
      * @since 2.0.0
      */
@@ -401,19 +368,19 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
         } else if (permission instanceof OrPermission) {
             for (final Permission innerPermission : permission.permissions()) {
                 final PermissionResult result = this.testPermission(sender, innerPermission);
-                if (result.succeeded()) {
+                if (result.allowed()) {
                     return result; // short circuit the first true result
                 }
             }
-            return PermissionResult.failed(permission); // none returned true
+            return PermissionResult.denied(permission); // none returned true
         } else if (permission instanceof AndPermission) {
             for (final Permission innerPermission : permission.permissions()) {
                 final PermissionResult result = this.testPermission(sender, innerPermission);
-                if (!result.succeeded()) {
+                if (!result.allowed()) {
                     return result; // short circuit the first false result
                 }
             }
-            return PermissionResult.succeeded(permission); // all returned true
+            return PermissionResult.allowed(permission); // all returned true
         }
         return PermissionResult.of(permission.isEmpty() || this.hasPermission(sender, permission.permissionString()), permission);
     }

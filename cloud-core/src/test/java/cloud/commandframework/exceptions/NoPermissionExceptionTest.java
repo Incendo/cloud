@@ -36,14 +36,14 @@ class NoPermissionExceptionTest {
 
     @Test
     void testSucceededResult() {
-        PermissionResult result = PermissionResult.succeeded(Permission.of("konicai"));
+        PermissionResult result = PermissionResult.allowed(Permission.of("konicai"));
         assertThrows(IllegalArgumentException.class, () -> new NoPermissionException(result, new Object(), Collections.emptyList()));
     }
 
     @Test
     void testCommandPermission() {
         Permission permission = Permission.of("konicai");
-        PermissionResult result = PermissionResult.failed(permission);
+        PermissionResult result = PermissionResult.denied(permission);
         NoPermissionException exception = new NoPermissionException(result, new Object(), Collections.emptyList());
 
         assertEquals(permission, exception.missingPermission());

@@ -49,12 +49,12 @@ public class SimplePermissionResult implements PermissionResult {
     }
 
     @Override
-    public final boolean succeeded() {
+    public final boolean allowed() {
         return this.result;
     }
 
     @Override
-    public final boolean failed() {
+    public final boolean denied() {
         // this doesn't need to be overridden, but we do it so that we can make it final
         return !this.result;
     }

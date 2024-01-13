@@ -59,7 +59,12 @@ public interface PredicatePermission<C> extends Permission, CloudKeyHolder<Void>
      * @return Created permission node
      */
     static <C> PredicatePermission<C> of(final @NonNull Predicate<C> predicate) {
-        return predicate::test;
+        return new PredicatePermission<C>() {
+            @Override
+            public @NonNull PermissionResult testPermission(final @NonNull C sender) {
+                return PermissionResult.of(predicate.test(sender), this);
+            }
+        };
     }
 
     @Override
@@ -81,19 +86,7 @@ public interface PredicatePermission<C> extends Permission, CloudKeyHolder<Void>
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    default @NonNull PermissionResult testPermission(final @NonNull C sender) {
-        return PermissionResult.of(this.hasPermission(sender), this);
-    }
-
-    /**
-     * Checks whether the given sender has this permission
-     *
-     * @param sender Sender to check for
-     * @return true if the permission check succeeded
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    boolean hasPermission(@NonNull C sender);
+    @NonNull PermissionResult testPermission(@NonNull C sender);
 
     @Override
     default boolean isEmpty() {

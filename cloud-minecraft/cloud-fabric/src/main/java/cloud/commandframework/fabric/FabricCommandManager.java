@@ -386,15 +386,10 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
             @Override
             public @NonNull PermissionResult testPermission(final @NonNull C sender) {
                 return new PermissionLevelResult(
-                        this.hasPermission(sender),
+                        FabricCommandManager.this.senderMapper().reverse(sender).hasPermission(permissionLevel),
                         this,
                         permissionLevel
                 );
-            }
-
-            @Override
-            public boolean hasPermission(final @NonNull C sender) {
-                return FabricCommandManager.this.senderMapper().reverse(sender).hasPermission(permissionLevel);
             }
         };
     }

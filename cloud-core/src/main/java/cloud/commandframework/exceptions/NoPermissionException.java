@@ -55,7 +55,7 @@ public class NoPermissionException extends CommandParseException {
             final @NonNull List<@NonNull CommandComponent<?>> currentChain
     ) {
         super(commandSender, currentChain);
-        if (permissionResult.succeeded()) {
+        if (permissionResult.allowed()) {
             throw new IllegalArgumentException("Provided permission result was one that succeeded instead of failed");
         }
         this.result = permissionResult;

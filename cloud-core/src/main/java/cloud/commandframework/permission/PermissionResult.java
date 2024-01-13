@@ -29,7 +29,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * The cached result of a permission check, representing whether a command may be executed.
  *
- * <p>Implementations must be immutable. Most importantly, {@link #succeeded()} must always return the same value as previous
+ * <p>Implementations must be immutable. Most importantly, {@link #allowed()} must always return the same value as previous
  * invocations.</p>
  *
  * <p>Custom implementations may be used in order to provide more information.
@@ -43,21 +43,21 @@ public interface PermissionResult {
     /**
      * Returns {@code true} if the command may be executed.
      *
-     * <p>This always returns the opposite of {@link #failed()}.</p>
+     * <p>This always returns the opposite of {@link #denied()}.</p>
      *
      * @return {@code true} if the command may be executed
      */
-    boolean succeeded();
+    boolean allowed();
 
     /**
      * Returns {@code true} if the command may not be executed.
      *
-     * <p>This always returns the opposite of {@link #succeeded()}.</p>
+     * <p>This always returns the opposite of {@link #allowed()}.</p>
      *
      * @return {@code true} if the command may not be executed
      */
-    default boolean failed() {
-        return !this.succeeded();
+    default boolean denied() {
+        return !this.allowed();
     }
 
     /**
@@ -84,7 +84,7 @@ public interface PermissionResult {
      * @param permission the permission that this result came from
      * @return a successful PermissionResult
      */
-    static @NonNull PermissionResult succeeded(final @NonNull Permission permission) {
+    static @NonNull PermissionResult allowed(final @NonNull Permission permission) {
         return new SimplePermissionResult(true, permission);
     }
 
@@ -94,7 +94,7 @@ public interface PermissionResult {
      * @param permission the permission that this result came from
      * @return a failed PermissionResult
      */
-    static @NonNull PermissionResult failed(final @NonNull Permission permission) {
+    static @NonNull PermissionResult denied(final @NonNull Permission permission) {
         return new SimplePermissionResult(false, permission);
     }
 }
