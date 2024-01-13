@@ -34,7 +34,6 @@ import cloud.commandframework.execution.CommandExecutionHandler
 import cloud.commandframework.keys.CloudKey
 import cloud.commandframework.kotlin.extension.command
 import cloud.commandframework.kotlin.extension.senderType
-import cloud.commandframework.meta.CommandMeta
 import cloud.commandframework.permission.Permission
 import kotlin.reflect.KClass
 
@@ -279,16 +278,6 @@ public class MutableCommandBuilder<C : Any>(
     public fun commandDescription(commandDescription: CommandDescription): MutableCommandBuilder<C> = mutate {
         it.commandDescription(commandDescription)
     }
-
-    /**
-     * Set the [CommandMeta.HIDDEN] meta for this command
-     *
-     * @param hidden whether this command should be hidden
-     * @return this mutable builder
-     * @since 1.3.0
-     */
-    public fun hidden(hidden: Boolean = true): MutableCommandBuilder<C> =
-        meta(CommandMeta.HIDDEN, hidden)
 
     /**
      * Specify a required sender type
