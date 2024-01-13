@@ -23,8 +23,10 @@
 //
 package cloud.commandframework.permission;
 
+import cloud.commandframework.internal.ImmutableImpl;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
 /**
  * The cached result of a permission check, representing whether a command may be executed.
@@ -37,6 +39,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @since 2.0.0
  */
+@ImmutableImpl
+@Value.Immutable
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface PermissionResult {
 
@@ -75,7 +79,7 @@ public interface PermissionResult {
      * @return a PermissionResult of the boolean result
      */
     static @NonNull PermissionResult of(final boolean result, final @NonNull Permission permission) {
-        return new SimplePermissionResult(result, permission);
+        return PermissionResultImpl.of(result, permission);
     }
 
     /**
@@ -85,7 +89,7 @@ public interface PermissionResult {
      * @return a successful PermissionResult
      */
     static @NonNull PermissionResult allowed(final @NonNull Permission permission) {
-        return new SimplePermissionResult(true, permission);
+        return PermissionResultImpl.of(true, permission);
     }
 
     /**
@@ -95,6 +99,6 @@ public interface PermissionResult {
      * @return a failed PermissionResult
      */
     static @NonNull PermissionResult denied(final @NonNull Permission permission) {
-        return new SimplePermissionResult(false, permission);
+        return PermissionResultImpl.of(false, permission);
     }
 }

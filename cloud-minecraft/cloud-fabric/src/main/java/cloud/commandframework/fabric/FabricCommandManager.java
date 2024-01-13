@@ -385,7 +385,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         return new PredicatePermission<C>() {
             @Override
             public @NonNull PermissionResult testPermission(final @NonNull C sender) {
-                return new PermissionLevelResult(
+                return PermissionLevelResult.of(
                         FabricCommandManager.this.senderMapper().reverse(sender).hasPermission(permissionLevel),
                         this,
                         permissionLevel
