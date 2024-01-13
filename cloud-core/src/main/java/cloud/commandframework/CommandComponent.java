@@ -42,7 +42,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import org.apiguardian.api.API;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
@@ -67,8 +66,6 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
     private final TypeToken<?> valueType;
     private final SuggestionProvider<C> suggestionProvider;
     private final Collection<@NonNull ComponentPreprocessor<C>> componentPreprocessors;
-
-    private Command<C> owningCommand;
 
     /**
      * Creates a new mutable builder.
@@ -248,29 +245,6 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
     }
 
     /**
-     * Returns the command that owns this component.
-     *
-     * @return the owning command
-     */
-    public final @MonotonicNonNull Command<C> owningCommand() {
-        return this.owningCommand;
-    }
-
-    /**
-     * Sets the command that owns this component.
-     *
-     * @param owningCommand the command
-     * @throws IllegalStateException if {@link #owningCommand()} has already been set
-     */
-    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.CommandTree")
-    final void owningCommand(final @NonNull Command<C> owningCommand) {
-        if (this.owningCommand != null) {
-            throw new IllegalStateException("Cannot replace owning command");
-        }
-        this.owningCommand = owningCommand;
-    }
-
-    /**
      * Registers a new preprocessor.
      *
      * <p>If all preprocessor has succeeding {@link ArgumentParseResult results}
@@ -344,24 +318,6 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
                 this.name(),
                 this.type(),
                 this.valueType().getType().getTypeName()
-        );
-    }
-
-    /**
-     * Returns a copy of the component.
-     *
-     * @return copy of the component
-     */
-    public @NonNull CommandComponent<C> copy() {
-        return new CommandComponent<>(
-                this.name(),
-                this.parser(),
-                this.valueType(),
-                this.description(),
-                this.type(),
-                this.defaultValue(),
-                this.suggestionProvider(),
-                this.preprocessors()
         );
     }
 

@@ -60,7 +60,7 @@ class BuilderDecoratorTest {
         this.annotationParser.parse(new TestClass());
 
         // Assert
-        assertThat(this.commandManager.commandTree().getNamedNode("command").component().owningCommand().commandDescription())
+        assertThat(this.commandManager.commandTree().getNamedNode("command").command().commandDescription())
                 .isEqualTo(CommandDescription.commandDescription("default description"));
     }
 
@@ -74,7 +74,7 @@ class BuilderDecoratorTest {
         this.annotationParser.parse(new TestClass());
 
         // Assert
-        assertThat(this.commandManager.commandTree().getNamedNode("command").component().owningCommand().commandPermission())
+        assertThat(this.commandManager.commandTree().getNamedNode("command").command().commandPermission())
                 .isEqualTo(Permission.of("default.permission"));
     }
 

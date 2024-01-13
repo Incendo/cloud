@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.internal;
 
+import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import java.util.Collections;
 import java.util.Comparator;
@@ -52,6 +53,7 @@ public final class CommandNode<C> {
     private final List<CommandNode<C>> children = new LinkedList<>();
     private final CommandComponent<C> component;
     private CommandNode<C> parent;
+    private Command<C> command;
 
     /**
      * Creates a new command node
@@ -133,6 +135,27 @@ public final class CommandNode<C> {
      */
     public @MonotonicNonNull CommandComponent<C> component() {
         return this.component;
+    }
+
+    /**
+     * Returns the command that the {@link #component()} belongs to, if the {@link #component()} is executable.
+     *
+     * @return the command
+     */
+    public @MonotonicNonNull Command<C> command() {
+        return this.command;
+    }
+
+    /**
+     * Sets the executable command of this node.
+     *
+     * @param command command
+     */
+    public void command(final @NonNull Command<C> command) {
+        if (this.command != null) {
+            throw new IllegalStateException("Cannot replace owning command");
+        }
+        this.command = command;
     }
 
     /**

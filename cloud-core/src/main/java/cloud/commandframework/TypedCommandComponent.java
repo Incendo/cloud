@@ -72,18 +72,4 @@ public final class TypedCommandComponent<C, T> extends CommandComponent<C> imple
     public @NonNull CloudKey<T> key() {
         return CloudKey.of(this.name(), this.valueType());
     }
-
-    @Override
-    public @NonNull TypedCommandComponent<C, T> copy() {
-        return new TypedCommandComponent<>(
-                this.name(),
-                this.parser(),
-                this.valueType(),
-                this.description(),
-                this.type(),
-                this.defaultValue(),
-                this.suggestionProvider(),
-                this.preprocessors()
-        );
-    }
 }

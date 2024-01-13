@@ -319,7 +319,7 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
         if (this.cloudBrigadierManager.settings().get(BrigadierSetting.FORCE_EXECUTABLE)
                 || node.isLeaf()
                 || node.component().optional()
-                || node.component().owningCommand() != null
+                || node.command() != null
                 || node.children().stream().map(CommandNode::component)
                 .filter(Objects::nonNull).anyMatch(CommandComponent::optional)) {
             builder.executes(executor);
