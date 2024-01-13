@@ -24,7 +24,6 @@
 package cloud.commandframework.meta;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyContainer;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -37,11 +36,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 @API(status = API.Status.STABLE)
 public abstract class CommandMeta implements CloudKeyContainer {
-
-    public static final CloudKey<Boolean> HIDDEN = CloudKey.of(
-            "cloud:hidden",
-            Boolean.class
-    );
 
     /**
      * Create a new simple command meta-builder

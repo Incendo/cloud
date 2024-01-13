@@ -60,7 +60,7 @@ class CommandBeanTest {
         final CommandComponent<TestCommandSender> component = node.children().get(0).component();
         assertThat(component).isNotNull();
 
-        final Command<TestCommandSender> command = component.owningCommand();
+        final Command<TestCommandSender> command = node.children().get(0).command();
         assertThat(command).isNotNull();
         assertThat(command.nonFlagArguments().get(0).aliases()).containsExactly("t", "test");
         assertThat(command.commandMeta().getOrDefault(META_KEY, "otherValue")).isEqualTo("value");

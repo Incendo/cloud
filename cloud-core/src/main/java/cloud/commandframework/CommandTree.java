@@ -246,7 +246,7 @@ public final class CommandTree<C> {
         // There are 0 or more static arguments as children. No variable child arguments are present
         if (root.children().isEmpty()) {
             final CommandComponent<C> rootComponent = root.component();
-            if (rootComponent == null || rootComponent.owningCommand() == null || !commandInput.isEmpty()) {
+            if (rootComponent == null || root.command() == null || !commandInput.isEmpty()) {
                 // Too many arguments. We have a unique path, so we can send the entire context
                 return CompletableFutures.failedFuture(
                         new InvalidSyntaxException(
@@ -256,7 +256,7 @@ public final class CommandTree<C> {
                         )
                 );
             }
-            return CompletableFuture.completedFuture(rootComponent.owningCommand());
+            return CompletableFuture.completedFuture(root.command());
         }
 
         CompletableFuture<Command<C>> childCompletable = CompletableFuture.completedFuture(null);
@@ -320,7 +320,7 @@ public final class CommandTree<C> {
                     // If we couldn't match a child, check if there's a command attached and execute it
                     final CommandComponent<C> rootComponent = root.component();
                     if (rootComponent != null && rootComponent.owningCommand() != null && commandInput.isEmpty()) {
-                        final Command<C> command = rootComponent.owningCommand();
+                        final Command<C> command = root.command();
                         final PermissionResult check = this.commandManager.testPermission(
                                 commandContext.sender(),
                                 command.commandPermission()
@@ -334,7 +334,7 @@ public final class CommandTree<C> {
                                     )
                             );
                         }
-                        return CompletableFuture.completedFuture(rootComponent.owningCommand());
+                        return CompletableFuture.completedFuture(root.command());
                     }
 
                     // We know that there's no command, and we also cannot match any of the children
@@ -413,25 +413,23 @@ public final class CommandTree<C> {
                     argumentValue = defaultValue.evaluateDefault(commandContext);
                 }
             } else if (!child.component().required()) {
-                if (childComponent.owningCommand() == null) {
+                if (child.command() == null) {
                     // If there are multiple children with different owning commands then it's ambiguous and
                     // not allowed, therefore we're able to pick any child command, as long as we can find it
                     CommandNode<C> node = child;
                     while (!node.isLeaf()) {
                         node = node.children().get(0);
                         final CommandComponent<C> nodeComponent = node.component();
-                        if (nodeComponent != null && nodeComponent.owningCommand() != null) {
-                            childComponent.owningCommand(nodeComponent.owningCommand());
+                        if (nodeComponent != null && node.command() != null) {
+                            child.command(node.command());
                         }
                     }
                 }
-                return CompletableFuture.completedFuture(childComponent.owningCommand());
+                return CompletableFuture.completedFuture(child.command());
             } else if (child.isLeaf()) {
                 final CommandComponent<C> rootComponent = root.component();
-                if (rootComponent == null || rootComponent.owningCommand() == null) {
-                    final List<CommandComponent<C>> components = Objects.requireNonNull(
-                            childComponent.owningCommand()
-                    ).components();
+                if (rootComponent == null || root.command() == null) {
+                    final List<CommandComponent<C>> components = Objects.requireNonNull(child.command()).components();
                     return CompletableFutures.failedFuture(
                             new InvalidSyntaxException(
                                     this.commandManager.commandSyntaxFormatter()
@@ -442,7 +440,7 @@ public final class CommandTree<C> {
                     );
                 }
 
-                final Command<C> command = rootComponent.owningCommand();
+                final Command<C> command = root.command();
                 final PermissionResult check = this.commandManager().testPermission(sender, command.commandPermission());
                 if (check.allowed()) {
                     return CompletableFuture.completedFuture(command);
@@ -457,7 +455,7 @@ public final class CommandTree<C> {
             } else {
                 // The child is not a leaf, but may have an intermediary executor, attempt to use it
                 final CommandComponent<C> rootComponent = root.component();
-                if (rootComponent == null || rootComponent.owningCommand() == null) {
+                if (rootComponent == null || root.command() == null) {
                     // Child does not have a command, and so we cannot proceed
                     return CompletableFutures.failedFuture(
                             new InvalidSyntaxException(
@@ -470,7 +468,7 @@ public final class CommandTree<C> {
                 }
 
                 // If the sender has permission to use the command, then we're completely done
-                final Command<C> command = Objects.requireNonNull(rootComponent.owningCommand());
+                final Command<C> command = Objects.requireNonNull(root.command());
                 final PermissionResult check = this.commandManager().testPermission(sender, command.commandPermission());
                 if (check.allowed()) {
                     return CompletableFuture.completedFuture(command);
@@ -506,7 +504,7 @@ public final class CommandTree<C> {
            commandContext.store(component.name(), value);
            if (child.isLeaf()) {
                if (commandInput.isEmpty()) {
-                   return CompletableFuture.completedFuture(component.owningCommand());
+                   return CompletableFuture.completedFuture(child.command());
                }
                return CompletableFutures.failedFuture(
                        new InvalidSyntaxException(
@@ -937,14 +935,14 @@ public final class CommandTree<C> {
 
             final CommandComponent<C> nodeComponent = node.component();
             if (nodeComponent != null) {
-                if (nodeComponent.owningCommand() != null) {
+                if (node.command() != null) {
                     throw new IllegalStateException(String.format(
                             "Duplicate command chains detected. Node '%s' already has an owning command (%s)",
-                            node, nodeComponent.owningCommand()
+                            node, node.command()
                     ));
                 }
 
-                nodeComponent.owningCommand(command);
+                node.command(command);
             }
 
             this.verifyAndRegister();
@@ -1027,10 +1025,10 @@ public final class CommandTree<C> {
 
         // Verify that all leaf nodes have command registered
         this.getLeaves(this.internalTree).forEach(leaf -> {
-            if (leaf.component().owningCommand() == null) {
+            if (leaf.command() == null) {
                 throw new NoCommandInLeafException(leaf.component());
             } else {
-                final Command<C> owningCommand = leaf.component().owningCommand();
+                final Command<C> owningCommand = leaf.command();
                 this.commandManager.commandRegistrationHandler().registerCommand(owningCommand);
             }
         });
@@ -1046,8 +1044,8 @@ public final class CommandTree<C> {
      */
     @SuppressWarnings("unchecked")
     private void propagateRequirements(final @NonNull CommandNode<C> leafNode) {
-        final Permission commandPermission = leafNode.component().owningCommand().commandPermission();
-        Class<?> senderType = leafNode.component().owningCommand().senderType().orElse(null);
+        final Permission commandPermission = leafNode.command().commandPermission();
+        Class<?> senderType = leafNode.command().senderType().orElse(null);
         if (senderType == null) {
             senderType = Object.class;
         }
@@ -1070,8 +1068,8 @@ public final class CommandTree<C> {
             }
 
             /* Now also check if there's a command handler attached to an upper level node */
-            if (commandArgumentNode.component() != null && commandArgumentNode.component().owningCommand() != null) {
-                final Command<C> command = commandArgumentNode.component().owningCommand();
+            if (commandArgumentNode.component() != null && commandArgumentNode.command() != null) {
+                final Command<C> command = commandArgumentNode.command();
                 if (this.commandManager().settings().get(ManagerSetting.ENFORCE_INTERMEDIARY_PERMISSIONS)) {
                     permission = command.commandPermission();
                 } else {
@@ -1235,7 +1233,7 @@ public final class CommandTree<C> {
         }
 
         final @Nullable CommandComponent<C> component = node.component();
-        final @Nullable Command<C> owner = component == null ? null : component.owningCommand();
+        final @Nullable Command<C> owner = component == null ? null : node.command();
         if (owner != null) {
             commandConsumer.accept(owner);
         }

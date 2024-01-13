@@ -964,10 +964,6 @@ public final class AnnotationParser<C> {
         } catch (final Exception e) {
             throw new RuntimeException("Failed to construct command execution handler", e);
         }
-        /* Check if the command should be hidden */
-        if (methodOrClassHasAnnotation(method, Hidden.class)) {
-            builder = builder.hidden();
-        }
         /* Apply flags */
         for (final CommandFlag<?> flag : flags) {
             builder = builder.flag(flag);
@@ -1016,12 +1012,9 @@ public final class AnnotationParser<C> {
         if (proxy.contains(" ")) {
             throw new IllegalArgumentException("@ProxiedBy proxies may only contain single literals");
         }
-        cloud.commandframework.Command.Builder<C> proxyBuilder = this.manager.commandBuilder(proxy, command.commandMeta())
-                .proxies(command);
-        if (proxyAnnotation.hidden()) {
-            proxyBuilder = proxyBuilder.hidden();
-        }
-        return proxyBuilder.build();
+        return this.manager.commandBuilder(proxy, command.commandMeta())
+                .proxies(command)
+                .build();
     }
 
     private @NonNull SyntaxFragment findSyntaxFragment(

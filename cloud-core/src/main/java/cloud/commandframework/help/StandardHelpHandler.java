@@ -141,17 +141,15 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
             ++index;
             traversedNodes.add(head.component());
 
-            if (head.component() != null && head.component().owningCommand() != null) {
+            if (head.component() != null && head.command() != null) {
                 if (head.isLeaf() || index == queryFragments.size()) {
-                    if (this.commandManager.testPermission(query.sender(), head.component()
-                            .owningCommand()
-                            .commandPermission()).allowed()) {
+                    if (this.commandManager.testPermission(query.sender(), head.command().commandPermission()).allowed()) {
                         return VerboseCommandResult.of(
                                 query,
                                 CommandEntry.of(
-                                        head.component().owningCommand(),
+                                        head.command(),
                                         this.commandManager.commandSyntaxFormatter()
-                                                .apply(query.sender(), head.component().owningCommand().components(), null)
+                                                .apply(query.sender(), head.command().components(), null)
                                 )
                         );
                     }
@@ -194,9 +192,9 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
                     }
 
                     final List<CommandComponent<C>> traversedNodesSub = new LinkedList<>(traversedNodes);
-                    if (child.component() == null || child.component().owningCommand() == null
-                            || this.commandManager.testPermission(query.sender(), child.component()
-                            .owningCommand().commandPermission()).allowed()
+                    if (child.component() == null || child.command == null
+                            || this.commandManager.testPermission(query.sender(), 
+                            child.command().commandPermission()).allowed()
                     ) {
                         traversedNodesSub.add(child.component());
                         childSuggestions.add(this.commandManager.commandSyntaxFormatter()
@@ -242,7 +240,7 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
         /* Check node is itself a command that is visible */
         final CommandComponent<C> component = node.component();
         if (component != null) {
-            final Command<C> owningCommand = component.owningCommand();
+            final Command<C> owningCommand = node.command();
             if (owningCommand != null && this.commandFilter.test(owningCommand)) {
                 return true;
             }

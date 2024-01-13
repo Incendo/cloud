@@ -44,11 +44,4 @@ public @interface ProxiedBy {
      * @return Proxy syntax
      */
     @NonNull String value();
-
-    /**
-     * Whether or not the proxying command should be {@link Hidden}
-     *
-     * @return {@code true} if the proxying command should be hidden, {@code false} if not
-     */
-    boolean hidden() default false;
 }

@@ -404,15 +404,6 @@ public class Command<C> {
         return build.substring(0, build.length() - 1);
     }
 
-    /**
-     * Returns whether the command is hidden.
-     *
-     * @return {@code true} if the command is hidden, {@code false} if not
-     */
-    public boolean isHidden() {
-        return this.commandMeta().getOrDefault(CommandMeta.HIDDEN, false);
-    }
-
 
     /**
      * Builder for {@link Command} instances. The builder is immutable, and each
@@ -1442,8 +1433,6 @@ public class Command<C> {
 
         /**
          * Adds the given {@code argument} to the command.
-         * <p>
-         * The component will be copied using {@link CommandComponent#copy()} before being inserted into the command tree.
          *
          * @param argument argument to add
          * @return new builder instance with the command argument inserted into the argument list
@@ -1454,7 +1443,7 @@ public class Command<C> {
                 final @NonNull CommandComponent<C> argument
         ) {
             final List<CommandComponent<C>> commandComponents = new ArrayList<>(this.commandComponents);
-            commandComponents.add(argument.copy());
+            commandComponents.add(argument);
             return new Builder<>(
                     this.commandManager,
                     this.commandMeta,
@@ -1469,8 +1458,6 @@ public class Command<C> {
 
         /**
          * Adds the given {@code argument} to the command.
-         * <p>
-         * The component will be copied using {@link CommandComponent#copy()} before being inserted into the command tree.
          *
          * @param builder builder that builds the component to add
          * @return new builder instance with the command argument inserted into the argument list
@@ -2237,7 +2224,7 @@ public class Command<C> {
         /**
          * Makes the current command be a proxy of the supplied command. T
          * <p>
-         * his means that all the proxied command's variable command arguments will be inserted into this
+         * This means that all the proxied command's variable command arguments will be inserted into this
          * builder instance, in the order they are declared in the proxied command. Furthermore,
          * the proxied command's command handler will be shown by the command that is currently
          * being built. If the current command builder does not have a permission node set, this
@@ -2252,23 +2239,12 @@ public class Command<C> {
                 if (component.type() == CommandComponent.ComponentType.LITERAL) {
                     continue;
                 }
-                final CommandComponent<C> componentCopy = component.copy();
-                builder = builder.argument(componentCopy);
+                builder = builder.argument(component);
             }
             if (this.permission.permissionString().isEmpty()) {
                 builder = builder.permission(command.commandPermission());
             }
             return builder.handler(command.commandExecutionHandler);
-        }
-
-        /**
-         * Indicates that the command should be hidden from help menus
-         * and other places where commands are exposed to users.
-         *
-         * @return new builder instance that indicates that the constructed command should be hidden
-         */
-        public @NonNull Builder<C> hidden() {
-            return this.meta(CommandMeta.HIDDEN, true);
         }
 
         /**
