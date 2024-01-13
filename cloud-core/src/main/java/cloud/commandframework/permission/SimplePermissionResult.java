@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ public class SimplePermissionResult implements PermissionResult {
     private final Permission permission;
 
     /**
-     * Creates a result that wraps the given boolean result
+     * Creates a result that wraps the given boolean result.
      *
      * @param result true if the command may be executed, false otherwise
      * @param permission the permission that this result came from
@@ -75,10 +75,10 @@ public class SimplePermissionResult implements PermissionResult {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        SimplePermissionResult that = (SimplePermissionResult) o;
+        final SimplePermissionResult that = (SimplePermissionResult) o;
         return this.result == that.result && Objects.equals(this.permission, that.permission);
     }
 

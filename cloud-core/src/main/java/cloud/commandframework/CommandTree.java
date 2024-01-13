@@ -1002,7 +1002,7 @@ public final class CommandTree<C> {
             final @NonNull C sender,
             final @NonNull CommandNode<C> node
     ) {
-        final Permission permission = (Permission) node.nodeMeta().get("permission");
+        final Permission permission = (Permission) node.nodeMeta().get(CommandNode.META_KEY_PERMISSION);
         if (permission != null) {
             return this.commandManager.testPermission(sender, permission);
         }
