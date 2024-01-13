@@ -63,7 +63,7 @@ class DescriptionMapperTest {
         // Assert
         final CommandNode<?> node = this.commandManager.commandTree().getNamedNode("command");
         final CommandNode<?> argumentNode = node.children().get(0);
-        assertThat(argumentNode.component().owningCommand().commandDescription().description()).isEqualTo(testDescription);
+        assertThat(argumentNode.command().commandDescription().description()).isEqualTo(testDescription);
         assertThat(node.children().get(0).component().description()).isEqualTo(testDescription);
     }
 

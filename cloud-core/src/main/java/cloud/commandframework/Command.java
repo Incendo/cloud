@@ -1442,8 +1442,6 @@ public class Command<C> {
 
         /**
          * Adds the given {@code argument} to the command.
-         * <p>
-         * The component will be copied using {@link CommandComponent#copy()} before being inserted into the command tree.
          *
          * @param argument argument to add
          * @return new builder instance with the command argument inserted into the argument list
@@ -1454,7 +1452,7 @@ public class Command<C> {
                 final @NonNull CommandComponent<C> argument
         ) {
             final List<CommandComponent<C>> commandComponents = new ArrayList<>(this.commandComponents);
-            commandComponents.add(argument.copy());
+            commandComponents.add(argument);
             return new Builder<>(
                     this.commandManager,
                     this.commandMeta,
@@ -1469,8 +1467,6 @@ public class Command<C> {
 
         /**
          * Adds the given {@code argument} to the command.
-         * <p>
-         * The component will be copied using {@link CommandComponent#copy()} before being inserted into the command tree.
          *
          * @param builder builder that builds the component to add
          * @return new builder instance with the command argument inserted into the argument list
@@ -2237,7 +2233,7 @@ public class Command<C> {
         /**
          * Makes the current command be a proxy of the supplied command. T
          * <p>
-         * his means that all the proxied command's variable command arguments will be inserted into this
+         * This means that all the proxied command's variable command arguments will be inserted into this
          * builder instance, in the order they are declared in the proxied command. Furthermore,
          * the proxied command's command handler will be shown by the command that is currently
          * being built. If the current command builder does not have a permission node set, this
@@ -2252,11 +2248,14 @@ public class Command<C> {
                 if (component.type() == CommandComponent.ComponentType.LITERAL) {
                     continue;
                 }
-                final CommandComponent<C> componentCopy = component.copy();
-                builder = builder.argument(componentCopy);
+                builder = builder.argument(component);
             }
             if (this.permission.permissionString().isEmpty()) {
                 builder = builder.permission(command.commandPermission());
+            }
+            final Class<? extends C> senderType = command.senderType().orElse(null);
+            if (senderType != null) {
+                builder = builder.senderType(senderType);
             }
             return builder.handler(command.commandExecutionHandler);
         }
