@@ -586,7 +586,7 @@ public final class CommandTree<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull CompletableFuture<@NonNull Suggestions<C, ?>> getSuggestions(
+    public @NonNull CompletableFuture<@NonNull Suggestions<C, Suggestion>> getSuggestions(
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput,
             final @NonNull Executor executor
@@ -594,7 +594,7 @@ public final class CommandTree<C> {
         return CompletableFutures.scheduleOn(executor, () -> this.getSuggestionsDirect(context, commandInput, executor));
     }
 
-    private @NonNull CompletableFuture<@NonNull Suggestions<C, ?>> getSuggestionsDirect(
+    private @NonNull CompletableFuture<@NonNull Suggestions<C, Suggestion>> getSuggestionsDirect(
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput,
             final @NonNull Executor executor

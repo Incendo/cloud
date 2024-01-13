@@ -23,10 +23,7 @@
 //
 package cloud.commandframework.arguments.suggestion;
 
-import cloud.commandframework.CommandManager;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.context.CommandContextFactory;
-import cloud.commandframework.execution.ExecutionCoordinator;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import org.apiguardian.api.API;
@@ -41,33 +38,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface SuggestionFactory<C, S extends Suggestion> {
-
-    /**
-     * Returns a suggestion factory that invokes the command tree to create the suggestions, and then maps them
-     * to the output type using the given {@code mapper}.
-     *
-     * @param <C>                  the command sender type
-     * @param <S>                  the output suggestion type
-     * @param manager              the command manager
-     * @param mapper               the suggestion mapper
-     * @param contextFactory       factory producing {@link CommandContext} instances
-     * @param executionCoordinator the execution coordinator
-     * @return the factory
-     */
-    static <C, S extends Suggestion> @NonNull SuggestionFactory<C, S> delegating(
-            final @NonNull CommandManager<C> manager,
-            final @NonNull SuggestionMapper<S> mapper,
-            final @NonNull CommandContextFactory<C> contextFactory,
-            final @NonNull ExecutionCoordinator<C> executionCoordinator
-    ) {
-        return new DelegatingSuggestionFactory<>(
-                manager,
-                manager.commandTree(),
-                mapper,
-                contextFactory,
-                executionCoordinator
-        );
-    }
 
     /**
      * Returns command suggestions for the "next" argument that would yield a correctly
