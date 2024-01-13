@@ -975,9 +975,9 @@ public final class CommandTree<C> {
      * Determines the permission result describing whether the given {@code sender} can execute the command attached to the
      * given {@code node}.
      *
-     * @param sender the command sender
-     * @param node   the command node
-     * @return true if the {@code sender} is allowed to execute the command, otherwise false
+     * @param sender command sender
+     * @param node   command node
+     * @return {@code true} if the {@code sender} is allowed to execute the command, otherwise {@code false}
      */
     private boolean hasPermission(
             final @NonNull C sender,
@@ -994,8 +994,8 @@ public final class CommandTree<C> {
      * Determines the permission result describing whether the given {@code sender} can execute the command attached to the
      * given {@code node}.
      *
-     * @param sender the command sender
-     * @param node   the command node
+     * @param sender command sender
+     * @param node   command node
      * @return a permission result for the given sender and node
      */
     private @NonNull PermissionResult determinePermissionResult(

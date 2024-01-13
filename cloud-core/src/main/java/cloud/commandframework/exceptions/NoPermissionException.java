@@ -42,11 +42,11 @@ public class NoPermissionException extends CommandParseException {
     private final PermissionResult result;
 
     /**
-     * Construct a new no permission exception
+     * Constructs a new no permission exception,
      *
-     * @param permissionResult  Result of the permission check
-     * @param commandSender     Command sender
-     * @param currentChain      Chain leading up to the exception
+     * @param permissionResult result of the permission check
+     * @param commandSender    command sender
+     * @param currentChain     chain leading up to the exception
      */
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public NoPermissionException(
