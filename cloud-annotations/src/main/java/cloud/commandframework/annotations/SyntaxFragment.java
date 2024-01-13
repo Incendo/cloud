@@ -58,23 +58,23 @@ public final class SyntaxFragment {
 
     /**
      * Returns the major portion of the fragment.
-     * <p>
-     * This is likely the name of an argument, or a string literal.
+     *
+     * <p>This is likely the name of an argument, or a string literal.</p>
      *
      * @return the major part of the fragment
      */
-    public @NonNull String getMajor() {
+    public @NonNull String major() {
         return this.major;
     }
 
     /**
      * Returns the minor part of the fragment.
-     * <p>
-     * This is likely a list of aliases.
+     *
+     * <p>This is likely a list of aliases.</p>
      *
      * @return the minor part of the fragment.
      */
-    public @NonNull List<@NonNull String> getMinor() {
+    public @NonNull List<@NonNull String> minor() {
         return this.minor;
     }
 
@@ -83,7 +83,7 @@ public final class SyntaxFragment {
      *
      * @return the argument mode
      */
-    public @NonNull ArgumentMode getArgumentMode() {
+    public @NonNull ArgumentMode argumentMode() {
         return this.argumentMode;
     }
 }

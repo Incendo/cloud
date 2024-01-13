@@ -108,21 +108,21 @@ public class SpongeCommandManager<C> extends CommandManager<C> implements Sender
         return this.senderMapper.reverse(sender).hasPermission(permission);
     }
 
-    final PluginContainer getOwningPlugin() {
+    final PluginContainer owningPlugin() {
         return this.owningPlugin;
     }
 
     private void registerDefaultExceptionHandlers() {
         this.registerHandler(Throwable.class, (source, throwable) -> {
             source.sendMessage(MESSAGE_INTERNAL_ERROR);
-            this.getOwningPlugin().getLogger().error(
+            this.owningPlugin().getLogger().error(
                     "An unhandled exception was thrown during command execution",
                     throwable
             );
         });
         this.registerHandler(CommandExecutionException.class, (source, throwable) -> {
             source.sendMessage(MESSAGE_INTERNAL_ERROR);
-            this.getOwningPlugin().getLogger().error(
+            this.owningPlugin().getLogger().error(
                     "Exception executing command handler",
                     throwable.getCause()
             );

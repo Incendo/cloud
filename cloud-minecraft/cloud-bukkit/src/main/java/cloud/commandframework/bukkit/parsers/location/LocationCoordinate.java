@@ -60,20 +60,20 @@ public final class LocationCoordinate {
     }
 
     /**
-     * Get the coordinate type
+     * Returns the coordinate type.
      *
-     * @return Coordinate type
+     * @return coordinate type
      */
-    public @NonNull LocationCoordinateType getType() {
+    public @NonNull LocationCoordinateType type() {
         return this.type;
     }
 
     /**
-     * Get the coordinate
+     * Returns the coordinate.
      *
-     * @return Coordinate
+     * @return coordinate
      */
-    public double getCoordinate() {
+    public double coordinate() {
         return this.coordinate;
     }
 

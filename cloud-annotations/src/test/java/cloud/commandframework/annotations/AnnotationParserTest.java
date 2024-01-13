@@ -78,7 +78,7 @@ class AnnotationParserTest {
                 SuggestionProvider.suggesting(NAMED_SUGGESTIONS)
         );
         /* Register a parameter injector */
-        annotationParser.getParameterInjectorRegistry().registerInjector(
+        manager.parameterInjectorRegistry().registerInjector(
                 InjectableValue.class,
                 (context, annotations) -> new InjectableValue("Hello World!")
         );

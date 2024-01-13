@@ -122,7 +122,7 @@ public final class Location2DParser<C> implements ArgumentParser<C, Location2D>,
             originalLocation = new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
         }
 
-        if (coordinates[0].getType() == LocationCoordinateType.LOCAL && coordinates[1].getType() != LocationCoordinateType.LOCAL) {
+        if (coordinates[0].type() == LocationCoordinateType.LOCAL && coordinates[1].type() != LocationCoordinateType.LOCAL) {
             return ArgumentParseResult.failure(
                     new LocationParser.LocationParseException(
                             commandContext,
@@ -132,21 +132,21 @@ public final class Location2DParser<C> implements ArgumentParser<C, Location2D>,
             );
         }
 
-        if (coordinates[0].getType() == LocationCoordinateType.ABSOLUTE) {
-            originalLocation.setX(coordinates[0].getCoordinate());
-        } else if (coordinates[0].getType() == LocationCoordinateType.RELATIVE) {
-            originalLocation.add(coordinates[0].getCoordinate(), 0, 0);
+        if (coordinates[0].type() == LocationCoordinateType.ABSOLUTE) {
+            originalLocation.setX(coordinates[0].coordinate());
+        } else if (coordinates[0].type() == LocationCoordinateType.RELATIVE) {
+            originalLocation.add(coordinates[0].coordinate(), 0, 0);
         }
 
-        if (coordinates[1].getType() == LocationCoordinateType.ABSOLUTE) {
-            originalLocation.setZ(coordinates[1].getCoordinate());
-        } else if (coordinates[1].getType() == LocationCoordinateType.RELATIVE) {
-            originalLocation.add(0, 0, coordinates[1].getCoordinate());
+        if (coordinates[1].type() == LocationCoordinateType.ABSOLUTE) {
+            originalLocation.setZ(coordinates[1].coordinate());
+        } else if (coordinates[1].type() == LocationCoordinateType.RELATIVE) {
+            originalLocation.add(0, 0, coordinates[1].coordinate());
         } else {
             final Vector declaredPos = new Vector(
-                    coordinates[0].getCoordinate(),
+                    coordinates[0].coordinate(),
                     0,
-                    coordinates[1].getCoordinate()
+                    coordinates[1].coordinate()
             );
             final Location local = LocationParser.toLocalSpace(originalLocation, declaredPos);
             return ArgumentParseResult.success(Location2D.from(

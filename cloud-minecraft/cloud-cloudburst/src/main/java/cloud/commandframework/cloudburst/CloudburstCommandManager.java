@@ -112,21 +112,21 @@ public class CloudburstCommandManager<C> extends CommandManager<C> implements Se
      *
      * @return Owning plugin
      */
-    public final @NonNull Plugin getOwningPlugin() {
+    public final @NonNull Plugin owningPlugin() {
         return this.owningPlugin;
     }
 
     private void registerDefaultExceptionHandlers() {
         this.registerHandler(Throwable.class, (commandSender, throwable) -> {
             commandSender.sendMessage(MESSAGE_INTERNAL_ERROR);
-            this.getOwningPlugin().getLogger().error(
+            this.owningPlugin().getLogger().error(
                     "An unhandled exception was thrown during command execution",
                     throwable
             );
         });
         this.registerHandler(CommandExecutionException.class, (commandSender, throwable) -> {
             commandSender.sendMessage(MESSAGE_INTERNAL_ERROR);
-            this.getOwningPlugin().getLogger().error(
+            this.owningPlugin().getLogger().error(
                     "Exception executing command handler",
                     throwable.getCause()
             );

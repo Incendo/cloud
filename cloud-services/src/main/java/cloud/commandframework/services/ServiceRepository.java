@@ -75,12 +75,12 @@ public final class ServiceRepository<Context, Response> {
     }
 
     /**
-     * Get a queue containing all implementations
+     * Returns a queue containing all implementations.
      *
-     * @return Queue containing all implementations
+     * @return queue containing all implementations
      */
     @SuppressWarnings("NonApiType")
-    @NonNull LinkedList<ServiceWrapper<? extends Service<Context, Response>>> getQueue() {
+    @NonNull LinkedList<ServiceWrapper<? extends Service<Context, Response>>> queue() {
         synchronized (this.lock) {
             return new LinkedList<>(this.implementations);
         }
@@ -121,11 +121,11 @@ public final class ServiceRepository<Context, Response> {
             this.executionOrder = executionOrder;
         }
 
-        @NonNull T getImplementation() {
+        @NonNull T implementation() {
             return this.implementation;
         }
 
-        @NonNull Collection<Predicate<Context>> getFilters() {
+        @NonNull Collection<Predicate<Context>> filters() {
             return Collections.unmodifiableCollection(this.filters);
         }
 

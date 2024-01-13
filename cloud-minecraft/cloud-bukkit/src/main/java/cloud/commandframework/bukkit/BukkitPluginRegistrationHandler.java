@@ -119,7 +119,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
         );
 
         this.recognizedAliases.addAll(newAliases);
-        if (this.bukkitCommandManager.getSplitAliases()) {
+        if (this.bukkitCommandManager.splitAliases()) {
             newAliases.forEach(alias -> this.registerExternal(alias, command, bukkitCommand));
         }
 
@@ -157,7 +157,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
         this.bukkitCommands.remove(this.getNamespacedLabel(component.name()));
 
         this.recognizedAliases.removeAll(registeredAliases);
-        if (this.bukkitCommandManager.getSplitAliases()) {
+        if (this.bukkitCommandManager.splitAliases()) {
             registeredAliases.forEach(this::unregisterExternal);
         }
 

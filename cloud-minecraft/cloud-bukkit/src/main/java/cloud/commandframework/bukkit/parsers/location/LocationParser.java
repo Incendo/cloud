@@ -130,10 +130,10 @@ public final class LocationParser<C> implements ArgumentParser<C, Location>, Blo
             originalLocation = new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
         }
 
-        if (((coordinates[0].getType() == LocationCoordinateType.LOCAL)
-                != (coordinates[1].getType() == LocationCoordinateType.LOCAL))
-                || ((coordinates[0].getType() == LocationCoordinateType.LOCAL)
-                != (coordinates[2].getType() == LocationCoordinateType.LOCAL))
+        if (((coordinates[0].type() == LocationCoordinateType.LOCAL)
+                != (coordinates[1].type() == LocationCoordinateType.LOCAL))
+                || ((coordinates[0].type() == LocationCoordinateType.LOCAL)
+                != (coordinates[2].type() == LocationCoordinateType.LOCAL))
         ) {
             return ArgumentParseResult.failure(
                     new LocationParseException(
@@ -144,27 +144,27 @@ public final class LocationParser<C> implements ArgumentParser<C, Location>, Blo
             );
         }
 
-        if (coordinates[0].getType() == LocationCoordinateType.ABSOLUTE) {
-            originalLocation.setX(coordinates[0].getCoordinate());
-        } else if (coordinates[0].getType() == LocationCoordinateType.RELATIVE) {
-            originalLocation.add(coordinates[0].getCoordinate(), 0, 0);
+        if (coordinates[0].type() == LocationCoordinateType.ABSOLUTE) {
+            originalLocation.setX(coordinates[0].coordinate());
+        } else if (coordinates[0].type() == LocationCoordinateType.RELATIVE) {
+            originalLocation.add(coordinates[0].coordinate(), 0, 0);
         }
 
-        if (coordinates[1].getType() == LocationCoordinateType.ABSOLUTE) {
-            originalLocation.setY(coordinates[1].getCoordinate());
-        } else if (coordinates[1].getType() == LocationCoordinateType.RELATIVE) {
-            originalLocation.add(0, coordinates[1].getCoordinate(), 0);
+        if (coordinates[1].type() == LocationCoordinateType.ABSOLUTE) {
+            originalLocation.setY(coordinates[1].coordinate());
+        } else if (coordinates[1].type() == LocationCoordinateType.RELATIVE) {
+            originalLocation.add(0, coordinates[1].coordinate(), 0);
         }
 
-        if (coordinates[2].getType() == LocationCoordinateType.ABSOLUTE) {
-            originalLocation.setZ(coordinates[2].getCoordinate());
-        } else if (coordinates[2].getType() == LocationCoordinateType.RELATIVE) {
-            originalLocation.add(0, 0, coordinates[2].getCoordinate());
+        if (coordinates[2].type() == LocationCoordinateType.ABSOLUTE) {
+            originalLocation.setZ(coordinates[2].coordinate());
+        } else if (coordinates[2].type() == LocationCoordinateType.RELATIVE) {
+            originalLocation.add(0, 0, coordinates[2].coordinate());
         } else {
             final Vector declaredPos = new Vector(
-                    coordinates[0].getCoordinate(),
-                    coordinates[1].getCoordinate(),
-                    coordinates[2].getCoordinate()
+                    coordinates[0].coordinate(),
+                    coordinates[1].coordinate(),
+                    coordinates[2].coordinate()
             );
             return ArgumentParseResult.success(
                     toLocalSpace(originalLocation, declaredPos)
@@ -242,7 +242,7 @@ public final class LocationParser<C> implements ArgumentParser<C, Location>, Blo
             super(
                     LocationParser.class,
                     context,
-                    reason.getCaption(),
+                    reason.caption(),
                     CaptionVariable.of("input", input)
             );
         }
@@ -264,11 +264,11 @@ public final class LocationParser<C> implements ArgumentParser<C, Location>, Blo
             }
 
             /**
-             * Get the caption used for this failure reason
+             * Returns the caption used for this failure reason.
              *
-             * @return The caption
+             * @return the caption
              */
-            public @NonNull Caption getCaption() {
+            public @NonNull Caption caption() {
                 return this.caption;
             }
         }

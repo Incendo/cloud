@@ -203,7 +203,7 @@ public final class ChannelParser<C> implements ArgumentParser<C, MessageChannel>
          *
          * @return users input
          */
-        public final @NonNull String getInput() {
+        public final @NonNull String input() {
             return this.input;
         }
     }
@@ -224,7 +224,7 @@ public final class ChannelParser<C> implements ArgumentParser<C, MessageChannel>
 
         @Override
         public @NonNull String getMessage() {
-            return String.format("Too many channels found for '%s'.", getInput());
+            return String.format("Too many channels found for '%s'.", input());
         }
     }
 
@@ -244,7 +244,7 @@ public final class ChannelParser<C> implements ArgumentParser<C, MessageChannel>
 
         @Override
         public @NonNull String getMessage() {
-            return String.format("Channel not found for '%s'.", getInput());
+            return String.format("Channel not found for '%s'.", input());
         }
     }
 }

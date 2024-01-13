@@ -199,7 +199,7 @@ public final class CloudBrigadierManager<C, S> implements SenderMapperHolder<S, 
         }, builder -> builder.cloudSuggestions().toConstant(StringArgumentType.greedyString()));
         /* Map wrapped parsers to their native types */
         this.registerMapping(new TypeToken<WrappedBrigadierParser<C, ?>>() {
-        }, builder -> builder.to(WrappedBrigadierParser::getNativeArgument));
+        }, builder -> builder.to(WrappedBrigadierParser::nativeArgumentType));
     }
 
     /**

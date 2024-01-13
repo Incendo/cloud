@@ -126,8 +126,8 @@ public abstract class StandardArgumentExtractor implements ArgumentExtractor {
     ) {
         final Map<String, SyntaxFragment> variableFragments = new HashMap<>();
         syntax.stream()
-                .filter(fragment -> fragment.getArgumentMode() != ArgumentMode.LITERAL)
-                .forEach(fragment -> variableFragments.put(fragment.getMajor(), fragment));
+                .filter(fragment -> fragment.argumentMode() != ArgumentMode.LITERAL)
+                .forEach(fragment -> variableFragments.put(fragment.major(), fragment));
 
         final Collection<ArgumentDescriptor> arguments = new ArrayList<>();
         for (final Parameter parameter : method.getParameters()) {

@@ -175,7 +175,7 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
         final InjectionRequest<C> request = InjectionRequest.of(context, type, annotationAccessor);
         try {
             final Object rawResult = this.servicePipeline.pump(request).through(new TypeToken<InjectionService<C>>() {
-            }).getResult();
+            }).complete();
 
             if (!request.injectedClass().isInstance(rawResult)) {
                 throw new IllegalStateException(String.format(

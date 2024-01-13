@@ -63,7 +63,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
             commandSender = new JavacordCommandSender(event);
         }
 
-        C sender = this.manager.getCommandSenderMapper().apply(commandSender);
+        C sender = this.manager.commandSenderMapper().apply(commandSender);
 
         String messageContent = event.getMessageContent();
         String commandPrefix = this.manager.getCommandPrefix(sender);

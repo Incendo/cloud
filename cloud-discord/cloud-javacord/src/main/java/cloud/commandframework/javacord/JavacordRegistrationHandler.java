@@ -56,7 +56,7 @@ final class JavacordRegistrationHandler<C> implements CommandRegistrationHandler
                 this.javacordCommandManager
         );
         this.registeredCommands.put(component, javacordCommand);
-        this.javacordCommandManager.getDiscordApi().addMessageCreateListener(javacordCommand);
+        this.javacordCommandManager.discordApi().addMessageCreateListener(javacordCommand);
         return true;
     }
 
@@ -69,6 +69,6 @@ final class JavacordRegistrationHandler<C> implements CommandRegistrationHandler
             return;
         }
 
-        this.javacordCommandManager.getDiscordApi().removeListener(MessageCreateListener.class, command);
+        this.javacordCommandManager.discordApi().removeListener(MessageCreateListener.class, command);
     }
 }

@@ -45,19 +45,19 @@ public class SyntaxParserImplTest {
         Assertions.assertEquals(3, fragments.size());
 
         final SyntaxFragment literal = fragments.get(0);
-        Assertions.assertEquals("literal", literal.getMajor());
-        Assertions.assertEquals(Arrays.asList("litalias1", "litalias2"), literal.getMinor());
-        Assertions.assertEquals(ArgumentMode.LITERAL, literal.getArgumentMode());
+        Assertions.assertEquals("literal", literal.major());
+        Assertions.assertEquals(Arrays.asList("litalias1", "litalias2"), literal.minor());
+        Assertions.assertEquals(ArgumentMode.LITERAL, literal.argumentMode());
 
         final SyntaxFragment requirement = fragments.get(1);
-        Assertions.assertEquals("requirement", requirement.getMajor());
-        Assertions.assertEquals(Collections.emptyList(), requirement.getMinor());
-        Assertions.assertEquals(ArgumentMode.REQUIRED, requirement.getArgumentMode());
+        Assertions.assertEquals("requirement", requirement.major());
+        Assertions.assertEquals(Collections.emptyList(), requirement.minor());
+        Assertions.assertEquals(ArgumentMode.REQUIRED, requirement.argumentMode());
 
         final SyntaxFragment optional = fragments.get(2);
-        Assertions.assertEquals("optional", optional.getMajor());
-        Assertions.assertEquals(Collections.emptyList(), optional.getMinor());
-        Assertions.assertEquals(ArgumentMode.OPTIONAL, optional.getArgumentMode());
+        Assertions.assertEquals("optional", optional.major());
+        Assertions.assertEquals(Collections.emptyList(), optional.minor());
+        Assertions.assertEquals(ArgumentMode.OPTIONAL, optional.argumentMode());
     }
 
     @Test
@@ -70,19 +70,19 @@ public class SyntaxParserImplTest {
         Assertions.assertEquals(3, fragments.size());
 
         final SyntaxFragment literal = fragments.get(0);
-        Assertions.assertEquals("literal", literal.getMajor());
-        Assertions.assertEquals(Collections.emptyList(), literal.getMinor());
-        Assertions.assertEquals(ArgumentMode.LITERAL, literal.getArgumentMode());
+        Assertions.assertEquals("literal", literal.major());
+        Assertions.assertEquals(Collections.emptyList(), literal.minor());
+        Assertions.assertEquals(ArgumentMode.LITERAL, literal.argumentMode());
 
         final SyntaxFragment requirement = fragments.get(1);
-        Assertions.assertEquals("requirement", requirement.getMajor());
-        Assertions.assertEquals(Collections.emptyList(), requirement.getMinor());
-        Assertions.assertEquals(ArgumentMode.REQUIRED, requirement.getArgumentMode());
+        Assertions.assertEquals("requirement", requirement.major());
+        Assertions.assertEquals(Collections.emptyList(), requirement.minor());
+        Assertions.assertEquals(ArgumentMode.REQUIRED, requirement.argumentMode());
 
         final SyntaxFragment optional = fragments.get(2);
-        Assertions.assertEquals("optional", optional.getMajor());
-        Assertions.assertEquals(Collections.emptyList(), optional.getMinor());
-        Assertions.assertEquals(ArgumentMode.OPTIONAL, optional.getArgumentMode());
+        Assertions.assertEquals("optional", optional.major());
+        Assertions.assertEquals(Collections.emptyList(), optional.minor());
+        Assertions.assertEquals(ArgumentMode.OPTIONAL, optional.argumentMode());
     }
 
     @Test
@@ -95,18 +95,18 @@ public class SyntaxParserImplTest {
         Assertions.assertEquals(3, fragments.size());
 
         final SyntaxFragment literal = fragments.get(0);
-        Assertions.assertEquals("l_itera-l", literal.getMajor());
-        Assertions.assertEquals(Collections.singletonList("with_ali-as"), literal.getMinor());
-        Assertions.assertEquals(ArgumentMode.LITERAL, literal.getArgumentMode());
+        Assertions.assertEquals("l_itera-l", literal.major());
+        Assertions.assertEquals(Collections.singletonList("with_ali-as"), literal.minor());
+        Assertions.assertEquals(ArgumentMode.LITERAL, literal.argumentMode());
 
         final SyntaxFragment requirement = fragments.get(1);
-        Assertions.assertEquals("r_equiremen-t", requirement.getMajor());
-        Assertions.assertEquals(Collections.emptyList(), requirement.getMinor());
-        Assertions.assertEquals(ArgumentMode.REQUIRED, requirement.getArgumentMode());
+        Assertions.assertEquals("r_equiremen-t", requirement.major());
+        Assertions.assertEquals(Collections.emptyList(), requirement.minor());
+        Assertions.assertEquals(ArgumentMode.REQUIRED, requirement.argumentMode());
 
         final SyntaxFragment optional = fragments.get(2);
-        Assertions.assertEquals("o_ptiona-l", optional.getMajor());
-        Assertions.assertEquals(Collections.emptyList(), optional.getMinor());
-        Assertions.assertEquals(ArgumentMode.OPTIONAL, optional.getArgumentMode());
+        Assertions.assertEquals("o_ptiona-l", optional.major());
+        Assertions.assertEquals(Collections.emptyList(), optional.minor());
+        Assertions.assertEquals(ArgumentMode.OPTIONAL, optional.argumentMode());
     }
 }

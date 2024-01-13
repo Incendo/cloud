@@ -76,24 +76,24 @@ public class ServicesTest {
         Assertions.assertEquals(
                 32,
                 servicePipeline.pump(new MockService.MockContext("Hello")).through(MockService.class)
-                        .getResult().getInteger()
+                        .complete().getInteger()
         );
         servicePipeline.pump(new MockService.MockContext("Hello")).through(MockService.class)
-                .getResult(
+                .complete(
                         (mockResult, throwable) -> Assertions.assertEquals(32, mockResult.getInteger()));
         Assertions.assertEquals(
                 999,
                 servicePipeline.pump(new MockService.MockContext("potato")).through(MockService.class)
-                        .getResult().getInteger()
+                        .complete().getInteger()
         );
         Assertions.assertEquals(
                 -91,
                 servicePipeline.pump(new MockService.MockContext("-91")).through(MockService.class)
-                        .getResult().getInteger()
+                        .complete().getInteger()
         );
         Assertions.assertNotNull(
                 servicePipeline.pump(new MockService.MockContext("oi")).through(MockService.class)
-                        .getResultAsynchronously().get());
+                        .completeAsynchronously().get());
     }
 
     @Test
@@ -108,7 +108,7 @@ public class ServicesTest {
         Assertions.assertEquals(20, mockPlayer.getHealth());
         Assertions.assertEquals(
                 State.ACCEPTED,
-                servicePipeline.pump(mockPlayer).through(MockSideEffectService.class).getResult()
+                servicePipeline.pump(mockPlayer).through(MockSideEffectService.class).complete()
         );
         Assertions.assertEquals(0, mockPlayer.getHealth());
         mockPlayer.setHealth(20);
@@ -118,7 +118,7 @@ public class ServicesTest {
         Assertions.assertThrows(
                 IllegalStateException.class,
                 () -> servicePipeline.pump(mockPlayer).through(MockSideEffectService.class)
-                        .getResult()
+                        .complete()
         );
     }
 
@@ -136,14 +136,14 @@ public class ServicesTest {
         Assertions.assertEquals(
                 State.ACCEPTED,
                 servicePipeline.pump(new MockService.MockContext("huh")).through(MockService.class)
-                        .forward().through(MockResultConsumer.class).getResult()
+                        .forward().through(MockResultConsumer.class).complete()
         );
         Assertions.assertEquals(
                 State.ACCEPTED,
                 servicePipeline.pump(new MockService.MockContext("Something"))
                         .through(MockService.class).forwardAsynchronously()
                         .thenApply(pump -> pump.through(MockResultConsumer.class))
-                        .thenApply(ServiceSpigot::getResult).get()
+                        .thenApply(ServiceSpigot::complete).get()
         );
     }
 
@@ -164,7 +164,7 @@ public class ServicesTest {
         Assertions.assertEquals(
                 1,
                 servicePipeline.pump(new MockService.MockContext("")).through(MockService.class)
-                        .getResult().getInteger()
+                        .complete().getInteger()
         );
     }
 
@@ -175,7 +175,7 @@ public class ServicesTest {
                         TypeToken.get(MockService.class),
                         new DefaultMockService()
                 );
-        Assertions.assertEquals(1, servicePipeline.getRecognizedTypes().size());
+        Assertions.assertEquals(1, servicePipeline.recognizedTypes().size());
     }
 
     @Test
@@ -194,7 +194,7 @@ public class ServicesTest {
         final TypeToken<? extends Service<?, ?>> first = TypeToken.get(MockOrderedFirst.class),
                 last = TypeToken.get(MockOrderedLast.class);
         final TypeToken<MockService> mockServiceType = TypeToken.get(MockService.class);
-        for (Type typeToken : servicePipeline.getRecognizedTypes()) {
+        for (Type typeToken : servicePipeline.recognizedTypes()) {
             Assertions.assertEquals(mockServiceType.getType(), typeToken);
         }
         final Collection<? extends TypeToken<? extends Service<MockService.MockContext, MockService.MockResult>>>
@@ -219,7 +219,7 @@ public class ServicesTest {
         Assertions.assertEquals(
                 testString.length(),
                 servicePipeline.pump(new MockService.MockContext(testString)).through(MockService.class)
-                        .getResult().getInteger()
+                        .complete().getInteger()
         );
     }
 
@@ -236,7 +236,7 @@ public class ServicesTest {
                         Collections.emptyList()
                 );
         final MockService.MockContext context = new MockService.MockContext("");
-        servicePipeline.pump(context).through(MockConsumerService.class).getResult();
+        servicePipeline.pump(context).through(MockConsumerService.class).complete();
         Assertions.assertEquals("", context.getState());
     }
 
@@ -257,7 +257,7 @@ public class ServicesTest {
         final MockChunkedRequest.Animal cat = new MockChunkedRequest.Animal("cat");
         final Map<MockChunkedRequest.Animal, MockChunkedRequest.Sound> sounds =
                 servicePipeline.pump(new MockChunkedRequest(Arrays.asList(cow, dog, cat)))
-                        .through(MockPartialResultService.class).getResult();
+                        .through(MockPartialResultService.class).complete();
         Assertions.assertEquals("moo", sounds.get(cow).getSound());
         Assertions.assertEquals("woof", sounds.get(dog).getSound());
         Assertions.assertEquals("unknown", sounds.get(cat).getSound());
@@ -272,14 +272,14 @@ public class ServicesTest {
         final PipelineException pipelineException = Assertions.assertThrows(
                 PipelineException.class,
                 () -> servicePipeline.pump(new MockService.MockContext("pls throw exception"))
-                        .through(MockService.class).getResult()
+                        .through(MockService.class).complete()
         );
         Assertions.assertEquals(
                 DefaultMockService.TotallyIntentionalException.class,
                 pipelineException.getCause().getClass()
         );
         servicePipeline.pump(new MockService.MockContext("pls throw exception"))
-                .through(MockService.class).getResult((result, throwable) -> {
+                .through(MockService.class).complete((result, throwable) -> {
                     Assertions.assertNotNull(throwable);
                     Assertions.assertEquals(
                             DefaultMockService.TotallyIntentionalException.class,

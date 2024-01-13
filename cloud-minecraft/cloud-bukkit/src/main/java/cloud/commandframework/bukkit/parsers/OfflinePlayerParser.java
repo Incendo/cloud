@@ -139,7 +139,7 @@ public final class OfflinePlayerParser<C> implements ArgumentParser<C, OfflinePl
          *
          * @return String value
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
     }

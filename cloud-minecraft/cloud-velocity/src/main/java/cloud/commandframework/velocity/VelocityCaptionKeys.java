@@ -58,11 +58,11 @@ public final class VelocityCaptionKeys {
     }
 
     /**
-     * Get an immutable collection containing all standard caption keys
+     * Returns an immutable collection containing all standard caption keys.
      *
-     * @return Immutable collection of keys
+     * @return immutable collection of keys
      */
-    public static @NonNull Collection<@NonNull Caption> getVelocityCaptionKeys() {
+    public static @NonNull Collection<@NonNull Caption> velocityCaptionKeys() {
         return Collections.unmodifiableCollection(RECOGNIZED_CAPTIONS);
     }
 }

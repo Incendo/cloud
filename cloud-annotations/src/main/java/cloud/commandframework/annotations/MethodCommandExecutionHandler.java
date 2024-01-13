@@ -177,7 +177,7 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
             this.commandComponents = commandComponents;
             this.method = method;
             this.method.setAccessible(true);
-            this.injectorRegistry = annotationParser.getParameterInjectorRegistry();
+            this.injectorRegistry = annotationParser.manager().parameterInjectorRegistry();
             this.annotationParser = annotationParser;
             this.argumentDescriptors = argumentDescriptors;
             this.flagDescriptors = flagDescriptors;

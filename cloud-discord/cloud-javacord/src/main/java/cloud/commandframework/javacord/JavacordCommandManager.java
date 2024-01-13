@@ -122,7 +122,7 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
         return serverSender.getServer().hasPermission(authorOptional.get(), PermissionType.valueOf(permission));
     }
 
-    final @NonNull Function<@NonNull JavacordCommandSender, @NonNull C> getCommandSenderMapper() {
+    final @NonNull Function<@NonNull JavacordCommandSender, @NonNull C> commandSenderMapper() {
         return this.commandSenderMapper;
     }
 
@@ -137,11 +137,11 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
     }
 
     /**
-     * Gets the DiscordApi instance
+     * Returns the DiscordApi instance.
      *
-     * @return Current DiscordApi instance
+     * @return current DiscordApi instance
      */
-    public @NonNull DiscordApi getDiscordApi() {
+    public @NonNull DiscordApi discordApi() {
         return this.discordApi;
     }
 

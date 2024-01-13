@@ -55,22 +55,22 @@ public abstract class ChunkedRequestContext<@NonNull Context, @NonNull Result> {
     }
 
     /**
-     * Get a view of the (currently) available results
+     * Returns a view of the (currently) available results.
      *
-     * @return Unmodifiable map of results
+     * @return unmodifiable map of results
      */
-    public final @NonNull Map<@NonNull Context, @NonNull Result> getAvailableResults() {
+    public final @NonNull Map<@NonNull Context, @NonNull Result> availableResults() {
         synchronized (this.lock) {
             return Collections.unmodifiableMap(this.results);
         }
     }
 
     /**
-     * Get all remaining requests
+     * Returns all remaining requests.
      *
-     * @return Unmodifiable list of remaining requests
+     * @return unmodifiable list of remaining requests
      */
-    public final @NonNull List<@NonNull Context> getRemaining() {
+    public final @NonNull List<@NonNull Context> remaining() {
         synchronized (this.lock) {
             return Collections.unmodifiableList(this.requests);
         }

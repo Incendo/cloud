@@ -122,7 +122,7 @@ public final class MaterialParser<C> implements ArgumentParser<C, Material>, Blo
          *
          * @return Input
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
     }

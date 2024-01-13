@@ -130,7 +130,7 @@ public final class PlayerParser<C> implements ArgumentParser<C, Player>, Blockin
          *
          * @return String value
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
     }
