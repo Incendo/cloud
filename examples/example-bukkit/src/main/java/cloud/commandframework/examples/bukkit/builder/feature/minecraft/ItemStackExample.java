@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,8 +55,8 @@ public final class ItemStackExample implements BuilderFeature {
                                 Pair.of("item", "amount"),
                                 Pair.of(ProtoItemStack.class, Integer.class),
                                 (sender, pair) -> {
-                                    final ProtoItemStack proto = pair.getFirst();
-                                    final int amount = pair.getSecond();
+                                    final ProtoItemStack proto = pair.first();
+                                    final int amount = pair.second();
                                     return proto.createItemStack(amount, true);
                                 },
                                 Description.of("The ItemStack to give")

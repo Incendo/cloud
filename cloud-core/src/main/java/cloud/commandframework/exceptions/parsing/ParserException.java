@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,16 +30,30 @@ import cloud.commandframework.context.CommandContext;
 import java.util.Arrays;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("serial")
 @API(status = API.Status.STABLE)
 public class ParserException extends IllegalArgumentException {
 
-    private static final long serialVersionUID = -4409795575435072170L;
     private final Class<?> argumentParser;
     private final CommandContext<?> context;
     private final Caption errorCaption;
     private final CaptionVariable[] captionVariables;
+
+    protected ParserException(
+            final @Nullable Throwable cause,
+            final @NonNull Class<?> argumentParser,
+            final @NonNull CommandContext<?> context,
+            final @NonNull Caption errorCaption,
+            final @NonNull CaptionVariable... captionVariables
+    ) {
+        super(cause);
+        this.argumentParser = argumentParser;
+        this.context = context;
+        this.errorCaption = errorCaption;
+        this.captionVariables = captionVariables;
+    }
 
     protected ParserException(
             final @NonNull Class<?> argumentParser,
@@ -47,10 +61,7 @@ public class ParserException extends IllegalArgumentException {
             final @NonNull Caption errorCaption,
             final @NonNull CaptionVariable... captionVariables
     ) {
-        this.argumentParser = argumentParser;
-        this.context = context;
-        this.errorCaption = errorCaption;
-        this.captionVariables = captionVariables;
+        this(null /* cause */, argumentParser, context, errorCaption, captionVariables);
     }
 
     @Override
@@ -96,20 +107,20 @@ public class ParserException extends IllegalArgumentException {
     }
 
     /**
-     * Get the argument parser
+     * Returns the argument parser class.
      *
-     * @return Argument parser
+     * @return argument parser class
      */
-    public final @NonNull Class<?> getArgumentParserClass() {
+    public final @NonNull Class<?> argumentParserClass() {
         return this.argumentParser;
     }
 
     /**
-     * Get the command context
+     * Returns the command context.
      *
-     * @return Command context
+     * @return command context
      */
-    public final @NonNull CommandContext<?> getContext() {
+    public final @NonNull CommandContext<?> context() {
         return this.context;
     }
 }

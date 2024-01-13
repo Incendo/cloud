@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.AmbiguousNodeException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.execution.CommandExecutionHandler;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.meta.CommandMeta;
 import io.leangen.geantyref.TypeToken;
@@ -39,6 +40,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -93,22 +95,28 @@ class CommandTreeTest {
                         .build()
         );
 
+        final Executor executor = ExecutionCoordinator.nonSchedulingExecutor();
+
         // Act
         final CompletableFuture<Command<TestCommandSender>> command1 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("test one")
+                CommandInput.of("test one"),
+                executor
         );
         final CompletableFuture<Command<TestCommandSender>> command2 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("test two")
+                CommandInput.of("test two"),
+                executor
         );
         final CompletableFuture<Command<TestCommandSender>> command3 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("test opt")
+                CommandInput.of("test opt"),
+                executor
         );
         final CompletableFuture<Command<TestCommandSender>> command4 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("test opt 12")
+                CommandInput.of("test opt 12"),
+                executor
         );
 
         // Assert
@@ -133,7 +141,8 @@ class CommandTreeTest {
         // Act
         final Command<TestCommandSender> result = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("other öpt 12")
+                CommandInput.of("other öpt 12"),
+                ExecutionCoordinator.nonSchedulingExecutor()
         ).join();
 
         // Assert
@@ -153,10 +162,11 @@ class CommandTreeTest {
         );
 
         // Act
-        final List<Suggestion> results = this.commandManager.commandTree().getSuggestions(
+        final List<? extends Suggestion> results = this.commandManager.commandTree().getSuggestions(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("test ")
-        ).join();
+                CommandInput.of("test "),
+                ExecutionCoordinator.nonSchedulingExecutor()
+        ).join().list();
 
         // Assert
         assertThat(results).containsExactly(Suggestion.simple("a"), Suggestion.simple("b"));
@@ -176,7 +186,7 @@ class CommandTreeTest {
         );
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "default 5").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "default 5").join();
 
         // Assert
         final ArgumentCaptor<CommandContext<TestCommandSender>> contextArgumentCaptor = ArgumentCaptor.forClass(
@@ -190,8 +200,10 @@ class CommandTreeTest {
 
     @Test
     void invalidCommand() {
-        assertThrows(CompletionException.class, () -> this.commandManager
-                .executeCommand(new TestCommandSender(), "invalid test").join());
+        assertThrows(CompletionException.class, () -> this.commandManager.commandExecutor().executeCommand(
+                new TestCommandSender(),
+                "invalid test"
+        ).join());
     }
 
     @Test
@@ -211,8 +223,8 @@ class CommandTreeTest {
         this.commandManager.command(this.commandManager.commandBuilder("proxy").proxies(toProxy).build());
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "test unproxied foo 10 anotherliteral").join();
-        this.commandManager.executeCommand(new TestCommandSender(), "proxy foo 10").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test unproxied foo 10 anotherliteral").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "proxy foo 10").join();
 
         // Assert
         verify(executionHandler, times(2)).executeFuture(notNull());
@@ -247,7 +259,7 @@ class CommandTreeTest {
         final CommandExecutionHandler<TestCommandSender> executionHandler = this.setupFlags();
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "flags").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "flags").join();
 
         // Assert
         final ArgumentCaptor<CommandContext<TestCommandSender>> contextArgumentCaptor = ArgumentCaptor.forClass(
@@ -265,7 +277,7 @@ class CommandTreeTest {
         final CommandExecutionHandler<TestCommandSender> executionHandler = this.setupFlags();
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "flags --test").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "flags --test").join();
 
         // Assert
         final ArgumentCaptor<CommandContext<TestCommandSender>> contextArgumentCaptor = ArgumentCaptor.forClass(
@@ -283,7 +295,7 @@ class CommandTreeTest {
         final CommandExecutionHandler<TestCommandSender> executionHandler = this.setupFlags();
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "flags -t").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "flags -t").join();
 
         // Assert
         final ArgumentCaptor<CommandContext<TestCommandSender>> contextArgumentCaptor = ArgumentCaptor.forClass(
@@ -303,7 +315,7 @@ class CommandTreeTest {
         // Act & Assert
         assertThrows(
                 CompletionException.class, () ->
-                        this.commandManager.executeCommand(new TestCommandSender(), "flags --test --nonexistent").join()
+                        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "flags --test --nonexistent").join()
         );
     }
 
@@ -313,7 +325,7 @@ class CommandTreeTest {
         final CommandExecutionHandler<TestCommandSender> executionHandler = this.setupFlags();
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "flags --test --test2").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "flags --test --test2").join();
 
         // Assert
         final ArgumentCaptor<CommandContext<TestCommandSender>> contextArgumentCaptor = ArgumentCaptor.forClass(
@@ -334,7 +346,7 @@ class CommandTreeTest {
         // Act
         assertThrows(
                 CompletionException.class, () ->
-                        this.commandManager.executeCommand(new TestCommandSender(), "flags --test test2").join()
+                        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "flags --test test2").join()
         );
     }
 
@@ -344,7 +356,7 @@ class CommandTreeTest {
         final CommandExecutionHandler<TestCommandSender> executionHandler = this.setupFlags();
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "flags --num 500").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "flags --num 500").join();
 
         // Assert
         final ArgumentCaptor<CommandContext<TestCommandSender>> contextArgumentCaptor = ArgumentCaptor.forClass(
@@ -362,7 +374,7 @@ class CommandTreeTest {
         final CommandExecutionHandler<TestCommandSender> executionHandler = this.setupFlags();
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "flags --num 63 --enum potato --test").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "flags --num 63 --enum potato --test").join();
 
         // Assert
         final ArgumentCaptor<CommandContext<TestCommandSender>> contextArgumentCaptor = ArgumentCaptor.forClass(
@@ -381,7 +393,7 @@ class CommandTreeTest {
         final CommandExecutionHandler<TestCommandSender> executionHandler = this.setupFlags();
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "flags -tf --num 63 --enum potato").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "flags -tf --num 63 --enum potato").join();
 
         // Assert
         final ArgumentCaptor<CommandContext<TestCommandSender>> contextArgumentCaptor = ArgumentCaptor.forClass(
@@ -477,10 +489,13 @@ class CommandTreeTest {
                         .literal("literal", "literalalias")
         );
 
+        final Executor executor = ExecutionCoordinator.nonSchedulingExecutor();
+
         /* Try parsing as a variable, which should match the variable command */
         final Command<TestCommandSender> variableResult = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("literalwithvariable argthatdoesnotmatch")
+                CommandInput.of("literalwithvariable argthatdoesnotmatch"),
+                executor
         ).join();
         assertThat(variableResult).isNotNull();
         assertThat(variableResult.rootComponent().name()).isEqualTo("literalwithvariable");
@@ -489,7 +504,8 @@ class CommandTreeTest {
         /* Try parsing with the main name literal, which should match the literal command */
         final Command<TestCommandSender> literalResult = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("literalwithvariable literal")
+                CommandInput.of("literalwithvariable literal"),
+                executor
         ).join();
         assertThat(literalResult).isNotNull();
         assertThat(literalResult.rootComponent().name()).isEqualTo("literalwithvariable");
@@ -498,7 +514,8 @@ class CommandTreeTest {
         /* Try parsing with the alias of the literal, which should match the literal command */
         final Command<TestCommandSender> literalAliasResult = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                CommandInput.of("literalwithvariable literalalias")
+                CommandInput.of("literalwithvariable literalalias"),
+                executor
         ).join();
         assertThat(literalAliasResult).isNotNull();
         assertThat(literalAliasResult.rootComponent().name()).isEqualTo("literalwithvariable");
@@ -530,8 +547,8 @@ class CommandTreeTest {
         );
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "float 0.0").join();
-        this.commandManager.executeCommand(new TestCommandSender(), "float 100").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "float 0.0").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "float 100").join();
 
         // Assert
         final ArgumentCaptor<CommandContext<TestCommandSender>> contextArgumentCaptor = ArgumentCaptor.forClass(
@@ -560,7 +577,7 @@ class CommandTreeTest {
         );
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "optionals").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "optionals").join();
 
         // Assert
         final ArgumentCaptor<CommandContext<TestCommandSender>> contextArgumentCaptor = ArgumentCaptor.forClass(

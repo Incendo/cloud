@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,14 +23,18 @@
 //
 package cloud.commandframework.annotations.parsers;
 
+import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
+import cloud.commandframework.annotations.method.AnnotatedMethodHandler;
+import cloud.commandframework.annotations.method.ParameterValue;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -40,26 +44,26 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <T> Argument type
  * @since 1.3.0
  */
-public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
+public final class MethodArgumentParser<C, T> extends AnnotatedMethodHandler<C> implements ArgumentParser<C, T> {
 
     private final SuggestionProvider<C> suggestionProvider;
-    private final MethodHandle methodHandle;
 
     /**
-     * Create a new parser
+     * Creates a new parser.
      *
-     * @param suggestionProvider Suggestion provider
-     * @param instance           Instance that owns the method
-     * @param method             The annotated method
-     * @throws Exception If the method lookup fails
+     * @param suggestionProvider suggestion provider
+     * @param instance           instance that owns the method
+     * @param method             the annotated method
+     * @param injectorRegistry   injector registry
      */
     public MethodArgumentParser(
             final @NonNull SuggestionProvider<C> suggestionProvider,
             final @NonNull Object instance,
-            final @NonNull Method method
-    ) throws Exception {
+            final @NonNull Method method,
+            final @NonNull ParameterInjectorRegistry<C> injectorRegistry
+    ) {
+        super(method, instance, injectorRegistry);
         this.suggestionProvider = suggestionProvider;
-        this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);
     }
 
     @Override
@@ -68,9 +72,14 @@ public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
+        final List<Object> arguments = this.createParameterValues(
+                commandContext,
+                this.parameters(),
+                Collections.singletonList(commandInput)
+        ).stream().map(ParameterValue::value).collect(Collectors.toList());
         try {
             return ArgumentParseResult.success(
-                    (T) this.methodHandle.invokeWithArguments(commandContext, commandInput)
+                    (T) this.methodHandle().invokeWithArguments(arguments)
             );
         } catch (final Throwable t) {
             return ArgumentParseResult.failure(t);

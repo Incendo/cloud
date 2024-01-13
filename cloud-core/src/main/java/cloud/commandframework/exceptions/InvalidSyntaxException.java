@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE)
 public class InvalidSyntaxException extends CommandParseException {
 
-    private static final long serialVersionUID = -4183356059293785202L;
     private final String correctSyntax;
 
     /**
@@ -56,14 +55,13 @@ public class InvalidSyntaxException extends CommandParseException {
     }
 
     /**
-     * Get the correct syntax of the command
+     * Returns the correct syntax of the command.
      *
-     * @return Correct command syntax
+     * @return correct command syntax
      */
-    public @NonNull String getCorrectSyntax() {
+    public @NonNull String correctSyntax() {
         return this.correctSyntax;
     }
-
 
     @Override
     public final String getMessage() {

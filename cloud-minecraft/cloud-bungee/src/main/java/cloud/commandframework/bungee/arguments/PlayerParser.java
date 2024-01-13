@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,6 @@ import cloud.commandframework.bungee.BungeeCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.ProxyServer;
@@ -77,14 +76,8 @@ public final class PlayerParser<C> implements ArgumentParser<C, ProxiedPlayer>, 
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    PlayerParser.class,
-                    commandContext
-            ));
-        }
-        final ProxiedPlayer player = commandContext.<ProxyServer>get("ProxyServer").getPlayer(commandInput.readString());
+        final String input = commandInput.readString();
+        final ProxiedPlayer player = commandContext.<ProxyServer>get("ProxyServer").getPlayer(input);
         if (player == null) {
             return ArgumentParseResult.failure(
                     new PlayerParseException(
@@ -99,7 +92,7 @@ public final class PlayerParser<C> implements ArgumentParser<C, ProxiedPlayer>, 
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         return commandContext.<ProxyServer>get("ProxyServer")
                 .getPlayers()
@@ -110,7 +103,6 @@ public final class PlayerParser<C> implements ArgumentParser<C, ProxiedPlayer>, 
 
     public static final class PlayerParseException extends ParserException {
 
-        private static final long serialVersionUID = -2685136673577959929L;
 
         private PlayerParseException(
                 final @NonNull String input,

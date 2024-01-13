@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -145,12 +145,13 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
     public static @NonNull List<@NonNull String> getSuggestions(
             final long min,
             final long max,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         final Set<Long> numbers = new TreeSet<>();
+        final String token = input.peekString();
 
         try {
-            final long inputNum = Long.parseLong(input.equals("-") ? "-0" : input.isEmpty() ? "0" : input);
+            final long inputNum = Long.parseLong(token.equals("-") ? "-0" : token.isEmpty() ? "0" : token);
             final long inputNumAbsolute = Math.abs(inputNum);
 
             numbers.add(inputNumAbsolute); /* It's a valid number, so we suggest it */
@@ -161,7 +162,7 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
 
             final List<String> suggestions = new LinkedList<>();
             for (long number : numbers) {
-                if (input.startsWith("-")) {
+                if (token.startsWith("-")) {
                     number = -number; /* Preserve sign */
                 }
                 if (number < min || number > max) {
@@ -192,20 +193,20 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
     }
 
     /**
-     * Get the minimum value accepted by this parser
+     * Returns the minimum value accepted by this parser.
      *
-     * @return Min value
+     * @return min value
      */
-    public int getMin() {
+    public int min() {
         return this.min;
     }
 
     /**
-     * Get the maximum value accepted by this parser
+     * Returns the maximum value accepted by this parser.
      *
-     * @return Max value
+     * @return max value
      */
-    public int getMax() {
+    public int max() {
         return this.max;
     }
 
@@ -234,7 +235,7 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         return getSuggestions(this.min, this.max, input);
     }
@@ -243,7 +244,6 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
     @API(status = API.Status.STABLE)
     public static final class IntegerParseException extends NumberParseException {
 
-        private static final long serialVersionUID = -6933923056628373853L;
 
         private final IntegerParser<?> parser;
 
@@ -276,7 +276,7 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
         }
 
         @Override
-        public @NonNull String getNumberType() {
+        public @NonNull String numberType() {
             return "integer";
         }
 

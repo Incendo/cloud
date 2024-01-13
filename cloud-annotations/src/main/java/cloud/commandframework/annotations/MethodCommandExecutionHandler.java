@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,21 +24,20 @@
 package cloud.commandframework.annotations;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
+import cloud.commandframework.annotations.descriptor.FlagDescriptor;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
-import cloud.commandframework.arguments.flags.FlagContext;
+import cloud.commandframework.annotations.method.AnnotatedMethodHandler;
+import cloud.commandframework.annotations.method.ParameterValue;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.execution.CommandExecutionHandler;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -50,12 +49,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type.
  * @since 1.6.0 (Was made public in 1.6.0)
  */
-public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
+public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> implements CommandExecutionHandler<C> {
 
     private final CommandMethodContext<C> context;
-    private final Parameter[] parameters;
-    private final MethodHandle methodHandle;
-    private final AnnotationAccessor annotationAccessor;
     private final AnnotationParser<C> annotationParser;
 
     /**
@@ -64,128 +60,10 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
      * @param context The context
      * @since 1.6.0
      */
-    public MethodCommandExecutionHandler(
-            final @NonNull CommandMethodContext<C> context
-    ) throws Exception {
+    public MethodCommandExecutionHandler(final @NonNull CommandMethodContext<C> context) {
+        super(context.method, context.instance, context.annotationParser.manager().parameterInjectorRegistry());
         this.context = context;
-        this.methodHandle = MethodHandles.lookup().unreflect(context.method).bindTo(context.instance);
-        this.parameters = context.method.getParameters();
-        this.annotationAccessor = AnnotationAccessor.of(context.method);
         this.annotationParser = context.annotationParser();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void execute(final @NonNull CommandContext<C> commandContext) {
-        /* Invoke the command method */
-        try {
-            this.methodHandle.invokeWithArguments(
-                    this.createParameterValues(
-                            commandContext,
-                            commandContext.flags(),
-                            this.parameters
-                    ).stream().map(ParameterValue::value).collect(Collectors.toList())
-            );
-        } catch (final Error e) {
-            throw e;
-        } catch (final Throwable throwable) {
-            throw new CommandExecutionException(throwable, commandContext);
-        }
-    }
-
-    /**
-     * Creates a list containing the values for the given method parameters.
-     *
-     * @param commandContext The context
-     * @param flagContext    The flag context
-     * @param parameters     The parameters to create values for
-     * @return A list containing all parameters, in order
-     * @since 1.6.0
-     */
-    protected final @NonNull List<@NonNull ParameterValue> createParameterValues(
-            final CommandContext<C> commandContext,
-            final FlagContext flagContext,
-            final Parameter[] parameters
-    ) {
-        final List<ParameterValue> arguments = new ArrayList<>(parameters.length);
-        for (final Parameter parameter : parameters) {
-            final ArgumentDescriptor argumentDescriptor = this.context.argumentDescriptors.stream()
-                    .filter(descriptor -> descriptor.parameter().equals(parameter))
-                    .findFirst()
-                    .orElse(null);
-            final FlagDescriptor flagDescriptor = this.context.flagDescriptors.stream()
-                    .filter(descriptor -> descriptor.parameter().equals(parameter))
-                    .findFirst()
-                    .orElse(null);
-
-            if (argumentDescriptor != null) {
-                final String argumentName;
-                if (argumentDescriptor.name().equals(AnnotationParser.INFERRED_ARGUMENT_NAME)) {
-                    argumentName = parameter.getName();
-                } else {
-                    argumentName = this.annotationParser.processString(argumentDescriptor.name());
-                }
-
-                final CommandComponent<C> commandComponent = this.context.commandComponents.get(argumentName);
-                if (commandComponent.required()) {
-                    arguments.add(new ParameterValue(parameter, argumentDescriptor, commandContext.get(argumentName)));
-                } else {
-                    final Object optional = commandContext.optional(argumentName).orElse(null);
-                    arguments.add(new ParameterValue(parameter, argumentDescriptor, optional));
-                }
-            } else if (flagDescriptor != null) {
-                if (parameter.getType().equals(boolean.class)) {
-                    arguments.add(
-                            new ParameterValue(
-                                    parameter,
-                                    flagDescriptor,
-                                    flagContext.isPresent(flagDescriptor.name())
-                            )
-                    );
-                } else if (flagDescriptor.repeatable() && parameter.getType().isAssignableFrom(List.class)) {
-                    arguments.add(
-                            new ParameterValue(
-                                    parameter,
-                                    flagDescriptor,
-                                    flagContext.getAll(flagDescriptor.name())
-                            )
-                    );
-                } else {
-                    arguments.add(
-                            new ParameterValue(
-                                    parameter,
-                                    flagDescriptor,
-                                    flagContext.getValue(flagDescriptor.name(), null)
-                            )
-                    );
-                }
-            } else {
-                if (parameter.getType().isAssignableFrom(commandContext.sender().getClass())) {
-                    arguments.add(new ParameterValue(parameter, null, commandContext.sender()));
-                } else {
-                    final Optional<?> value = this.context.injectorRegistry.getInjectable(
-                            parameter.getType(),
-                            commandContext,
-                            AnnotationAccessor.of(AnnotationAccessor.of(parameter), this.annotationAccessor)
-                    );
-                    if (value.isPresent()) {
-                        arguments.add(new ParameterValue(parameter, null, value.get()));
-                    } else if (parameter.getType() == String.class) {
-                        arguments.add(new ParameterValue(parameter, null, parameter.getName()));
-                    } else {
-                        throw new IllegalArgumentException(String.format(
-                                "Could not create value for parameter '%s' of type '%s' in method '%s'",
-                                parameter.getName(),
-                                parameter.getType().getTypeName(),
-                                this.methodHandle.toString()
-                        ));
-                    }
-                }
-            }
-        }
-        return arguments;
     }
 
     /**
@@ -199,33 +77,76 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
     }
 
     /**
-     * Returns all parameters passed to the method
-     *
-     * @return The parameters
-     * @since 1.6.0
+     * {@inheritDoc}
      */
-    public final @NonNull Parameter @NonNull [] parameters() {
-        return this.parameters;
+    @Override
+    public void execute(final @NonNull CommandContext<C> commandContext) {
+        /* Invoke the command method */
+        try {
+            this.methodHandle().invokeWithArguments(
+                    this.createParameterValues(commandContext).stream()
+                            .map(ParameterValue::value)
+                            .collect(Collectors.toList())
+            );
+        } catch (final Error e) {
+            throw e;
+        } catch (final Throwable throwable) {
+            throw new CommandExecutionException(throwable, commandContext);
+        }
     }
 
-    /**
-     * Returns the compiled method handle for the command method.
-     *
-     * @return The method handle
-     * @since 1.6.0
-     */
-    public final @NonNull MethodHandle methodHandle() {
-        return this.methodHandle;
-    }
+    @Override
+    protected final @Nullable ParameterValue getParameterValue(
+            final @NonNull Parameter parameter,
+            final @NonNull CommandContext<C> context
+    ) {
+        final ArgumentDescriptor argumentDescriptor = this.context.argumentDescriptors.stream()
+                .filter(descriptor -> descriptor.parameter().equals(parameter))
+                .findFirst()
+                .orElse(null);
+        if (argumentDescriptor != null) {
+            final String argumentName;
+            if (argumentDescriptor.name().equals(AnnotationParser.INFERRED_ARGUMENT_NAME)) {
+                argumentName = parameter.getName();
+            } else {
+                argumentName = this.annotationParser.processString(argumentDescriptor.name());
+            }
 
-    /**
-     * The annotation accessor for the command method
-     *
-     * @return Annotation accessor
-     * @since 1.6.0
-     */
-    public final AnnotationAccessor annotationAccessor() {
-        return this.annotationAccessor;
+            final CommandComponent<C> commandComponent = this.context.commandComponents.get(argumentName);
+            if (commandComponent.required()) {
+                return ParameterValue.of(parameter, context.get(argumentName), argumentDescriptor);
+            }
+
+            final Object optional = context.optional(argumentName).orElse(null);
+            return ParameterValue.of(parameter, optional, argumentDescriptor);
+        }
+
+        final FlagDescriptor flagDescriptor = this.context.flagDescriptors.stream()
+                .filter(descriptor -> descriptor.parameter().equals(parameter))
+                .findFirst()
+                .orElse(null);
+        if (flagDescriptor != null) {
+            if (parameter.getType().equals(boolean.class)) {
+                return ParameterValue.of(
+                        parameter,
+                        context.flags().isPresent(flagDescriptor.name()),
+                        flagDescriptor
+                );
+            } else if (flagDescriptor.repeatable() && parameter.getType().isAssignableFrom(List.class)) {
+                return ParameterValue.of(
+                        parameter,
+                        context.flags().getAll(flagDescriptor.name()),
+                        flagDescriptor
+                );
+            }
+            return ParameterValue.of(
+                    parameter,
+                    context.flags().getValue(flagDescriptor.name(), null),
+                    flagDescriptor
+            );
+        }
+
+        return null;
     }
 
     /**
@@ -332,51 +253,6 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
         @API(status = API.Status.STABLE, since = "2.0.0")
         public @NonNull Collection<@NonNull FlagDescriptor> flagDescriptors() {
             return Collections.unmodifiableCollection(this.flagDescriptors);
-        }
-    }
-
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public static final class ParameterValue {
-
-        private final Parameter parameter;
-        private final Descriptor descriptor;
-        private final Object value;
-
-        private ParameterValue(
-                final @NonNull Parameter parameter,
-                final @Nullable Descriptor descriptor,
-                final @Nullable Object value
-        ) {
-            this.parameter = parameter;
-            this.descriptor = descriptor;
-            this.value = value;
-        }
-
-        /**
-         * Returns the name of the parameter.
-         *
-         * @return the parameter
-         */
-        public @NonNull Parameter parameter() {
-            return this.parameter;
-        }
-
-        /**
-         * Returns the associated descriptor.
-         *
-         * @return the descriptor, or {@code null}
-         */
-        public @Nullable Descriptor descriptor() {
-            return this.descriptor;
-        }
-
-        /**
-         * Returns the parameter value.
-         *
-         * @return the value
-         */
-        public @Nullable Object value() {
-            return this.value;
         }
     }
 }

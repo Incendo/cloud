@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -509,7 +509,7 @@ public abstract class MinecraftHelp<C> {
         audience.sendMessage(this.basicHeader(sender));
         audience.sendMessage(this.showingResults(sender, query));
         final String command = this.commandManager().commandSyntaxFormatter()
-                .apply(helpTopic.entry().command().components(), null);
+                .apply(sender, helpTopic.entry().command().components(), null);
         audience.sendMessage(text()
                 .append(this.lastBranch())
                 .append(space())
@@ -558,7 +558,7 @@ public abstract class MinecraftHelp<C> {
                 final CommandComponent<C> component = iterator.next();
 
                 final String syntax = this.commandManager().commandSyntaxFormatter()
-                        .apply(Collections.singletonList(component), null);
+                        .apply(sender, Collections.singletonList(component), null);
 
                 final TextComponent.Builder textComponent = text()
                         .append(text("       "))

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -89,19 +89,19 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
     ) {
         final ParserRegistry<C> parserRegistry = manager.parserRegistry();
         final ArgumentParser<C, U> firstParser = parserRegistry.createParser(
-                TypeToken.get(types.getFirst()),
+                TypeToken.get(types.first()),
                 ParserParameters.empty()
         ).orElseThrow(() ->
                 new IllegalArgumentException(
                         "Could not create parser for primary type"));
         final ArgumentParser<C, V> secondaryParser = parserRegistry.createParser(
-                TypeToken.get(types.getSecond()),
+                TypeToken.get(types.second()),
                 ParserParameters.empty()
         ).orElseThrow(() ->
                 new IllegalArgumentException(
                         "Could not create parser for secondary type"));
         final ArgumentParser<C, W> tertiaryParser = parserRegistry.createParser(
-                TypeToken.get(types.getThird()),
+                TypeToken.get(types.third()),
                 ParserParameters.empty()
         ).orElseThrow(() ->
                 new IllegalArgumentException(

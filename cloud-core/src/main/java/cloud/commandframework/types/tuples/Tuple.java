@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,16 +33,16 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface Tuple {
 
     /**
-     * Get the tuple size
+     * Returns the tuple size.
      *
-     * @return Tuple size
+     * @return tuple size
      */
-    int getSize();
+    int size();
 
     /**
-     * Turn the tuple into a type erased array
+     * Turns the tuple into a type erased array.
      *
-     * @return Created array
+     * @return created array
      */
-    @NonNull Object @NonNull [] toArray();
+    @NonNull Object @NonNull[] toArray();
 }

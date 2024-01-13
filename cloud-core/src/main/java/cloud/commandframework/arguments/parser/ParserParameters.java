@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -115,11 +115,11 @@ public final class ParserParameters {
     }
 
     /**
-     * Get an immutable view of the internal map
+     * Returns an immutable view of the internal map.
      *
-     * @return Immutable map
+     * @return immutable map containing all stored parameters
      */
-    public @NonNull Map<@NonNull ParserParameter<?>, @NonNull Object> getAll() {
+    public @NonNull Map<@NonNull ParserParameter<?>, @NonNull Object> parameters() {
         return Collections.unmodifiableMap(this.internalMap);
     }
 }

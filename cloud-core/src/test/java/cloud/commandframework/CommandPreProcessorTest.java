@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,9 +61,9 @@ public class CommandPreProcessorTest {
 
     @Test
     void testPreprocessing() {
-        Assertions.assertEquals(10, manager.executeCommand(new TestCommandSender(), "10 test value1")
-                .join().getCommandContext().<Integer>optional("int").orElse(0));
-        manager.executeCommand(new TestCommandSender(), "aa test value1").join();
+        Assertions.assertEquals(10, manager.commandExecutor().executeCommand(new TestCommandSender(), "10 test value1")
+                .join().commandContext().<Integer>optional("int").orElse(0));
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "aa test value1").join();
     }
 
 
@@ -78,7 +78,9 @@ public class CommandPreProcessorTest {
         public void accept(final @NonNull CommandPreprocessingContext<TestCommandSender> context) {
             try {
                 final int num = context.commandInput().readInteger();
-                context.getCommandContext().store("int", num);
+                // The processor must leave the input in a readable state.
+                context.commandInput().skipWhitespace();
+                context.commandContext().store("int", num);
             } catch (final Exception ignored) {
                 /* Will prevent execution */
                 ConsumerService.interrupt();

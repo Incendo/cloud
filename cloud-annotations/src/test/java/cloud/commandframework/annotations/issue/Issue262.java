@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ package cloud.commandframework.annotations.issue;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
 import cloud.commandframework.help.HelpHandler;
@@ -158,11 +158,11 @@ class Issue262 {
         assertThat(topic.longestPath()).isEqualTo("cloudcommand");
     }
 
-    @CommandMethod("cloudcommand|cc sub1 [argument]")
+    @Command("cloudcommand|cc sub1 [argument]")
     public void commandSource(@Argument("argument") final String argument) {
     }
 
-    @CommandMethod("cloudcommand sub2|s [argument]")
+    @Command("cloudcommand sub2|s [argument]")
     public void commandToken(@Argument("argument") final String argument) {
     }
 }

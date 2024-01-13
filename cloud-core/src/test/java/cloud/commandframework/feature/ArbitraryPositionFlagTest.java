@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -67,8 +67,8 @@ class ArbitraryPositionFlagTest {
                 "test literal foo bar --flag");
 
         for (String cmd : passing) {
-            CommandResult<TestCommandSender> result = this.commandManager.executeCommand(new TestCommandSender(), cmd).join();
-            assertThat(result.getCommandContext().flags().isPresent("flag")).isEqualTo(true);
+            CommandResult<TestCommandSender> result = this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), cmd).join();
+            assertThat(result.commandContext().flags().isPresent("flag")).isEqualTo(true);
         }
     }
 
@@ -94,7 +94,7 @@ class ArbitraryPositionFlagTest {
     }
 
     private Executable commandExecutable(String cmd) {
-        return () -> this.commandManager.executeCommand(new TestCommandSender(), cmd).join();
+        return () -> this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), cmd).join();
     }
 
 }

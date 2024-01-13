@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,10 +28,10 @@ import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.feature.BuilderModifierExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.CommandContainerExample;
-import cloud.commandframework.examples.bukkit.annotations.feature.ConfirmationExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.EnumExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.FlagExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.HelpExample;
+import cloud.commandframework.examples.bukkit.annotations.feature.InjectionExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.PermissionExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.RegexExample;
 import cloud.commandframework.examples.bukkit.annotations.feature.RootCommandDeletionExample;
@@ -53,10 +53,10 @@ public final class AnnotationParserExample {
     private static final List<AnnotationFeature> FEATURES = Arrays.asList(
             new BuilderModifierExample(),
             new CommandContainerExample(),
-            new ConfirmationExample(),
             new EnumExample(),
             new FlagExample(),
             new HelpExample(),
+            new InjectionExample(),
             new PermissionExample(),
             new RegexExample(),
             new RootCommandDeletionExample(),

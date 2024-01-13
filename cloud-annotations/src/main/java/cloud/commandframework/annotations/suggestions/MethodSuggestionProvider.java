@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,16 @@
 //
 package cloud.commandframework.annotations.suggestions;
 
+import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
+import cloud.commandframework.annotations.method.AnnotatedMethodHandler;
+import cloud.commandframework.annotations.method.ParameterValue;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
+import cloud.commandframework.context.CommandInput;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -44,35 +47,33 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 1.3.0
  */
-public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> {
-
-    private final MethodHandle methodHandle;
+public final class MethodSuggestionProvider<C> extends AnnotatedMethodHandler<C> implements SuggestionProvider<C> {
 
     /**
-     * Create a new provider
+     * Creates a new provider.
      *
-     * @param instance Instance that owns the method
-     * @param method   The annotated method
+     * @param instance         instance that owns the method
+     * @param method           the annotated method
+     * @param injectorRegistry injector registry
      */
     public MethodSuggestionProvider(
             final @NonNull Object instance,
-            final @NonNull Method method
+            final @NonNull Method method,
+            final @NonNull ParameterInjectorRegistry<C> injectorRegistry
     ) {
-        try {
-            this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);
-        } catch (final IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        super(method, instance, injectorRegistry);
     }
 
     @Override
     public @NonNull CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> context,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         try {
-            final Object output = this.methodHandle.invokeWithArguments(context, input);
-            return mapSuggestions(output);
+            final List<Object> arguments = this.createParameterValues(
+                    context, this.parameters(), Arrays.asList(context, input, input.lastRemainingToken())
+            ).stream().map(ParameterValue::value).collect(Collectors.toList());
+            return mapSuggestions(this.methodHandle().invokeWithArguments(arguments));
         } catch (final Throwable t) {
             throw new RuntimeException(t);
         }

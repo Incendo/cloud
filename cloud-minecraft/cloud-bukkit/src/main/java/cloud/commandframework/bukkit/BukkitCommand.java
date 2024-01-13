@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,10 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandDescription;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.Suggestions;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.permission.Permission;
+import cloud.commandframework.util.StringUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -95,10 +97,15 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         for (final String string : args) {
             builder.append(" ").append(string);
         }
-        return this.manager.suggestionFactory().suggestImmediately(
-                this.manager.getCommandSenderMapper().apply(sender),
+        final Suggestions<C, ?> result = this.manager.suggestionFactory().suggestImmediately(
+                this.manager.senderMapper().map(sender),
                 builder.toString()
-        ).stream().map(Suggestion::suggestion).collect(Collectors.toList());
+        );
+        return result.list().stream()
+                .map(Suggestion::suggestion)
+                .map(suggestion -> StringUtils.trimBeforeLastSpace(suggestion, result.commandInput()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -108,12 +115,12 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
             final @NonNull String @NonNull [] strings
     ) {
         /* Join input */
-        final StringBuilder builder = new StringBuilder(commandLabel);
+        final StringBuilder builder = new StringBuilder(this.command.name());
         for (final String string : strings) {
             builder.append(" ").append(string);
         }
-        final C sender = this.manager.getCommandSenderMapper().apply(commandSender);
-        this.manager.executeCommand(sender, builder.toString());
+        final C sender = this.manager.senderMapper().map(commandSender);
+        this.manager.commandExecutor().executeCommand(sender, builder.toString());
         return true;
     }
 
@@ -124,12 +131,13 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
     @Override
     public @NonNull Plugin getPlugin() {
-        return this.manager.getOwningPlugin();
+        return this.manager.owningPlugin();
     }
 
     @Override
     public @NonNull String getUsage() {
         return this.manager.commandSyntaxFormatter().apply(
+                null,
                 Collections.singletonList(Objects.requireNonNull(this.namedNode().component())),
                 this.namedNode()
         );
@@ -144,9 +152,9 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
         final Permission permission = (Permission) node
                 .nodeMeta()
-                .getOrDefault("permission", Permission.empty());
+                .getOrDefault(CommandNode.META_KEY_PERMISSION, Permission.empty());
 
-        return this.manager.hasPermission(this.manager.getCommandSenderMapper().apply(target), permission);
+        return this.manager.hasPermission(this.manager.senderMapper().map(target), permission);
     }
 
     @API(status = API.Status.INTERNAL, since = "1.7.0")

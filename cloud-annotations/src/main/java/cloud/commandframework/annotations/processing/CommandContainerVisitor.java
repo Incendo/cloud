@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -78,7 +78,7 @@ final class CommandContainerVisitor implements ElementVisitor<Void, Void> {
         if (!e.getModifiers().contains(Modifier.PUBLIC)) {
             this.processingEnvironment.getMessager().printMessage(
                     Diagnostic.Kind.ERROR,
-                    String.format("@CommandMethod annotated class must be public (%s)", e.getSimpleName()),
+                    String.format("@Command annotated class must be public (%s)", e.getSimpleName()),
                     e
             );
         }
@@ -103,7 +103,7 @@ final class CommandContainerVisitor implements ElementVisitor<Void, Void> {
         if (!this.suitableConstructorFound) {
             this.processingEnvironment.getMessager().printMessage(
                     Diagnostic.Kind.ERROR,
-                    String.format("@CommandMethod must have a suitable constructor (%s)", e.getSimpleName()),
+                    String.format("@Command must have a suitable constructor (%s)", e.getSimpleName()),
                     e
             );
         }

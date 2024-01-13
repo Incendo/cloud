@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,6 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.EnumSet;
 import java.util.Locale;
@@ -93,17 +92,10 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    EnumParser.class,
-                    commandContext
-            ));
-        }
+        final String input = commandInput.readString();
 
         for (final E value : this.allowedValues) {
             if (value.name().equalsIgnoreCase(input)) {
-                commandInput.readString();
                 return ArgumentParseResult.success(value);
             }
         }
@@ -112,10 +104,8 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
     }
 
     @Override
-    public @NonNull Iterable<@NonNull String> stringSuggestions(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
-    ) {
+    public @NonNull Iterable<@NonNull String> stringSuggestions(final @NonNull CommandContext<C> commandContext,
+                                                                final @NonNull CommandInput input) {
         return EnumSet.allOf(this.enumClass).stream().map(e -> e.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
     }
 
@@ -123,7 +113,6 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
     @API(status = API.Status.STABLE)
     public static final class EnumParseException extends ParserException {
 
-        private static final long serialVersionUID = 3465389578951428862L;
         private final String input;
         private final Class<? extends Enum<?>> enumClass;
 
@@ -159,20 +148,20 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
         }
 
         /**
-         * Get the input provided by the sender
+         * Returns the input provided by the sender.
          *
-         * @return Input
+         * @return input
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
 
         /**
-         * Get the enum class that was attempted to be parsed
+         * Returns the enum class that was attempted to be parsed.
          *
-         * @return Enum class
+         * @return enum class
          */
-        public @NonNull Class<? extends Enum<?>> getEnumClass() {
+        public @NonNull Class<? extends Enum<?>> enumClass() {
             return this.enumClass;
         }
 

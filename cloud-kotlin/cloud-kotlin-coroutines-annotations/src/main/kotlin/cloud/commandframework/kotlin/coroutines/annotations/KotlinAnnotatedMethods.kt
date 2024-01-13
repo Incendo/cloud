@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,12 +25,14 @@ package cloud.commandframework.kotlin.coroutines.annotations
 
 import cloud.commandframework.annotations.AnnotationParser
 import cloud.commandframework.annotations.MethodCommandExecutionHandler
+import cloud.commandframework.annotations.injection.ParameterInjectorRegistry
+import cloud.commandframework.annotations.method.ParameterValue
 import cloud.commandframework.annotations.suggestions.MethodSuggestionProvider
 import cloud.commandframework.annotations.suggestions.SuggestionProviderFactory
 import cloud.commandframework.arguments.suggestion.Suggestion
 import cloud.commandframework.arguments.suggestion.SuggestionProvider
 import cloud.commandframework.context.CommandContext
-import cloud.commandframework.execution.CommandExecutionCoordinator
+import cloud.commandframework.context.CommandInput
 import io.leangen.geantyref.GenericTypeReflector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
@@ -65,14 +67,6 @@ public fun <C> AnnotationParser<C>.installCoroutineSupport(
     context: CoroutineContext = EmptyCoroutineContext,
     onlyForSuspending: Boolean = false
 ): AnnotationParser<C> {
-    if (manager().commandExecutionCoordinator() is CommandExecutionCoordinator.SimpleCoordinator) {
-        RuntimeException(
-            """You are highly advised to not use the simple command execution coordinator together
-                            with coroutine support. Consider using the asynchronous command execution coordinator instead."""
-        )
-            .printStackTrace()
-    }
-
     val predicate = Predicate<Method> { method ->
         if (onlyForSuspending) {
             method.kotlinFunction?.isSuspend == true
@@ -108,7 +102,6 @@ private class KotlinMethodCommandExecutionHandler<C>(
         if (valueParameters.values.none(KParameter::isOptional)) {
             val params = createParameterValues(
                 commandContext,
-                commandContext.flags(),
                 paramsWithoutContinuation
             ).map(ParameterValue::value)
             return coroutineScope.future(this@KotlinMethodCommandExecutionHandler.coroutineContext) {
@@ -129,7 +122,6 @@ private class KotlinMethodCommandExecutionHandler<C>(
         // by comparing the types of the parameters.
         val params = createParameterValues(
             commandContext,
-            commandContext.flags(),
             paramsWithoutContinuation
         ).associate { parameterValue ->
             val descriptor = parameterValue.descriptor()
@@ -170,9 +162,13 @@ private class KotlinSuggestionProviderFactory<C>(
     private val coroutineContext: CoroutineContext
 ) : SuggestionProviderFactory<C> {
 
-    override fun createSuggestionProvider(instance: Any, method: Method): SuggestionProvider<C> {
+    override fun createSuggestionProvider(
+        instance: Any,
+        method: Method,
+        injectorRegistry: ParameterInjectorRegistry<C>
+    ): SuggestionProvider<C> {
         if (method.kotlinFunction == null) {
-            return SuggestionProviderFactory.defaultFactory<C>().createSuggestionProvider(instance, method)
+            return SuggestionProviderFactory.defaultFactory<C>().createSuggestionProvider(instance, method, injectorRegistry)
         }
         val kFunction = requireNotNull(method.kotlinFunction)
         return KotlinSuggestionProvider(coroutineScope, coroutineContext, kFunction, instance)
@@ -186,10 +182,14 @@ private class KotlinSuggestionProvider<C>(
     private val instance: Any
 ) : SuggestionProvider<C> {
 
-    override fun suggestionsFuture(context: CommandContext<C>, input: String): CompletableFuture<Iterable<Suggestion>> {
+    override fun suggestionsFuture(context: CommandContext<C>, input: CommandInput): CompletableFuture<Iterable<Suggestion>> {
         return coroutineScope.future(coroutineContext) {
             try {
-                kFunction.callSuspend(instance, context, input)
+                if (kFunction.valueParameters[1].type.classifier == String::class) {
+                    kFunction.callSuspend(instance, context, input.lastRemainingToken())
+                } else {
+                    kFunction.callSuspend(instance, context, input)
+                }
             } catch (e: InvocationTargetException) {
                 e.cause?.let { throw it } ?: throw e // if cause exists, throw, else rethrow invocation exception
             }

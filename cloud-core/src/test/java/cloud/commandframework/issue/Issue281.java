@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ package cloud.commandframework.issue;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.exceptions.CommandExecutionException;
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import java.util.concurrent.CompletionException;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -45,7 +45,8 @@ class Issue281 {
     void commandExceptionShouldNotBeSwallowed() {
         // Arrange
         final CommandManager<TestCommandSender> commandManager = new CommandManager<TestCommandSender>(
-                AsynchronousCommandExecutionCoordinator.<TestCommandSender>builder().withSynchronousParsing().build(),
+                ExecutionCoordinator.<TestCommandSender>builder()
+                        .parsingExecutor(ExecutionCoordinator.nonSchedulingExecutor()).build(),
                 CommandRegistrationHandler.nullCommandRegistrationHandler()
         ) {
             @Override
@@ -70,7 +71,7 @@ class Issue281 {
         // Act
         final CompletionException exception = assertThrows(
                 CompletionException.class,
-                () -> commandManager.executeCommand(new TestCommandSender(), "test").join()
+                () -> commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test").join()
         );
 
         // Assert
@@ -78,7 +79,6 @@ class Issue281 {
         assertThat(exception).hasCauseThat().hasCauseThat().isInstanceOf(CustomException.class);
     }
 
-    @SuppressWarnings("serial")
     private static final class CustomException extends RuntimeException {
 
     }

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -64,20 +64,20 @@ public class Pair<U, V> implements Tuple {
     }
 
     /**
-     * Get the first value
+     * Returns the first value.
      *
-     * @return First value
+     * @return first value
      */
-    public final U getFirst() {
+    public final U first() {
         return this.first;
     }
 
     /**
-     * Get the second value
+     * Returns the second value.
      *
-     * @return Second value
+     * @return second value
      */
-    public final V getSecond() {
+    public final V second() {
         return this.second;
     }
 
@@ -86,17 +86,17 @@ public class Pair<U, V> implements Tuple {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
         final Pair<?, ?> pair = (Pair<?, ?>) o;
-        return Objects.equals(this.getFirst(), pair.getFirst())
-                && Objects.equals(this.getSecond(), pair.getSecond());
+        return Objects.equals(this.first(), pair.first())
+                && Objects.equals(this.second(), pair.second());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(this.getFirst(), this.getSecond());
+        return Objects.hash(this.first(), this.second());
     }
 
     @Override
@@ -105,7 +105,7 @@ public class Pair<U, V> implements Tuple {
     }
 
     @Override
-    public final int getSize() {
+    public final int size() {
         return 2;
     }
 

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,9 +47,9 @@ class CommandSuggestionProcessorTest {
     @Test
     void testModifying() {
         // Arrange
-        this.commandManager.commandSuggestionProcessor((ctx, suggestion) -> suggestion.withSuggestion(
-                        String.format("test-%s", suggestion.suggestion()))
-        );
+        this.commandManager.commandSuggestionProcessor((ctx, suggestions) -> suggestions.map(s -> s.withSuggestion(
+                String.format("test-%s", s.suggestion()))
+        ));
         this.commandManager.command(
                 this.commandManager.commandBuilder("test").required(
                         "arg",
@@ -62,7 +62,7 @@ class CommandSuggestionProcessorTest {
         final List<? extends Suggestion> suggestions = this.commandManager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 "test "
-        );
+        ).list();
 
         // Assert
         assertThat(suggestions).containsExactly(Suggestion.simple("test-suggestion"));
@@ -71,7 +71,7 @@ class CommandSuggestionProcessorTest {
     @Test
     void testFiltering() {
         // Arrange
-        this.commandManager.commandSuggestionProcessor((ctx, suggestion) -> null);
+        this.commandManager.commandSuggestionProcessor((ctx, suggestions) -> suggestions.limit(0));
         this.commandManager.command(
                 this.commandManager.commandBuilder("test").required(
                         "arg",
@@ -84,7 +84,7 @@ class CommandSuggestionProcessorTest {
         final List<? extends Suggestion> suggestions = this.commandManager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 "test "
-        );
+        ).list();
 
         // Assert
         assertThat(suggestions).isEmpty();

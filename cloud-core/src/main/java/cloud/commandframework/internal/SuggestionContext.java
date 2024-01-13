@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,9 @@ import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -56,7 +59,7 @@ public final class SuggestionContext<C> {
     ) {
         this.processor = processor;
         this.commandContext = commandContext;
-        this.preprocessingContext = new CommandPreprocessingContext<>(this.commandContext, commandInput);
+        this.preprocessingContext = CommandPreprocessingContext.of(this.commandContext, commandInput);
     }
 
     /**
@@ -65,7 +68,17 @@ public final class SuggestionContext<C> {
      * @return list of suggestions
      */
     public @NonNull List<@NonNull Suggestion> suggestions() {
-        return Collections.unmodifiableList(this.suggestions);
+        final Stream<Suggestion> stream = this.suggestions.stream();
+        final Stream<Suggestion> processedStream = this.processor.process(this.preprocessingContext, stream);
+        if (stream == processedStream) {
+            // don't re-collect with a pass-through processor
+            return Collections.unmodifiableList(this.suggestions);
+        }
+        return Collections.unmodifiableList(
+                processedStream
+                        .peek(obj -> Objects.requireNonNull(obj, "suggestion"))
+                        .collect(Collectors.toList())
+        );
     }
 
     /**
@@ -92,10 +105,7 @@ public final class SuggestionContext<C> {
      * @param suggestion the suggestion to add
      */
     public void addSuggestion(final @NonNull Suggestion suggestion) {
-        final Suggestion result = this.processor.process(this.preprocessingContext, suggestion);
-        if (result == null) {
-            return;
-        }
-        this.suggestions.add(result);
+        Objects.requireNonNull(suggestion, "suggestion");
+        this.suggestions.add(suggestion);
     }
 }

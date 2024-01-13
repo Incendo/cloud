@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,13 +26,14 @@ package cloud.commandframework.kotlin.coroutines.annotations
 import cloud.commandframework.CommandManager
 import cloud.commandframework.annotations.AnnotationParser
 import cloud.commandframework.annotations.Argument
-import cloud.commandframework.annotations.CommandMethod
+import cloud.commandframework.annotations.Command
 import cloud.commandframework.annotations.suggestions.Suggestions
 import cloud.commandframework.arguments.suggestion.Suggestion
 import cloud.commandframework.context.CommandContext
+import cloud.commandframework.context.CommandInput
 import cloud.commandframework.context.StandardCommandContextFactory
 import cloud.commandframework.exceptions.CommandExecutionException
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
+import cloud.commandframework.execution.ExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -70,7 +71,7 @@ class KotlinAnnotatedMethodsTest {
             .installCoroutineSupport()
             .parse(CommandMethods())
 
-        commandManager.executeCommand(TestCommandSender(), "test").await()
+        commandManager.commandExecutor().executeCommand(TestCommandSender(), "test").await()
     }
 
     @Test
@@ -80,7 +81,7 @@ class KotlinAnnotatedMethodsTest {
             .parse(CommandMethods())
 
         assertThrows<CommandExecutionException> {
-            commandManager.executeCommand(TestCommandSender(), "test-exception").await()
+            commandManager.commandExecutor().executeCommand(TestCommandSender(), "test-exception").await()
         }
     }
 
@@ -90,8 +91,8 @@ class KotlinAnnotatedMethodsTest {
             .installCoroutineSupport()
             .parse(CommandMethods())
 
-        val result = commandManager.executeCommand(TestCommandSender(), "with-default").await()
-        assertThat(result.commandContext.get<Int>("the-value")).isEqualTo(5)
+        val result = commandManager.commandExecutor().executeCommand(TestCommandSender(), "with-default").await()
+        assertThat(result.commandContext().get<Int>("the-value")).isEqualTo(5)
     }
 
     @Test
@@ -105,7 +106,7 @@ class KotlinAnnotatedMethodsTest {
             TestCommandSender()
         )
         val suggestions = commandManager.parserRegistry().getSuggestionProvider("suspending-suggestions").get()
-            .suggestionsFuture(commandContext, "")
+            .suggestionsFuture(commandContext, CommandInput.empty())
             .await()
             .map(Suggestion::suggestion)
             .map(String::toInt)
@@ -123,7 +124,7 @@ class KotlinAnnotatedMethodsTest {
             TestCommandSender()
         )
         val suggestions = commandManager.parserRegistry().getSuggestionProvider("non-suspending-suggestions").get()
-            .suggestionsFuture(commandContext, "")
+            .suggestionsFuture(commandContext, CommandInput.empty())
             .await()
             .map(Suggestion::suggestion)
             .map(String::toInt)
@@ -133,8 +134,8 @@ class KotlinAnnotatedMethodsTest {
     public class TestCommandSender
 
     private class TestCommandManager : CommandManager<TestCommandSender>(
-        AsynchronousCommandExecutionCoordinator.builder<TestCommandSender>()
-            .withExecutor(executorService)
+        ExecutionCoordinator.builder<TestCommandSender>()
+            .executor(executorService)
             .build(),
         CommandRegistrationHandler.nullCommandRegistrationHandler()
     ) {
@@ -144,16 +145,16 @@ class KotlinAnnotatedMethodsTest {
 
     public class CommandMethods {
 
-        @CommandMethod("test")
+        @Command("test")
         public suspend fun suspendingCommand(): Unit =
             withContext(Dispatchers.Default) {
                 println("called from thread: ${Thread.currentThread().name}")
             }
 
-        @CommandMethod("test-exception")
+        @Command("test-exception")
         public suspend fun suspendingCommandWithException(): Unit = throw IllegalStateException()
 
-        @CommandMethod("with-default [value]")
+        @Command("with-default [value]")
         public fun commandWithDefault(@Argument("value") value: Int = 5, context: CommandContext<TestCommandSender>) {
             context["the-value"] = value
         }

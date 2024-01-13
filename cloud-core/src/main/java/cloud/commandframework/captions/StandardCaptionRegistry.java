@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -96,6 +96,14 @@ public class StandardCaptionRegistry<C> implements CaptionRegistry<C> {
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_DURATION}
      */
     public static final String ARGUMENT_PARSE_FAILURE_DURATION = "'<input>' is not a duration format";
+    /**
+     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_AGGREGATE_MISSING_INPUT}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_AGGREGATE_MISSING_INPUT = "Missing component '<component>'";
+    /**
+     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE = "Invalid component '<component>': <failure>";
 
     private final LinkedList<@NonNull CaptionProvider<C>> providers = new LinkedList<>();
 
@@ -147,6 +155,12 @@ public class StandardCaptionRegistry<C> implements CaptionRegistry<C> {
                         ).putCaptions(
                                 StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_NO_PERMISSION,
                                 ARGUMENT_PARSE_FAILURE_FLAG_NO_PERMISSION
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_MISSING_INPUT,
+                                ARGUMENT_PARSE_FAILURE_AGGREGATE_MISSING_INPUT
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE,
+                                ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE
                         ).build()
         );
     }

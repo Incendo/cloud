@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -72,8 +72,8 @@ class NamespacedKeyArgumentTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(new NamespacedKey(NamespacedKey.MINECRAFT, "test"));
+        assertThat(result.failure()).isEmpty();
+        assertThat(result.parsedValue()).hasValue(new NamespacedKey(NamespacedKey.MINECRAFT, "test"));
         assertThat(commandInput.remainingInput()).isEmpty();
     }
 
@@ -93,8 +93,8 @@ class NamespacedKeyArgumentTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isPresent();
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result.failure()).isPresent();
+        assertThat(result.parsedValue()).isEmpty();
     }
 
     @Test
@@ -113,8 +113,8 @@ class NamespacedKeyArgumentTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(new NamespacedKey(NamespacedKey.MINECRAFT, "test"));
+        assertThat(result.failure()).isEmpty();
+        assertThat(result.parsedValue()).hasValue(new NamespacedKey(NamespacedKey.MINECRAFT, "test"));
         assertThat(commandInput.remainingInput()).isEmpty();
     }
 }

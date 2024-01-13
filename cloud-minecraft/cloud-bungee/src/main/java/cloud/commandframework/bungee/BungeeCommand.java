@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,9 @@ package cloud.commandframework.bungee;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.Suggestions;
+import cloud.commandframework.util.StringUtils;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
@@ -57,8 +60,8 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
         for (final String string : strings) {
             builder.append(" ").append(string);
         }
-        final C sender = this.manager.getCommandSenderMapper().apply(commandSender);
-        this.manager.executeCommand(sender, builder.toString());
+        final C sender = this.manager.senderMapper().map(commandSender);
+        this.manager.commandExecutor().executeCommand(sender, builder.toString());
     }
 
     @Override
@@ -70,9 +73,14 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
         for (final String string : args) {
             builder.append(" ").append(string);
         }
-        return this.manager.suggestionFactory().suggestImmediately(
-                this.manager.getCommandSenderMapper().apply(sender),
+        final Suggestions<C, ?> result = this.manager.suggestionFactory().suggestImmediately(
+                this.manager.senderMapper().map(sender),
                 builder.toString()
-        ).stream().map(Suggestion::suggestion).collect(Collectors.toList());
+        );
+        return result.list().stream()
+                .map(Suggestion::suggestion)
+                .map(suggestion -> StringUtils.trimBeforeLastSpace(suggestion, result.commandInput()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 }

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ package cloud.commandframework.annotations.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
@@ -53,19 +53,19 @@ class RepeatableFlagTest {
     @Test
     void testRepeatableFlagParsing() {
         // Act
-        final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(
+        final CommandResult<TestCommandSender> result = this.commandManager.commandExecutor().executeCommand(
                 new TestCommandSender(),
                 "test --flag one --flag two --flag three"
         ).join();
 
         // Assert
-        assertThat(result.getCommandContext().flags().getAll("flag")).containsExactly("one", "two", "three");
+        assertThat(result.commandContext().flags().getAll("flag")).containsExactly("one", "two", "three");
     }
 
 
     public static final class TestClassA {
 
-        @CommandMethod("test")
+        @Command("test")
         public void command(@Flag(value = "flag", repeatable = true) Collection<String> flags) {
         }
     }

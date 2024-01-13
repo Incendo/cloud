@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,8 @@ package cloud.commandframework.examples.bukkit.annotations.feature.minecraft;
 
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
+import cloud.commandframework.annotations.Default;
 import cloud.commandframework.bukkit.parsers.location.Location2D;
 import cloud.commandframework.examples.bukkit.ExamplePlugin;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationFeature;
@@ -48,16 +49,19 @@ public final class LocationExample implements AnnotationFeature {
         annotationParser.parse(this);
     }
 
-    @CommandMethod("annotations teleport location <location>")
+    @Command("annotations teleport location <location> [announce]")
     public void teleportComplex(
             final @NonNull Player sender,
-            final @Argument("location") @NonNull Location location
+            final @Argument("location") @NonNull Location location,
+            final @Argument("announce") @Default("false") boolean announce
     ) {
         sender.teleport(location);
-        sender.sendMessage("You have been teleported!");
+        if (announce) {
+            sender.sendMessage("You have been teleported!");
+        }
     }
 
-    @CommandMethod("annotations teleport chunk <chunk>")
+    @Command("annotations teleport chunk <chunk>")
     public void teleportComplex(
             final @NonNull Player sender,
             final @Argument("chunk") @NonNull Location2D chunkCoordinates

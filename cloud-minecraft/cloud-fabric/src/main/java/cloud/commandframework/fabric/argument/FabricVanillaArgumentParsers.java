@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -83,9 +83,9 @@ public final class FabricVanillaArgumentParsers {
     /**
      * A parser that wraps Brigadier argument types which need a {@link CommandBuildContext}
      *
-     * @param <C>     sender type
-     * @param <V>     argument value type
-     * @param factory factory that creates these arguments
+     * @param <C>       sender type
+     * @param <V>       argument value type
+     * @param factory   factory that creates these arguments
      * @param valueType value type of parsers output
      * @return the parser
      * @since 2.0.0
@@ -106,7 +106,7 @@ public final class FabricVanillaArgumentParsers {
      */
     public static <C> @NonNull ParserDescriptor<C, MinecraftTime> timeParser() {
         ArgumentParser<C, MinecraftTime> parser = new WrappedBrigadierParser<C, Integer>(TimeArgument.time())
-                .map((ctx, val) -> CompletableFuture.completedFuture(MinecraftTime.of(val)));
+                .flatMapSuccess((ctx, val) -> ArgumentParseResult.successFuture(MinecraftTime.of(val)));
 
         return ParserDescriptor.of(parser, MinecraftTime.class);
     }
@@ -121,7 +121,7 @@ public final class FabricVanillaArgumentParsers {
     public static <C> @NonNull ParserDescriptor<C, Coordinates.BlockCoordinates> blockPosParser() {
         ArgumentParser<C, Coordinates.BlockCoordinates> parser = new WrappedBrigadierParser<C,
                 net.minecraft.commands.arguments.coordinates.Coordinates>(BlockPosArgument.blockPos())
-                .map(FabricVanillaArgumentParsers::mapToCoordinates);
+                .flatMapSuccess(FabricVanillaArgumentParsers::mapToCoordinates);
 
         return ParserDescriptor.of(parser, Coordinates.BlockCoordinates.class);
     }
@@ -136,7 +136,7 @@ public final class FabricVanillaArgumentParsers {
     public static <C> @NonNull ParserDescriptor<C, Coordinates.ColumnCoordinates> columnPosParser() {
         ArgumentParser<C, Coordinates.ColumnCoordinates> parser = new WrappedBrigadierParser<C,
                 net.minecraft.commands.arguments.coordinates.Coordinates>(ColumnPosArgument.columnPos())
-                .map(FabricVanillaArgumentParsers::mapToCoordinates);
+                .flatMapSuccess(FabricVanillaArgumentParsers::mapToCoordinates);
 
         return ParserDescriptor.of(parser, Coordinates.ColumnCoordinates.class);
     }
@@ -153,7 +153,7 @@ public final class FabricVanillaArgumentParsers {
     public static <C> @NonNull ParserDescriptor<C, Coordinates.CoordinatesXZ> vec2Parser(final boolean centerIntegers) {
         ArgumentParser<C, Coordinates.CoordinatesXZ> parser = new WrappedBrigadierParser<C,
                 net.minecraft.commands.arguments.coordinates.Coordinates>(new Vec2Argument(centerIntegers))
-                .map(FabricVanillaArgumentParsers::mapToCoordinates);
+                .flatMapSuccess(FabricVanillaArgumentParsers::mapToCoordinates);
 
         return ParserDescriptor.of(parser, Coordinates.CoordinatesXZ.class);
     }
@@ -169,19 +169,19 @@ public final class FabricVanillaArgumentParsers {
     public static <C> @NonNull ParserDescriptor<C, Coordinates> vec3Parser(final boolean centerIntegers) {
         ArgumentParser<C, Coordinates> parser = new WrappedBrigadierParser<C,
                 net.minecraft.commands.arguments.coordinates.Coordinates>(Vec3Argument.vec3(centerIntegers))
-                .map(FabricVanillaArgumentParsers::mapToCoordinates);
+                .flatMapSuccess(FabricVanillaArgumentParsers::mapToCoordinates);
 
         return ParserDescriptor.of(parser, Coordinates.class);
     }
 
     @SuppressWarnings("unchecked")
-    private static <C, O extends Coordinates> @NonNull CompletableFuture<@NonNull O> mapToCoordinates(
+    private static <C, O extends Coordinates> @NonNull CompletableFuture<@NonNull ArgumentParseResult<O>> mapToCoordinates(
             final @NonNull CommandContext<C> ctx,
             final net.minecraft.commands.arguments.coordinates.@NonNull Coordinates posArgument
     ) {
         return requireCommandSourceStack(
                 ctx,
-                serverCommandSource -> CompletableFuture.completedFuture((O) new CoordinatesImpl(
+                serverCommandSource -> ArgumentParseResult.successFuture((O) new CoordinatesImpl(
                         serverCommandSource,
                         posArgument
                 ))
@@ -197,7 +197,7 @@ public final class FabricVanillaArgumentParsers {
      */
     public static <C> @NonNull ParserDescriptor<C, SinglePlayerSelector> singlePlayerSelectorParser() {
         ArgumentParser<C, SinglePlayerSelector> parser = new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.player())
-                .map((ctx, entitySelector) -> requireCommandSourceStack(
+                .flatMapSuccess((ctx, entitySelector) -> requireCommandSourceStack(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
                                 () -> ArgumentParseResult.success(new SinglePlayerSelectorImpl(
@@ -220,7 +220,7 @@ public final class FabricVanillaArgumentParsers {
      */
     public static <C> @NonNull ParserDescriptor<C, MultiplePlayerSelector> multiplePlayerSelectorParser() {
         ArgumentParser<C, MultiplePlayerSelector> parser = new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.players())
-                .map((ctx, entitySelector) -> requireCommandSourceStack(
+                .flatMapSuccess((ctx, entitySelector) -> requireCommandSourceStack(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
                                 () -> ArgumentParseResult.success(new MultiplePlayerSelectorImpl(
@@ -243,7 +243,7 @@ public final class FabricVanillaArgumentParsers {
      */
     public static <C> @NonNull ParserDescriptor<C, SingleEntitySelector> singleEntitySelectorParser() {
         ArgumentParser<C, SingleEntitySelector> parser = new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.entity())
-                .map((ctx, entitySelector) -> requireCommandSourceStack(
+                .flatMapSuccess((ctx, entitySelector) -> requireCommandSourceStack(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
                                 () -> ArgumentParseResult.success(new SingleEntitySelectorImpl(
@@ -266,7 +266,7 @@ public final class FabricVanillaArgumentParsers {
      */
     public static <C> @NonNull ParserDescriptor<C, MultipleEntitySelector> multipleEntitySelectorParser() {
         ArgumentParser<C, MultipleEntitySelector> parser = new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.entities())
-                .map((ctx, entitySelector) -> requireCommandSourceStack(
+                .flatMapSuccess((ctx, entitySelector) -> requireCommandSourceStack(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
                                 () -> ArgumentParseResult.success(new MultipleEntitySelectorImpl(
@@ -289,7 +289,7 @@ public final class FabricVanillaArgumentParsers {
      */
     public static <C> @NonNull ParserDescriptor<C, Message> messageParser() {
         ArgumentParser<C, Message> parser = new WrappedBrigadierParser<C, MessageArgument.Message>(MessageArgument.message())
-                .map((ctx, format) -> requireCommandSourceStack(
+                .flatMapSuccess((ctx, format) -> requireCommandSourceStack(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
                                 () -> ArgumentParseResult.success(MessageImpl.from(
@@ -309,7 +309,7 @@ public final class FabricVanillaArgumentParsers {
         @NonNull ArgumentParseResult<O> result() throws CommandSyntaxException;
     }
 
-    private static <O> @NonNull CompletableFuture<O> handleCommandSyntaxExceptionAsFailure(
+    private static <O> @NonNull CompletableFuture<ArgumentParseResult<O>> handleCommandSyntaxExceptionAsFailure(
             final @NonNull CommandSyntaxExceptionThrowingParseResultSupplier<O> resultSupplier
     ) {
         final CompletableFuture<ArgumentParseResult<O>> future = new CompletableFuture<>();
@@ -318,22 +318,20 @@ public final class FabricVanillaArgumentParsers {
         } catch (final CommandSyntaxException ex) {
             future.completeExceptionally(ex);
         }
-        return future.thenCompose(ArgumentParseResult::asFuture);
+        return future;
     }
 
     private static @NonNull IllegalStateException serverOnly() {
         return new IllegalStateException("This command argument type is server-only.");
     }
 
-    private static <C, O> @NonNull CompletableFuture<O> requireCommandSourceStack(
+    private static <C, O> @NonNull CompletableFuture<ArgumentParseResult<O>> requireCommandSourceStack(
             final @NonNull CommandContext<C> context,
-            final @NonNull Function<CommandSourceStack, CompletableFuture<O>> resultFunction
+            final @NonNull Function<CommandSourceStack, CompletableFuture<ArgumentParseResult<O>>> resultFunction
     ) {
         final SharedSuggestionProvider nativeSource = context.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
         if (!(nativeSource instanceof CommandSourceStack)) {
-            final CompletableFuture<O> future = new CompletableFuture<>();
-            future.completeExceptionally(serverOnly());
-            return future;
+            return ArgumentParseResult.failureFuture(serverOnly());
         }
         return resultFunction.apply((CommandSourceStack) nativeSource);
     }

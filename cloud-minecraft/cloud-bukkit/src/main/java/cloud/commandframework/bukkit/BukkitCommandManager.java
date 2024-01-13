@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,21 +25,16 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.CommandTree;
+import cloud.commandframework.SenderMapper;
+import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionMapper;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
-import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.bukkit.annotation.specifier.AllowEmptySelection;
 import cloud.commandframework.bukkit.annotation.specifier.DefaultNamespace;
 import cloud.commandframework.bukkit.annotation.specifier.RequireExplicitNamespace;
 import cloud.commandframework.bukkit.data.MultipleEntitySelector;
 import cloud.commandframework.bukkit.data.MultiplePlayerSelector;
-import cloud.commandframework.bukkit.data.ProtoItemStack;
-import cloud.commandframework.bukkit.data.SingleEntitySelector;
-import cloud.commandframework.bukkit.data.SinglePlayerSelector;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.parsers.BlockPredicateParser;
 import cloud.commandframework.bukkit.parsers.EnchantmentParser;
@@ -50,7 +45,6 @@ import cloud.commandframework.bukkit.parsers.NamespacedKeyParser;
 import cloud.commandframework.bukkit.parsers.OfflinePlayerParser;
 import cloud.commandframework.bukkit.parsers.PlayerParser;
 import cloud.commandframework.bukkit.parsers.WorldParser;
-import cloud.commandframework.bukkit.parsers.location.Location2D;
 import cloud.commandframework.bukkit.parsers.location.Location2DParser;
 import cloud.commandframework.bukkit.parsers.location.LocationParser;
 import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorParser;
@@ -63,24 +57,16 @@ import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.state.RegistrationState;
 import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Method;
 import java.util.Locale;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
+import java.util.concurrent.Executor;
 import java.util.logging.Level;
+import org.apiguardian.api.API;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -88,10 +74,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Command manager for the Bukkit platform
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
-@SuppressWarnings("unchecked")
-public class BukkitCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C> {
+public class BukkitCommandManager<C> extends CommandManager<C>
+        implements BrigadierManagerHolder<C, Object>, SenderMapperHolder<CommandSender, C> {
 
     private static final String MESSAGE_INTERNAL_ERROR = ChatColor.RED
             + "An internal error occurred while attempting to perform this command.";
@@ -101,47 +87,41 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
     private final Plugin owningPlugin;
-
-    private final Function<CommandSender, C> commandSenderMapper;
-    private final Function<C, CommandSender> backwardsCommandSenderMapper;
+    private final SenderMapper<CommandSender, C> senderMapper;
 
     private boolean splitAliases = false;
 
     /**
-     * Construct a new Bukkit command manager
+     * Create a new Bukkit command manager.
      *
-     * @param owningPlugin                 Plugin that is constructing the manager. This will be used when registering the
-     *                                     commands to the Bukkit command map.
-     * @param commandExecutionCoordinator  Execution coordinator instance. The coordinator is in charge of executing incoming
-     *                                     commands. Some considerations must be made when picking a suitable execution
-     *                                     coordinator. For example, an entirely asynchronous coordinator is not suitable
-     *                                     when the parsers used in your commands are not thread safe. If you have
-     *                                     commands that perform blocking operations, however, it might not be a good idea to
-     *                                     use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
-     *                                     {@link cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator}.
-     * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
-     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
-     * @throws Exception If the construction of the manager fails
+     * @param owningPlugin                Plugin constructing the manager. Used when registering commands to the command map,
+     *                                    registering event listeners, etc.
+     * @param commandExecutionCoordinator Execution coordinator instance. Due to Bukkit blocking the main thread for
+     *                                    suggestion requests, it's potentially unsafe to use anything other than
+     *                                    {@link ExecutionCoordinator#nonSchedulingExecutor()} for
+     *                                    {@link ExecutionCoordinator.Builder#suggestionsExecutor(Executor)}. Once the
+     *                                    coordinator, a suggestion provider, parser, or similar routes suggestion logic
+     *                                    off of the calling (main) thread, it won't be possible to schedule further logic
+     *                                    back to the main thread without a deadlock. When Brigadier support is active, this issue
+     *                                    is avoided, as it allows for non-blocking suggestions.
+     * @param senderMapper                Mapper between Bukkit's {@link CommandSender} and the command sender type {@code C}.
+     * @see #registerBrigadier()
+     * @throws InitializationException if construction of the manager fails
      */
-    @SuppressWarnings("unchecked")
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public BukkitCommandManager(
             final @NonNull Plugin owningPlugin,
-            final @NonNull Function<@NonNull CommandTree<@NonNull C>,
-                    @NonNull CommandExecutionCoordinator<@NonNull C>> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
-            final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper
-    )
-            throws Exception {
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
+            final @NonNull SenderMapper<CommandSender, C> senderMapper
+    ) throws InitializationException {
         super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler<>());
-        ((BukkitPluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
+        try {
+            ((BukkitPluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
+        } catch (final ReflectiveOperationException exception) {
+            throw new InitializationException("Failed to initialize command registration handler", exception);
+        }
         this.owningPlugin = owningPlugin;
-        this.commandSenderMapper = commandSenderMapper;
-        this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
-
-        this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
-                FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
-        ));
+        this.senderMapper = senderMapper;
 
         /* Register capabilities */
         CloudBukkitCapabilities.CAPABLE.forEach(this::registerCapability);
@@ -151,28 +131,19 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         this.registerCommandPreProcessor(new BukkitCommandPreprocessor<>(this));
 
         /* Register Bukkit Parsers */
-        this.parserRegistry().registerParserSupplier(TypeToken.get(World.class), parserParameters ->
-                new WorldParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(Material.class), parserParameters ->
-                new MaterialParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(Player.class), parserParameters ->
-                new PlayerParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(OfflinePlayer.class), parserParameters ->
-                new OfflinePlayerParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(Enchantment.class), parserParameters ->
-                new EnchantmentParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(Location.class), parserParameters ->
-                new LocationParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(Location2D.class), parserParameters ->
-                new Location2DParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(ProtoItemStack.class), parserParameters ->
-                new ItemStackParser<>());
+        this.parserRegistry()
+                .registerParser(WorldParser.worldParser())
+                .registerParser(MaterialParser.materialParser())
+                .registerParser(PlayerParser.playerParser())
+                .registerParser(OfflinePlayerParser.offlinePlayerParser())
+                .registerParser(EnchantmentParser.enchantmentParser())
+                .registerParser(LocationParser.locationParser())
+                .registerParser(Location2DParser.location2DParser())
+                .registerParser(ItemStackParser.itemStackParser())
+                .registerParser(SingleEntitySelectorParser.singleEntitySelectorParser())
+                .registerParser(SinglePlayerSelectorParser.singlePlayerSelectorParser());
 
         /* Register Entity Selector Parsers */
-        this.parserRegistry().registerParserSupplier(TypeToken.get(SingleEntitySelector.class), parserParameters ->
-                new SingleEntitySelectorParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(SinglePlayerSelector.class), parserParameters ->
-                new SinglePlayerSelectorParser<>());
         this.parserRegistry().registerAnnotationMapper(
                 AllowEmptySelection.class,
                 (annotation, type) -> ParserParameters.single(
@@ -222,59 +193,19 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     }
 
     /**
-     * Create a command manager using Bukkit's {@link CommandSender} as the sender type.
+     * Returns the plugin that owns the manager.
      *
-     * @param owningPlugin                plugin owning the command manager
-     * @param commandExecutionCoordinator execution coordinator instance
-     * @return a new command manager
-     * @throws Exception If the construction of the manager fails
-     * @see #BukkitCommandManager(Plugin, Function, Function, Function) for a more thorough explanation
-     * @since 1.5.0
+     * @return owning plugin
+     * @since 2.0.0
      */
-    public static @NonNull BukkitCommandManager<@NonNull CommandSender> createNative(
-            final @NonNull Plugin owningPlugin,
-            final @NonNull Function<@NonNull CommandTree<@NonNull CommandSender>,
-                    @NonNull CommandExecutionCoordinator<@NonNull CommandSender>> commandExecutionCoordinator
-    ) throws Exception {
-        return new BukkitCommandManager<>(
-                owningPlugin,
-                commandExecutionCoordinator,
-                UnaryOperator.identity(),
-                UnaryOperator.identity()
-        );
-    }
-
-    /**
-     * Get the plugin that owns the manager
-     *
-     * @return Owning plugin
-     */
-    public @NonNull Plugin getOwningPlugin() {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public final @NonNull Plugin owningPlugin() {
         return this.owningPlugin;
     }
 
-    /**
-     * Get the command sender mapper
-     *
-     * @return Command sender mapper
-     */
-    public final @NonNull Function<@NonNull CommandSender, @NonNull C> getCommandSenderMapper() {
-        return this.commandSenderMapper;
-    }
-
-    /**
-     * Sets the suggestion mapper.
-     * <p>
-     * If you're using Brigadier and you want to be able to use suggestions with tooltips, then
-     * your suggestion mapper should output {@link TooltipSuggestion}.
-     *
-     * @param <S>              the custom type
-     * @param suggestionMapper the suggestion mapper
-     * @since 2.0.0
-     */
     @Override
-    public <S extends Suggestion> void suggestionMapper(final @NonNull SuggestionMapper<S> suggestionMapper) {
-        super.suggestionMapper(suggestionMapper);
+    public final @NonNull SenderMapper<CommandSender, C> senderMapper() {
+        return this.senderMapper;
     }
 
     @Override
@@ -282,13 +213,15 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         if (permission.isEmpty()) {
             return true;
         }
-        return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
+        return this.senderMapper.reverse(sender).hasPermission(permission);
     }
 
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     protected final boolean getSplitAliases() {
         return this.splitAliases;
     }
 
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     protected final void setSplitAliases(final boolean value) {
         this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.splitAliases = value;
@@ -297,27 +230,17 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     /**
      * Check whether Brigadier can be used on the server instance
      *
-     * @throws BrigadierFailureException An exception is thrown if Brigadier isn't available. The exception
+     * @throws BrigadierInitializationException An exception is thrown if Brigadier isn't available. The exception
      *                                   will contain the reason for this.
      */
-    protected final void checkBrigadierCompatibility() throws BrigadierFailureException {
+    protected final void checkBrigadierCompatibility() throws BrigadierInitializationException {
         if (!this.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
-            throw new BrigadierFailureException(
-                    BrigadierFailureReason.VERSION_TOO_LOW,
-                    new IllegalArgumentException(
-                            "Brigadier does not appear to be present on the currently running server. This is usually due to "
-                                    + "running too old a version of Minecraft (Brigadier is implemented in 1.13 and newer).")
+            throw new BrigadierInitializationException(
+                    "Missing capability " + CloudBukkitCapabilities.class.getSimpleName() + "."
+                            + CloudBukkitCapabilities.BRIGADIER + " (Minecraft version too old? Brigadier was added in 1.13). "
+                            + "See the Javadocs for more details"
             );
         }
-    }
-
-    /**
-     * Check for the platform capabilities
-     *
-     * @return A set containing all capabilities of the instance
-     */
-    public final @NonNull Set<@NonNull CloudBukkitCapabilities> queryCapabilities() {
-        return CloudBukkitCapabilities.CAPABLE;
     }
 
     /**
@@ -326,36 +249,58 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      * <p>Callers should check for {@link CloudBukkitCapabilities#COMMODORE_BRIGADIER} first
      * to avoid exceptions.</p>
      *
-     * @throws BrigadierFailureException If Brigadier isn't
-     *                                   supported by the platform
+     * @see #hasCapability(CloudCapability)
+     * @throws BrigadierInitializationException when the prerequisite capabilities are not present or some other issue occurs
+     * during registration of Brigadier support
      */
-    public void registerBrigadier() throws BrigadierFailureException {
+    public void registerBrigadier() throws BrigadierInitializationException {
         this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.checkBrigadierCompatibility();
         if (!this.hasCapability(CloudBukkitCapabilities.COMMODORE_BRIGADIER)) {
-            throw new BrigadierFailureException(BrigadierFailureReason.VERSION_TOO_HIGH);
+            throw new BrigadierInitializationException(
+                    "Missing capability " + CloudBukkitCapabilities.class.getSimpleName() + "."
+                            + CloudBukkitCapabilities.COMMODORE_BRIGADIER + " (Minecraft version too new). "
+                            + "See the Javadocs for more details"
+            );
         }
         try {
             final CloudCommodoreManager<C> cloudCommodoreManager = new CloudCommodoreManager<>(this);
             cloudCommodoreManager.initialize(this);
             this.commandRegistrationHandler(cloudCommodoreManager);
             this.setSplitAliases(true);
-        } catch (final Throwable e) {
-            throw new BrigadierFailureException(BrigadierFailureReason.COMMODORE_NOT_PRESENT, e);
+        } catch (final Exception e) {
+            throw new BrigadierInitializationException(
+                    "Unexpected exception initializing " + CloudCommodoreManager.class.getSimpleName(), e);
         }
     }
 
     /**
      * {@inheritDoc}
      *
+     * @return {@inheritDoc}
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    @Override
+    public boolean hasBrigadierManager() {
+        return this.commandRegistrationHandler() instanceof CloudCommodoreManager;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     * @throws BrigadierManagerNotPresent when {@link #hasBrigadierManager()} is false
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @Override
-    public @Nullable CloudBrigadierManager<C, ?> brigadierManager() {
+    public @NonNull CloudBrigadierManager<C, ?> brigadierManager() {
         if (this.commandRegistrationHandler() instanceof CloudCommodoreManager) {
             return ((CloudCommodoreManager<C>) this.commandRegistrationHandler()).brigadierManager();
         }
-        return null;
+        throw new BrigadierManagerHolder.BrigadierManagerNotPresent("The CloudBrigadierManager is either not supported in the "
+                + "current environment, or it is not enabled.");
     }
 
     /**
@@ -365,6 +310,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      * @param command Command
      * @return Stripped command
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public final @NonNull String stripNamespace(final @NonNull String command) {
         @NonNull String input;
 
@@ -376,21 +322,12 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         }
 
         /* Remove leading plugin namespace */
-        final String namespace = String.format("%s:", this.getOwningPlugin().getName().toLowerCase(Locale.ROOT));
+        final String namespace = String.format("%s:", this.owningPlugin().getName().toLowerCase(Locale.ROOT));
         if (input.startsWith(namespace)) {
             input = input.substring(namespace.length());
         }
 
         return input;
-    }
-
-    /**
-     * Get the backwards command sender plugin
-     *
-     * @return The backwards command sender mapper
-     */
-    public final @NonNull Function<@NonNull C, @NonNull CommandSender> getBackwardsCommandSenderMapper() {
-        return this.backwardsCommandSenderMapper;
     }
 
     /**
@@ -413,35 +350,35 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
 
     private void registerDefaultExceptionHandlers() {
         this.exceptionController().registerHandler(Throwable.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(MESSAGE_INTERNAL_ERROR);
+            this.senderMapper.reverse(context.context().sender()).sendMessage(MESSAGE_INTERNAL_ERROR);
             this.owningPlugin.getLogger().log(
                     Level.SEVERE,
                     "An unhandled exception was thrown during command execution",
                     context.exception()
             );
         }).registerHandler(CommandExecutionException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(MESSAGE_INTERNAL_ERROR);
+            this.senderMapper.reverse(context.context().sender()).sendMessage(MESSAGE_INTERNAL_ERROR);
             this.owningPlugin.getLogger().log(
                     Level.SEVERE,
                     "Exception executing command handler",
                     context.exception().getCause()
             );
         }).registerHandler(ArgumentParseException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(
+            this.senderMapper.reverse(context.context().sender()).sendMessage(
                     ChatColor.RED + "Invalid Command Argument: " + ChatColor.GRAY + context.exception().getCause().getMessage()
             );
         }).registerHandler(NoSuchCommandException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(MESSAGE_UNKNOWN_COMMAND);
+            this.senderMapper.reverse(context.context().sender()).sendMessage(MESSAGE_UNKNOWN_COMMAND);
         }).registerHandler(NoPermissionException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(MESSAGE_NO_PERMS);
+            this.senderMapper.reverse(context.context().sender()).sendMessage(MESSAGE_NO_PERMS);
         }).registerHandler(InvalidCommandSenderException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(
+            this.senderMapper.reverse(context.context().sender()).sendMessage(
                     ChatColor.RED + context.exception().getMessage()
             );
         }).registerHandler(InvalidSyntaxException.class, context -> {
-            this.backwardsCommandSenderMapper.apply(context.context().sender()).sendMessage(
+            this.senderMapper.reverse(context.context().sender()).sendMessage(
                     ChatColor.RED + "Invalid Command Syntax. Correct command syntax is: "
-                            + ChatColor.GRAY + context.exception().getCorrectSyntax()
+                            + ChatColor.GRAY + context.exception().correctSyntax()
             );
         });
     }
@@ -452,58 +389,54 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         }
     }
 
+
     /**
-     * Reasons to explain why Brigadier failed to initialize
+     * Exception thrown when the command manager could not be initialized.
+     *
+     * @since 2.0.0
      */
-    public enum BrigadierFailureReason {
-        COMMODORE_NOT_PRESENT,
-        VERSION_TOO_LOW,
-        VERSION_TOO_HIGH,
-        PAPER_BRIGADIER_INITIALIZATION_FAILURE
-    }
-
-
-    public static final class BrigadierFailureException extends IllegalStateException {
-
-        private static final long serialVersionUID = 7816660840063155703L;
-        private final BrigadierFailureReason reason;
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static final class InitializationException extends IllegalStateException {
 
         /**
-         * Initialize a new Brigadier failure exception
+         * Create a new {@link InitializationException}.
+         *
+         * @param message message
+         * @param cause   cause
+         */
+        @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
+        public InitializationException(final String message, final @Nullable Throwable cause) {
+            super(message, cause);
+        }
+    }
+
+    /**
+     * Exception thrown when Brigadier mappings fail to initialize.
+     *
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static final class BrigadierInitializationException extends IllegalStateException {
+
+        /**
+         * Creates a new Brigadier failure exception.
          *
          * @param reason Reason
          */
-        public BrigadierFailureException(final @NonNull BrigadierFailureReason reason) {
-            this.reason = reason;
+        @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
+        public BrigadierInitializationException(final @NonNull String reason) {
+            super(reason);
         }
 
         /**
-         * Initialize a new Brigadier failure exception
+         * Creates a new Brigadier failure exception.
          *
          * @param reason Reason
          * @param cause  Cause
          */
-        public BrigadierFailureException(final @NonNull BrigadierFailureReason reason, final @NonNull Throwable cause) {
-            super(cause);
-            this.reason = reason;
-        }
-
-        /**
-         * Get the reason for the exception
-         *
-         * @return Reason
-         */
-        public @NonNull BrigadierFailureReason getReason() {
-            return this.reason;
-        }
-
-        @Override
-        public String getMessage() {
-            return String.format(
-                    "Could not initialize Brigadier mappings. Reason: %s (%s)",
-                    this.reason.name().toLowerCase(Locale.ROOT).replace("_", " "),
-                    this.getCause() == null ? "" : this.getCause().getMessage()
-            );
+        @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
+        public BrigadierInitializationException(final @NonNull String reason, final @Nullable Throwable cause) {
+            super(reason, cause);
         }
     }
 }

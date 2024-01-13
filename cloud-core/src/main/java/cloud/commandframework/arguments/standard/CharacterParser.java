@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,6 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.Objects;
 import org.apiguardian.api.API;
@@ -69,12 +68,7 @@ public final class CharacterParser<C> implements ArgumentParser<C, Character> {
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        if (commandInput.peekString().isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    CharacterParser.class,
-                    commandContext
-            ));
-        } else if (commandInput.peekString().length() != 1) {
+        if (commandInput.peekString().length() != 1) {
             return ArgumentParseResult.failure(new CharParseException(commandInput.peekString(), commandContext));
         }
 
@@ -88,7 +82,6 @@ public final class CharacterParser<C> implements ArgumentParser<C, Character> {
     @API(status = API.Status.STABLE)
     public static final class CharParseException extends ParserException {
 
-        private static final long serialVersionUID = 6458851071584278854L;
         private final String input;
 
         /**
@@ -108,11 +101,11 @@ public final class CharacterParser<C> implements ArgumentParser<C, Character> {
         }
 
         /**
-         * Get the supplied input
+         * Returns the supplied input.
          *
-         * @return Input value
+         * @return the input
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
 

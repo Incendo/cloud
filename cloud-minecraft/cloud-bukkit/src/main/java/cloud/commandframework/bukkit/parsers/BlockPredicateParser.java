@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,6 @@ import cloud.commandframework.bukkit.internal.RegistryReflection;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import com.mojang.brigadier.arguments.ArgumentType;
-import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -61,7 +60,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  * @since 1.5.0
  */
-public final class BlockPredicateParser<C> implements ArgumentParser<C, BlockPredicate> {
+public final class BlockPredicateParser<C> implements ArgumentParser.FutureArgumentParser<C, BlockPredicate> {
 
     private static final Class<?> TAG_CONTAINER_CLASS;
 
@@ -190,10 +189,10 @@ public final class BlockPredicateParser<C> implements ArgumentParser<C, BlockPre
             // 1.19+
             inst = (ArgumentType<Object>) ctr.newInstance(CommandBuildContextSupplier.commandBuildContext());
         }
-        return new WrappedBrigadierParser<C, Object>(inst).map((ctx, result) -> {
+        return new WrappedBrigadierParser<C, Object>(inst).flatMapSuccess((ctx, result) -> {
             if (result instanceof Predicate) {
                 // 1.19+
-                return CompletableFuture.completedFuture(new BlockPredicateImpl((Predicate<Object>) result));
+                return ArgumentParseResult.successFuture(new BlockPredicateImpl((Predicate<Object>) result));
             }
             final Object commandSourceStack = ctx.get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER);
             try {
@@ -206,7 +205,7 @@ public final class BlockPredicateParser<C> implements ArgumentParser<C, BlockPre
                 }
                 Objects.requireNonNull(CREATE_PREDICATE_METHOD, "create on BlockPredicateArgument$Result");
                 final Predicate<Object> predicate = (Predicate<Object>) CREATE_PREDICATE_METHOD.invoke(result, obj);
-                return CompletableFuture.completedFuture(new BlockPredicateImpl(predicate));
+                return ArgumentParseResult.successFuture(new BlockPredicateImpl(predicate));
             } catch (final ReflectiveOperationException ex) {
                 throw new RuntimeException(ex);
             }
@@ -214,11 +213,11 @@ public final class BlockPredicateParser<C> implements ArgumentParser<C, BlockPre
     }
 
     @Override
-    public @NonNull ArgumentParseResult<@NonNull BlockPredicate> parse(
+    public @NonNull CompletableFuture<ArgumentParseResult<@NonNull BlockPredicate>> parseFuture(
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        return this.parser.parse(commandContext, commandInput);
+        return this.parser.parseFuture(commandContext, commandInput);
     }
 
     @Override
@@ -234,8 +233,7 @@ public final class BlockPredicateParser<C> implements ArgumentParser<C, BlockPre
      */
     @SuppressWarnings("unused")
     private static <C> void registerParserSupplier(final @NonNull BukkitCommandManager<C> commandManager) {
-        commandManager.parserRegistry()
-                .registerParserSupplier(TypeToken.get(BlockPredicate.class), params -> new BlockPredicateParser<>());
+        commandManager.parserRegistry().registerParser(BlockPredicateParser.blockPredicateParser());
     }
 
 

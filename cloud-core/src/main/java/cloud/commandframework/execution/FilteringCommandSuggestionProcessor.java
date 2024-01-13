@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,14 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
+import cloud.commandframework.internal.CommandInputTokenizer;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.stream.Stream;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -36,7 +41,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Command suggestion processor filters suggestions based on the remaining unconsumed input in the
  * queue.
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.STABLE)
 public final class FilteringCommandSuggestionProcessor<C> implements CommandSuggestionProcessor<C> {
@@ -44,12 +49,12 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
     private final @NonNull Filter<C> filter;
 
     /**
-     * Create a new {@link FilteringCommandSuggestionProcessor} filtering with {@link String#startsWith(String)} that does
-     * not ignore case.
+     * Create a new {@link FilteringCommandSuggestionProcessor} filtering with {@link Filter#partialTokenMatches(boolean)} that
+     * ignores case.
      */
-    @API(status = API.Status.STABLE)
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public FilteringCommandSuggestionProcessor() {
-        this(Filter.startsWith(false));
+        this(Filter.partialTokenMatches(true));
     }
 
     /**
@@ -64,27 +69,29 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
     }
 
     @Override
-    public @Nullable Suggestion process(
+    public @NonNull Stream<@NonNull Suggestion> process(
             final @NonNull CommandPreprocessingContext<C> context,
-            final @NonNull Suggestion suggestion
+            final @NonNull Stream<@NonNull Suggestion> suggestions
     ) {
         final String input;
         if (context.commandInput().isEmpty(true /* ignoreWhitespace */)) {
             input = "";
         } else {
-            input = context.commandInput().remainingInput();
+            input = context.commandInput().skipWhitespace().remainingInput();
         }
-        final String filtered = this.filter.filter(context, suggestion.suggestion(), input);
-        if (filtered == null) {
-            return null;
-        }
-        return suggestion.withSuggestion(filtered);
+        return suggestions.map(suggestion -> {
+            final String filtered = this.filter.filter(context, suggestion.suggestion(), input);
+            if (filtered == null) {
+                return null;
+            }
+            return suggestion.withSuggestion(filtered);
+        }).filter(Objects::nonNull);
     }
 
     /**
      * Filter function that tests (and potentially changes) each suggestion against the input and context.
      *
-     * @param <C> sender type
+     * @param <C> command sender type
      * @since 1.8.0
      */
     @API(status = API.Status.STABLE, since = "1.8.0")
@@ -127,18 +134,6 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
         }
 
         /**
-         * Returns a new {@link Filter} that tests this filter, and then
-         * uses {@link #trimBeforeLastSpace()} if the result is non-null.
-         *
-         * @return combined filter
-         * @since 1.8.0
-         */
-        @API(status = API.Status.STABLE, since = "1.8.0")
-        default Filter<C> andTrimBeforeLastSpace() {
-            return this.and(trimBeforeLastSpace());
-        }
-
-        /**
          * Create a filter using {@link String#startsWith(String)} that can optionally ignore case.
          *
          * @param ignoreCase whether to ignore case
@@ -171,32 +166,48 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
         }
 
         /**
-         * Create a filter which does extra processing when the input contains spaces.
+         * Filter that requires every token of input to be a partial or full match for a single corresponding token in the
+         * suggestion.
          *
-         * <p>Will return the portion of the suggestion which is after the last space in
-         * the input.</p>
-         *
-         * @param <C> sender type
+         * @param ignoreCase whether to ignore case
+         * @param <C>        command sender type
          * @return new filter
-         * @since 1.8.0
+         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
-        static <C> @NonNull Filter<C> trimBeforeLastSpace() {
-            return (context, suggestion, input) -> {
-                final int lastSpace = input.lastIndexOf(' ');
-                // No spaces in input, don't do anything
-                if (lastSpace == -1) {
-                    return suggestion;
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        static <C> @NonNull Simple<C> partialTokenMatches(final boolean ignoreCase) {
+            return Simple.contextFree((suggestion, input) -> {
+                final List<String> suggestionTokens = new CommandInputTokenizer(suggestion).tokenize();
+                final List<String> inputTokens = new CommandInputTokenizer(input).tokenize();
+
+                boolean passed = true;
+
+                for (String inputToken : inputTokens) {
+                    if (ignoreCase) {
+                        inputToken = inputToken.toLowerCase(Locale.ROOT);
+                    }
+
+                    boolean foundMatch = false;
+
+                    for (final Iterator<String> iterator = suggestionTokens.iterator(); iterator.hasNext();) {
+                        final String suggestionToken = iterator.next();
+                        final String suggestionTokenLower =
+                                ignoreCase ? suggestionToken.toLowerCase(Locale.ROOT) : suggestionToken;
+                        if (suggestionTokenLower.contains(inputToken)) {
+                            iterator.remove();
+                            foundMatch = true;
+                            break;
+                        }
+                    }
+
+                    if (!foundMatch) {
+                        passed = false;
+                        break;
+                    }
                 }
 
-                // Always use case-insensitive here. If case-sensitive filtering is desired it should
-                // be done in another filter which this is appended to using #and/#andTrimBeforeLastSpace.
-                if (suggestion.toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT).substring(0, lastSpace))) {
-                    return suggestion.substring(lastSpace + 1);
-                }
-
-                return null;
-            };
+                return passed;
+            });
         }
 
         /**

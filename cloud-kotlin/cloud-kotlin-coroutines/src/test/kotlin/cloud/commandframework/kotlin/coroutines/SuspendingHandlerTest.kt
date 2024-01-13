@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 package cloud.commandframework.kotlin.coroutines
 
 import cloud.commandframework.CommandManager
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
+import cloud.commandframework.execution.ExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
 import cloud.commandframework.kotlin.coroutines.extension.suspendingHandler
 import cloud.commandframework.kotlin.extension.buildAndRegister
@@ -52,7 +52,7 @@ class SuspendingHandlerTest {
             }
         }
 
-        manager.executeCommand(TestCommandSender(), "suspend").await()
+        manager.commandExecutor().executeCommand(TestCommandSender(), "suspend").await()
     }
 
     suspend fun someSuspendingFunction() {}
@@ -60,8 +60,8 @@ class SuspendingHandlerTest {
     private class TestCommandSender
 
     private class TestCommandManager : CommandManager<TestCommandSender>(
-        AsynchronousCommandExecutionCoordinator.builder<TestCommandSender>()
-            .withExecutor(executorService)
+        ExecutionCoordinator.builder<TestCommandSender>()
+            .executor(executorService)
             .build(),
         CommandRegistrationHandler.nullCommandRegistrationHandler()
     ) {

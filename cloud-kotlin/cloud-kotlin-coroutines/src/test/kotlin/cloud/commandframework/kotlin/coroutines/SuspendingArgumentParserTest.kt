@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,9 @@
 package cloud.commandframework.kotlin.coroutines
 
 import cloud.commandframework.CommandManager
+import cloud.commandframework.arguments.parser.ArgumentParseResult
 import cloud.commandframework.arguments.suggestion.Suggestion
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
+import cloud.commandframework.execution.ExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
 import cloud.commandframework.kotlin.extension.buildAndRegister
 import com.google.common.truth.Truth.assertThat
@@ -46,7 +47,7 @@ class SuspendingArgumentParserTest {
     fun test(): Unit = runBlocking {
         val suspendingParser = suspendingArgumentParser<TestCommandSender, Int> { _, commandInput ->
             delay(1L)
-            commandInput.readInteger()
+            ArgumentParseResult.success(commandInput.readInteger())
         }
         val suspendingSuggestionProvider = suspendingSuggestionProvider<TestCommandSender> { _, _ ->
             delay(1L)
@@ -61,8 +62,8 @@ class SuspendingArgumentParserTest {
             }
         }
 
-        manager.executeCommand(TestCommandSender(), "test 123").await()
-        assertThat(manager.suggestionFactory().suggest(TestCommandSender(), "test ").await()).containsExactly(
+        manager.commandExecutor().executeCommand(TestCommandSender(), "test 123").await()
+        assertThat(manager.suggestionFactory().suggest(TestCommandSender(), "test ").await().list()).containsExactly(
             Suggestion.simple("1"),
             Suggestion.simple("2"),
             Suggestion.simple("3")
@@ -72,8 +73,8 @@ class SuspendingArgumentParserTest {
     private class TestCommandSender
 
     private class TestCommandManager : CommandManager<TestCommandSender>(
-        AsynchronousCommandExecutionCoordinator.builder<TestCommandSender>()
-            .withExecutor(SuspendingHandlerTest.executorService)
+        ExecutionCoordinator.builder<TestCommandSender>()
+            .executor(executorService)
             .build(),
         CommandRegistrationHandler.nullCommandRegistrationHandler()
     ) {

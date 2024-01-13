@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -140,20 +140,20 @@ public final class FloatParser<C> implements ArgumentParser<C, Float> {
     }
 
     /**
-     * Get the minimum value accepted by this parser
+     * Returns the minimum value accepted by this parser.
      *
-     * @return Min value
+     * @return min value
      */
-    public float getMin() {
+    public float min() {
         return this.min;
     }
 
     /**
-     * Get the maximum value accepted by this parser
+     * Returns the maximum value accepted by this parser.
      *
-     * @return Max value
+     * @return max value
      */
-    public float getMax() {
+    public float max() {
         return this.max;
     }
 
@@ -183,7 +183,6 @@ public final class FloatParser<C> implements ArgumentParser<C, Float> {
     @API(status = API.Status.STABLE)
     public static final class FloatParseException extends NumberParseException {
 
-        private static final long serialVersionUID = -1162983846751812292L;
 
         private final FloatParser<?> parser;
 
@@ -216,7 +215,7 @@ public final class FloatParser<C> implements ArgumentParser<C, Float> {
         }
 
         @Override
-        public @NonNull String getNumberType() {
+        public @NonNull String numberType() {
             return "float";
         }
 

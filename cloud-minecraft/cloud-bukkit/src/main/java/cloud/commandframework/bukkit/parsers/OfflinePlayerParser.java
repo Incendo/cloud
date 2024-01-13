@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,6 @@ import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
@@ -84,15 +83,9 @@ public final class OfflinePlayerParser<C> implements ArgumentParser<C, OfflinePl
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    OfflinePlayerParser.class,
-                    commandContext
-            ));
-        }
+        final String input = commandInput.readString();
 
-        final OfflinePlayer player = Bukkit.getOfflinePlayer(commandInput.readString());
+        final OfflinePlayer player = Bukkit.getOfflinePlayer(input);
 
         if (!player.hasPlayedBefore() && !player.isOnline()) {
             return ArgumentParseResult.failure(new OfflinePlayerParseException(input, commandContext));
@@ -104,7 +97,7 @@ public final class OfflinePlayerParser<C> implements ArgumentParser<C, OfflinePl
     @Override
     public @NonNull Iterable<@NonNull Suggestion> suggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         final CommandSender bukkit = commandContext.get(BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER);
         return Bukkit.getOnlinePlayers().stream()
@@ -120,7 +113,6 @@ public final class OfflinePlayerParser<C> implements ArgumentParser<C, OfflinePl
      */
     public static final class OfflinePlayerParseException extends ParserException {
 
-        private static final long serialVersionUID = 7632293268451349508L;
         private final String input;
 
         /**

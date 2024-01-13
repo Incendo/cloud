@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -66,7 +66,7 @@ import static java.util.Objects.requireNonNull;
  * @param <C> Command sender type
  * @since 1.5.0
  */
-public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
+public class ItemStackParser<C> implements ArgumentParser.FutureArgumentParser<C, ProtoItemStack> {
 
     /**
      * Creates a new item stack parser.
@@ -122,11 +122,11 @@ public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
     }
 
     @Override
-    public final @NonNull ArgumentParseResult<ProtoItemStack> parse(
+    public final @NonNull CompletableFuture<@NonNull ArgumentParseResult<ProtoItemStack>> parseFuture(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        return this.parser.parse(commandContext, commandInput);
+        return this.parser.parseFuture(commandContext, commandInput);
     }
 
     @Override
@@ -135,7 +135,7 @@ public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
     }
 
 
-    private static final class ModernParser<C> implements ArgumentParser<C, ProtoItemStack> {
+    private static final class ModernParser<C> implements ArgumentParser.FutureArgumentParser<C, ProtoItemStack> {
 
         private static final Class<?> NMS_ITEM_STACK_CLASS = CraftBukkitReflection.needNMSClassOrElse(
                 "ItemStack",
@@ -201,16 +201,17 @@ public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
                 inst = (ArgumentType<Object>) ctr.newInstance(CommandBuildContextSupplier.commandBuildContext());
             }
             return new WrappedBrigadierParser<C, Object>(inst)
-                    .map((ctx, itemInput) -> CompletableFuture.completedFuture(new ModernProtoItemStack(itemInput)));
+                    .flatMapSuccess((ctx, itemInput) -> ArgumentParseResult.successFuture(
+                            new ModernProtoItemStack(itemInput)));
         }
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull ProtoItemStack> parse(
+        public @NonNull CompletableFuture<@NonNull ArgumentParseResult<@NonNull ProtoItemStack>> parseFuture(
                 final @NonNull CommandContext<@NonNull C> commandContext,
                 final @NonNull CommandInput commandInput
         ) {
             // Minecraft has a parser for this - just use it
-            return this.parser.parse(commandContext, commandInput);
+            return this.parser.parseFuture(commandContext, commandInput);
         }
 
         @Override
@@ -274,25 +275,23 @@ public class ItemStackParser<C> implements ArgumentParser<C, ProtoItemStack> {
         }
     }
 
-    private static final class LegacyParser<C> implements ArgumentParser<C, ProtoItemStack>,
+    private static final class LegacyParser<C> implements ArgumentParser.FutureArgumentParser<C, ProtoItemStack>,
             BlockingSuggestionProvider.Strings<C> {
 
         private final ArgumentParser<C, ProtoItemStack> parser = new MaterialParser<C>()
-                .map((ctx, material) -> CompletableFuture.completedFuture(new LegacyProtoItemStack(material)));
+                .mapSuccess((ctx, material) -> CompletableFuture.completedFuture(new LegacyProtoItemStack(material)));
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull ProtoItemStack> parse(
+        public @NonNull CompletableFuture<@NonNull ArgumentParseResult<@NonNull ProtoItemStack>> parseFuture(
                 final @NonNull CommandContext<@NonNull C> commandContext,
                 final @NonNull CommandInput commandInput
         ) {
-            return this.parser.parse(commandContext, commandInput);
+            return this.parser.parseFuture(commandContext, commandInput);
         }
 
         @Override
-        public @NonNull Iterable<@NonNull String> stringSuggestions(
-                final @NonNull CommandContext<C> commandContext,
-                final @NonNull String input
-        ) {
+        public @NonNull Iterable<@NonNull String> stringSuggestions(final @NonNull CommandContext<C> commandContext,
+                                                                    final @NonNull CommandInput input) {
             return Arrays.stream(Material.values())
                     .filter(Material::isItem)
                     .map(value -> value.name().toLowerCase(Locale.ROOT))

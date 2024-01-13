@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @API(status = API.Status.STABLE, since = "1.2.0")
 public class CommandExecutionException extends IllegalArgumentException {
 
-    private static final long serialVersionUID = -4785446899438294661L;
     private final CommandContext<?> commandContext;
 
     /**
@@ -64,13 +63,13 @@ public class CommandExecutionException extends IllegalArgumentException {
     }
 
     /**
-     * Get the CommandContext which led to this exception
+     * Returns the command context which caused this exception.
      *
      * @return Command
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public @Nullable CommandContext<?> getCommandContext() {
+    public @Nullable CommandContext<?> context() {
         return this.commandContext;
     }
 }

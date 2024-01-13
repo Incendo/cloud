@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -69,10 +69,8 @@ public interface CloudCapability {
      * @since 1.7.0
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
-    @SuppressWarnings("serial")
     final class CloudCapabilityMissingException extends RuntimeException {
 
-        private static final long serialVersionUID = 8961652857372971486L;
 
         /**
          * Create a new cloud capability missing exception instance.

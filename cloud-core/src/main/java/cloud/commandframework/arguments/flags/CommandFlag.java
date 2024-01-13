@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class CommandFlag<T> {
 
     private final @NonNull String name;
-    private final @NonNull String @NonNull [] aliases;
+    private final @NonNull String @NonNull[] aliases;
     private final @NonNull Description description;
     private final @NonNull Permission permission;
     private final @NonNull FlagMode mode;
@@ -58,7 +58,7 @@ public final class CommandFlag<T> {
 
     private CommandFlag(
             final @NonNull String name,
-            final @NonNull String @NonNull [] aliases,
+            final @NonNull String @NonNull[] aliases,
             final @NonNull Description description,
             final @NonNull Permission permission,
             final @Nullable TypedCommandComponent<?, T> commandComponent,
@@ -85,20 +85,20 @@ public final class CommandFlag<T> {
     }
 
     /**
-     * Get the flag name
+     * Returns the name of the flag.
      *
-     * @return Flag name
+     * @return flag name
      */
-    public @NonNull String getName() {
+    public @NonNull String name() {
         return this.name;
     }
 
     /**
-     * Get all flag aliases. This does not include the flag name
+     * Returns the flag aliases, not including the {@link #name()}.
      *
-     * @return Flag aliases
+     * @return flag aliases
      */
-    public @NonNull Collection<@NonNull String> getAliases() {
+    public @NonNull Collection<@NonNull String> aliases() {
         return Arrays.asList(this.aliases);
     }
 
@@ -113,20 +113,20 @@ public final class CommandFlag<T> {
     }
 
     /**
-     * Get the flag description.
+     * Returns the flag description.
      *
-     * @return Flag description
+     * @return flag description
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public @NonNull Description getArgumentDescription() {
+    public @NonNull Description description() {
         return this.description;
     }
 
     /**
-     * Returns the command component, if it exists
+     * Returns the command component, if this is a value flag.
      *
-     * @return Command component, or {@code null}
+     * @return command component, or {@code null} if this is a presence flag
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
@@ -135,7 +135,7 @@ public final class CommandFlag<T> {
     }
 
     /**
-     * Get the permission required to use this flag, if it exists
+     * Returns the permission required to use this flag, if it exists.
      *
      * @return Command permission, or {@code null}
      * @since 1.6.0
@@ -159,12 +159,12 @@ public final class CommandFlag<T> {
             return false;
         }
         final CommandFlag<?> that = (CommandFlag<?>) o;
-        return this.getName().equals(that.getName());
+        return this.name().equals(that.name());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.getName());
+        return Objects.hash(this.name());
     }
 
 

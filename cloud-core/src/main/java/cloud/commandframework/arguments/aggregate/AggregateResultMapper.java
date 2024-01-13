@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.aggregate;
 
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
 import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
@@ -45,7 +46,10 @@ public interface AggregateResultMapper<C, O> {
      * @param context        the context to map
      * @return future that completes with the result
      */
-    @NonNull CompletableFuture<O> map(@NonNull CommandContext<C> commandContext, @NonNull AggregateCommandContext<C> context);
+    @NonNull CompletableFuture<ArgumentParseResult<O>> map(
+            @NonNull CommandContext<C> commandContext,
+            @NonNull AggregateCommandContext<C> context
+    );
 
 
     @API(status = API.Status.STABLE, since = "2.0.0")
@@ -58,14 +62,17 @@ public interface AggregateResultMapper<C, O> {
          * @param context        the context to map
          * @return the result
          */
-        @NonNull O mapImmediately(@NonNull CommandContext<C> commandContext, @NonNull AggregateCommandContext<C> context);
+        @NonNull ArgumentParseResult<O> mapImmediately(
+                @NonNull CommandContext<C> commandContext,
+                @NonNull AggregateCommandContext<C> context
+        );
 
         @Override
-        default @NonNull CompletableFuture<O> map(
+        default @NonNull CompletableFuture<ArgumentParseResult<O>> map(
                 @NonNull CommandContext<C> commandContext,
                 @NonNull AggregateCommandContext<C> context
         ) {
-            final CompletableFuture<O> result = new CompletableFuture<>();
+            final CompletableFuture<ArgumentParseResult<O>> result = new CompletableFuture<>();
             try {
                 result.complete(this.mapImmediately(commandContext, context));
             } catch (final Exception e) {

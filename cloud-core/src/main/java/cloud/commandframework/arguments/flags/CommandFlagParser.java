@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.flags;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
@@ -94,7 +95,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
     }
 
     @Override
-    public @NonNull CompletableFuture<@NonNull Object> parseFuture(
+    public @NonNull CompletableFuture<@NonNull ArgumentParseResult<Object>> parseFuture(
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
@@ -145,31 +146,31 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
     @SuppressWarnings({"unchecked", "rawtypes"})
     public @NonNull CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         /* Check if we have a last flag stored */
         final String lastArg = Objects.requireNonNull(commandContext.getOrDefault(FLAG_META_KEY, ""));
         if (!lastArg.startsWith("-")) {
-            final String rawInput = commandContext.rawInput().input();
+            final String readInput = input.readInput();
             /* Collection containing all used flags */
             final List<CommandFlag<?>> usedFlags = new LinkedList<>();
             /* Find all "primary" flags, using --flag */
-            final Matcher primaryMatcher = FLAG_PRIMARY_PATTERN.matcher(rawInput);
+            final Matcher primaryMatcher = FLAG_PRIMARY_PATTERN.matcher(readInput);
             while (primaryMatcher.find()) {
                 final String name = primaryMatcher.group("name");
                 for (final CommandFlag<?> flag : this.flags) {
-                    if (flag.getName().equalsIgnoreCase(name)) {
+                    if (flag.name().equalsIgnoreCase(name)) {
                         usedFlags.add(flag);
                         break;
                     }
                 }
             }
             /* Find all alias flags */
-            final Matcher aliasMatcher = FLAG_ALIAS_PATTERN.matcher(rawInput);
+            final Matcher aliasMatcher = FLAG_ALIAS_PATTERN.matcher(readInput);
             while (aliasMatcher.find()) {
                 final String name = aliasMatcher.group("name");
                 for (final CommandFlag<?> flag : this.flags) {
-                    for (final String alias : flag.getAliases()) {
+                    for (final String alias : flag.aliases()) {
                         /* Aliases are single-char strings */
                         if (name.contains(alias)) {
                             usedFlags.add(flag);
@@ -177,6 +178,13 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                         }
                     }
                 }
+            }
+            final String nextToken = input.peekString();
+            final String currentFlag;
+            if (nextToken.length() > 1) {
+                currentFlag = nextToken.substring(1);
+            } else {
+                currentFlag = "";
             }
             /* Suggestions */
             final List<Suggestion> suggestions = new LinkedList<>();
@@ -189,10 +197,10 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                     continue;
                 }
 
-                suggestions.add(Suggestion.simple(String.format("--%s", flag.getName())));
+                suggestions.add(Suggestion.simple(String.format("--%s", flag.name())));
             }
             /* Recommend aliases */
-            final boolean suggestCombined = input.length() > 1 && input.charAt(0) == '-' && input.charAt(1) != '-';
+            final boolean suggestCombined = nextToken.length() > 1 && nextToken.startsWith("-") && !nextToken.startsWith("--");
             for (final CommandFlag<?> flag : this.flags) {
                 if (usedFlags.contains(flag) && flag.mode() != CommandFlag.FlagMode.REPEATABLE) {
                     continue;
@@ -201,9 +209,12 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                     continue;
                 }
 
-                for (final String alias : flag.getAliases()) {
+                for (final String alias : flag.aliases()) {
+                    if (alias.equalsIgnoreCase(currentFlag)) {
+                        continue;
+                    }
                     if (suggestCombined && flag.commandComponent() == null) {
-                        suggestions.add(Suggestion.simple(String.format("%s%s", input, alias)));
+                        suggestions.add(Suggestion.simple(String.format("%s%s", input.peekString(), alias)));
                     } else {
                         suggestions.add(Suggestion.simple(String.format("-%s", alias)));
                     }
@@ -211,7 +222,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
             }
             /* If we are suggesting the combined flag, then also suggest the current input */
             if (suggestCombined) {
-                suggestions.add(Suggestion.simple(input));
+                suggestions.add(Suggestion.simple(input.peekString()));
             }
             return CompletableFuture.completedFuture(suggestions);
         } else {
@@ -219,7 +230,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
             if (lastArg.startsWith("--")) { // --long
                 final String flagName = lastArg.substring(2);
                 for (final CommandFlag<?> flag : this.flags) {
-                    if (flagName.equalsIgnoreCase(flag.getName())) {
+                    if (flagName.equalsIgnoreCase(flag.name())) {
                         currentFlag = flag;
                         break;
                     }
@@ -228,7 +239,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                 final String flagName = lastArg.substring(1);
                 outer:
                 for (final CommandFlag<?> flag : this.flags) {
-                    for (final String alias : flag.getAliases()) {
+                    for (final String alias : flag.aliases()) {
                         if (alias.equalsIgnoreCase(flagName)) {
                             currentFlag = flag;
                             break outer;
@@ -267,11 +278,11 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
         }
 
         /**
-         * Get the caption used for this failure reason
+         * Returns the caption used for this failure reason.
          *
-         * @return The caption
+         * @return the caption
          */
-        public @NonNull Caption getCaption() {
+        public @NonNull Caption caption() {
             return this.caption;
         }
     }
@@ -283,7 +294,6 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
     @API(status = API.Status.STABLE)
     public static final class FlagParseException extends ParserException {
 
-        private static final long serialVersionUID = -7725389394142868549L;
         private final String input;
         private final FailureReason failureReason;
 
@@ -302,7 +312,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
             super(
                     CommandFlagParser.class,
                     context,
-                    failureReason.getCaption(),
+                    failureReason.caption(),
                     CaptionVariable.of("input", input),
                     CaptionVariable.of("flag", input)
             );
@@ -311,11 +321,11 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
         }
 
         /**
-         * Get the supplied input
+         * Returns the supplied input.
          *
-         * @return String value
+         * @return input
          */
-        public String getInput() {
+        public String input() {
             return this.input;
         }
 
@@ -337,30 +347,34 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
      * and flag values. On failure the intermediate results
      * can be obtained, which are used for providing suggestions.
      */
-    private class FlagParser {
+    private final class FlagParser {
 
         private String lastParsedFlag;
 
         @SuppressWarnings({"unchecked", "rawtypes"})
-        private @NonNull CompletableFuture<@NonNull Object> parse(
+        private @NonNull CompletableFuture<@NonNull ArgumentParseResult<Object>> parse(
                 final @NonNull CommandContext<@NonNull C> commandContext,
                 final @NonNull CommandInput commandInput
         ) {
-            CompletableFuture<Boolean> result = CompletableFuture.completedFuture(false);
+            CompletableFuture<ArgumentParseResult<Object>> result = CompletableFuture.completedFuture(null);
             final Set<CommandFlag<?>> parsedFlags = commandContext.computeIfAbsent(PARSED_FLAGS, k -> new HashSet());
 
             final int remainingTokens = commandInput.remainingTokens();
             for (int i = 0; i <= remainingTokens; i++) {
-                result = result.thenCompose(done -> {
-                    if (done || commandInput.isEmpty()) {
-                        return CompletableFuture.completedFuture(true);
+                result = result.thenCompose(parseResult -> {
+                    // The previous flag might have left us with trailing whitespace. We remove it so that we
+                    // do not have to account for it throughout the parsing process.
+                    commandInput.skipWhitespace();
+
+                    if (parseResult != null || commandInput.isEmpty()) {
+                        return CompletableFuture.completedFuture(parseResult);
                     }
 
                     final String string = commandInput.peekString();
 
                     if (!string.startsWith("-")) {
                         // If we're not starting a new flag then we're outside the scope of this parser. We exit.
-                        return CompletableFuture.completedFuture(true);
+                        return CompletableFuture.completedFuture(ArgumentParseResult.success(FLAG_PARSE_RESULT_OBJECT));
                     }
 
                     // We're definitely not supplying anything to the flag.
@@ -373,12 +387,12 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                         commandInput.moveCursor(1);
                     }
 
-                    final String flagName = commandInput.readString();
+                    final String flagName = commandInput.readStringSkipWhitespace();
                     CommandFlag<?> flag = null;
 
                     if (string.startsWith("--")) {
                         for (final CommandFlag<?> flagCandidate : CommandFlagParser.this.flags) {
-                            if (flagName.equalsIgnoreCase(flagCandidate.getName())) {
+                            if (flagName.equalsIgnoreCase(flagCandidate.name())) {
                                 flag = flagCandidate;
                                 break;
                             }
@@ -386,7 +400,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                     } else if (flagName.length() == 1) {
                         outer:
                         for (final CommandFlag<?> flagCandidate : CommandFlagParser.this.flags) {
-                            for (final String alias : flagCandidate.getAliases()) {
+                            for (final String alias : flagCandidate.aliases()) {
                                 if (alias.equalsIgnoreCase(flagName)) {
                                     flag = flagCandidate;
                                     break outer;
@@ -403,7 +417,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                                     continue;
                                 }
 
-                                if (!candidateFlag.getAliases().contains(parsedFlag)) {
+                                if (!candidateFlag.aliases().contains(parsedFlag)) {
                                     continue;
                                 }
 
@@ -442,7 +456,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                         }
 
                         // This type of flag can never have a value. We move on to the next flag.
-                        return CompletableFuture.completedFuture(false);
+                        return CompletableFuture.completedFuture(null);
                     }
 
                     if (flag == null) {
@@ -475,7 +489,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                     if (flag.commandComponent() == null) {
                         commandContext.flags().addPresenceFlag(flag);
                         parsedFlags.add(flag);
-                        return CompletableFuture.completedFuture(false);
+                        return CompletableFuture.completedFuture(null);
                     }
 
                     // If the command input ends with a space then we set lastParsedFlag before checking if the command
@@ -491,7 +505,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                     if (commandInput.isEmpty(true /* ignoreWhitespace */)) {
                         return this.fail(
                                 new FlagParseException(
-                                        flag.getName(),
+                                        flag.name(),
                                         FailureReason.MISSING_ARGUMENT,
                                         commandContext
                                 )
@@ -509,31 +523,34 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                                     commandContext,
                                     commandInput
                             ).thenApply(parsedValue -> {
+                                // Forward parsing errors.
+                                if (parsedValue.failure().isPresent()) {
+                                    return (ArgumentParseResult<Object>) parsedValue;
+                                }
+
                                 // We store the parsed flag in the context. We do ugly erasure here because generics :)
-                                commandContext.flags().addValueFlag(parsingFlag, (Object) parsedValue);
+                                commandContext.flags().addValueFlag(parsingFlag, (Object) parsedValue.parsedValue().get());
                                 // At this point we know the flag parsed successfully.
                                 parsedFlags.add(parsingFlag);
 
                                 // We're no longer parsing a flag.
                                 this.lastParsedFlag = null;
 
-                                return false;
+                                return null;
                             });
                 });
             }
 
             // We've consumed everything!
-            return result.thenApply(v -> FLAG_PARSE_RESULT_OBJECT);
+            return result.thenApply(r -> r == null ? ArgumentParseResult.success(FLAG_PARSE_RESULT_OBJECT) : r);
         }
 
         private @Nullable String lastParsedFlag() {
             return this.lastParsedFlag;
         }
 
-        private @NonNull CompletableFuture<Boolean> fail(final @NonNull Throwable exception) {
-            final CompletableFuture<Boolean> future = new CompletableFuture<>();
-            future.completeExceptionally(exception);
-            return future;
+        private @NonNull CompletableFuture<ArgumentParseResult<Object>> fail(final @NonNull Throwable exception) {
+            return CompletableFuture.completedFuture(ArgumentParseResult.failure(exception));
         }
     }
 }

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,14 @@
 package cloud.commandframework.annotations;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class TestCommandManager extends CommandManager<TestCommandSender> {
 
     public TestCommandManager() {
-        super(CommandExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
+        super(ExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
     }
 
     @Override

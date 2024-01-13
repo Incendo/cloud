@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -64,10 +64,10 @@ class StringArgumentTest {
                 .build());
 
         // Act
-        final CommandResult<?> result = this.manager.executeCommand(new TestCommandSender(), "single string").join();
+        final CommandResult<?> result = this.manager.commandExecutor().executeCommand(new TestCommandSender(), "single string").join();
 
         // Assert
-        assertThat(result.getCommandContext().get(MESSAGE1_KEY)).isEqualTo("string");
+        assertThat(result.commandContext().get(MESSAGE1_KEY)).isEqualTo("string");
     }
 
     @Test
@@ -79,12 +79,12 @@ class StringArgumentTest {
                 .build());
 
         // Act
-        final CommandResult<?> result = this.manager.executeCommand(new TestCommandSender(),
+        final CommandResult<?> result = this.manager.commandExecutor().executeCommand(new TestCommandSender(),
                 "quoted 'quoted \" string' unquoted").join();
 
         // Assert
-        assertThat(result.getCommandContext().get(MESSAGE1_KEY)).isEqualTo("quoted \" string");
-        assertThat(result.getCommandContext().get(MESSAGE2_KEY)).isEqualTo("unquoted");
+        assertThat(result.commandContext().get(MESSAGE1_KEY)).isEqualTo("quoted \" string");
+        assertThat(result.commandContext().get(MESSAGE2_KEY)).isEqualTo("unquoted");
     }
 
     @Test
@@ -96,11 +96,11 @@ class StringArgumentTest {
                 .build());
 
         // Act
-        final CommandResult<?> result = this.manager.executeCommand(new TestCommandSender(), "quoted quoted unquoted").join();
+        final CommandResult<?> result = this.manager.commandExecutor().executeCommand(new TestCommandSender(), "quoted quoted unquoted").join();
 
         // Assert
-        assertThat(result.getCommandContext().get(MESSAGE1_KEY)).isEqualTo("quoted");
-        assertThat(result.getCommandContext().get(MESSAGE2_KEY)).isEqualTo("unquoted");
+        assertThat(result.commandContext().get(MESSAGE1_KEY)).isEqualTo("quoted");
+        assertThat(result.commandContext().get(MESSAGE2_KEY)).isEqualTo("unquoted");
     }
 
     @Test
@@ -112,12 +112,12 @@ class StringArgumentTest {
                 .build());
 
         // Act
-        final CommandResult<?> result = this.manager.executeCommand(new TestCommandSender(),
+        final CommandResult<?> result = this.manager.commandExecutor().executeCommand(new TestCommandSender(),
                 "quoted \"quoted \\\" string\" unquoted").join();
 
         // Assert
-        assertThat(result.getCommandContext().get(MESSAGE1_KEY)).isEqualTo("quoted \" string");
-        assertThat(result.getCommandContext().get(MESSAGE2_KEY)).isEqualTo("unquoted");
+        assertThat(result.commandContext().get(MESSAGE1_KEY)).isEqualTo("quoted \" string");
+        assertThat(result.commandContext().get(MESSAGE2_KEY)).isEqualTo("unquoted");
     }
 
     @Test
@@ -131,7 +131,7 @@ class StringArgumentTest {
         // Act & Assert
         Assertions.assertThrows(
                 CompletionException.class,
-                () -> manager.executeCommand(new TestCommandSender(), "'quoted quoted unquoted").join()
+                () -> manager.commandExecutor().executeCommand(new TestCommandSender(), "'quoted quoted unquoted").join()
         );
     }
 
@@ -144,9 +144,9 @@ class StringArgumentTest {
 
         // Act
         final CommandResult<?> result =
-                this.manager.executeCommand(new TestCommandSender(), "greedy greedy string content").join();
+                this.manager.commandExecutor().executeCommand(new TestCommandSender(), "greedy greedy string content").join();
 
         // Assert
-        assertThat(result.getCommandContext().get(MESSAGE1_KEY)).isEqualTo("greedy string content");
+        assertThat(result.commandContext().get(MESSAGE1_KEY)).isEqualTo("greedy string content");
     }
 }

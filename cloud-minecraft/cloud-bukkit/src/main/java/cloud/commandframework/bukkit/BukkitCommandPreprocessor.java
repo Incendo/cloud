@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,9 @@ import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
+import java.util.concurrent.Executor;
+import org.bukkit.Server;
+import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -34,7 +37,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Command preprocessor which decorates incoming {@link cloud.commandframework.context.CommandContext}
  * with Bukkit specific objects
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
 
@@ -61,20 +64,34 @@ final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
         if (this.mapper != null) {
             // If the server is Brigadier capable but the Brigadier manager has not been registered, store the native
             // sender in context manually so that getting suggestions from WrappedBrigadierParser works like expected.
-            if (!context.getCommandContext().contains(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER)) {
-                context.getCommandContext().store(
+            if (!context.commandContext().contains(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER)) {
+                context.commandContext().store(
                         WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER,
-                        this.mapper.apply(context.getCommandContext().sender())
+                        this.mapper.apply(context.commandContext().sender())
                 );
             }
         }
-        context.getCommandContext().store(
+        context.commandContext().store(
                 BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER,
-                this.commandManager.getBackwardsCommandSenderMapper().apply(context.getCommandContext().sender())
+                this.commandManager.senderMapper().reverse(context.commandContext().sender())
         );
-        context.getCommandContext().store(
-                BukkitCommandContextKeys.CLOUD_BUKKIT_CAPABILITIES,
-                this.commandManager.queryCapabilities()
+
+        // Store if PaperCommandManager's preprocessor didn't already
+        context.commandContext().computeIfAbsent(
+                BukkitCommandContextKeys.SENDER_SCHEDULER_EXECUTOR,
+                $ -> this.mainThreadExecutor()
         );
+    }
+
+    private Executor mainThreadExecutor() {
+        final Plugin plugin = this.commandManager.owningPlugin();
+        final Server server = plugin.getServer();
+        return task -> {
+            if (server.isPrimaryThread()) {
+                task.run();
+                return;
+            }
+            server.getScheduler().runTask(plugin, task);
+        };
     }
 }

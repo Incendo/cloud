@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,6 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.StringRange;
-import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -62,7 +61,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  * @since 1.5.0
  */
-public final class ItemStackPredicateParser<C> implements ArgumentParser<C, ItemStackPredicate> {
+public final class ItemStackPredicateParser<C> implements ArgumentParser.FutureArgumentParser<C, ItemStackPredicate> {
 
     private static final Class<?> CRAFT_ITEM_STACK_CLASS =
             CraftBukkitReflection.needOBCClass("inventory.CraftItemStack");
@@ -139,17 +138,17 @@ public final class ItemStackPredicateParser<C> implements ArgumentParser<C, Item
             // 1.19+
             inst = (ArgumentType<Object>) ctr.newInstance(CommandBuildContextSupplier.commandBuildContext());
         }
-        return new WrappedBrigadierParser<C, Object>(inst).map((ctx, result) -> {
+        return new WrappedBrigadierParser<C, Object>(inst).flatMapSuccess((ctx, result) -> {
             if (result instanceof Predicate) {
                 // 1.19+
-                return CompletableFuture.completedFuture(new ItemStackPredicateImpl((Predicate<Object>) result));
+                return ArgumentParseResult.successFuture(new ItemStackPredicateImpl((Predicate<Object>) result));
             }
             final Object commandSourceStack = ctx.get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER);
             final com.mojang.brigadier.context.CommandContext<Object> dummy = createDummyContext(ctx, commandSourceStack);
             Objects.requireNonNull(CREATE_PREDICATE_METHOD, "ItemPredicateArgument$Result#create");
             try {
                 final Predicate<Object> predicate = (Predicate<Object>) CREATE_PREDICATE_METHOD.invoke(result, dummy);
-                return CompletableFuture.completedFuture(new ItemStackPredicateImpl(predicate));
+                return ArgumentParseResult.successFuture(new ItemStackPredicateImpl(predicate));
             } catch (final ReflectiveOperationException ex) {
                 throw new RuntimeException(ex);
             }
@@ -182,18 +181,15 @@ public final class ItemStackPredicateParser<C> implements ArgumentParser<C, Item
      */
     @SuppressWarnings("unused")
     private static <C> void registerParserSupplier(final @NonNull BukkitCommandManager<C> commandManager) {
-        commandManager.parserRegistry().registerParserSupplier(
-                TypeToken.get(ItemStackPredicate.class),
-                params -> new ItemStackPredicateParser<>()
-        );
+        commandManager.parserRegistry().registerParser(ItemStackPredicateParser.itemStackPredicateParser());
     }
 
     @Override
-    public @NonNull ArgumentParseResult<@NonNull ItemStackPredicate> parse(
+    public @NonNull CompletableFuture<ArgumentParseResult<@NonNull ItemStackPredicate>> parseFuture(
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        return this.parser.parse(commandContext, commandInput);
+        return this.parser.parseFuture(commandContext, commandInput);
     }
 
     @Override

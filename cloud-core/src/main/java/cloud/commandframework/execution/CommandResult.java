@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,34 +24,37 @@
 package cloud.commandframework.execution;
 
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.internal.ImmutableImpl;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
 /**
- * The result of a command execution
+ * The result of a command execution.
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
+ * @since 2.0.0
  */
-@API(status = API.Status.STABLE)
-public class CommandResult<C> {
-
-    private final CommandContext<C> commandContext;
+@ImmutableImpl
+@Value.Immutable
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface CommandResult<C> {
 
     /**
-     * Construct a new command result instance
+     * Creates a {@link CommandResult} using the given {@code context}.
      *
-     * @param context Command context
+     * @param <C>     command sender type
+     * @param context command context
+     * @return the result instance
      */
-    public CommandResult(final @NonNull CommandContext<C> context) {
-        this.commandContext = context;
+    static <C> @NonNull CommandResult<C> of(final @NonNull CommandContext<C> context) {
+        return CommandResultImpl.of(context);
     }
 
     /**
-     * Get the command context
+     * Returns the command context.
      *
-     * @return Command context
+     * @return the command context
      */
-    public @NonNull CommandContext<C> getCommandContext() {
-        return this.commandContext;
-    }
+    @NonNull CommandContext<C> commandContext();
 }

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,13 +25,11 @@ package cloud.commandframework.fabric;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.brigadier.permission.BrigadierPermissionChecker;
+import cloud.commandframework.brigadier.CloudBrigadierCommand;
 import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
-import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,6 +46,8 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import static cloud.commandframework.brigadier.util.BrigadierUtil.buildRedirect;
 
 /**
  * A registration handler for Fabric API.
@@ -67,41 +67,6 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
 
     FabricCommandManager<C, S> commandManager() {
         return this.commandManager;
-    }
-
-    /**
-     * Returns a literal node that redirects its execution to
-     * the given destination node.
-     *
-     * <p>This method is taken from MIT licensed code in the Velocity project, see
-     * <a href="https://github.com/VelocityPowered/Velocity/blob/b88c573eb11839a95bea1af947b0c59a5956368b/proxy/src/main/java/com/velocitypowered/proxy/util/BrigadierUtils.java#L33">
-     * Velocity's BrigadierUtils class</a></p>
-     *
-     * @param alias       the command alias
-     * @param destination the destination node
-     * @param <S>         brig sender type
-     * @return the built node
-     */
-    private static <S> LiteralCommandNode<S> buildRedirect(
-            final @NonNull String alias,
-            final @NonNull CommandNode<S> destination
-    ) {
-        // Redirects only work for nodes with children, but break the top argument-less command.
-        // Manually adding the root command after setting the redirect doesn't fix it.
-        // (See https://github.com/Mojang/brigadier/issues/46) Manually clone the node instead.
-        final LiteralArgumentBuilder<S> builder = LiteralArgumentBuilder
-                .<S>literal(alias)
-                .requires(destination.getRequirement())
-                .forward(
-                        destination.getRedirect(),
-                        destination.getRedirectModifier(),
-                        destination.isFork()
-                )
-                .executes(destination.getCommand());
-        for (final CommandNode<S> child : destination.getChildren()) {
-            builder.then(child);
-        }
-        return builder.build();
     }
 
     static class Client<C> extends FabricCommandRegistrationHandler<C, FabricClientCommandSource> {
@@ -167,12 +132,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                     .createNode(
                             component.name(),
                             command,
-                            (src, perm) -> this.commandManager().hasPermission(
-                                    this.commandManager().commandSourceMapper().apply(src),
-                                    perm
-                            ),
-                            true,
-                            new FabricExecutor<>(this.commandManager())
+                            new CloudBrigadierCommand<>(this.commandManager(), this.commandManager().brigadierManager())
                     );
 
             rootNode.addChild(baseNode);
@@ -228,21 +188,14 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
 
         private void registerCommand(final RootCommandNode<CommandSourceStack> dispatcher, final Command<C> command) {
             final CommandComponent<C> component = command.rootComponent();
-            final FabricExecutor<C, CommandSourceStack> executor = new FabricExecutor<>(this.commandManager());
-            final BrigadierPermissionChecker<CommandSourceStack> permission = (src, perm) -> this.commandManager().hasPermission(
-                    this.commandManager().commandSourceMapper().apply(src),
-                    perm
-            );
             final CommandNode<CommandSourceStack> baseNode = this.commandManager()
                     .brigadierManager()
                     .literalBrigadierNodeFactory()
                     .createNode(
-                        component.name(),
-                        command,
-                        permission,
-                        true /* forceRegister */,
-                        executor
-            );
+                            component.name(),
+                            command,
+                            new CloudBrigadierCommand<>(this.commandManager(), this.commandManager().brigadierManager())
+                    );
 
             dispatcher.addChild(baseNode);
 

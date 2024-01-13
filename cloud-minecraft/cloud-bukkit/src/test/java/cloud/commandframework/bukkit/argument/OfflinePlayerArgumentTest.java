@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,8 +63,8 @@ class OfflinePlayerArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(player);
+        assertThat(result.failure()).isEmpty();
+        assertThat(result.parsedValue()).hasValue(player);
         Truth.assertThat(commandInput.remainingInput()).isEmpty();
 
         verify(this.server()).getOfflinePlayer("player");
@@ -83,8 +83,8 @@ class OfflinePlayerArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isPresent();
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result.failure()).isPresent();
+        assertThat(result.parsedValue()).isEmpty();
 
         verify(this.server()).getOfflinePlayer("player");
     }

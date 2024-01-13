@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE, since = "2.0.0")
 public final class SelectorUnsupportedException extends ParserException {
 
-    private static final long serialVersionUID = -6649195171043474961L;
 
     /**
      * Create a new {@link SelectorUnsupportedException}.

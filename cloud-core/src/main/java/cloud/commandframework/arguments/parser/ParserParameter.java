@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,20 +54,20 @@ public class ParserParameter<T> {
     }
 
     /**
-     * Get the parameter key
+     * Returns the key that identifies the parameter.
      *
-     * @return Parameter key
+     * @return parameter key
      */
-    public @NonNull String getKey() {
+    public @NonNull String key() {
         return this.key;
     }
 
     /**
-     * Ge the type that is expected to be mapped to this parameter
+     * Returns the type that is expected to be mapped to this parameter.
      *
      * @return Expected type
      */
-    public @NonNull TypeToken<T> getExpectedType() {
+    public @NonNull TypeToken<T> expectedType() {
         return this.expectedType;
     }
 
@@ -76,7 +76,7 @@ public class ParserParameter<T> {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
         final ParserParameter<?> that = (ParserParameter<?>) o;

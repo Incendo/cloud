@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,12 @@
 package cloud.commandframework.paper.suggestions;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.Suggestions;
 import cloud.commandframework.bukkit.BukkitPluginRegistrationHandler;
 import cloud.commandframework.paper.PaperCommandManager;
+import cloud.commandframework.util.StringUtils;
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
-import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.bukkit.event.EventHandler;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -61,14 +63,14 @@ class AsyncCommandSuggestionListener<C> implements SuggestionListener<C> {
 
         this.setSuggestions(
                 event,
-                this.paperCommandManager.getCommandSenderMapper().apply(event.getSender()),
+                this.paperCommandManager.senderMapper().map(event.getSender()),
                 this.paperCommandManager.stripNamespace(event.getBuffer())
         );
 
         event.setHandled(true);
     }
 
-    protected List<? extends Suggestion> querySuggestions(final @NonNull C commandSender, final @NonNull String input) {
+    protected Suggestions<C, ?> querySuggestions(final @NonNull C commandSender, final @NonNull String input) {
         return this.paperCommandManager.suggestionFactory().suggestImmediately(commandSender, input);
     }
 
@@ -77,7 +79,11 @@ class AsyncCommandSuggestionListener<C> implements SuggestionListener<C> {
             final @NonNull C commandSender,
             final @NonNull String input
     ) {
-        final List<? extends Suggestion> suggestions = this.querySuggestions(commandSender, input);
-        event.setCompletions(suggestions.stream().map(Suggestion::suggestion).collect(Collectors.toList()));
+        final Suggestions<C, ?> suggestions = this.querySuggestions(commandSender, input);
+        event.setCompletions(suggestions.list().stream()
+                .map(Suggestion::suggestion)
+                .map(suggestion -> StringUtils.trimBeforeLastSpace(suggestion, suggestions.commandInput()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList()));
     }
 }

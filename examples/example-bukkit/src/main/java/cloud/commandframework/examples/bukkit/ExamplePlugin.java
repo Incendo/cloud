@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,16 +23,14 @@
 //
 package cloud.commandframework.examples.bukkit;
 
-import cloud.commandframework.bukkit.BukkitCommandManager;
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.examples.bukkit.annotations.AnnotationParserExample;
 import cloud.commandframework.examples.bukkit.builder.BuilderExample;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.paper.PaperCommandManager;
-import java.util.function.Function;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
@@ -52,49 +50,28 @@ public final class ExamplePlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        final BukkitCommandManager<CommandSender> manager;
-        try {
-            //
-            // (1) The execution coordinator determines how commands are executed. The simple execution coordinator will
-            //     run the command on the thread that is calling it. In the case of Bukkit, this is the primary server thread.
-            //     It is possible to execute (and parse!) commands asynchronously by using the
-            //     AsynchronousCommandExecutionCoordinator.
-            // (2) This functions maps the Bukkit command sender to your custom sender type. If you're not using a custom
-            //     type, then Function.identity() maps CommandSender to itself.
-            // (3) The same concept as (2), but mapping from your custom type to a Bukkit command sender.
-            //
-            manager = new PaperCommandManager<>(
-                    /* Owning plugin */ this,
-                    /* (1) */ CommandExecutionCoordinator.simpleCoordinator(),
-                    /* (2) */ Function.identity(),
-                    /* (3) */ Function.identity()
-            );
-        } catch (final Exception e) {
-            this.getLogger().severe("Failed to initialize the command this.manager");
-            /* Disable the plugin */
-            this.getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
         //
-        // Use contains to filter suggestions instead of default startsWith
+        // (1) The execution coordinator determines how commands are executed. The simple execution coordinator will
+        //     run the command on the thread that is calling it. In the case of Bukkit, this is the primary server thread.
+        //     It is possible to execute (and parse!) commands asynchronously by using the
+        //     AsynchronousCommandExecutionCoordinator.
+        // (2) This function maps the Bukkit CommandSender to your custom sender type and back. If you're not using a custom
+        //     type, then SenderMapper.identity() maps CommandSender to itself.
         //
-        manager.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
-                FilteringCommandSuggestionProcessor.Filter.<CommandSender>contains(true).andTrimBeforeLastSpace()
-        ));
+        final PaperCommandManager<CommandSender> manager = new PaperCommandManager<>(
+                /* Owning plugin */ this,
+                /* (1) */ ExecutionCoordinator.simpleCoordinator(),
+                /* (2) */ SenderMapper.identity()
+        );
         //
-        // Register Brigadier mappings. The capability tells us whether Brigadier is natively available
-        // on the current server. If it is, we can safely register the Brigadier integration.
+        // Configure based on capabilities
         //
         if (manager.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
+            // Register Brigadier mappings for rich completions
             manager.registerBrigadier();
-        }
-        //
-        // Register asynchronous completions. The capability tells us whether asynchronous completions
-        // are available on the server that is running the plugin. The asynchronous completion method
-        // is only available in cloud-paper, not cloud-bukkit.
-        //
-        if (manager.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
-            ((PaperCommandManager<CommandSender>) manager).registerAsynchronousCompletions();
+        } else if (manager.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
+            // Use Paper async completions API (see Javadoc for why we don't use this with Brigadier)
+            manager.registerAsynchronousCompletions();
         }
         //
         // Create the Bukkit audiences that maps command senders to adventure audience. This is not needed

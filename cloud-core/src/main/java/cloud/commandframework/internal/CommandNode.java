@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "2.0.0")
 public final class CommandNode<C> {
+
+    public static final String META_KEY_PERMISSION = "permission";
+    public static final String META_KEY_SENDER_TYPES = "senderTypes";
 
     private final Map<String, Object> nodeMeta = new HashMap<>();
     private final List<CommandNode<C>> children = new LinkedList<>();
@@ -162,7 +165,7 @@ public final class CommandNode<C> {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
         final CommandNode<?> node = (CommandNode<?>) o;

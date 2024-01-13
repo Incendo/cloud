@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,7 +50,7 @@ public class JDACommandListener<C> extends ListenerAdapter {
     @Override
     public final void onMessageReceived(final @NonNull MessageReceivedEvent event) {
         final Message message = event.getMessage();
-        final C sender = this.commandManager.getCommandSenderMapper().apply(event);
+        final C sender = this.commandManager.senderMapper().map(event);
 
         if (this.commandManager.getBotId() == event.getAuthor().getIdLong()) {
             return;
@@ -62,6 +62,6 @@ public class JDACommandListener<C> extends ListenerAdapter {
             return;
         }
 
-        this.commandManager.executeCommand(sender, content.substring(prefix.length()));
+        this.commandManager.commandExecutor().executeCommand(sender, content.substring(prefix.length()));
     }
 }

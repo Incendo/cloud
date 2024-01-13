@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -140,7 +140,7 @@ class BooleanParserTest {
         // Act
         final Iterable<Suggestion> suggestions = parser.suggestions(
                 this.context,
-                ""
+                CommandInput.empty()
         );
 
         // Assert

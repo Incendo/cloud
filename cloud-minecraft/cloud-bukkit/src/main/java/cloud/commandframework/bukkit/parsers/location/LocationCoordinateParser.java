@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,8 @@ package cloud.commandframework.bukkit.parsers.location;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.standard.DoubleParser;
-import cloud.commandframework.bukkit.parsers.PlayerParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -45,13 +43,7 @@ public final class LocationCoordinateParser<C> implements ArgumentParser<C, Loca
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    PlayerParser.class,
-                    commandContext
-            ));
-        }
+        final String input = commandInput.skipWhitespace().peekString();
 
         /* Determine the type */
         final LocationCoordinateType locationCoordinateType;

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,13 +57,13 @@ class RepeatableFlagTest {
         );
 
         // Act
-        final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(
+        final CommandResult<TestCommandSender> result = this.commandManager.commandExecutor().executeCommand(
                 new TestCommandSender(),
                 "test --flag one --flag two --flag three"
         ).join();
 
         // Assert
-        assertThat(result.getCommandContext().flags().getAll("flag")).containsExactly("one", "two", "three");
+        assertThat(result.commandContext().flags().getAll("flag")).containsExactly("one", "two", "three");
     }
 
     @Test
@@ -79,13 +79,13 @@ class RepeatableFlagTest {
         );
 
         // Act
-        final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(
+        final CommandResult<TestCommandSender> result = this.commandManager.commandExecutor().executeCommand(
                 new TestCommandSender(),
                 "test --flag -fff"
         ).join();
 
         // Assert
-        assertThat(result.getCommandContext().flags().count("flag")).isEqualTo(4);
+        assertThat(result.commandContext().flags().count("flag")).isEqualTo(4);
     }
 
     @Test
@@ -104,7 +104,7 @@ class RepeatableFlagTest {
         final List<? extends Suggestion> suggestions = this.commandManager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 "test --flag --"
-        );
+        ).list();
 
         // Assert
         assertThat(suggestions).containsExactly(Suggestion.simple("--flag"));

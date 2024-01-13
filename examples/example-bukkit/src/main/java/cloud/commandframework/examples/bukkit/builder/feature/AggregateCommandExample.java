@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,9 @@
 package cloud.commandframework.examples.bukkit.builder.feature;
 
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
@@ -44,6 +46,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import static cloud.commandframework.arguments.standard.BooleanParser.booleanParser;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 import static cloud.commandframework.bukkit.parsers.WorldParser.worldParser;
@@ -73,7 +76,7 @@ public final class AggregateCommandExample implements BuilderFeature {
                     final int x = aggregateCommandContext.get("x");
                     final int y = aggregateCommandContext.get("y");
                     final int z = aggregateCommandContext.get("z");
-                    return new Location(world, x, y, z);
+                    return ArgumentParseResult.success(new Location(world, x, y, z));
                 })
                 .build();
         manager.command(
@@ -81,8 +84,14 @@ public final class AggregateCommandExample implements BuilderFeature {
                         .literal("aggregate")
                         .literal("teleport")
                         .required("location", locationParser)
+                        .optional("announce", booleanParser(), DefaultValue.constant(true))
                         .senderType(Player.class)
-                        .handler(commandContext -> commandContext.sender().teleport(commandContext.<Location>get("location")))
+                        .handler(commandContext -> {
+                            commandContext.sender().teleport(commandContext.<Location>get("location"));
+                            if (commandContext.get("announce")) {
+                                commandContext.sender().sendMessage("You've been teleported :)");
+                            }
+                        })
         );
     }
 
@@ -94,7 +103,7 @@ public final class AggregateCommandExample implements BuilderFeature {
                         .withMapper(new TypeToken<Pair<Integer, String>>(){}, (commandContext, context) -> {
                             final int slot = context.get("slot");
                             final String name = context.get("name");
-                            return CompletableFuture.completedFuture(Pair.of(slot, name));
+                            return CompletableFuture.completedFuture(ArgumentParseResult.success(Pair.of(slot, name)));
                         })
                         .build();
         manager.command(
@@ -105,12 +114,12 @@ public final class AggregateCommandExample implements BuilderFeature {
                         .senderType(Player.class)
                         .handler(commandContext -> {
                             final Pair<Integer, String> name = commandContext.get("name");
-                            final ItemStack stack = commandContext.sender().getInventory().getItem(name.getFirst());
+                            final ItemStack stack = commandContext.sender().getInventory().getItem(name.first());
                             if (stack == null) {
                                 return;
                             }
                             final ItemMeta meta = stack.getItemMeta();
-                            meta.setDisplayName(name.getSecond());
+                            meta.setDisplayName(name.second());
                             stack.setItemMeta(meta);
                         })
         );

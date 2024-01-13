@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import org.apiguardian.api.API;
@@ -91,12 +90,6 @@ public final class RegexPreprocessor<C> implements ComponentPreprocessor<C> {
             final @NonNull CommandInput commandInput
     ) {
         final String head = commandInput.peekString();
-        if (head.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    RegexPreprocessor.class,
-                    context
-            ));
-        }
         if (this.predicate.test(head)) {
             return ArgumentParseResult.success(true);
         }
@@ -114,11 +107,9 @@ public final class RegexPreprocessor<C> implements ComponentPreprocessor<C> {
     /**
      * Exception thrown when input fails regex matching in {@link RegexPreprocessor}
      */
-    @SuppressWarnings("serial")
     @API(status = API.Status.STABLE)
     public static final class RegexValidationException extends IllegalArgumentException {
 
-        private static final long serialVersionUID = 747826566058072233L;
         private final String pattern;
         private final String failedString;
         private final Caption failureCaption;
@@ -152,20 +143,20 @@ public final class RegexPreprocessor<C> implements ComponentPreprocessor<C> {
         }
 
         /**
-         * Get the string that failed the verification
+         * Returns the input that failed the verification.
          *
-         * @return Failed string
+         * @return failed input
          */
-        public @NonNull String getFailedString() {
+        public @NonNull String failedInput() {
             return this.failedString;
         }
 
         /**
-         * Get the pattern that caused the string to fail
+         * Returns the pattern that caused the string to fail.
          *
-         * @return Pattern
+         * @return the un-compiled pattern
          */
-        public @NonNull String getPattern() {
+        public @NonNull String pattern() {
             return this.pattern;
         }
     }

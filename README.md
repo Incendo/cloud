@@ -1,13 +1,17 @@
+<div align="center">
+<img src="icons/CloudNew.png" width="300px"/>
+<br/>
+<h1>cloud command framework</h1>
 
-<div align="center">  
- <img src="icons/CloudNew.png" width="300px"/>  
-</div>  
-  
-# cloud command framework
+![license](https://img.shields.io/github/license/incendo/cloud.svg)
+[![central](https://img.shields.io/maven-central/v/cloud.commandframework/cloud-core)](https://search.maven.org/search?q=cloud.commandframework)
+![build](https://img.shields.io/github/actions/workflow/status/incendo/cloud/build.yml?logo=github)
+[![docs](https://img.shields.io/readthedocs/incendocloud?logo=readthedocs)](https://cloud.incendo.org)
+</div>
 
-![license](https://img.shields.io/github/license/Incendo/cloud.svg)
-![build](https://github.com/Incendo/cloud/workflows/Java%20CI%20with%20Maven/badge.svg)
-[![central](https://maven-badges.herokuapp.com/maven-central/cloud.commandframework/cloud-core/badge.svg)](https://search.maven.org/search?q=cloud.commandframework)
+> [!NOTE]
+> Cloud 2 is a major update with many significant changes. Cloud 2 is _not_ compatible with version 1.
+> You can find the changelog [here](https://cloud.incendo.org/en/latest/cloud-v2/).
 
 Cloud is a general-purpose Java command dispatcher &amp; framework. It allows programmers to define command chains that are then parsed and invoked from user-supplied string inputs, to execute pre-defined actions.
 
@@ -47,7 +51,7 @@ manager.buildAndRegister("command", aliases = arrayOf("alias")) {
 
 or using annotated methods, in Java:
 ```java
-@CommandMethod("command literal <number> [string]")
+@Command("command literal <number> [string]")
 public void yourCommand(
         CommandSender sender,
         int number, // @Argument is optional!
@@ -58,7 +62,7 @@ public void yourCommand(
 ```
 or in Kotlin:
 ```kotlin
-@CommandMethod("command literal <number> [string]")
+@Command("command literal <number> [string]")
 public suspend fun yourCommand(
     sender: CommandSender,
     number: Int, // @Argument is optional!
@@ -76,45 +80,23 @@ able to create your own parsers. If you use the annotation parsing system, you c
 and register them to further customise the behaviour of the library.
 
 Cloud by default ships with implementations and mappings for the most common Minecraft server platforms, JDA and javacord for
-Discord bots and PircBotX for IRC.
+Discord bots, PircBotX for IRC and [cloud-spring](https://github.com/incendo/cloud-spring) for Spring Shell.
 The core module allows you to use Cloud anywhere, simply by implementing the CommandManager for the platform of your choice.
-
-The code is based on a (W.I.P) paper that can be found [here](https://github.com/Sauilitired/Sauilitired/blob/master/AS_2020_09_Commands.pdf).  
-
-## nomenclature  
-- **sender**: someone who is able to produce input  
-- **argument**: an argument is something that can be parsed from a string  
-- **required argument**: a required argument is an argument that must be provided by the sender  
-- **optional argument**: an optional argument is an argument that can be omitted (may have a default value) 
-- **static argument**: a string literal  
-- **command**: a command is a chain of arguments and a handler that acts on the parsed arguments
-- **command tree**: structure that contains all commands and is used to parse input into arguments
-
-## modules
-- **cloud-core**: Core module containing most of the cloud API, and shared implementations
-- **cloud-annotations**: Annotation parsing code that allows you to use annotated methods rather than builders - Now also 
-  includes several compile-time annotation processors
-- **cloud-services**: Services for cloud
-- **cloud-kotlin/cloud-kotlin-extensions**: Kotlin extensions for cloud
-- **cloud-kotlin/cloud-kotlin-coroutines**: Coroutine support for cloud
-- **cloud-kotlin/cloud-kotlin-coroutines-annotations**: Coroutine support for cloud-annotations
-- **cloud-minecraft/cloud-brigadier**: Brigadier mappings for cloud
-- **cloud-minecraft/cloud-bukkit**: Bukkit 1.8.8+ implementation of cloud
-- **cloud-minecraft/cloud-paper**: Module that extends cloud-bukkit to add special support for Paper 1.8.8+
-- **cloud-minecraft/cloud-bungee**: BungeeCord 1.8.8+ implementation of Cloud
-- **cloud-minecraft/cloud-velocity**: Velocity v1.1.0 implementation of cloud
-- **cloud-minecraft/cloud-cloudburst**: Cloudburst v1.0.0+ implementation of cloud
-- **cloud-minecraft/cloud-fabric**: Fabric implementation of Cloud
-- **cloud-minecraft/cloud-minecraft-extras**: Opinionated Extra Features for cloud-minecraft
-- **cloud-discord/cloud-jda**: JDA v4.2.0_209+ implementation of cloud
-- **cloud-discord/cloud-javacord**: Javacord v3.1.1+ implementation of cloud
-- **cloud-irc/cloud-pircbotx**: PircBotX 2.0+ implementation of cloud
 
 ## links  
 
 - JavaDoc: https://javadoc.io/doc/cloud.commandframework
-- Docs: https://github.com/Incendo/cloud/blob/master/docs/README.adoc
-- Discord: https://discord.gg/aykZu32
+- Docs: https://cloud.incendo.org
+- Incendo Discord: https://discord.gg/aykZu32
+
+### repositories
+
+- [cloud](https://github.com/incendo/cloud) - main repository
+- [cloud-processors](https://github.com/incendo/cloud-processors) - extra pre- & postprocessors
+- [cloud-neoforge](https://github.com/incendo/cloud-neoforge) - cloud implementation for neoforge
+- [cloud-spring](https://github.com/incendo/cloud-spring) - cloud implementation for spring-shell
+- [cloud-build-logic](https://github.com/incendo/cloud-build-logic) - gradle plugin for building cloud
+- [cloud-docs](https://github.com/incendo/cloud-docs) - documentation sources
   
 ## develop &amp; build  
   
@@ -220,16 +202,3 @@ This library is licensed under the <a href="https://opensource.org/licenses/MIT"
   
 The <a href="https://iconscout.com/icons/cloud" target="_blank">Cloud</a> icon was created by <a href="https://iconscout.com/contributors/oviyan">
 Thanga Vignesh P</a> on <a href="https://iconscout.com">Iconscout</a> and Digital rights were purchased under a premium plan.
-
-## projects using cloud
-
-Here are some projects that are using cloud:
-
-- [Sauilitired/YouTrackDiscordBot](https://github.com/Sauilitired/YouTrackDiscordBot): Discord bot for linking YouTrack issues
-- [Incendo/bot](https://github.com/Incendo/bot): IRC bot for #incendo on esper.net
-- [Incendo/ban](https://github.com/Incendo/ban): Velocity punishment suite
-- [broccolai/tickets](https://github.com/broccolai/tickets): Minecraft ticket system
-- [jpenilla/squaremap](https://github.com/jpenilla/squaremap): Minimalistic and lightweight world map viewer for Minecraft servers
-- [bergerhealer/TrainCarts](https://github.com/bergerhealer/TrainCarts): Minecraft plugin that links carts together to form trains you can control
-- [PEXPlugins/PermissionsEx](https://github.com/PEXPlugins/PermissionsEx): Minecraft permissions plugin
-

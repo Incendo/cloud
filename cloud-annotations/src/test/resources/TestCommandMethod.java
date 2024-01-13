@@ -1,9 +1,9 @@
 import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 
 public class TestCommandMethod {
 
-    @CommandMethod("command <required> [optional]")
+    @Command("command <required> [optional]")
     public void commandMethod(
             final Object sender,
             @Argument("required") final String required,

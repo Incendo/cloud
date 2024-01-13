@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -479,6 +479,17 @@ public class Command<C> {
         }
 
         /**
+         * Returns the current {@link CommandMeta command meta} value.
+         *
+         * @return current command meta
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull CommandMeta meta() {
+            return this.commandMeta;
+        }
+
+        /**
          * Applies the provided {@link Applicable} to this {@link Builder}, and returns the result.
          *
          * @param applicable operation
@@ -560,6 +571,32 @@ public class Command<C> {
                     this.flags,
                     commandDescription
             );
+        }
+
+        /**
+         * Returns the result of invoking {@link #commandDescription(CommandDescription)} with the result of
+         * {@link CommandDescription#commandDescription(Description)}.
+         *
+         * @param commandDescription the new command description
+         * @return new builder instance using the provided command description
+         */
+        public @NonNull Builder<C> commandDescription(final @NonNull Description commandDescription) {
+            return this.commandDescription(CommandDescription.commandDescription(commandDescription));
+        }
+
+        /**
+         * Returns the result of invoking {@link #commandDescription(CommandDescription)} with the result of
+         * {@link CommandDescription#commandDescription(Description, Description)}.
+         *
+         * @param commandDescription        the new command description
+         * @param verboseCommandDescription the new verbose command description
+         * @return new builder instance using the provided command description
+         */
+        public @NonNull Builder<C> commandDescription(
+                final @NonNull Description commandDescription,
+                final @NonNull Description verboseCommandDescription
+        ) {
+            return this.commandDescription(CommandDescription.commandDescription(commandDescription, verboseCommandDescription));
         }
 
         /**

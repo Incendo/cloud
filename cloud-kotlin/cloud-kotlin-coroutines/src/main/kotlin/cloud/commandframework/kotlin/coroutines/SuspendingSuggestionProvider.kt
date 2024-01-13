@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,8 @@ package cloud.commandframework.kotlin.coroutines
 import cloud.commandframework.arguments.suggestion.Suggestion
 import cloud.commandframework.arguments.suggestion.SuggestionProvider
 import cloud.commandframework.context.CommandContext
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
-import cloud.commandframework.execution.CommandExecutionCoordinator
+import cloud.commandframework.context.CommandInput
+import cloud.commandframework.execution.ExecutionCoordinator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.future
@@ -37,8 +37,8 @@ import kotlin.coroutines.EmptyCoroutineContext
 /**
  * Suspending version of [SuggestionProvider] for use with coroutines.
  *
- * NOTE: It is highly advised to not use [CommandExecutionCoordinator.SimpleCoordinator] together
- * with coroutine support. Consider using [AsynchronousCommandExecutionCoordinator] instead.
+ * NOTE: It is highly advised to not use [ExecutionCoordinator.simpleCoordinator] together
+ * with coroutine support. Consider using [ExecutionCoordinator.asyncCoordinator] instead.
  *
  * @param C command sender type.
  */
@@ -50,7 +50,7 @@ public fun interface SuspendingSuggestionProvider<C : Any> {
      * @param input   the current input
      * @return the suggestions
      */
-    public suspend operator fun invoke(context: CommandContext<C>, input: String): Iterable<Suggestion>
+    public suspend operator fun invoke(context: CommandContext<C>, input: CommandInput): Iterable<Suggestion>
 
     /**
      * Creates a new [SuggestionProvider] backed by this [SuspendingExecutionHandler].
@@ -95,7 +95,7 @@ public fun interface SuspendingSuggestionProvider<C : Any> {
 public suspend inline fun <C : Any> suspendingSuggestionProvider(
     scope: CoroutineScope = GlobalScope,
     context: CoroutineContext = EmptyCoroutineContext,
-    crossinline provider: suspend (CommandContext<C>, String) -> Iterable<Suggestion>
+    crossinline provider: suspend (CommandContext<C>, CommandInput) -> Iterable<Suggestion>
 ): SuggestionProvider<C> = SuspendingSuggestionProvider<C> { commandContext, input ->
     provider(commandContext, input)
 }.asSuggestionProvider(scope, context)

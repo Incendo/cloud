@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -71,6 +71,16 @@ public final class RichDescription implements Description {
         }
 
         return new RichDescription(componentContents);
+    }
+
+    /**
+     * Create a new rich description from the provided component. Alias for {@link #of(ComponentLike)}.
+     *
+     * @param contents the rich contents
+     * @return a new rich description
+     */
+    public static @NonNull RichDescription richDescription(final @NonNull ComponentLike contents) {
+        return of(contents);
     }
 
     /* Translatable helper methods */

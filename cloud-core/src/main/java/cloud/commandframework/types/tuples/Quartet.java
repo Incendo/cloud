@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -82,7 +82,7 @@ public class Quartet<U, V, W, X> implements Tuple {
      *
      * @return First value
      */
-    public final @NonNull U getFirst() {
+    public final @NonNull U first() {
         return this.first;
     }
 
@@ -91,7 +91,7 @@ public class Quartet<U, V, W, X> implements Tuple {
      *
      * @return Second value
      */
-    public final @NonNull V getSecond() {
+    public final @NonNull V second() {
         return this.second;
     }
 
@@ -100,7 +100,7 @@ public class Quartet<U, V, W, X> implements Tuple {
      *
      * @return Third value
      */
-    public final @NonNull W getThird() {
+    public final @NonNull W third() {
         return this.third;
     }
 
@@ -109,7 +109,7 @@ public class Quartet<U, V, W, X> implements Tuple {
      *
      * @return Fourth value
      */
-    public final @NonNull X getFourth() {
+    public final @NonNull X fourth() {
         return this.fourth;
     }
 
@@ -118,19 +118,19 @@ public class Quartet<U, V, W, X> implements Tuple {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
         final Quartet<?, ?, ?, ?> quartet = (Quartet<?, ?, ?, ?>) o;
-        return Objects.equals(this.getFirst(), quartet.getFirst())
-                && Objects.equals(this.getSecond(), quartet.getSecond())
-                && Objects.equals(this.getThird(), quartet.getThird())
-                && Objects.equals(this.getFourth(), quartet.getFourth());
+        return Objects.equals(this.first(), quartet.first())
+                && Objects.equals(this.second(), quartet.second())
+                && Objects.equals(this.third(), quartet.third())
+                && Objects.equals(this.fourth(), quartet.fourth());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(this.getFirst(), this.getSecond(), this.getThird(), this.getFourth());
+        return Objects.hash(this.first(), this.second(), this.third(), this.fourth());
     }
 
     @Override
@@ -139,7 +139,7 @@ public class Quartet<U, V, W, X> implements Tuple {
     }
 
     @Override
-    public final int getSize() {
+    public final int size() {
         return 4;
     }
 

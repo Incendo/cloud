@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,9 +31,9 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Container for {@link CommandMethod}.
+ * Container for {@link Command}.
  * <p>
- * This is required in order for {@link CommandMethod} to be repeatable.
+ * This is required in order for {@link Command} to be repeatable.
  *
  * @since 2.0.0
  */
@@ -43,9 +43,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public @interface Commands {
 
     /**
-     * Returns the {@link CommandMethod comman methods}.
+     * Returns the {@link Command comman methods}.
      *
      * @return the command method declarations
      */
-    @NonNull CommandMethod @NonNull[] value();
+    @NonNull Command @NonNull[] value();
 }

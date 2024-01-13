@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -141,20 +141,20 @@ public final class ByteParser<C> implements ArgumentParser<C, Byte>, BlockingSug
     }
 
     /**
-     * Get the minimum value accepted by this parser
+     * Returns the minimum value accepted by this parser.
      *
-     * @return Min value
+     * @return min value
      */
-    public byte getMin() {
+    public byte min() {
         return this.min;
     }
 
     /**
-     * Get the maximum value accepted by this parser
+     * Returns the maximum value accepted by this parser.
      *
-     * @return Max value
+     * @return max value
      */
-    public byte getMax() {
+    public byte max() {
         return this.max;
     }
 
@@ -183,7 +183,7 @@ public final class ByteParser<C> implements ArgumentParser<C, Byte>, BlockingSug
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         return IntegerParser.getSuggestions(this.min, this.max, input);
     }
@@ -192,7 +192,6 @@ public final class ByteParser<C> implements ArgumentParser<C, Byte>, BlockingSug
     @API(status = API.Status.STABLE)
     public static final class ByteParseException extends NumberParseException {
 
-        private static final long serialVersionUID = -4724241304872989208L;
 
         private final ByteParser<?> parser;
 
@@ -225,7 +224,7 @@ public final class ByteParser<C> implements ArgumentParser<C, Byte>, BlockingSug
         }
 
         @Override
-        public @NonNull String getNumberType() {
+        public @NonNull String numberType() {
             return "byte";
         }
 

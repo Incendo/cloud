@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -140,20 +140,20 @@ public final class DoubleParser<C> implements ArgumentParser<C, Double> {
     }
 
     /**
-     * Get the minimum value accepted by this parser
+     * Returns the minimum value accepted by this parser.
      *
-     * @return Min value
+     * @return min value
      */
-    public double getMin() {
+    public double min() {
         return this.min;
     }
 
     /**
-     * Get the maximum value accepted by this parser
+     * Returns the maximum value accepted by this parser.
      *
-     * @return Max value
+     * @return max value
      */
-    public double getMax() {
+    public double max() {
         return this.max;
     }
 
@@ -183,7 +183,6 @@ public final class DoubleParser<C> implements ArgumentParser<C, Double> {
     @API(status = API.Status.STABLE)
     public static final class DoubleParseException extends NumberParseException {
 
-        private static final long serialVersionUID = 1764554911581976586L;
 
         private final DoubleParser<?> parser;
 
@@ -216,7 +215,7 @@ public final class DoubleParser<C> implements ArgumentParser<C, Double> {
         }
 
         @Override
-        public @NonNull String getNumberType() {
+        public @NonNull String numberType() {
             return "double";
         }
 

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
 import cloud.commandframework.annotations.injection.ParameterInjector;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.StandardCommandContextFactory;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.exceptions.handling.ExceptionContext;
 import cloud.commandframework.exceptions.handling.ExceptionController;
@@ -50,7 +51,7 @@ class MethodExceptionHandlerTest {
         final CommandManager<TestCommandSender> commandManager = new TestCommandManager();
         this.exceptionController = commandManager.exceptionController();
         this.annotationParser = new AnnotationParser<>(commandManager, TestCommandSender.class);
-        this.context = commandManager.commandContextFactory().create(false, new TestCommandSender());
+        this.context = new StandardCommandContextFactory<>(commandManager).create(false, new TestCommandSender());
         commandManager.parameterInjectorRegistry().registerInjector(Integer.class, ParameterInjector.constantInjector(5));
     }
 

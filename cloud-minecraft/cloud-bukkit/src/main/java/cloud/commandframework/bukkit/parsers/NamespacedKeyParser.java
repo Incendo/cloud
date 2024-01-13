@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -184,13 +184,16 @@ public final class NamespacedKeyParser<C> implements ArgumentParser<C, Namespace
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         final List<String> ret = new ArrayList<>();
         ret.add(this.defaultNamespace + ":");
-        if (!input.contains(":") && !input.isEmpty()) {
-            ret.add(input + ":");
+
+        final String token = input.peekString();
+        if (!token.contains(":") && !token.isEmpty()) {
+            ret.add(token + ":");
         }
+
         return ret;
     }
 
@@ -217,7 +220,6 @@ public final class NamespacedKeyParser<C> implements ArgumentParser<C, Namespace
      */
     public static final class NamespacedKeyParseException extends ParserException {
 
-        private static final long serialVersionUID = -482592639358941441L;
         private final String input;
 
         /**

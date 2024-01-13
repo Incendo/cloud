@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,8 @@ package cloud.commandframework.examples.bukkit.annotations.feature;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.CommandDescription;
-import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.context.CommandContext;
@@ -66,7 +66,7 @@ public final class HelpExample implements AnnotationFeature {
         // Set up the help instance.
         this.setupHelp();
 
-        // This will scan for `@CommandMethod` and `@Suggestions`.
+        // This will scan for `@Command` and `@Suggestions`.
         annotationParser.parse(this);
     }
 
@@ -94,7 +94,7 @@ public final class HelpExample implements AnnotationFeature {
                 .collect(Collectors.toList());
     }
 
-    @CommandMethod("annotations|an|a help [query]")
+    @Command("annotations|an|a help [query]")
     @CommandDescription("Help menu")
     public void commandHelp(
             final @NonNull CommandSender sender,

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,7 +50,7 @@ final class CloudBukkitListener<C> implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     void onPluginDisable(final @NonNull PluginDisableEvent event) {
-        if (event.getPlugin().equals(this.bukkitCommandManager.getOwningPlugin())) {
+        if (event.getPlugin().equals(this.bukkitCommandManager.owningPlugin())) {
             this.bukkitCommandManager.rootCommands().forEach(this.bukkitCommandManager::deleteRootCommand);
         }
     }

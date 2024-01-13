@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
+import cloud.commandframework.annotations.string.StringProcessor;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;

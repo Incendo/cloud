@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,21 +29,21 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 final class CommandMethodPair {
 
     private final Method method;
-    private final CommandMethod commandMethod;
+    private final Command annotation;
 
     CommandMethodPair(
             final @NonNull Method method,
-            final @NonNull CommandMethod commandMethod
+            final @NonNull Command annotation
     ) {
         this.method = method;
-        this.commandMethod = commandMethod;
+        this.annotation = annotation;
     }
 
-    @NonNull Method getMethod() {
+    @NonNull Method method() {
         return this.method;
     }
 
-    @NonNull CommandMethod getCommandMethod() {
-        return this.commandMethod;
+    @NonNull Command annotation() {
+        return this.annotation;
     }
 }

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,8 +49,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class Location2DParser<C> implements ArgumentParser<C, Location2D>, BlockingSuggestionProvider.Strings<C> {
 
-    private static final int EXPECTED_PARAMETER_COUNT = 2;
-
     /**
      * Creates a new location 2D parser.
      *
@@ -93,16 +91,25 @@ public final class Location2DParser<C> implements ArgumentParser<C, Location2D>,
         }
         final LocationCoordinate[] coordinates = new LocationCoordinate[2];
         for (int i = 0; i < 2; i++) {
+            if (commandInput.peekString().isEmpty()) {
+                return ArgumentParseResult.failure(
+                        new LocationParser.LocationParseException(
+                                commandContext,
+                                LocationParser.LocationParseException.FailureReason.WRONG_FORMAT,
+                                commandInput.remainingInput()
+                        )
+                );
+            }
             final ArgumentParseResult<@NonNull LocationCoordinate> coordinate = this.locationCoordinateParser.parse(
                     commandContext,
                     commandInput
             );
-            if (coordinate.getFailure().isPresent()) {
+            if (coordinate.failure().isPresent()) {
                 return ArgumentParseResult.failure(
-                        coordinate.getFailure().get()
+                        coordinate.failure().get()
                 );
             }
-            coordinates[i] = coordinate.getParsedValue().orElseThrow(NullPointerException::new);
+            coordinates[i] = coordinate.parsedValue().orElseThrow(NullPointerException::new);
         }
         final Location originalLocation;
         final CommandSender bukkitSender = commandContext.get(BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER);
@@ -159,13 +166,9 @@ public final class Location2DParser<C> implements ArgumentParser<C, Location2D>,
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
-        return LocationParser.getSuggestions(commandContext, input);
+        return LocationParser.getSuggestions(2, commandContext, input);
     }
 
-    @Override
-    public int getRequestedArgumentCount() {
-        return EXPECTED_PARAMETER_COUNT;
-    }
 }

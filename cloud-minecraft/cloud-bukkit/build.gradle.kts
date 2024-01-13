@@ -1,5 +1,6 @@
 plugins {
     id("cloud.base-conventions")
+    id("cloud.publishing-conventions")
 }
 
 dependencies {
@@ -8,7 +9,6 @@ dependencies {
     compileOnly(libs.bukkit)
     compileOnly(libs.commodore)
     compileOnly(libs.jetbrainsAnnotations)
-    compileOnly(libs.guava)
     testImplementation(libs.bukkit)
     testImplementation(libs.jetbrainsAnnotations)
 }

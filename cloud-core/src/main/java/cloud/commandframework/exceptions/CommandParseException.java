@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE)
 public class CommandParseException extends IllegalArgumentException {
 
-    private static final long serialVersionUID = -2415981126382517435L;
     private final Object commandSender;
     private final List<CommandComponent<?>> currentChain;
 
@@ -56,20 +55,20 @@ public class CommandParseException extends IllegalArgumentException {
     }
 
     /**
-     * Get the command sender
+     * Returns the command sender.
      *
-     * @return Command sender
+     * @return command sender
      */
-    public @NonNull Object getCommandSender() {
+    public @NonNull Object commandSender() {
         return this.commandSender;
     }
 
     /**
-     * Get the command chain leading up to the exception
+     * Returns the command chain leading up to the exception.
      *
-     * @return Unmodifiable list of command arguments
+     * @return unmodifiable list of command arguments
      */
-    public @NonNull List<@NonNull CommandComponent<?>> getCurrentChain() {
+    public @NonNull List<@NonNull CommandComponent<?>> currentChain() {
         return Collections.unmodifiableList(this.currentChain);
     }
 }

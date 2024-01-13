@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,10 @@
 //
 package cloud.commandframework.annotations.processing;
 
+import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.ArgumentMode;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.SyntaxFragment;
 import cloud.commandframework.annotations.SyntaxParserImpl;
 import java.util.ArrayList;
@@ -85,7 +86,7 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
             this.processingEnvironment.getMessager().printMessage(
                     Diagnostic.Kind.WARNING,
                     String.format(
-                            "@CommandMethod annotated methods should be public (%s)",
+                            "@Command annotated methods should be public (%s)",
                             e.getSimpleName()
                     ),
                     e
@@ -96,7 +97,7 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
             this.processingEnvironment.getMessager().printMessage(
                     Diagnostic.Kind.ERROR,
                     String.format(
-                            "@CommandMethod annotated methods should be non-static (%s)",
+                            "@Command annotated methods should be non-static (%s)",
                             e.getSimpleName()
                     ),
                     e
@@ -107,7 +108,7 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
             this.processingEnvironment.getMessager().printMessage(
                     Diagnostic.Kind.ERROR,
                     String.format(
-                            "@CommandMethod annotated methods should return void (%s)",
+                            "@Command annotated methods should return void (%s)",
                             e.getSimpleName()
                     ),
                     e
@@ -115,24 +116,28 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
         }
 
 
-        final CommandMethod[] commandMethods = e.getAnnotationsByType(CommandMethod.class);
-        for (final CommandMethod commandMethod : commandMethods) {
+        final Command[] commands = e.getAnnotationsByType(Command.class);
+        for (final Command command : commands) {
             final List<String> annotatedArgumentNames = e.getParameters()
                     .stream()
                     .map(parameter -> parameter.getAnnotation(Argument.class))
                     .filter(Objects::nonNull)
                     .map(Argument::value)
+                    .filter(name -> !name.equals(AnnotationParser.INFERRED_ARGUMENT_NAME))
                     .collect(Collectors.toList());
             final List<String> parameterArgumentNames = new ArrayList<>(annotatedArgumentNames);
 
             e.getParameters()
                     .stream()
-                    .filter(parameter -> parameter.getAnnotation(Argument.class) == null)
+                    .filter(parameter -> {
+                        final Argument argument = parameter.getAnnotation(Argument.class);
+                        return argument == null || AnnotationParser.INFERRED_ARGUMENT_NAME.equals(argument.value());
+                    })
                     .map(parameter -> parameter.getSimpleName().toString())
                     .forEach(parameterArgumentNames::add);
 
             final List<String> parsedArgumentNames = new ArrayList<>(parameterArgumentNames.size());
-            final List<SyntaxFragment> syntaxFragments = this.syntaxParser.parseSyntax(null, commandMethod.value());
+            final List<SyntaxFragment> syntaxFragments = this.syntaxParser.parseSyntax(null, command.value());
 
             boolean foundOptional = false;
             for (final SyntaxFragment fragment : syntaxFragments) {
@@ -144,7 +149,7 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
                     this.processingEnvironment.getMessager().printMessage(
                             Diagnostic.Kind.ERROR,
                             String.format(
-                                    "@Argument(\"%s\") is missing from @CommandMethod (%s)",
+                                    "@Argument(\"%s\") is missing from @Command (%s)",
                                     fragment.getMajor(),
                                     e.getSimpleName()
                             ),
@@ -176,7 +181,7 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
                     this.processingEnvironment.getMessager().printMessage(
                             Diagnostic.Kind.ERROR,
                             String.format(
-                                    "Argument '%s' is missing from the @CommandMethod syntax (%s)",
+                                    "Argument '%s' is missing from the @Command syntax (%s)",
                                     argument,
                                     e.getSimpleName()
                             ),

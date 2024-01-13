@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,17 +25,20 @@ package cloud.commandframework.brigadier.node;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.brigadier.suggestion.CloudDelegatingSuggestionProvider;
-import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.context.StandardCommandContextFactory;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.types.tuples.Pair;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
@@ -47,9 +50,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static cloud.commandframework.arguments.standard.BooleanParser.booleanParser;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.arguments.standard.StringParser.greedyStringParser;
 import static com.google.common.truth.Truth.assertThat;
@@ -59,19 +62,18 @@ import static com.google.common.truth.Truth8.assertThat;
 @ExtendWith(MockitoExtension.class)
 class LiteralBrigadierNodeFactoryTest {
 
-    @Mock
-    private CommandContext<Object> context;
-
+    private CommandDispatcher<Object> dispatcher;
     private TestCommandManager commandManager;
     private LiteralBrigadierNodeFactory<Object, Object> literalBrigadierNodeFactory;
 
     @BeforeEach
     void setup() {
+        this.dispatcher = new CommandDispatcher<>();
         this.commandManager = new TestCommandManager();
         final CloudBrigadierManager<Object, Object> cloudBrigadierManager = new CloudBrigadierManager<>(
                 this.commandManager,
-                () -> this.commandManager.commandContextFactory().create(false, new Object()),
-                this.commandManager.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion)
+                () -> new StandardCommandContextFactory<>(this.commandManager).create(false, new Object()),
+                SenderMapper.identity()
         );
         this.literalBrigadierNodeFactory = cloudBrigadierManager.literalBrigadierNodeFactory();
     }
@@ -95,22 +97,21 @@ class LiteralBrigadierNodeFactoryTest {
         final LiteralCommandNode<Object> commandNode = this.literalBrigadierNodeFactory.createNode(
                 "command",
                 command,
-                (source, permission) -> true,
-                false /* forceRegister */,
                 brigadierCommand
         );
+        this.dispatcher.getRoot().addChild(commandNode);
 
         // Assert
         assertThat(commandNode).isNotNull();
         assertThat(commandNode.getLiteral()).isEqualTo("command");
         assertThat(commandNode.isValidInput("command")).isTrue();
         assertThat(commandNode.getChildren()).hasSize(1);
-        assertThat(commandNode.getCommand()).isEqualTo(brigadierCommand);
+        assertThat(commandNode.getCommand()).isNull();
 
         assertThat(commandNode.getChild("literal")).isNotNull();
         assertThat(commandNode.getChild("literal")).isInstanceOf(LiteralCommandNode.class);
         assertThat(commandNode.getChild("literal").getChildren()).hasSize(1);
-        assertThat(commandNode.getCommand()).isEqualTo(brigadierCommand);
+        assertThat(commandNode.getCommand()).isNull();
 
         assertThat(commandNode.getChild("literal").getChild("integer")).isNotNull();
         assertThat(commandNode.getChild("literal").getChild("integer")).isInstanceOf(ArgumentCommandNode.class);
@@ -120,7 +121,7 @@ class LiteralBrigadierNodeFactoryTest {
         assertThat(integerArgument.getType()).isInstanceOf(IntegerArgumentType.class);
         assertThat(integerArgument.getType()).isEqualTo(IntegerArgumentType.integer(0, 10));
         assertThat(integerArgument.getChildren()).hasSize(1);
-        assertThat(integerArgument.getCommand()).isEqualTo(brigadierCommand);
+        assertThat(integerArgument.getCommand()).isEqualTo(brigadierCommand); // Following is optional.
 
         assertThat(integerArgument.getChild("string")).isNotNull();
         assertThat(integerArgument.getChild("string")).isInstanceOf(ArgumentCommandNode.class);
@@ -137,7 +138,7 @@ class LiteralBrigadierNodeFactoryTest {
         final String suggestionString = "command literal 9 ";
         final SuggestionProvider<Object> suggestionProvider = stringArgument.getCustomSuggestions();
         final Suggestions suggestions = suggestionProvider.getSuggestions(
-                this.context,
+                this.dispatcher.parse(suggestionString, new Object()).getContext().build(suggestionString),
                 new SuggestionsBuilder(suggestionString, suggestionString.length())
         ).get();
         assertThat(suggestions.getList().stream().map(com.mojang.brigadier.suggestion.Suggestion::getText))
@@ -157,9 +158,12 @@ class LiteralBrigadierNodeFactoryTest {
                                 .withDirectMapper(
                                         new TypeToken<Pair<Integer, String>>() {
                                         },
-                                        (cmdCtx, ctx) -> Pair.of(ctx.<Integer>get("integer"), ctx.<String>get("string"))
+                                        (cmdCtx, ctx) -> ArgumentParseResult.success(
+                                                Pair.of(ctx.<Integer>get("integer"), ctx.<String>get("string"))
+                                        )
                                 ).build()
                 )
+                .required("boolean", booleanParser())
                 .build();
         this.commandManager.command(command);
         final com.mojang.brigadier.Command<Object> brigadierCommand = ctx -> 0;
@@ -168,8 +172,6 @@ class LiteralBrigadierNodeFactoryTest {
         final LiteralCommandNode<Object> commandNode = this.literalBrigadierNodeFactory.createNode(
                 "command",
                 command,
-                (source, permission) -> true,
-                false /* forceRegister */,
                 brigadierCommand
         );
 
@@ -178,12 +180,12 @@ class LiteralBrigadierNodeFactoryTest {
         assertThat(commandNode.getLiteral()).isEqualTo("command");
         assertThat(commandNode.isValidInput("command")).isTrue();
         assertThat(commandNode.getChildren()).hasSize(1);
-        assertThat(commandNode.getCommand()).isEqualTo(brigadierCommand);
+        assertThat(commandNode.getCommand()).isNull();
 
         assertThat(commandNode.getChild("literal")).isNotNull();
         assertThat(commandNode.getChild("literal")).isInstanceOf(LiteralCommandNode.class);
         assertThat(commandNode.getChild("literal").getChildren()).hasSize(1);
-        assertThat(commandNode.getCommand()).isEqualTo(brigadierCommand);
+        assertThat(commandNode.getCommand()).isNull();
 
         assertThat(commandNode.getChild("literal").getChild("integer")).isNotNull();
         assertThat(commandNode.getChild("literal").getChild("integer")).isInstanceOf(ArgumentCommandNode.class);
@@ -203,15 +205,24 @@ class LiteralBrigadierNodeFactoryTest {
         assertThat(stringArgument.getType()).isInstanceOf(StringArgumentType.class);
         assertThat(((StringArgumentType) stringArgument.getType()).getType())
                 .isEqualTo(StringArgumentType.StringType.GREEDY_PHRASE);
-        assertThat(stringArgument.getChildren()).isEmpty();
-        assertThat(stringArgument.getCommand()).isEqualTo(brigadierCommand);
+        assertThat(stringArgument.getChildren()).hasSize(1);
+        assertThat(stringArgument.getCommand()).isNull();
+
+        assertThat(stringArgument.getChild("boolean")).isNotNull();
+        assertThat(stringArgument.getChild("boolean")).isInstanceOf(ArgumentCommandNode.class);
+        final ArgumentCommandNode<Object, Boolean> booleanArgument = (ArgumentCommandNode<Object, Boolean>)
+                stringArgument.getChild("boolean");
+        assertThat(booleanArgument.getName()).isEqualTo("boolean");
+        assertThat(booleanArgument.getType()).isInstanceOf(BoolArgumentType.class);
+        assertThat(booleanArgument.getChildren()).isEmpty();
+        assertThat(booleanArgument.getCommand()).isEqualTo(brigadierCommand);
     }
 
 
     private static final class TestCommandManager extends CommandManager<Object> {
 
         private TestCommandManager() {
-            super(CommandExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
+            super(ExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
         }
 
         @Override

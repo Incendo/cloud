@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.examples.velocity;
 
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.SenderMapper;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.velocity.CloudInjectionModule;
 import cloud.commandframework.velocity.VelocityCommandManager;
@@ -39,7 +40,6 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import java.util.function.Function;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -66,9 +66,8 @@ public final class ExampleVelocityPlugin {
         final Injector childInjector = this.injector.createChildInjector(
                 new CloudInjectionModule<>(
                         CommandSource.class,
-                        CommandExecutionCoordinator.simpleCoordinator(),
-                        Function.identity(),
-                        Function.identity()
+                        ExecutionCoordinator.simpleCoordinator(),
+                        SenderMapper.identity()
                 )
         );
         final VelocityCommandManager<CommandSource> commandManager = childInjector.getInstance(

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,19 +23,14 @@
 //
 package cloud.commandframework.examples.bungee;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.Description;
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.bungee.BungeeCommandManager;
 import cloud.commandframework.bungee.arguments.PlayerParser;
 import cloud.commandframework.bungee.arguments.ServerParser;
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.RichDescription;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.CommandSender;
@@ -43,48 +38,22 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
-import static cloud.commandframework.CommandDescription.commandDescription;
 import static net.kyori.adventure.text.Component.text;
 
 public final class ExamplePlugin extends Plugin {
 
     private BungeeCommandManager<CommandSender> manager;
     private BungeeAudiences bungeeAudiences;
-    private CommandConfirmationManager<CommandSender> confirmationManager;
-
 
     @Override
     public void onEnable() {
-        final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
-                AsynchronousCommandExecutionCoordinator.<CommandSender>builder().build();
-
-        final Function<CommandSender, CommandSender> mapperFunction = Function.identity();
-
-        try {
-            this.manager = new BungeeCommandManager<>(
-                    this,
-                    executionCoordinatorFunction,
-                    mapperFunction,
-                    mapperFunction
-            );
-        } catch (final Exception e) {
-            this.getLogger().severe("Failed to initialize the command manager");
-            return;
-        }
-
-        this.bungeeAudiences = BungeeAudiences.create(this);
-
-        this.confirmationManager = new CommandConfirmationManager<>(
-                30L,
-                TimeUnit.SECONDS,
-                context -> this.bungeeAudiences.sender(context.getCommandContext().sender()).sendMessage(
-                        text(
-                                "Confirmation required. Confirm using /example confirm.", NamedTextColor.RED)),
-                sender -> this.bungeeAudiences.sender(sender).sendMessage(
-                        text("You do not have any pending commands.", NamedTextColor.RED))
+        this.manager = new BungeeCommandManager<>(
+                this,
+                ExecutionCoordinator.simpleCoordinator(),
+                SenderMapper.identity()
         );
 
-        this.confirmationManager.registerConfirmationProcessor(this.manager);
+        this.bungeeAudiences = BungeeAudiences.create(this);
 
         MinecraftExceptionHandler.create(this.bungeeAudiences::sender)
                 .defaultInvalidSyntaxHandler()
@@ -102,17 +71,6 @@ public final class ExamplePlugin extends Plugin {
     }
 
     private void constructCommands() {
-
-        // Base command builder
-        //
-        final Command.Builder<CommandSender> builder = this.manager.commandBuilder("example");
-        //
-        // Add a confirmation command
-        //
-        this.manager.command(builder.literal("confirm")
-                .commandDescription(commandDescription("Confirm a pending command"))
-                .handler(this.confirmationManager.createConfirmationExecutionHandler()));
-
         //
         // Create a player command
         //

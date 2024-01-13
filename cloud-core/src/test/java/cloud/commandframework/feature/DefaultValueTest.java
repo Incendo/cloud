@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,10 +54,10 @@ class DefaultValueTest {
         );
 
         // Act
-        final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(new TestCommandSender(), "test").get();
+        final CommandResult<TestCommandSender> result = this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test").get();
 
         // Assert
-        assertThat(result.getCommandContext().get(key)).isEqualTo(5);
+        assertThat(result.commandContext().get(key)).isEqualTo(5);
     }
 
     @Test
@@ -70,10 +70,10 @@ class DefaultValueTest {
         );
 
         // Act
-        final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(new TestCommandSender(), "test").get();
+        final CommandResult<TestCommandSender> result = this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test").get();
 
         // Assert
-        assertThat(result.getCommandContext().get(key)).isNotNull();
+        assertThat(result.commandContext().get(key)).isNotNull();
     }
 
     @Test
@@ -85,9 +85,9 @@ class DefaultValueTest {
         );
 
         // Act
-        final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(new TestCommandSender(), "test").get();
+        final CommandResult<TestCommandSender> result = this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test").get();
 
         // Assert
-        assertThat(result.getCommandContext().get(key)).isEqualTo(5);
+        assertThat(result.commandContext().get(key)).isEqualTo(5);
     }
 }

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE)
 public abstract class NumberParseException extends ParserException {
 
-    private static final long serialVersionUID = 3018775374056029797L;
     private final String input;
     private final Number min;
     private final Number max;
@@ -67,50 +66,50 @@ public abstract class NumberParseException extends ParserException {
     }
 
     /**
-     * Get the number type
+     * Returns the number type.
      *
-     * @return Number type
+     * @return number type
      */
-    public abstract @NonNull String getNumberType();
+    public abstract @NonNull String numberType();
 
     /**
-     * If the parser had a maximum value
+     * Returns whether the parser has a maximum value.
      *
      * @return {@code true} if there was a maximum value, else {@code false}
      */
     public abstract boolean hasMax();
 
     /**
-     * If the parser had a minimum value
+     * Returns whether the parser has a minimum value.
      *
      * @return {@code true} if there was a minimum value, else {@code false}
      */
     public abstract boolean hasMin();
 
     /**
-     * Get the input that failed to parse
+     * Returns the input that failed to parse.
      *
-     * @return Input
+     * @return input
      */
-    public @NonNull String getInput() {
+    public @NonNull String input() {
         return this.input;
     }
 
     /**
-     * Get the minimum accepted integer that could have been parsed
+     * Returns the minimum accepted integer that could have been parsed.
      *
-     * @return Minimum integer
+     * @return minimum integer
      */
-    public Number getMin() {
+    public Number min() {
         return this.min;
     }
 
     /**
-     * Get the maximum accepted integer that could have been parsed
+     * Returns the maximum accepted integer that could have been parsed.
      *
-     * @return Maximum integer
+     * @return maximum integer
      */
-    public Number getMax() {
+    public Number max() {
         return this.max;
     }
 }

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@ package cloud.commandframework.javacord;
 
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -33,7 +32,7 @@ import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.handling.ExceptionContext;
 import cloud.commandframework.exceptions.handling.ExceptionHandler;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.javacord.sender.JavacordCommandSender;
 import cloud.commandframework.javacord.sender.JavacordServerSender;
 import cloud.commandframework.keys.CloudKey;
@@ -76,8 +75,7 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
     @SuppressWarnings("unchecked")
     public JavacordCommandManager(
             final @NonNull DiscordApi discordApi,
-            final @NonNull Function<@NonNull CommandTree<C>,
-                    @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
             final @NonNull Function<@NonNull JavacordCommandSender, @NonNull C> commandSenderMapper,
             final @NonNull Function<@NonNull C,
                     @NonNull JavacordCommandSender> backwardsCommandSenderMapper,
@@ -167,7 +165,7 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
         );
         this.registerHandler(InvalidSyntaxException.class, (commandSender, throwable) ->
                 commandSender.sendErrorMessage("Invalid Command Syntax. Correct command syntax is: `"
-                        + throwable.getCorrectSyntax() + "`")
+                        + throwable.correctSyntax() + "`")
         );
     }
 

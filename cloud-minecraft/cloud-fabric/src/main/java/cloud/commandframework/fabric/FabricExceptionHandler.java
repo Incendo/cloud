@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ final class FabricExceptionHandler<C, S extends SharedSuggestionProvider, T exte
     @Override
     public void handle(final @NonNull ExceptionContext<C, T> context) throws Throwable {
         this.consumer.handle(
-                this.fabricCommandManager.backwardsCommandSourceMapper().apply(context.context().sender()),
+                this.fabricCommandManager.senderMapper().reverse(context.context().sender()),
                 context.context().sender(),
                 context.exception()
         );

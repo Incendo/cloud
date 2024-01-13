@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,8 @@
 package cloud.commandframework.examples.jda;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.SenderMapper;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.jda.JDA4CommandManager;
 import cloud.commandframework.jda.JDAGuildSender;
 import cloud.commandframework.jda.JDAPrivateSender;
@@ -78,36 +79,38 @@ public final class ExampleBot {
                 jda,
                 message -> "!",
                 (sender, permission) -> permissionRegistry.hasPermission(sender.getUser().getIdLong(), permission),
-                CommandExecutionCoordinator.simpleCoordinator(),
-                sender -> {
-                    MessageReceivedEvent event = sender.getEvent().orElse(null);
+                ExecutionCoordinator.simpleCoordinator(),
+                SenderMapper.create(
+                        sender -> {
+                            MessageReceivedEvent event = sender.getEvent().orElse(null);
 
-                    if (sender instanceof JDAPrivateSender) {
-                        JDAPrivateSender jdaPrivateSender = (JDAPrivateSender) sender;
-                        return new PrivateUser(event, jdaPrivateSender.getUser(), jdaPrivateSender.getPrivateChannel());
-                    }
+                            if (sender instanceof JDAPrivateSender) {
+                                JDAPrivateSender jdaPrivateSender = (JDAPrivateSender) sender;
+                                return new PrivateUser(event, jdaPrivateSender.getUser(), jdaPrivateSender.getPrivateChannel());
+                            }
 
-                    if (sender instanceof JDAGuildSender) {
-                        JDAGuildSender jdaGuildSender = (JDAGuildSender) sender;
-                        return new GuildUser(event, jdaGuildSender.getMember(), jdaGuildSender.getTextChannel());
-                    }
+                            if (sender instanceof JDAGuildSender) {
+                                JDAGuildSender jdaGuildSender = (JDAGuildSender) sender;
+                                return new GuildUser(event, jdaGuildSender.getMember(), jdaGuildSender.getTextChannel());
+                            }
 
-                    throw new UnsupportedOperationException();
-                },
-                user -> {
-                    MessageReceivedEvent event = user.getEvent().orElse(null);
-                    if (user instanceof PrivateUser) {
-                        PrivateUser privateUser = (PrivateUser) user;
-                        return new JDAPrivateSender(event, privateUser.getUser(), privateUser.getPrivateChannel());
-                    }
+                            throw new UnsupportedOperationException();
+                        },
+                        user -> {
+                            MessageReceivedEvent event = user.getEvent().orElse(null);
+                            if (user instanceof PrivateUser) {
+                                PrivateUser privateUser = (PrivateUser) user;
+                                return new JDAPrivateSender(event, privateUser.getUser(), privateUser.getPrivateChannel());
+                            }
 
-                    if (user instanceof GuildUser) {
-                        GuildUser guildUser = (GuildUser) user;
-                        return new JDAGuildSender(event, guildUser.getMember(), guildUser.getTextChannel());
-                    }
+                            if (user instanceof GuildUser) {
+                                GuildUser guildUser = (GuildUser) user;
+                                return new JDAGuildSender(event, guildUser.getMember(), guildUser.getTextChannel());
+                            }
 
-                    throw new UnsupportedOperationException();
-                }
+                            throw new UnsupportedOperationException();
+                        }
+                )
         );
 
         commandManager.command(commandManager

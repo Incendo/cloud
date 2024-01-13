@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,16 +25,16 @@ package cloud.commandframework.annotations.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.ArgumentDescriptor;
-import cloud.commandframework.annotations.ArgumentExtractor;
 import cloud.commandframework.annotations.ArgumentMode;
-import cloud.commandframework.annotations.CommandDescriptor;
-import cloud.commandframework.annotations.CommandExtractor;
-import cloud.commandframework.annotations.ImmutableCommandDescriptor;
 import cloud.commandframework.annotations.SyntaxFragment;
 import cloud.commandframework.annotations.SyntaxParser;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
+import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
+import cloud.commandframework.annotations.descriptor.CommandDescriptor;
+import cloud.commandframework.annotations.descriptor.ImmutableCommandDescriptor;
+import cloud.commandframework.annotations.extractor.ArgumentExtractor;
+import cloud.commandframework.annotations.extractor.CommandExtractor;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -75,7 +75,7 @@ class ArgumentDrivenCommandsTest {
         this.annotationParser.parse(new ArgumentDrivenCommandClass());
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "test 3 literal").get();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test 3 literal").get();
     }
 
     private static class TestArgumentExtractor implements ArgumentExtractor {

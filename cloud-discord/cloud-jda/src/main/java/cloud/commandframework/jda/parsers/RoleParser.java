@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.List;
 import java.util.Set;
 import net.dv8tion.jda.api.entities.Role;
@@ -106,12 +105,6 @@ public final class RoleParser<C> implements ArgumentParser<C, Role> {
             final @NonNull CommandInput commandInput
     ) {
         final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    RoleParser.class,
-                    commandContext
-            ));
-        }
 
         if (!commandContext.contains("MessageReceivedEvent")) {
             return ArgumentParseResult.failure(new IllegalStateException(

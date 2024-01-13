@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class PipelineException extends RuntimeException {
 
-    private static final long serialVersionUID = -7092487758537841656L;
 
     /**
      * Construct a new pipeline exception

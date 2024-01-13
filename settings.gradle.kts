@@ -11,12 +11,17 @@ pluginManagement {
             name = "jmpSnapshots"
             mavenContent { snapshotsOnly() }
         }
+        maven("https://oss.sonatype.org/content/repositories/snapshots/") {
+            name = "sonatypeOssSnapshots"
+            mavenContent { snapshotsOnly() }
+        }
     }
-    includeBuild("build-logic")
+    includeBuild("gradle/build-logic")
 }
 
 plugins {
     id("quiet-fabric-loom") version "1.4-SNAPSHOT"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
 dependencyResolutionManagement {

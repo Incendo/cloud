@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ package cloud.commandframework.velocity;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.brigadier.CloudBrigadierCommand;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.internal.CommandRegistrationHandler;
@@ -44,17 +45,13 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
         this.brigadierManager = new CloudBrigadierManager<>(
                 velocityCommandManager,
                 () -> new CommandContext<>(
-                        velocityCommandManager.commandSenderMapper()
-                                .apply(velocityCommandManager.proxyServer()
+                        velocityCommandManager.senderMapper()
+                                .map(velocityCommandManager.proxyServer()
                                         .getConsoleCommandSource()),
                         velocityCommandManager
                 ),
-                velocityCommandManager.suggestionFactory()
+                velocityCommandManager.senderMapper()
         );
-        this.brigadierManager.brigadierSenderMapper(
-                sender -> this.manager.commandSenderMapper().apply(sender)
-        );
-        this.brigadierManager.backwardsBrigadierSenderMapper(this.manager.backwardsCommandSenderMapper());
     }
 
     @Override
@@ -66,12 +63,7 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                 this.brigadierManager.literalBrigadierNodeFactory().createNode(
                         command.rootComponent().name(),
                         command,
-                        (c, p) -> this.manager.hasPermission(
-                                this.manager.commandSenderMapper().apply(c),
-                                p
-                        ),
-                        true,
-                        new VelocityExecutor<>(this.manager)
+                        new CloudBrigadierCommand<>(this.manager, this.brigadierManager)
                 )
         );
         final CommandMeta commandMeta = this.manager.proxyServer().getCommandManager()

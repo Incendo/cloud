@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,11 +32,9 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.time.Duration;
 import java.util.Collections;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -88,13 +86,7 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    DurationParseException.class,
-                    commandContext
-            ));
-        }
+        final String input = commandInput.readString();
 
         final Matcher matcher = DURATION_PATTERN.matcher(input);
 
@@ -126,35 +118,31 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
             return ArgumentParseResult.failure(new DurationParseException(input, commandContext));
         }
 
-        commandInput.readString();
         return ArgumentParseResult.success(duration);
     }
 
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
-        char[] chars = input.toLowerCase(Locale.ROOT).toCharArray();
-
-        if (chars.length == 0) {
+        if (input.isEmpty(true)) {
             return IntStream.range(1, 10).boxed()
                     .sorted()
                     .map(String::valueOf)
                     .collect(Collectors.toList());
         }
 
-        char last = chars[chars.length - 1];
-
         // 1d_, 5d4m_, etc
-        if (Character.isLetter(last)) {
+        if (Character.isLetter(input.lastRemainingCharacter())) {
             return Collections.emptyList();
         }
 
         // 1d5_, 5d4m2_, etc
+        final String string = input.readString();
         return Stream.of("d", "h", "m", "s")
-                .filter(unit -> !input.contains(unit))
-                .map(unit -> input + unit)
+                .filter(unit -> !string.contains(unit))
+                .map(unit -> string + unit)
                 .collect(Collectors.toList());
     }
 
@@ -167,7 +155,6 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
     @API(status = API.Status.STABLE, since = "1.7.0")
     public static final class DurationParseException extends ParserException {
 
-        private static final long serialVersionUID = 7632293268451349508L;
         private final String input;
 
         /**
@@ -191,12 +178,12 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
         }
 
         /**
-         * Get the supplied input string.
+         * Returns the supplied input string.
          *
          * @return input string
          * @since 1.7.0
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
     }

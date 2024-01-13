@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -67,7 +67,7 @@ class CommandPostProcessorTest {
         );
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "test").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test").join();
 
         // Assert
         verify(executionHandler, never()).executeFuture(notNull());

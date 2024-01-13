@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -77,11 +77,11 @@ public final class ProcessorExample {
 
         @Override
         public void accept(final @NonNull CommandPostprocessingContext<CommandSender> context) {
-            final Command<CommandSender> command = context.getCommand();
+            final Command<CommandSender> command = context.command();
             if (!command.commandMeta().getOrDefault(REQUIRES_BOOTS, false)) {
                 return;
             }
-            final CommandSender sender = context.getCommandContext().sender();
+            final CommandSender sender = context.commandContext().sender();
             if (!(sender instanceof Player)) {
                 return;
             }

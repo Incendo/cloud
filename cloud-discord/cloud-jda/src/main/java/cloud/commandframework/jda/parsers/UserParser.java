@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -128,12 +127,6 @@ public final class UserParser<C> implements ArgumentParser<C, User> {
             final @NonNull CommandInput commandInput
     ) {
         final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    UserParser.class,
-                    commandContext
-            ));
-        }
 
         if (!commandContext.contains("MessageReceivedEvent")) {
             return ArgumentParseResult.failure(new IllegalStateException(
@@ -235,7 +228,6 @@ public final class UserParser<C> implements ArgumentParser<C, User> {
 
     public static class UserParseException extends IllegalArgumentException {
 
-        private static final long serialVersionUID = -6728909884195850077L;
         private final String input;
 
         /**
@@ -260,7 +252,6 @@ public final class UserParser<C> implements ArgumentParser<C, User> {
 
     public static final class TooManyUsersFoundParseException extends UserParseException {
 
-        private static final long serialVersionUID = 7222089412615886672L;
 
         /**
          * Construct a new user parse exception
@@ -280,7 +271,6 @@ public final class UserParser<C> implements ArgumentParser<C, User> {
 
     public static final class UserNotFoundParseException extends UserParseException {
 
-        private static final long serialVersionUID = 3689949065073643826L;
 
         /**
          * Construct a new user parse exception

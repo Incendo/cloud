@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -76,12 +75,6 @@ public final class LiteralParser<C> implements ArgumentParser<C, String>, Blocki
             final @NonNull CommandInput commandInput
     ) {
         final String string = commandInput.peekString();
-        if (string.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    LiteralParser.class,
-                    commandContext
-            ));
-        }
         if (this.allAcceptedAliases.contains(string)) {
             commandInput.readString();
             return ArgumentParseResult.success(this.name);
@@ -90,10 +83,8 @@ public final class LiteralParser<C> implements ArgumentParser<C, String>, Blocki
     }
 
     @Override
-    public @NonNull Iterable<@NonNull String> stringSuggestions(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
-    ) {
+    public @NonNull Iterable<@NonNull String> stringSuggestions(final @NonNull CommandContext<C> commandContext,
+                                                                final @NonNull CommandInput input) {
         return Collections.singletonList(this.name);
     }
 

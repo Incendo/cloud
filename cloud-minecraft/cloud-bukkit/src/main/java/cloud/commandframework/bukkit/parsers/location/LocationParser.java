@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,8 +56,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class LocationParser<C> implements ArgumentParser<C, Location>, BlockingSuggestionProvider.Strings<C> {
 
-    private static final int EXPECTED_PARAMETER_COUNT = 3;
-
     /**
      * Creates a new location parser.
      *
@@ -101,16 +99,25 @@ public final class LocationParser<C> implements ArgumentParser<C, Location>, Blo
 
         final LocationCoordinate[] coordinates = new LocationCoordinate[3];
         for (int i = 0; i < 3; i++) {
+            if (commandInput.peekString().isEmpty()) {
+                return ArgumentParseResult.failure(
+                        new LocationParseException(
+                                commandContext,
+                                LocationParseException.FailureReason.WRONG_FORMAT,
+                                commandInput.remainingInput()
+                        )
+                );
+            }
             final ArgumentParseResult<@NonNull LocationCoordinate> coordinate = this.locationCoordinateParser.parse(
                     commandContext,
                     commandInput
             );
-            if (coordinate.getFailure().isPresent()) {
+            if (coordinate.failure().isPresent()) {
                 return ArgumentParseResult.failure(
-                        coordinate.getFailure().get()
+                        coordinate.failure().get()
                 );
             }
-            coordinates[i] = coordinate.getParsedValue().orElseThrow(NullPointerException::new);
+            coordinates[i] = coordinate.parsedValue().orElseThrow(NullPointerException::new);
         }
         final Location originalLocation;
         final CommandSender bukkitSender = commandContext.get(BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER);
@@ -196,40 +203,36 @@ public final class LocationParser<C> implements ArgumentParser<C, Location>, Blo
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
-        return LocationParser.getSuggestions(commandContext, input);
+        return LocationParser.getSuggestions(3, commandContext, input);
     }
 
     static <C> @NonNull List<@NonNull String> getSuggestions(
+            final int components,
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
-        final String workingInput;
-        final String prefix;
-        if (input.startsWith("~") || input.startsWith("^")) {
-            prefix = Character.toString(input.charAt(0));
-            workingInput = input.substring(1);
-        } else {
-            prefix = "";
-            workingInput = input;
+        final int toSkip = Math.min(components, input.remainingTokens()) - 1;
+        final StringBuilder prefix = new StringBuilder();
+        for (int i = 0; i < toSkip; i++) {
+            prefix.append(input.readStringSkipWhitespace()).append(" ");
         }
+
+        if (input.hasRemainingInput() && (input.peek() == '~' || input.peek() == '^')) {
+            prefix.append(input.read());
+        }
+
         return IntegerParser.getSuggestions(
                 Integer.MIN_VALUE,
                 Integer.MAX_VALUE,
-                workingInput
+                input
         ).stream().map(string -> prefix + string).collect(Collectors.toList());
-    }
-
-    @Override
-    public int getRequestedArgumentCount() {
-        return EXPECTED_PARAMETER_COUNT;
     }
 
 
     static class LocationParseException extends ParserException {
 
-        private static final long serialVersionUID = -3261835227265878218L;
 
         protected LocationParseException(
                 final @NonNull CommandContext<?> context,

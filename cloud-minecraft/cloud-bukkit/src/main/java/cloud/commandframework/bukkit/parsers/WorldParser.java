@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,6 @@ import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
@@ -71,13 +70,6 @@ public final class WorldParser<C> implements ArgumentParser<C, World>, BlockingS
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        if (commandInput.peekString().isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    WorldParser.class,
-                    commandContext
-            ));
-        }
-
         final String input = commandInput.readString();
         final World world = Bukkit.getWorld(input);
         if (world == null) {
@@ -88,17 +80,14 @@ public final class WorldParser<C> implements ArgumentParser<C, World>, BlockingS
     }
 
     @Override
-    public @NonNull Iterable<@NonNull String> stringSuggestions(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
-    ) {
+    public @NonNull Iterable<@NonNull String> stringSuggestions(final @NonNull CommandContext<C> commandContext,
+                                                                final @NonNull CommandInput input) {
         return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
     }
 
 
     public static final class WorldParseException extends ParserException {
 
-        private static final long serialVersionUID = 561648144491587450L;
         private final String input;
 
         /**

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -96,7 +96,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return First value
      */
-    public final @NonNull U getFirst() {
+    public final @NonNull U first() {
         return this.first;
     }
 
@@ -105,7 +105,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return Second value
      */
-    public final @NonNull V getSecond() {
+    public final @NonNull V second() {
         return this.second;
     }
 
@@ -114,7 +114,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return Third value
      */
-    public final @NonNull W getThird() {
+    public final @NonNull W third() {
         return this.third;
     }
 
@@ -123,7 +123,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return Fourth value
      */
-    public final @NonNull X getFourth() {
+    public final @NonNull X fourth() {
         return this.fourth;
     }
 
@@ -132,7 +132,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return Fifth value
      */
-    public final @NonNull Y getFifth() {
+    public final @NonNull Y fifth() {
         return this.fifth;
     }
 
@@ -141,7 +141,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return Sixth value
      */
-    public final @NonNull Z getSixth() {
+    public final @NonNull Z sixth() {
         return this.sixth;
     }
 
@@ -150,27 +150,27 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
         final Sextet<?, ?, ?, ?, ?, ?> sextet = (Sextet<?, ?, ?, ?, ?, ?>) o;
-        return Objects.equals(this.getFirst(), sextet.getFirst())
-                && Objects.equals(this.getSecond(), sextet.getSecond())
-                && Objects.equals(this.getThird(), sextet.getThird())
-                && Objects.equals(this.getFourth(), sextet.getFourth())
-                && Objects.equals(this.getFifth(), sextet.getFifth())
-                && Objects.equals(this.getSixth(), sextet.getSixth());
+        return Objects.equals(this.first(), sextet.first())
+                && Objects.equals(this.second(), sextet.second())
+                && Objects.equals(this.third(), sextet.third())
+                && Objects.equals(this.fourth(), sextet.fourth())
+                && Objects.equals(this.fifth(), sextet.fifth())
+                && Objects.equals(this.sixth(), sextet.sixth());
     }
 
     @Override
     public final int hashCode() {
         return Objects.hash(
-                this.getFirst(),
-                this.getSecond(),
-                this.getThird(),
-                this.getFourth(),
-                this.getFifth(),
-                this.getSixth()
+                this.first(),
+                this.second(),
+                this.third(),
+                this.fourth(),
+                this.fifth(),
+                this.sixth()
         );
     }
 
@@ -182,7 +182,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
     }
 
     @Override
-    public final int getSize() {
+    public final int size() {
         return 6;
     }
 

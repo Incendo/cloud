@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,8 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @FunctionalInterface
-@API(status = API.Status.STABLE, since = "2.0.0")
-public interface BrigadierPermissionChecker<S> {
+@API(status = API.Status.INTERNAL, since = "2.0.0")
+public interface BrigadierPermissionChecker<C> {
 
     /**
      * Returns whether the given Brigadier {@code sender} has the given {@code permission}.
@@ -38,5 +38,5 @@ public interface BrigadierPermissionChecker<S> {
      * @param permission the permission
      * @return {@code true} if the {@code sender} has the {@code permission}, else {@code false}
      */
-    boolean hasPermission(@NonNull S sender, @NonNull Permission permission);
+    boolean hasPermission(@NonNull C sender, @NonNull Permission permission);
 }

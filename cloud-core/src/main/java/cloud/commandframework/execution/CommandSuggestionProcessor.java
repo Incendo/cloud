@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,12 +25,15 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Stream;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Processor that formats command suggestions
+ * Processor that operates on the {@link Stream stream} of {@link Suggestion suggestions} before it is collected
+ * for the suggestion result passed to platform implementations or other callers.
  *
  * @param <C> command sender type
  * @since 2.0.0
@@ -40,23 +43,36 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public interface CommandSuggestionProcessor<C> {
 
     /**
-     * Creates a {@link CommandSuggestionProcessor} that simply returns the input suggestion.
+     * Creates a {@link CommandSuggestionProcessor} that simply returns the input suggestions.
      *
      * @param <C> command sender type
      * @return the processor
      */
     static <C> @NonNull CommandSuggestionProcessor<C> passThrough() {
-        return (ctx, suggestion) -> suggestion;
+        return (ctx, suggestions) -> suggestions;
     }
 
     /**
-     * Processes the given {@code suggestion} and returns the result.
+     * Adds operations to the {@link Suggestion suggestions} {@link Stream stream} and returns the result.
      *
-     * <p>If {@code null} is returned, the suggestion will be dropped.</p>
-     *
-     * @param context    command preprocessing context which can be used to access the command context and command input
-     * @param suggestion the suggestion to process
-     * @return the processed suggestion, or {@code null}
+     * @param context     command preprocessing context which can be used to access the command context and command input
+     * @param suggestions the suggestions to process
+     * @return the processed suggestions
      */
-    @Nullable Suggestion process(@NonNull CommandPreprocessingContext<C> context, @NonNull Suggestion suggestion);
+    @NonNull Stream<@NonNull Suggestion> process(
+            @NonNull CommandPreprocessingContext<C> context,
+            @NonNull Stream<@NonNull Suggestion> suggestions
+    );
+
+    /**
+     * Create a chained {@link CommandSuggestionProcessor processor} that invokes {@code this} processor and then the
+     * {@code nextProcessor} with the result.
+     *
+     * @param nextProcessor next suggestion processor
+     * @return chained processor
+     */
+    default @NonNull CommandSuggestionProcessor<C> and(final @NonNull CommandSuggestionProcessor<C> nextProcessor) {
+        Objects.requireNonNull(nextProcessor, "nextProcessor");
+        return new ChainedCommandSuggestionProcessor<>(Arrays.asList(this, nextProcessor));
+    }
 }

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,6 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.util.StringUtils;
 import java.util.StringJoiner;
@@ -154,14 +153,6 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    StringParser.class,
-                    commandContext
-            ));
-        }
-
         if (this.stringMode == StringMode.SINGLE) {
             return ArgumentParseResult.success(commandInput.readString());
         } else if (this.stringMode == StringMode.QUOTED) {
@@ -246,18 +237,18 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
                 }
             }
 
-            stringJoiner.add(commandInput.readString(false /* preserveSingleSpace */));
+            stringJoiner.add(commandInput.readStringSkipWhitespace(false /* preserveSingleSpace */));
         }
 
         return ArgumentParseResult.success(stringJoiner.toString());
     }
 
     /**
-     * Get the string mode
+     * Returns the string mode of the parser.
      *
-     * @return String mode
+     * @return string mode
      */
-    public StringParser.@NonNull StringMode getStringMode() {
+    public @NonNull StringMode stringMode() {
         return this.stringMode;
     }
 
@@ -280,7 +271,6 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
     @API(status = API.Status.STABLE)
     public static final class StringParseException extends ParserException {
 
-        private static final long serialVersionUID = -8903115465005472945L;
         private final String input;
         private final StringMode stringMode;
 
@@ -309,20 +299,20 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
 
 
         /**
-         * Get the input provided by the sender
+         * Returns the input provided by the sender.
          *
-         * @return Input
+         * @return input
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
 
         /**
-         * Get the string mode
+         * Returns the string mode.
          *
-         * @return String mode
+         * @return string mode
          */
-        public StringParser.@NonNull StringMode getStringMode() {
+        public @NonNull StringMode stringMode() {
             return this.stringMode;
         }
     }

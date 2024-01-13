@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,11 @@
 package cloud.commandframework.annotations.injection;
 
 import cloud.commandframework.annotations.AnnotationAccessor;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.types.tuples.Triplet;
+import com.google.inject.BindingAnnotation;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
+import com.google.inject.Key;
+import java.lang.annotation.Annotation;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -35,11 +36,44 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * {@link InjectionService Injection service} that injects using a Guice {@link Injector}
  *
+ * <p>You should not put {@link com.google.inject.Inject} annotation on your methods.
+ * Ignore the warning says 'Binding annotation @YourAnnotation without {@literal @Inject} declared'.</p>
+ *
  * @param <C> Command sender type
  * @since 1.4.0
  */
 @API(status = API.Status.STABLE, since = "1.4.0")
 public final class GuiceInjectionService<C> implements InjectionService<C> {
+
+    /**
+     * Creates a Guice key for the given class and annotation accessor.
+     *
+     * <p>If the annotation accessor contains a binding annotation, the key will be created with that annotation.
+     * Otherwise, the key will be created without a binding annotation.</p>
+     *
+     * <p>If the annotation accessor contains multiple binding annotations, the first one will be used.</p>
+     *
+     * @param <T>                type of the key
+     * @param clazz              class to create key for
+     * @param annotationAccessor annotation accessor to create key for
+     * @return the created key
+     */
+    private static <T> @NonNull Key<T> createKey(
+            final @NonNull Class<T> clazz,
+            final @NonNull AnnotationAccessor annotationAccessor
+    ) {
+        final Annotation bindingAnnotation = annotationAccessor
+                .annotations()
+                .stream()
+                .filter(annotation -> annotation.annotationType().isAnnotationPresent(BindingAnnotation.class))
+                .findFirst()
+                .orElse(null);
+        if (bindingAnnotation == null) {
+            return Key.get(clazz);
+        } else {
+            return Key.get(clazz, bindingAnnotation);
+        }
+    }
 
     private final Injector injector;
 
@@ -48,23 +82,22 @@ public final class GuiceInjectionService<C> implements InjectionService<C> {
     }
 
     /**
-     * Create a new Guice injection service that wraps the given injector
+     * Creates a new Guice injection service that wraps the given injector
      *
-     * @param injector Injector to wrap
-     * @param <C>      Command sender type
+     * @param <C>      command sender type
+     * @param injector injector to wrap
      * @return the created injection service
      */
-    public static <C> GuiceInjectionService<C> create(final @NonNull Injector injector) {
+    public static <C> @NonNull GuiceInjectionService<C> create(final @NonNull Injector injector) {
         return new GuiceInjectionService<>(injector);
     }
 
     @Override
-    @SuppressWarnings("EmptyCatch")
-    public @Nullable Object handle(final @NonNull Triplet<CommandContext<C>, Class<?>, AnnotationAccessor> triplet) {
+    public @Nullable Object handle(final @NonNull InjectionRequest<C> request) {
         try {
-            return this.injector.getInstance(triplet.getSecond());
+            return this.injector.getInstance(createKey(request.injectedClass(), request.annotationAccessor()));
         } catch (final ConfigurationException ignored) {
+            return null;
         }
-        return null;
     }
 }

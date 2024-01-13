@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,9 @@ public final class SelectorExample implements BuilderFeature {
                 .handler(commandContext -> {
                     final Player player = commandContext.sender();
                     final SingleEntitySelector singleEntitySelector = commandContext.get("entity");
-                    singleEntitySelector.single().teleport(player);
+                    player.getServer().getScheduler().runTask(examplePlugin, () -> {
+                        singleEntitySelector.single().teleport(player);
+                    });
                     player.sendMessage(ChatColor.GREEN + "The entity was teleported to you!");
                 }));
     }

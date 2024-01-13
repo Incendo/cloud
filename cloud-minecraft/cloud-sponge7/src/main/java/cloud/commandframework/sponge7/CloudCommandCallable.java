@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,11 @@ package cloud.commandframework.sponge7;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.Suggestions;
+import cloud.commandframework.util.StringUtils;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -57,9 +60,9 @@ final class CloudCommandCallable<C> implements CommandCallable {
 
     @Override
     public CommandResult process(final @NonNull CommandSource source, final @NonNull String arguments) {
-        final C cloudSender = this.manager.getCommandSourceMapper().apply(source);
+        final C cloudSender = this.manager.senderMapper().map(source);
 
-        this.manager.executeCommand(cloudSender, this.formatCommand(arguments), ctx ->
+        this.manager.commandExecutor().executeCommand(cloudSender, this.formatCommand(arguments), ctx ->
                         ctx.store(SpongeCommandManager.SPONGE_COMMAND_SOURCE_KEY, source));
         return CommandResult.success();
     }
@@ -70,12 +73,14 @@ final class CloudCommandCallable<C> implements CommandCallable {
             final @NonNull String arguments,
             final @Nullable Location<World> targetPosition
     ) {
-        return this.manager.suggestionFactory()
-                .suggestImmediately(
-                        this.manager.getCommandSourceMapper().apply(source),
-                        this.formatCommand(arguments)
-                ).stream()
+        final Suggestions<C, ?> result = this.manager.suggestionFactory().suggestImmediately(
+                this.manager.senderMapper().map(source),
+                this.formatCommand(arguments)
+        );
+        return result.list().stream()
                 .map(Suggestion::suggestion)
+                .map(suggestion -> StringUtils.trimBeforeLastSpace(suggestion, result.commandInput()))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
@@ -90,7 +95,7 @@ final class CloudCommandCallable<C> implements CommandCallable {
     @Override
     public boolean testPermission(final @NonNull CommandSource source) {
         return this.manager.hasPermission(
-                this.manager.getCommandSourceMapper().apply(source),
+                this.manager.senderMapper().map(source),
                 this.cloudCommand.commandPermission()
         );
     }
@@ -118,6 +123,7 @@ final class CloudCommandCallable<C> implements CommandCallable {
     @Override
     public Text getUsage(final @NonNull CommandSource source) {
         return Text.of(this.manager.commandSyntaxFormatter().apply(
+                this.manager.senderMapper().map(source),
                 Collections.emptyList(),
                 this.manager.commandTree().getNamedNode(this.command.name())
         ));

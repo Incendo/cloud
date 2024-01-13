@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE)
 public final class NoSuchCommandException extends CommandParseException {
 
-    private static final long serialVersionUID = -7775865652882764771L;
     private final String suppliedCommand;
 
     /**
@@ -60,7 +59,7 @@ public final class NoSuchCommandException extends CommandParseException {
     @Override
     public String getMessage() {
         final StringBuilder builder = new StringBuilder();
-        for (final CommandComponent<?> commandComponent : this.getCurrentChain()) {
+        for (final CommandComponent<?> commandComponent : this.currentChain()) {
             if (commandComponent == null) {
                 continue;
             }
@@ -70,11 +69,11 @@ public final class NoSuchCommandException extends CommandParseException {
     }
 
     /**
-     * Get the supplied command
+     * Returns the supplied command.
      *
-     * @return Supplied command
+     * @return supplied command
      */
-    public @NonNull String getSuppliedCommand() {
+    public @NonNull String suppliedCommand() {
         return this.suppliedCommand;
     }
 

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.exceptions.NoPermissionException;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PredicatePermission;
@@ -70,7 +70,7 @@ class PermissionTest {
 
         // Act
         final List<? extends Suggestion> suggestions = this.manager.suggestionFactory()
-                .suggestImmediately(new TestCommandSender(), "t");
+                .suggestImmediately(new TestCommandSender(), "t").list();
 
         // Assert
         assertThat(suggestions).isEmpty();
@@ -88,7 +88,7 @@ class PermissionTest {
 
         // Act
         final List<? extends Suggestion> suggestions = this.manager.suggestionFactory()
-                .suggestImmediately(new TestCommandSender(), "t");
+                .suggestImmediately(new TestCommandSender(), "t").list();
 
         // Assert
         assertThat(suggestions).isNotEmpty();
@@ -103,10 +103,10 @@ class PermissionTest {
         when(this.permissionFunction.apply("first")).thenReturn(true);
 
         // Act
-        this.manager.executeCommand(new TestCommandSender(), "first").join();
+        this.manager.commandExecutor().executeCommand(new TestCommandSender(), "first").join();
         final CompletionException exception = assertThrows(
                 CompletionException.class,
-                () -> this.manager.executeCommand(new TestCommandSender(), "first 10").join()
+                () -> this.manager.commandExecutor().executeCommand(new TestCommandSender(), "first 10").join()
         );
 
         // Assert
@@ -223,12 +223,12 @@ class PermissionTest {
                 CloudKey.of("boolean"), $ -> condition.get()
         )));
         // First time should succeed
-        manager.executeCommand(new TestCommandSender(), "predicate").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "predicate").join();
         // Now we force it to fail
         condition.set(false);
         assertThrows(
                 CompletionException.class,
-                () -> manager.executeCommand(new TestCommandSender(), "predicate").join()
+                () -> manager.commandExecutor().executeCommand(new TestCommandSender(), "predicate").join()
         );
     }
 
@@ -238,7 +238,7 @@ class PermissionTest {
         private final Function<String, Boolean> permissionFunction;
 
         private MockPermissionManager(final @NonNull Function<String, Boolean> permissionFunction) {
-            super(CommandExecutionCoordinator.simpleCoordinator(), cmd -> true);
+            super(ExecutionCoordinator.simpleCoordinator(), cmd -> true);
             this.permissionFunction = permissionFunction;
         }
 

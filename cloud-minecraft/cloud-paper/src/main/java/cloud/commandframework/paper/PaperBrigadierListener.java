@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,38 +24,24 @@
 package cloud.commandframework.paper;
 
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.brigadier.node.LiteralBrigadierNodeFactory;
 import cloud.commandframework.brigadier.permission.BrigadierPermissionChecker;
-import cloud.commandframework.brigadier.suggestion.TooltipSuggestion;
 import cloud.commandframework.bukkit.BukkitBrigadierMapper;
 import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.internal.CommandNode;
 import com.destroystokyo.paper.brigadier.BukkitBrigadierCommandSource;
-import java.lang.reflect.Method;
 import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
-@SuppressWarnings("deprecation") // Draft API
+@SuppressWarnings("UnstableApiUsage")
 class PaperBrigadierListener<C> implements Listener {
-    private static final @Nullable Method SET_RAW;
-
-    static {
-        @Nullable Method mth;
-        try {
-            mth = com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent.class
-                    .getDeclaredMethod("setRawCommand", boolean.class);
-        } catch (final NoSuchMethodException ex) {
-            mth = null;
-        }
-        SET_RAW = mth;
-    }
 
     private final CloudBrigadierManager<C, BukkitBrigadierCommandSource> brigadierManager;
     private final PaperCommandManager<C> paperCommandManager;
@@ -65,19 +51,16 @@ class PaperBrigadierListener<C> implements Listener {
         this.brigadierManager = new CloudBrigadierManager<>(
                 this.paperCommandManager,
                 () -> new CommandContext<>(
-                    this.paperCommandManager.getCommandSenderMapper().apply(Bukkit.getConsoleSender()),
-                    this.paperCommandManager
+                        this.paperCommandManager.senderMapper().map(Bukkit.getConsoleSender()),
+                        this.paperCommandManager
                 ),
-                paperCommandManager.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion)
+                SenderMapper.create(
+                        sender -> this.paperCommandManager.senderMapper().map(sender.getBukkitSender()),
+                        new BukkitBackwardsBrigadierSenderMapper<>(this.paperCommandManager)
+                )
         );
 
-        this.brigadierManager.brigadierSenderMapper(sender ->
-                this.paperCommandManager.getCommandSenderMapper().apply(sender.getBukkitSender()));
-
         new PaperBrigadierMapper<>(new BukkitBrigadierMapper<>(this.paperCommandManager, this.brigadierManager));
-
-        this.brigadierManager
-                .backwardsBrigadierSenderMapper(new BukkitBackwardsBrigadierSenderMapper<>(this.paperCommandManager));
     }
 
     protected @NonNull CloudBrigadierManager<C, BukkitBrigadierCommandSource> brigadierManager() {
@@ -92,7 +75,7 @@ class PaperBrigadierListener<C> implements Listener {
         if (!(event.getCommand() instanceof PluginIdentifiableCommand)) {
             return;
         } else if (!((PluginIdentifiableCommand) event.getCommand())
-                .getPlugin().equals(this.paperCommandManager.getOwningPlugin())) {
+                .getPlugin().equals(this.paperCommandManager.owningPlugin())) {
             return;
         }
 
@@ -110,30 +93,21 @@ class PaperBrigadierListener<C> implements Listener {
             return;
         }
 
-        final BrigadierPermissionChecker<BukkitBrigadierCommandSource> permissionChecker = (sender, permission) -> {
+        final BrigadierPermissionChecker<C> permissionChecker = (sender, permission) -> {
             // We need to check that the command still exists...
             if (commandTree.getNamedNode(label) == null) {
                 return false;
             }
 
-            final C commandSender = this.paperCommandManager.getCommandSenderMapper().apply(sender.getBukkitSender());
-            return this.paperCommandManager.hasPermission(commandSender, permission);
+            return this.paperCommandManager.hasPermission(sender, permission);
         };
         final LiteralBrigadierNodeFactory<C, BukkitBrigadierCommandSource> literalFactory =
                 this.brigadierManager.literalBrigadierNodeFactory();
         event.setLiteral(literalFactory.createNode(
+                event.getLiteral().getLiteral(),
                 node,
-                event.getLiteral(),
-                event.getBrigadierCommand(),
                 event.getBrigadierCommand(),
                 permissionChecker
         ));
-        if (SET_RAW != null) {
-            try {
-                SET_RAW.invoke(event, true);
-            } catch (final ReflectiveOperationException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
     }
 }

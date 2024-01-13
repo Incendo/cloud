@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,18 @@
 package cloud.commandframework.examples.bukkit.annotations;
 
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.Argument;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.processing.CommandContainer;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * Example of a command container.
+ *
+ * @see ExampleSuggestionContainer
+ */
 @CommandContainer
 public final class ExampleCommandContainer {
 
@@ -45,9 +52,16 @@ public final class ExampleCommandContainer {
      * This one gets parsed automatically!
      *
      * @param sender the sender
+     * @param arg    a string
      */
-    @CommandMethod("annotations container")
-    public void containerCommand(final CommandSender sender) {
+    @Command("annotations container [arg]")
+    public void containerCommand(
+            final CommandSender sender,
+            @Argument(suggestions = "container-suggestions") final @Nullable String arg
+    ) {
         sender.sendMessage("This is sent from a container!!");
+        if (arg != null) {
+            sender.sendMessage("You said: " + arg);
+        }
     }
 }

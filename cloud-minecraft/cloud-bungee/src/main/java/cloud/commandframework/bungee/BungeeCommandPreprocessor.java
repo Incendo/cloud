@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,6 @@ final class BungeeCommandPreprocessor<C> implements CommandPreprocessor<C> {
 
     @Override
     public void accept(final @NonNull CommandPreprocessingContext<C> context) {
-        context.getCommandContext().store(BungeeContextKeys.PROXY_SERVER_KEY, this.mgr.getOwningPlugin().getProxy());
+        context.commandContext().store(BungeeContextKeys.PROXY_SERVER_KEY, this.mgr.getOwningPlugin().getProxy());
     }
 }

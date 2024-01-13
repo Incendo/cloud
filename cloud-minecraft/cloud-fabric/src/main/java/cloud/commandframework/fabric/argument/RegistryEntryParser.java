@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,6 @@ import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.fabric.FabricCaptionKeys;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
@@ -133,11 +132,6 @@ public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V>, Bl
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String possibleIdentifier = commandInput.peekString();
-        if (possibleIdentifier.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(RegistryEntryParser.class, commandContext));
-        }
-
         final ResourceLocation key;
         try {
             key = ResourceLocation.read(new StringReader(commandInput.readString()));
@@ -166,7 +160,7 @@ public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V>, Bl
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         final Set<ResourceLocation> ids = this.resolveRegistry(commandContext).keySet();
         final List<String> results = new ArrayList<>(ids.size());
@@ -196,7 +190,6 @@ public final class RegistryEntryParser<C, V> implements ArgumentParser<C, V>, Bl
      */
     private static final class UnknownEntryException extends ParserException {
 
-        private static final long serialVersionUID = 7694424294461849903L;
 
         UnknownEntryException(
                 final CommandContext<?> context,

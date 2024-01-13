@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE)
 public final class NoCommandInLeafException extends IllegalStateException {
 
-    private static final long serialVersionUID = 3373529875213310821L;
     private final CommandComponent<?> commandComponent;
 
     /**
@@ -51,11 +50,11 @@ public final class NoCommandInLeafException extends IllegalStateException {
     }
 
     /**
-     * Get the command argument
+     * Returns the command component.
      *
-     * @return Command argument
+     * @return command component
      */
-    public @NonNull CommandComponent<?> getCommandComponent() {
+    public @NonNull CommandComponent<?> commandComponent() {
         return this.commandComponent;
     }
 }

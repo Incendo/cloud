@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,6 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.parsers.Parser;
 import cloud.commandframework.annotations.specifier.Greedy;
@@ -66,7 +65,7 @@ class AnnotationParserTest {
 
     private CommandManager<TestCommandSender> manager;
     private AnnotationParser<TestCommandSender> annotationParser;
-    private Collection<Command<TestCommandSender>> commands;
+    private Collection<cloud.commandframework.Command<TestCommandSender>> commands;
 
     @BeforeAll
     void setup() {
@@ -97,23 +96,23 @@ class AnnotationParserTest {
     @Test
     void testMethodConstruction() {
         Assertions.assertFalse(commands.isEmpty());
-        manager.executeCommand(new TestCommandSender(), "test literal 10").join();
-        manager.executeCommand(new TestCommandSender(), "t literal 10 o").join();
-        manager.executeCommand(new TestCommandSender(), "proxycommand 10").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "test literal 10").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "t literal 10 o").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "proxycommand 10").join();
         Assertions.assertThrows(CompletionException.class, () ->
-                manager.executeCommand(new TestCommandSender(), "test 101").join());
-        manager.executeCommand(new TestCommandSender(), "flagcommand -p").join();
-        manager.executeCommand(new TestCommandSender(), "flagcommand --print --word peanut").join();
-        manager.executeCommand(new TestCommandSender(), "parserflagcommand -s \"Hello World\"").join();
-        manager.executeCommand(new TestCommandSender(), "parserflagcommand -s \"Hello World\" -o This is a test").join();
-        manager.executeCommand(new TestCommandSender(), "class method").join();
+                manager.commandExecutor().executeCommand(new TestCommandSender(), "test 101").join());
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "flagcommand -p").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "flagcommand --print --word peanut").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "parserflagcommand -s \"Hello World\"").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "parserflagcommand -s \"Hello World\" -o This is a test").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "class method").join();
     }
 
     @Test
     void testNamedSuggestionProvider() {
         Assertions.assertEquals(
                 NAMED_SUGGESTIONS,
-                manager.suggestionFactory().suggestImmediately(new TestCommandSender(), "namedsuggestions ")
+                manager.suggestionFactory().suggestImmediately(new TestCommandSender(), "namedsuggestions ").list()
         );
     }
 
@@ -130,21 +129,21 @@ class AnnotationParserTest {
         Assertions.assertNotNull(commandDescription);
         Assertions.assertEquals("Hello World!", commandDescription.value());
 
-        System.out.println("Looking for @CommandPermission");
-        final CommandPermission commandPermission = AnnotationParser.getMethodOrClassAnnotation(
+        System.out.println("Looking for @Permission");
+        final Permission permission = AnnotationParser.getMethodOrClassAnnotation(
                 annotatedMethod,
-                CommandPermission.class
+                Permission.class
         );
-        Assertions.assertNotNull(commandPermission);
-        Assertions.assertEquals("some.permission", commandPermission.value());
+        Assertions.assertNotNull(permission);
+        Assertions.assertEquals("some.permission", permission.value());
 
-        System.out.println("Looking for @CommandMethod");
-        final CommandMethod commandMethod = AnnotationParser.getMethodOrClassAnnotation(
+        System.out.println("Looking for @Command");
+        final Command command = AnnotationParser.getMethodOrClassAnnotation(
                 annotatedMethod,
-                CommandMethod.class
+                Command.class
         );
-        Assertions.assertNotNull(commandMethod);
-        Assertions.assertEquals("method", commandMethod.value());
+        Assertions.assertNotNull(command);
+        Assertions.assertEquals("method", command.value());
 
         System.out.println("Looking for @Regex");
         @SuppressWarnings("unused") final Regex regex = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod, Regex.class);
@@ -152,7 +151,7 @@ class AnnotationParserTest {
 
     @Test
     void testParameterInjection() {
-        manager.executeCommand(new TestCommandSender(), "injected 10").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "injected 10").join();
     }
 
     @Test
@@ -161,8 +160,8 @@ class AnnotationParserTest {
                 this.manager.parserRegistry().getSuggestionProvider("cows").orElse(null);
 
         assertThat(suggestionProvider).isNotNull();
-        assertThat(suggestionProvider.suggestionsFuture(new CommandContext<>(new TestCommandSender(), manager), "").join())
-                .contains(Suggestion.simple("Stella"));
+        assertThat(suggestionProvider.suggestionsFuture(new CommandContext<>(new TestCommandSender(), manager),
+                CommandInput.empty()).join()).contains(Suggestion.simple("Stella"));
     }
 
     @Test
@@ -175,18 +174,19 @@ class AnnotationParserTest {
                 new TestCommandSender(),
                 this.manager
         );
-        assertThat(parser.parse(context, CommandInput.empty()).getParsedValue().orElse(new CustomType("")).toString())
+        assertThat(parser.parse(context, CommandInput.empty()).parsedValue().orElse(new CustomType("")).toString())
                 .isEqualTo("yay");
-        assertThat(parser.suggestionProvider().suggestionsFuture(context, "").join()).contains(Suggestion.simple("Stella"));
+        assertThat(parser.suggestionProvider().suggestionsFuture(context, CommandInput.empty()).join())
+                .contains(Suggestion.simple("Stella"));
     }
 
     @Test
     @SuppressWarnings("unchecked_cast")
     void testMultiAliasedCommands() {
-        final Collection<Command<TestCommandSender>> commands = annotationParser.parse(new AliasedCommands());
+        final Collection<cloud.commandframework.Command<TestCommandSender>> commands = annotationParser.parse(new AliasedCommands());
 
         // Find the root command that we are looking for.
-        for (final Command<TestCommandSender> command : commands) {
+        for (final cloud.commandframework.Command<TestCommandSender> command : commands) {
             if (command.rootComponent().aliases().contains("acommand")) {
                 assertThat(command.rootComponent().aliases()).containsExactly("acommand", "analias", "anotheralias");
 
@@ -199,7 +199,7 @@ class AnnotationParserTest {
 
     @Test
     void testInjectedCommand() {
-        manager.executeCommand(new TestCommandSender(), "injected 10").join();
+        manager.commandExecutor().executeCommand(new TestCommandSender(), "injected 10").join();
     }
 
     @Suggestions("cows")
@@ -213,13 +213,13 @@ class AnnotationParserTest {
     }
 
     @IntegerArgumentInjector
-    @CommandMethod("injected")
+    @Command("injected")
     public void injectedCommand(final CommandContext<TestCommandSender> context) {
         System.out.printf("Got an integer: %d\n", context.<Integer>get("number"));
     }
 
     @ProxiedBy("proxycommand")
-    @CommandMethod("test|t literal <int> [string]")
+    @Command("test|t literal <int> [string]")
     public void testCommand(
             final TestCommandSender sender,
             @Argument("int") @Range(max = "100") final int argument,
@@ -228,7 +228,7 @@ class AnnotationParserTest {
         System.out.printf("Received int: %d and string '%s'\n", argument, string);
     }
 
-    @CommandMethod("flagcommand")
+    @Command("flagcommand")
     public void testFlags(
             final TestCommandSender sender,
             @Flag(value = "print", aliases = "p") final boolean print,
@@ -239,7 +239,7 @@ class AnnotationParserTest {
         }
     }
 
-    @CommandMethod("parserflagcommand")
+    @Command("parserflagcommand")
     public void testQuotedFlags(
             final TestCommandSender sender,
             @Flag(value = "sentence", aliases = "s") @Quoted final String sentence,
@@ -248,29 +248,29 @@ class AnnotationParserTest {
         System.out.println(sentence + (otherStuff == null ? "" : " " + otherStuff));
     }
 
-    @CommandMethod("namedsuggestions <input>")
+    @Command("namedsuggestions <input>")
     public void testNamedSuggestionProviders(
             @Argument(value = "input", suggestions = "some-name") final String argument
     ) {
     }
 
-    @CommandMethod("inject")
+    @Command("inject")
     public void testInjectedParameters(
             final InjectableValue injectableValue
     ) {
         System.out.printf("Injected value: %s\n", injectableValue.toString());
     }
 
-    @CommandMethod("class")
+    @Command("class")
     private static class ClassCommandMethod {
 
-        @CommandMethod("method")
+        @Command("method")
         public void annotatedMethod() {
             System.out.println("kekw");
         }
     }
 
-    @CommandPermission("some.permission")
+    @Permission("some.permission")
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     private @interface AnnotatedAnnotation {
@@ -282,7 +282,7 @@ class AnnotationParserTest {
     @CommandDescription("Hello World!")
     private static class AnnotatedClass {
 
-        @CommandMethod("method")
+        @Command("method")
         @AnnotatedAnnotation
         public static void annotatedMethod() {
         }
@@ -352,15 +352,15 @@ class AnnotationParserTest {
 
         private static final String COMMAND_ALIASES = "acommand|analias|anotheralias";
 
-        @CommandMethod("acommand")
+        @Command("acommand")
         public void commandOne() {
         }
 
-        @CommandMethod(COMMAND_ALIASES + " sub1")
+        @Command(COMMAND_ALIASES + " sub1")
         public void commandTwo() {
         }
 
-        @CommandMethod(COMMAND_ALIASES + " sub2")
+        @Command(COMMAND_ALIASES + " sub2")
         public void commandThree() {
         }
     }

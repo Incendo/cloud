@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,7 +76,7 @@ public final class MinecraftExceptionHandler<C> {
         return ctx -> text("Invalid command syntax. Correct command syntax is: ", NamedTextColor.RED)
                 .append(ComponentHelper.highlight(
                         text(
-                                String.format("/%s", ctx.exception().getCorrectSyntax()),
+                                String.format("/%s", ctx.exception().correctSyntax()),
                                 NamedTextColor.GRAY
                         ),
                         NamedTextColor.WHITE
@@ -95,7 +95,7 @@ public final class MinecraftExceptionHandler<C> {
     public static <C> Function<ExceptionContext<C, InvalidCommandSenderException>, Component> createDefaultInvalidSenderHandler() {
         return ctx -> text("Invalid command sender. You must be of type ", NamedTextColor.RED)
                 .append(text(
-                        ctx.exception().getRequiredSender().getSimpleName(),
+                        ctx.exception().requiredSender().getSimpleName(),
                         NamedTextColor.GRAY
                 ));
     }

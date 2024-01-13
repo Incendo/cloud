@@ -1,5 +1,6 @@
 plugins {
     application
+    id("cloud.base-conventions")
     id("cloud.example-conventions")
     alias(libs.plugins.shadow)
 }

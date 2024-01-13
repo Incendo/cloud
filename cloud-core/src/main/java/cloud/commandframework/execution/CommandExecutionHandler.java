@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -131,6 +131,8 @@ public interface CommandExecutionHandler<C> {
         default void execute(
                 @NonNull CommandContext<C> commandContext
         ) {
+            throw new UnsupportedOperationException(
+                    "execute should not be called on FutureCommandExecutionHandlers, call executeFuture instead.");
         }
 
         @Override

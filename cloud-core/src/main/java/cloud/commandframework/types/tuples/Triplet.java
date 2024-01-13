@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -75,7 +75,7 @@ public class Triplet<U, V, W> implements Tuple {
      *
      * @return First value
      */
-    public final U getFirst() {
+    public final U first() {
         return this.first;
     }
 
@@ -84,7 +84,7 @@ public class Triplet<U, V, W> implements Tuple {
      *
      * @return Second value
      */
-    public final V getSecond() {
+    public final V second() {
         return this.second;
     }
 
@@ -93,7 +93,7 @@ public class Triplet<U, V, W> implements Tuple {
      *
      * @return Third value
      */
-    public final W getThird() {
+    public final W third() {
         return this.third;
     }
 
@@ -102,18 +102,18 @@ public class Triplet<U, V, W> implements Tuple {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
         final Triplet<?, ?, ?> triplet = (Triplet<?, ?, ?>) o;
-        return Objects.equals(this.getFirst(), triplet.getFirst())
-                && Objects.equals(this.getSecond(), triplet.getSecond())
-                && Objects.equals(this.getThird(), triplet.getThird());
+        return Objects.equals(this.first(), triplet.first())
+                && Objects.equals(this.second(), triplet.second())
+                && Objects.equals(this.third(), triplet.third());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(this.getFirst(), this.getSecond(), this.getThird());
+        return Objects.hash(this.first(), this.second(), this.third());
     }
 
     @Override
@@ -122,7 +122,7 @@ public class Triplet<U, V, W> implements Tuple {
     }
 
     @Override
-    public final int getSize() {
+    public final int size() {
         return 3;
     }
 

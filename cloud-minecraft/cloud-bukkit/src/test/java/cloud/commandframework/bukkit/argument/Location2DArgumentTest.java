@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -65,9 +65,9 @@ class Location2DArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue().isPresent()).isTrue();
-        assertThat(result.getParsedValue().get().toVector()).isEqualTo(expectedLocation);
+        assertThat(result.failure()).isEmpty();
+        assertThat(result.parsedValue().isPresent()).isTrue();
+        assertThat(result.parsedValue().get().toVector()).isEqualTo(expectedLocation);
         assertThat(commandInput.remainingInput()).isEmpty();
     }
 
@@ -98,7 +98,7 @@ class Location2DArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isPresent();
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result.failure()).isPresent();
+        assertThat(result.parsedValue()).isEmpty();
     }
 }

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.annotations.injection;
 
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.context.CommandContext;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -31,7 +32,7 @@ import java.lang.annotation.Target;
 
 /**
  * Used to inject {@link CommandContext#rawInput()} into a
- * {@link cloud.commandframework.annotations.CommandMethod}
+ * {@link Command}
  * <p>
  * This should only be used on {@code String[]}
  *

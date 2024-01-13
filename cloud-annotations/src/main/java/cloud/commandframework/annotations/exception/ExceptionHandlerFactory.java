@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.annotations.exception;
 
+import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.exceptions.handling.ExceptionHandler;
 import java.lang.reflect.Method;
 import org.apiguardian.api.API;
@@ -45,9 +46,14 @@ public interface ExceptionHandlerFactory<C> {
     /**
      * Creates an exception handler using the given {@code method}.
      *
-     * @param instance the parsed instance
-     * @param method   the exception handler method
+     * @param instance         parsed instance
+     * @param method           exception handler method
+     * @param injectorRegistry injector registry
      * @return the method handler
      */
-    @NonNull ExceptionHandler<C, Throwable> createExceptionHandler(@NonNull Object instance, @NonNull Method method);
+    @NonNull ExceptionHandler<C, Throwable> createExceptionHandler(
+            @NonNull Object instance,
+            @NonNull Method method,
+            @NonNull ParameterInjectorRegistry<C> injectorRegistry
+    );
 }

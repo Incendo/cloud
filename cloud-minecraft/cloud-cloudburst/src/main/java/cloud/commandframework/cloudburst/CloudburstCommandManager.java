@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,8 @@
 package cloud.commandframework.cloudburst;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.CommandTree;
+import cloud.commandframework.SenderMapper;
+import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -33,10 +34,8 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.exceptions.handling.ExceptionContext;
 import cloud.commandframework.exceptions.handling.ExceptionHandler;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.state.RegistrationState;
-import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.cloudburstmc.server.command.CommandSender;
 import org.cloudburstmc.server.event.EventPriority;
@@ -49,7 +48,7 @@ import org.cloudburstmc.server.plugin.Plugin;
  *
  * @param <C> Command sender type
  */
-public class CloudburstCommandManager<C> extends CommandManager<C> {
+public class CloudburstCommandManager<C> extends CommandManager<C> implements SenderMapperHolder<CommandSender, C> {
 
     private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS =
@@ -57,8 +56,7 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
                     + "Please contact the server administrators if you believe that this is in error.";
     private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
-    private final Function<CommandSender, C> commandSenderMapper;
-    private final Function<C, CommandSender> backwardsCommandSenderMapper;
+    private final SenderMapper<CommandSender, C> senderMapper;
 
     private final Plugin owningPlugin;
 
@@ -67,28 +65,21 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
      *
      * @param owningPlugin                 Plugin that is constructing the manager
      * @param commandExecutionCoordinator  Coordinator provider
-     * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
-     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
+     * @param senderMapper                 Function that maps {@link CommandSender} to the command sender type
      */
     @SuppressWarnings("unchecked")
     public CloudburstCommandManager(
             final @NonNull Plugin owningPlugin,
-            final @NonNull Function<@NonNull CommandTree<C>,
-                    @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
-            final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
+            final @NonNull SenderMapper<CommandSender, C> senderMapper
     ) {
         super(commandExecutionCoordinator, new CloudburstPluginRegistrationHandler<>());
         ((CloudburstPluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
-        this.commandSenderMapper = commandSenderMapper;
-        this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
+        this.senderMapper = senderMapper;
         this.owningPlugin = owningPlugin;
-        this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
-                FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
-        ));
         this.parameterInjectorRegistry().registerInjector(
                 CommandSender.class,
-                (context, annotations) -> this.backwardsCommandSenderMapper.apply(context.sender())
+                (context, annotations) -> this.senderMapper.reverse(context.sender())
         );
 
         // Prevent commands from being registered when the server would reject them anyways
@@ -108,16 +99,12 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
             final @NonNull C sender,
             final @NonNull String permission
     ) {
-        return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
+        return this.senderMapper.reverse(sender).hasPermission(permission);
     }
 
     @Override
     public final boolean isCommandRegistrationAllowed() {
         return this.state() != RegistrationState.AFTER_REGISTRATION;
-    }
-
-    final @NonNull Function<@NonNull CommandSender, @NonNull C> getCommandSenderMapper() {
-        return this.commandSenderMapper;
     }
 
     /**
@@ -157,7 +144,7 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
                 commandSender.sendMessage(throwable.getMessage())
         );
         this.registerHandler(InvalidSyntaxException.class, (commandSender, throwable) ->
-                commandSender.sendMessage("Invalid Command Syntax. Correct command syntax is: /" + throwable.getCorrectSyntax())
+                commandSender.sendMessage("Invalid Command Syntax. Correct command syntax is: /" + throwable.correctSyntax())
         );
     }
 
@@ -166,6 +153,11 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
             final @NonNull CloudburstExceptionHandler<C, T> handler
     ) {
         this.exceptionController().registerHandler(exceptionClass, handler);
+    }
+
+    @Override
+    public final @NonNull SenderMapper<CommandSender, C> senderMapper() {
+        return this.senderMapper;
     }
 
 

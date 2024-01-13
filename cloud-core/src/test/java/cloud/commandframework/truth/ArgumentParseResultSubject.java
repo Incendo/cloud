@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@ import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.OptionalSubject;
 import com.google.common.truth.Subject;
+import com.google.common.truth.ThrowableSubject;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -59,14 +60,14 @@ public final class ArgumentParseResultSubject<T> extends Subject {
         if (this.actual == null) {
             this.failWithActual(Fact.simpleFact("expected to not be null"));
         }
-        return this.check("getParsedValue()").about(OptionalSubject.optionals()).that(this.actual.getParsedValue());
+        return this.check("parsedValue()").about(OptionalSubject.optionals()).that(this.actual.parsedValue());
     }
 
     public @NonNull OptionalSubject failure() {
         if (this.actual == null) {
             this.failWithActual(Fact.simpleFact("expected to not be null"));
         }
-        return this.check("getFailure()").about(OptionalSubject.optionals()).that(this.actual.getFailure());
+        return this.check("failure()").about(OptionalSubject.optionals()).that(this.actual.failure());
     }
 
     public void hasParsedValue(final @NonNull T value) {
@@ -77,5 +78,10 @@ public final class ArgumentParseResultSubject<T> extends Subject {
     public void hasFailure(final @NonNull Throwable throwable) {
         this.failure().hasValue(throwable);
         this.parsedValue().isEmpty();
+    }
+
+    public @NonNull ThrowableSubject hasFailureThat() {
+        this.failure().isPresent();
+        return this.check("failure().get()").that(this.actual.failure().get());
     }
 }

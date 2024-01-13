@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,6 @@ import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.parsers.WorldParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -97,19 +96,13 @@ public final class KeyedWorldParser<C> implements ArgumentParser<C, World>, Sugg
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    KeyedWorldParser.class,
-                    commandContext
-            ));
-        }
-
         if (this.parser != null) {
             return this.parser.parse(commandContext, commandInput);
         }
 
-        final NamespacedKey key = NamespacedKey.fromString(commandInput.readString());
+        final String input = commandInput.readString();
+
+        final NamespacedKey key = NamespacedKey.fromString(input);
         if (key == null) {
             return ArgumentParseResult.failure(new WorldParser.WorldParseException(input, commandContext));
         }
@@ -125,7 +118,7 @@ public final class KeyedWorldParser<C> implements ArgumentParser<C, World>, Sugg
     @Override
     public @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         if (this.parser != null) {
             return this.parser.suggestionProvider().suggestionsFuture(commandContext, input);
@@ -135,7 +128,7 @@ public final class KeyedWorldParser<C> implements ArgumentParser<C, World>, Sugg
         final List<Suggestion> completions = new ArrayList<>(worlds.size() * 2);
         for (final World world : worlds) {
             final NamespacedKey key = world.getKey();
-            if (!input.isEmpty() && key.getNamespace().equals(NamespacedKey.MINECRAFT_NAMESPACE)) {
+            if (input.hasRemainingInput() && key.getNamespace().equals(NamespacedKey.MINECRAFT_NAMESPACE)) {
                 completions.add(Suggestion.simple(key.getKey()));
             }
             completions.add(Suggestion.simple(key.getNamespace() + ':' + key.getKey()));

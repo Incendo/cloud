@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,11 @@ package cloud.commandframework.annotations.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.annotations.ParameterNameExtractor;
-import cloud.commandframework.annotations.StandardArgumentExtractor;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
+import cloud.commandframework.annotations.extractor.ParameterNameExtractor;
+import cloud.commandframework.annotations.extractor.StandardArgumentExtractor;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandResult;
 import com.google.common.base.CaseFormat;
@@ -64,9 +64,9 @@ class ArgumentWithoutAnnotationTest {
         this.annotationParser.parse(new TestClass());
 
         // Assert
-        final CommandResult<?> result = this.commandManager.executeCommand(new TestCommandSender(),
+        final CommandResult<?> result = this.commandManager.commandExecutor().executeCommand(new TestCommandSender(),
                 "command abc 123 true").join();
-        final CommandContext<?> context = result.getCommandContext();
+        final CommandContext<?> context = result.commandContext();
         assertThat(context.<String>get("required")).isEqualTo("abc");
         assertThat(context.<Integer>get("optional")).isEqualTo(123);
         assertThat(context.<Boolean>get("optional_but_weird")).isEqualTo(true);
@@ -74,7 +74,7 @@ class ArgumentWithoutAnnotationTest {
 
     static class TestClass {
 
-        @CommandMethod("command <required> [optional] [optional_but_weird]")
+        @Command("command <required> [optional] [optional_but_weird]")
         public void command(TestCommandSender sender, String required, int optional, boolean optionalButWeird) {
         }
     }

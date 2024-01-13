@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,13 +50,13 @@ class Issue321 {
         );
 
         // Act
-        final CommandResult<TestCommandSender> result = commandManager.executeCommand(
+        final CommandResult<TestCommandSender> result = commandManager.commandExecutor().executeCommand(
                 new TestCommandSender(),
                 "command --flag1 one two three --flag2 1 2 3"
         ).join();
 
         // Assert
-        final CommandContext<TestCommandSender> context = result.getCommandContext();
+        final CommandContext<TestCommandSender> context = result.commandContext();
         final FlagContext flags = context.flags();
 
         assertThat(flags.<String[]>getValue("flag1")).hasValue(new String[]{"one", "two", "three"});

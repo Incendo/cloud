@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,8 @@
 package cloud.commandframework.fabric;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.CommandTree;
+import cloud.commandframework.SenderMapper;
+import cloud.commandframework.SenderMapperHolder;
 import cloud.commandframework.arguments.standard.UUIDParser;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
@@ -38,9 +39,7 @@ import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
 import cloud.commandframework.fabric.argument.RegistryEntryParser;
 import cloud.commandframework.fabric.argument.TeamParser;
@@ -103,6 +102,7 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -120,7 +120,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 1.5.0
  */
 public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider> extends CommandManager<C> implements
-        BrigadierManagerHolder<C> {
+        BrigadierManagerHolder<C, S>, SenderMapperHolder<S, C> {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int MOD_PUBLIC_STATIC_FINAL = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
@@ -133,8 +133,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
     private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
 
-    private final Function<S, C> commandSourceMapper;
-    private final Function<C, S> backwardsCommandSourceMapper;
+    private final SenderMapper<S, C> senderMapper;
     private final CloudBrigadierManager<C, S> brigadierManager;
     private final SuggestionFactory<C, ? extends TooltipSuggestion> suggestionFactory;
     private final FabricExceptionHandlerFactory<C, S> exceptionHandlerFactory = new FabricExceptionHandlerFactory<>(this);
@@ -149,25 +148,23 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
      *                                     when the parsers used in that particular platform are not thread safe. If you have
      *                                     commands that perform blocking operations, however, it might not be a good idea to
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
-     *                                     {@link AsynchronousCommandExecutionCoordinator}
-     * @param commandSourceMapper          Function that maps {@link SharedSuggestionProvider} to the command sender type
-     * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link SharedSuggestionProvider}
+     *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
+     *                                     {@link ExecutionCoordinator#asyncCoordinator()}
+     * @param senderMapper                 Function that maps {@link SharedSuggestionProvider} to the command sender type
      * @param registrationHandler          the handler accepting command registrations
      * @param dummyCommandSourceProvider   a provider of a dummy command source, for use with brigadier registration
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @SuppressWarnings("unchecked")
     FabricCommandManager(
-            final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-            final @NonNull Function<S, C> commandSourceMapper,
-            final @NonNull Function<C, S> backwardsCommandSourceMapper,
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
+            final @NonNull SenderMapper<S, C> senderMapper,
             final @NonNull FabricCommandRegistrationHandler<C, S> registrationHandler,
             final @NonNull Supplier<S> dummyCommandSourceProvider
     ) {
         super(commandExecutionCoordinator, registrationHandler);
-        this.commandSourceMapper = commandSourceMapper;
-        this.backwardsCommandSourceMapper = backwardsCommandSourceMapper;
+        this.senderMapper = senderMapper;
         this.suggestionFactory = super.suggestionFactory().mapped(TooltipSuggestion::tooltipSuggestion);
 
         // We're always brigadier
@@ -176,20 +173,15 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
                 () -> new CommandContext<>(
                         // This looks ugly, but it's what the server does when loading datapack functions in 1.16+
                         // See net.minecraft.server.function.FunctionLoader.reload for reference
-                        this.commandSourceMapper.apply(dummyCommandSourceProvider.get()),
+                        this.senderMapper.map(dummyCommandSourceProvider.get()),
                         this
                 ),
-                this.suggestionFactory()
+                this.senderMapper
         );
 
-        this.brigadierManager.backwardsBrigadierSenderMapper(this.backwardsCommandSourceMapper);
-        this.brigadierManager.brigadierSenderMapper(this.commandSourceMapper);
         this.registerNativeBrigadierMappings(this.brigadierManager);
         this.captionRegistry(new FabricCaptionRegistry<>());
         this.registerCommandPreProcessor(new FabricCommandPreprocessor<>(this));
-        this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
-                FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
-        ));
 
         ((FabricCommandRegistrationHandler<C, S>) this.commandRegistrationHandler()).initialize(this);
     }
@@ -340,14 +332,9 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         this.parserRegistry().registerParserSupplier(type, params -> new WrappedBrigadierParser<>(argument));
     }
 
-    /**
-     * Gets the mapper from a game {@link SharedSuggestionProvider} to the manager's {@code C} type.
-     *
-     * @return Command source mapper
-     * @since 1.5.0
-     */
-    public final @NonNull Function<@NonNull S, @NonNull C> commandSourceMapper() {
-        return this.commandSourceMapper;
+    @Override
+    public final @NonNull SenderMapper<S, C> senderMapper() {
+        return this.senderMapper;
     }
 
     @Override
@@ -356,15 +343,27 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
     }
 
     /**
-     * Gets the mapper from the manager's {@code C} type to a game {@link SharedSuggestionProvider}.
+     * {@inheritDoc}
      *
-     * @return Command source mapper
-     * @since 1.5.0
+     * <p>This will always return true for {@link FabricCommandManager}s.</p>
+     *
+     * @return {@code true}
+     * @since 2.0.0
      */
-    public final @NonNull Function<@NonNull C, @NonNull S> backwardsCommandSourceMapper() {
-        return this.backwardsCommandSourceMapper;
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    @Override
+    public final boolean hasBrigadierManager() {
+        return true;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>{@link FabricCommandManager}s always use Brigadier for registration, so the aforementioned check is not needed.</p>
+     *
+     * @return {@inheritDoc}
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     @Override
     public final @NonNull CloudBrigadierManager<C, S> brigadierManager() {
         return this.brigadierManager;
@@ -395,7 +394,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
 
             @Override
             public boolean hasPermission(final @NonNull C sender) {
-                return FabricCommandManager.this.backwardsCommandSourceMapper().apply(sender).hasPermission(permissionLevel);
+                return FabricCommandManager.this.senderMapper().reverse(sender).hasPermission(permissionLevel);
             }
         };
     }
@@ -455,7 +454,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
                 (source, sender, throwable) -> sendError.accept(
                         source,
                         Component.literal("Invalid Command Syntax. Correct command syntax is: ")
-                                .append(Component.literal(String.format("/%s", throwable.getCorrectSyntax()))
+                                .append(Component.literal(String.format("/%s", throwable.correctSyntax()))
                                         .withStyle(style -> style.withColor(ChatFormatting.GRAY)))
                 )
         ));

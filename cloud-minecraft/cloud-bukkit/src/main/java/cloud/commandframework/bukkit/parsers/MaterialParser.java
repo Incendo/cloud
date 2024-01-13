@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,6 @@ import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.Arrays;
 import java.util.Locale;
@@ -73,13 +72,6 @@ public final class MaterialParser<C> implements ArgumentParser<C, Material>, Blo
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        if (commandInput.peekString().isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    MaterialParser.class,
-                    commandContext
-            ));
-        }
-
         final String input = commandInput.readString();
         try {
             final Material material = Material.valueOf(input.toUpperCase(Locale.ROOT));
@@ -92,7 +84,7 @@ public final class MaterialParser<C> implements ArgumentParser<C, Material>, Blo
     @Override
     public @NonNull Iterable<@NonNull Suggestion> suggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         return Arrays.stream(Material.values())
                 .map(Material::name)
@@ -104,7 +96,6 @@ public final class MaterialParser<C> implements ArgumentParser<C, Material>, Blo
 
     public static final class MaterialParseException extends ParserException {
 
-        private static final long serialVersionUID = 1615554107385965610L;
         private final String input;
 
         /**

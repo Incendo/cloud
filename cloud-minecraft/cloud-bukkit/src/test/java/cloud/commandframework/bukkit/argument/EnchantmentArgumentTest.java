@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -87,8 +87,8 @@ class EnchantmentArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(enchantment);
+        assertThat(result.failure()).isEmpty();
+        assertThat(result.parsedValue()).hasValue(enchantment);
         assertThat(commandInput.remainingInput()).isEmpty();
     }
 
@@ -113,7 +113,7 @@ class EnchantmentArgumentTest extends ServerTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).isPresent();
-        assertThat(result.getParsedValue()).isEmpty();
+        assertThat(result.failure()).isPresent();
+        assertThat(result.parsedValue()).isEmpty();
     }
 }

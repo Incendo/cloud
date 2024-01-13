@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ package cloud.commandframework.arguments.compound;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
 import cloud.commandframework.arguments.aggregate.AggregateResultMapper;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.types.tuples.Tuple;
 import io.leangen.geantyref.TypeToken;
@@ -79,7 +80,9 @@ public final class CompoundParser<T extends Tuple, C, O> implements AggregateCom
         return (commandContext, context) -> {
             final Object[] values = this.components.stream().map(CommandComponent::name).map(context::get).toArray();
             final T tuple = this.tupleFactory.apply(values);
-            return CompletableFuture.completedFuture(this.mapper.apply(commandContext.sender(), tuple));
+            return CompletableFuture.completedFuture(
+                    ArgumentParseResult.success(this.mapper.apply(commandContext.sender(), tuple))
+            );
         };
     }
 

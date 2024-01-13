@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -102,7 +102,7 @@ class StringArrayParserTest {
 
         // Assert
         assertThat(result).hasParsedValue(new String[] { "this", "is", "a", "string" });
-        assertThat(commandInput.remainingInput()).isEqualTo("--flag more flag content");
+        assertThat(commandInput.remainingInput()).isEqualTo(" --flag more flag content");
     }
 
     @Test
@@ -128,6 +128,6 @@ class StringArrayParserTest {
 
         // Assert
         assertThat(result).hasParsedValue(new String[] { "this", "is", "a", "string" });
-        assertThat(commandInput.remainingInput()).isEqualTo("-f -l -a -g");
+        assertThat(commandInput.remainingInput()).isEqualTo(" -f -l -a -g");
     }
 }

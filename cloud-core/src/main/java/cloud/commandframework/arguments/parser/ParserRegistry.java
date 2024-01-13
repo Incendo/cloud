@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,81 +28,114 @@ import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
- * Registry of {@link ArgumentParser} that allows these arguments to be
- * referenced by a {@link Class} (or really, a {@link TypeToken})
- * or a {@link String} key
+ * Registry that allows {@link ArgumentParser parsers} to be referenced by the type of the values they produce, or by their names.
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.STABLE)
 public interface ParserRegistry<C> {
 
     /**
-     * Register a parser supplier
+     * Registers the given {@code supplier} as the default parser supplier for the given {@code type}.
      *
-     * @param type     The type that is parsed by the parser
-     * @param supplier The function that generates the parser. The map supplied my contain parameters used
-     *                 to configure the parser, many of which are documented in {@link StandardParameters}
-     * @param <T>      Generic type specifying what is produced by the parser
+     * @param type     type that is parsed by the parser
+     * @param supplier function that generates the parser
+     * @param <T>      generic type specifying what is produced by the parser
+     * @return {@code this}
      */
-    <T> void registerParserSupplier(
+    <T> @This ParserRegistry<C> registerParserSupplier(
             @NonNull TypeToken<T> type,
             @NonNull Function<@NonNull ParserParameters, @NonNull ArgumentParser<C, ?>> supplier
     );
 
     /**
-     * Register a named parser supplier
+     * Registers the parser described by the given {@code descriptor}.
      *
-     * @param name     Parser name
-     * @param supplier The function that generates the parser. The map supplied my contain parameters used
-     *                 to configure the parser, many of which are documented in {@link StandardParameters}
+     * <p>This does not allow for customization of the parser using parser parameters. If the parser has options then it is
+     * recommended to use {@link #registerParserSupplier(TypeToken, Function)} instead.</p>
+     *
+     * @param descriptor parser descriptor
+     * @param <T>        type produced by the parser
+     * @return {@code this}
+     * @since 2.0.0
      */
-    void registerNamedParserSupplier(
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    default <T> @This ParserRegistry<C> registerParser(final @NonNull ParserDescriptor<C, T> descriptor) {
+        return this.registerParserSupplier(descriptor.valueType(), parameters -> descriptor.parser());
+    }
+
+    /**
+     * Registers a named parser supplier.
+     *
+     * <p>The named parser will only be created if referenced by name using {@link #createParser(String, ParserParameters)}.
+     * Only unnamed parsers may be referenced by their value types.</p>
+     *
+     * @param name     parser name
+     * @param supplier the function that generates the parser
+     * @return {@code this}
+     */
+    @This ParserRegistry<C> registerNamedParserSupplier(
             @NonNull String name,
             @NonNull Function<@NonNull ParserParameters, @NonNull ArgumentParser<C, ?>> supplier
     );
 
     /**
-     * Register a mapper that maps annotation instances to a map of parameter-object pairs
+     * Registers a named parser supplier.
      *
-     * @param annotation Annotation class
-     * @param mapper     Mapper that maps the pair (annotation, type to be parsed) to a map of
-     *                   {@link ParserParameter parameter}-{@link Object object} pairs
-     * @param <A>        Annotation type
-     * @param <T>        Type of the object that the parser is retrieved for
+     * <p>This does not allow for customization of the parser using parser parameters. If the parser has options then it is
+     * recommended to use {@link #registerNamedParserSupplier(String, Function)} instead.</p>
+     *
+     * @param name       parser name
+     * @param descriptor parser descriptor
+     * @return {@code this}
      */
-    <A extends Annotation, T> void registerAnnotationMapper(
+    default @This ParserRegistry<C> registerNamedParser(
+            @NonNull String name,
+            @NonNull ParserDescriptor<C, ?> descriptor
+    ) {
+        return this.registerNamedParserSupplier(name, parameters -> descriptor.parser());
+    }
+
+    /**
+     * Registers a mapper that maps annotation instances to a map of parameter-object pairs.
+     *
+     * @param annotation annotation class
+     * @param mapper     mapper that maps the pair (annotation, type to be parsed) to a map of
+     *                   {@link ParserParameter parameter}-{@link Object object} pairs
+     * @param <A>        annotation type
+     * @return {@code this}
+     */
+    <A extends Annotation> @This ParserRegistry<C> registerAnnotationMapper(
             @NonNull Class<A> annotation,
-            @NonNull BiFunction<@NonNull A, @NonNull TypeToken<?>,
-                    @NonNull ParserParameters> mapper
+            @NonNull AnnotationMapper<A> mapper
     );
 
     /**
-     * Parse annotations into {@link ParserParameters}
+     * Parses the given {@code annotations} into {@link ParserParameters}.
      *
-     * @param parsingType The type that is produced by the parser that is requesting the parsing parameters
-     * @param annotations The annotations to be parsed
-     * @return Parsed parameters
+     * @param parsingType the type that is produced by the parser that is requesting the parsing parameters
+     * @param annotations annotations to be parsed
+     * @return the parsed parameters
      */
     @NonNull ParserParameters parseAnnotations(
             @NonNull TypeToken<?> parsingType,
-            @NonNull Collection<? extends Annotation> annotations
+            @NonNull Collection<@NonNull ? extends Annotation> annotations
     );
 
     /**
-     * Attempt to create a {@link ArgumentParser} for a specified type, using
-     * an instance of {@link ParserParameter} to configure the parser settings
+     * Attempts to create an instance of the default {@link ArgumentParser} for the given {@code type} using an instance of
+     * {@link ParserParameter} to configure the parser settings.
      *
-     * @param type             Type that should be produced by the parser
-     * @param parserParameters Parser parameters
-     * @param <T>              Generic type
-     * @return Parser, if one can be created
+     * @param type             type of values produced by the parser
+     * @param parserParameters parser parameters
+     * @param <T>              type of values produced by the parser
+     * @return the parser, if one could be created
      */
     <T> @NonNull Optional<ArgumentParser<C, T>> createParser(
             @NonNull TypeToken<T> type,
@@ -110,13 +143,13 @@ public interface ParserRegistry<C> {
     );
 
     /**
-     * Attempt to create a {@link ArgumentParser} for a specified type, using
-     * an instance of {@link ParserParameter} to configure the parser settings
+     * Attempts to create an instance of the parser {@link ArgumentParser} with the given {@code name} using an instance of
+     * {@link ParserParameter} to configure the parser settings.
      *
-     * @param name             Parser
-     * @param parserParameters Parser parameters
-     * @param <T>              Generic type
-     * @return Parser, if one can be created
+     * @param name             name of the parser
+     * @param parserParameters parser parameters
+     * @param <T>              type of values produced by the parser
+     * @return the parser, if one could be created
      */
     <T> @NonNull Optional<ArgumentParser<C, T>> createParser(
             @NonNull String name,
@@ -124,30 +157,40 @@ public interface ParserRegistry<C> {
     );
 
     /**
-     * Register a new named suggestion provider
+     * Registers a new named suggestion providers.
      *
-     * @param name               Name of the suggestion provider. The name is case independent.
-     * @param suggestionProvider The suggestion provider
+     * @param name               name of the suggestion provider. The name is case independent.
+     * @param suggestionProvider the suggestion provider
      * @see #getSuggestionProvider(String) Get a suggestion provider
-     * @since 1.1.0
+     * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    void registerSuggestionProvider(
-            @NonNull String name,
-            @NonNull SuggestionProvider<C> suggestionProvider
-    );
+    void registerSuggestionProvider(@NonNull String name, @NonNull SuggestionProvider<C> suggestionProvider);
 
     /**
-     * Get a named suggestion provider, if a suggestion provider with the given name exists in the registry
+     * Returns a named suggestion provider, if it exists.
      *
-     * @param name Suggestion provider name. The name is case independent.
-     * @return Optional that either contains the suggestion provider, or is empty if no
+     * @param name case-independent suggestion provider name
+     * @return optional that either contains the suggestion provider, or is empty if no
      *         suggestion provider is registered with the given name
      * @see #registerSuggestionProvider(String, SuggestionProvider) Register a suggestion provider
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    @NonNull Optional<SuggestionProvider<C>> getSuggestionProvider(
-            @NonNull String name
-    );
+    @NonNull Optional<SuggestionProvider<C>> getSuggestionProvider(@NonNull String name);
+
+
+    @FunctionalInterface
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    interface AnnotationMapper<A extends Annotation> {
+
+        /**
+         * Returns the {@link ParserParameters parser parameters} that correspond to the given {@code annotation}.
+         *
+         * @param annotation annotation instance
+         * @param parsedType type produced by the parser that is being constructed
+         * @return the parameters
+         */
+        @NonNull ParserParameters mapAnnotation(@NonNull A annotation, @NonNull TypeToken<?> parsedType);
+    }
 }

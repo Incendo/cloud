@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -60,12 +60,12 @@ final class CommandPerformanceTest {
 
     @Test
     void testLiterals() {
-        final CommandResult<TestCommandSender> result = manager.executeCommand(new TestCommandSender(), literalChain).join();
+        final CommandResult<TestCommandSender> result = manager.commandExecutor().executeCommand(new TestCommandSender(), literalChain).join();
 
         long elapsedTime = 0L;
         int amount = 0;
         for (int i = 0; i < 100000; i++) {
-            for (final ParsingContext<?> parsingContext : result.getCommandContext().parsingContexts()) {
+            for (final ParsingContext<?> parsingContext : result.commandContext().parsingContexts()) {
                 elapsedTime += parsingContext.parseDuration().toNanos();
                 amount += 1;
             }

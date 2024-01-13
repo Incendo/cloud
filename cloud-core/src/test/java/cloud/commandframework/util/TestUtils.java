@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,10 @@
 package cloud.commandframework.util;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.CommandMeta;
-import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.mockito.Mockito;
 
@@ -54,7 +52,7 @@ public final class TestUtils {
 
         @SuppressWarnings("unused") // mocked via mockito
         protected TestCommandSenderCommandManager(
-                final @NonNull Function<@NonNull CommandTree<TestCommandSender>, @NonNull CommandExecutionCoordinator<TestCommandSender>> commandExecutionCoordinator,
+                final @NonNull ExecutionCoordinator<TestCommandSender> commandExecutionCoordinator,
                 final @NonNull CommandRegistrationHandler<TestCommandSender> commandRegistrationHandler
         ) {
             super(commandExecutionCoordinator, commandRegistrationHandler);
@@ -70,7 +68,7 @@ public final class TestUtils {
         final CommandManager<TestCommandSender> manager = mock(
                 TestCommandSenderCommandManager.class,
                 withSettings().useConstructor(
-                        CommandExecutionCoordinator.simpleCoordinator(),
+                        ExecutionCoordinator.simpleCoordinator(),
                         CommandRegistrationHandler.nullCommandRegistrationHandler()
                 ).defaultAnswer(Mockito.CALLS_REAL_METHODS)
         );

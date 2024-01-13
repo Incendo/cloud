@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import java.util.concurrent.CompletionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -52,13 +53,14 @@ class Issue337 {
         // Act
         final CompletionException exception = Assertions.assertThrows(
                 CompletionException.class,
-                () -> commandTree.parse(new CommandContext<>(commandSender, commandManager), commandInput).join()
+                () -> commandTree.parse(new CommandContext<>(commandSender, commandManager), commandInput,
+                        ExecutionCoordinator.nonSchedulingExecutor()).join()
         );
 
         // Assert
         assertThat(exception).hasCauseThat().isInstanceOf(NoSuchCommandException.class);
         final NoSuchCommandException noSuchCommandException = (NoSuchCommandException) exception.getCause();
-        assertThat(noSuchCommandException.getSuppliedCommand()).isEqualTo("test");
+        assertThat(noSuchCommandException.suppliedCommand()).isEqualTo("test");
         assertThat(noSuchCommandException).hasCauseThat().isNull();
     }
 }

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@ import cloud.commandframework.execution.CommandResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.arguments.standard.StringParser.greedyStringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
@@ -55,16 +54,16 @@ class ParsingContextTest {
         final String commandInput = "t 1337 roflmao xd";
 
         // Act
-        final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(
+        final CommandResult<TestCommandSender> result = this.commandManager.commandExecutor().executeCommand(
                 new TestCommandSender(),
                 commandInput
         ).get();
 
         // Assert
-        final CommandContext<TestCommandSender> context = result.getCommandContext();
-        assertThat(context.parsingContext("test").consumedInput()).containsExactly("t");
-        assertThat(context.parsingContext("int").consumedInput()).containsExactly("1337");
-        assertThat(context.parsingContext("string").consumedInput()).containsExactly("roflmao", "xd");
+        final CommandContext<TestCommandSender> context = result.commandContext();
+        assertThat(context.parsingContext("test").consumedInput()).isEqualTo("t");
+        assertThat(context.parsingContext("int").consumedInput()).isEqualTo("1337");
+        assertThat(context.parsingContext("string").consumedInput()).isEqualTo("roflmao xd");
     }
 
     @Test
@@ -78,13 +77,13 @@ class ParsingContextTest {
         final String commandInput = "t f bar";
 
         // Act
-        final CommandResult<TestCommandSender> result = this.commandManager.executeCommand(
+        final CommandResult<TestCommandSender> result = this.commandManager.commandExecutor().executeCommand(
                 new TestCommandSender(),
                 commandInput
         ).get();
 
         // Assert
-        final CommandContext<TestCommandSender> context = result.getCommandContext();
+        final CommandContext<TestCommandSender> context = result.commandContext();
         assertThat(context.parsingContext("test").exactAlias()).isEqualTo("t");
         assertThat(context.parsingContext("foo").exactAlias()).isEqualTo("f");
         assertThat(context.parsingContext("bar").exactAlias()).isEqualTo("bar");

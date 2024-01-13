@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,6 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.types.tuples.Pair;
 import java.util.Arrays;
@@ -112,27 +111,21 @@ public final class TextColorParser<C> implements ArgumentParser<C, TextColor>, B
             final @NonNull CommandInput commandInput
     ) {
         final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    TextColorParser.class,
-                    commandContext
-            ));
-        }
         if (LEGACY_PREDICATE.matcher(input).matches()) {
             commandInput.moveCursor(1);
             final char code = Character.toLowerCase(commandInput.read());
             for (final Pair<Character, NamedTextColor> pair : COLORS) {
-                if (pair.getFirst() == code) {
-                    return ArgumentParseResult.success(pair.getSecond());
+                if (pair.first() == code) {
+                    return ArgumentParseResult.success(pair.second());
                 }
             }
             // If we didn't match the input, we move back.
             commandInput.moveCursor(-2);
         }
         for (final Pair<Character, NamedTextColor> pair : COLORS) {
-            if (pair.getSecond().toString().equalsIgnoreCase(commandInput.peekString())) {
+            if (pair.second().toString().equalsIgnoreCase(commandInput.peekString())) {
                 commandInput.readString();
-                return ArgumentParseResult.success(pair.getSecond());
+                return ArgumentParseResult.success(pair.second());
             }
         }
         if (HEX_PREDICATE.matcher(commandInput.peekString()).matches()) {
@@ -146,17 +139,18 @@ public final class TextColorParser<C> implements ArgumentParser<C, TextColor>, B
 
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
-            final @NonNull CommandContext<C> commandContext, final @NonNull String input
+            final @NonNull CommandContext<C> commandContext, final @NonNull CommandInput input
     ) {
         final List<String> suggestions = new LinkedList<>();
-        if (input.isEmpty() || input.equals("#") || (HEX_PREDICATE.matcher(input).matches()
-                && input.length() < (input.startsWith("#") ? 7 : 6))) {
+        final String token = input.readString();
+        if (token.isEmpty() || token.equals("#") || (HEX_PREDICATE.matcher(token).matches()
+                && token.length() < (token.startsWith("#") ? 7 : 6))) {
             for (char c = 'a'; c <= 'f'; c++) {
-                suggestions.add(String.format("%s%c", input, c));
+                suggestions.add(String.format("%s%c", token, c));
                 suggestions.add(String.format("&%c", c));
             }
             for (char c = '0'; c <= '9'; c++) {
-                suggestions.add(String.format("%s%c", input, c));
+                suggestions.add(String.format("%s%c", token, c));
                 suggestions.add(String.format("&%c", c));
             }
         }
@@ -167,7 +161,6 @@ public final class TextColorParser<C> implements ArgumentParser<C, TextColor>, B
 
     private static final class TextColorParseException extends ParserException {
 
-        private static final long serialVersionUID = -6236625328843879518L;
 
         private TextColorParseException(
                 final @NonNull CommandContext<?> commandContext,

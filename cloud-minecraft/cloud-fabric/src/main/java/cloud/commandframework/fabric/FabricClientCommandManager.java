@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,16 +23,15 @@
 //
 package cloud.commandframework.fabric;
 
-import cloud.commandframework.CommandTree;
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.SenderMapper;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.permission.PredicatePermission;
-import java.util.function.Function;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -52,14 +51,14 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      *
      * @param execCoordinator Execution coordinator instance.
      * @return a new command manager
-     * @see #FabricClientCommandManager(Function, Function, Function) for a more thorough explanation
+     * @see #FabricClientCommandManager(ExecutionCoordinator, SenderMapper) for a more thorough explanation
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public static @NonNull FabricClientCommandManager<@NonNull FabricClientCommandSource> createNative(
-            final @NonNull Function<@NonNull CommandTree<@NonNull FabricClientCommandSource>,
-                    @NonNull CommandExecutionCoordinator<@NonNull FabricClientCommandSource>> execCoordinator
+            final @NonNull ExecutionCoordinator<FabricClientCommandSource> execCoordinator
     ) {
-        return new FabricClientCommandManager<>(execCoordinator, Function.identity(), Function.identity());
+        return new FabricClientCommandManager<>(execCoordinator, SenderMapper.identity());
     }
 
     /**
@@ -71,22 +70,19 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      *                                     when the parsers used in that particular platform are not thread safe. If you have
      *                                     commands that perform blocking operations, however, it might not be a good idea to
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
-     *                                     {@link AsynchronousCommandExecutionCoordinator}
-     * @param commandSourceMapper          Function that maps {@link FabricClientCommandSource} to the command sender type
-     * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link FabricClientCommandSource}
+     *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
+     *                                     {@link ExecutionCoordinator#asyncCoordinator()}
+     * @param senderMapper                 Function that maps {@link FabricClientCommandSource} to the command sender type
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public FabricClientCommandManager(
-            final @NonNull Function<@NonNull CommandTree<@NonNull C>,
-                    @NonNull CommandExecutionCoordinator<@NonNull C>> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull FabricClientCommandSource, @NonNull C> commandSourceMapper,
-            final @NonNull Function<@NonNull C, @NonNull FabricClientCommandSource> backwardsCommandSourceMapper
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
+            final @NonNull SenderMapper<FabricClientCommandSource, C> senderMapper
     ) {
         super(
                 commandExecutionCoordinator,
-                commandSourceMapper,
-                backwardsCommandSourceMapper,
+                senderMapper,
                 new FabricCommandRegistrationHandler.Client<>(),
                 () -> (FabricClientCommandSource) new ClientSuggestionProvider(
                         Minecraft.getInstance().getConnection(),

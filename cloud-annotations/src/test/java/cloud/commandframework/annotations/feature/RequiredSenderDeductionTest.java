@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,8 @@ package cloud.commandframework.annotations.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.annotations.Command;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import io.leangen.geantyref.TypeToken;
 import java.util.concurrent.CompletionException;
@@ -43,7 +43,7 @@ class RequiredSenderDeductionTest {
     @BeforeEach
     void setup() {
         this.commandManager = new CommandManager<SuperSender<?>>(
-                CommandExecutionCoordinator.simpleCoordinator(),
+                ExecutionCoordinator.simpleCoordinator(),
                 CommandRegistrationHandler.nullCommandRegistrationHandler()
         ) {
             @Override
@@ -68,7 +68,7 @@ class RequiredSenderDeductionTest {
         final SuperSender<?> sender = new StringSender();
 
         // Act
-        this.commandManager.executeCommand(sender, "teststring").join();
+        this.commandManager.commandExecutor().executeCommand(sender, "teststring").join();
     }
 
     @Test
@@ -79,14 +79,14 @@ class RequiredSenderDeductionTest {
         // Act
         assertThrows(
                 CompletionException.class,
-                () -> this.commandManager.executeCommand(sender, "teststring").join()
+                () -> this.commandManager.commandExecutor().executeCommand(sender, "teststring").join()
         );
     }
 
 
     private static class TestClassA {
 
-        @CommandMethod("teststring")
+        @Command("teststring")
         public void command(final StringSender sender) {
         }
     }

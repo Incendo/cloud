@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -79,9 +79,8 @@ final class SelectorUtils {
         if (CraftBukkitReflection.MAJOR_REVISION < 13) {
             return null;
         }
-        final ArgumentParser<C, Object> wrappedBrigParser = new WrappedBrigadierParser<>(
+        final WrappedBrigadierParser<C, Object> wrappedBrigParser = new WrappedBrigadierParser<>(
                 () -> createEntityArgument(single, playersOnly),
-                ArgumentParser.DEFAULT_ARGUMENT_COUNT,
                 EntityArgumentParseFunction.INSTANCE
         );
         return new ModernSelectorParser<>(wrappedBrigParser, mapper);
@@ -167,25 +166,25 @@ final class SelectorUtils {
             this.modernParser = createModernParser(single, playersOnly, this);
         }
 
-        protected CompletableFuture<T> legacyParse(
+        protected CompletableFuture<ArgumentParseResult<T>> legacyParse(
                 final CommandContext<C> commandContext,
                 final CommandInput commandInput
         ) {
-            return ArgumentParseResult.<T>failure(new SelectorUnsupportedException(
+            return ArgumentParseResult.failureFuture(new SelectorUnsupportedException(
                     commandContext,
                     this.getClass()
-            )).asFuture();
+            ));
         }
 
         protected @NonNull Iterable<@NonNull Suggestion> legacySuggestions(
                 final CommandContext<C> commandContext,
-                final String input
+                final CommandInput input
         ) {
             return Collections.emptyList();
         }
 
         @Override
-        public CompletableFuture<T> parseFuture(
+        public CompletableFuture<ArgumentParseResult<T>> parseFuture(
                 final CommandContext<C> commandContext,
                 final CommandInput commandInput
         ) {
@@ -198,10 +197,10 @@ final class SelectorUtils {
         @Override
         public CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull String input
+                final @NonNull CommandInput input
         ) {
             if (this.modernParser != null) {
-                this.modernParser.suggestionProvider().suggestionsFuture(commandContext, input);
+                return this.modernParser.suggestionProvider().suggestionsFuture(commandContext, input);
             }
             return CompletableFuture.completedFuture(this.legacySuggestions(commandContext, input));
         }
@@ -249,7 +248,7 @@ final class SelectorUtils {
         @Override
         protected @NonNull Iterable<@NonNull Suggestion> legacySuggestions(
                 final CommandContext<C> commandContext,
-                final String input
+                final CommandInput input
         ) {
             final List<Suggestion> suggestions = new ArrayList<>();
 
@@ -267,11 +266,11 @@ final class SelectorUtils {
 
     private static class ModernSelectorParser<C, T> implements ArgumentParser.FutureArgumentParser<C, T>, SuggestionProvider<C> {
 
-        private final ArgumentParser<C, Object> wrappedBrigadierParser;
+        private final WrappedBrigadierParser<C, Object> wrappedBrigadierParser;
         private final SelectorMapper<T> mapper;
 
         ModernSelectorParser(
-                final ArgumentParser<C, Object> wrapperBrigParser,
+                final WrappedBrigadierParser<C, Object> wrapperBrigParser,
                 final SelectorMapper<T> mapper
         ) {
             this.wrappedBrigadierParser = wrapperBrigParser;
@@ -279,31 +278,37 @@ final class SelectorUtils {
         }
 
         @Override
-        public CompletableFuture<T> parseFuture(
+        @SuppressWarnings("unchecked")
+        public CompletableFuture<ArgumentParseResult<T>> parseFuture(
                 final CommandContext<C> commandContext,
                 final CommandInput commandInput
         ) {
-            final CommandInput originalCommandInput = commandInput.copy();
-            return this.wrappedBrigadierParser.parseFuture(commandContext, commandInput)
-                    .thenCompose(result -> {
-                        final CompletableFuture<T> future = new CompletableFuture<>();
-                        try {
-                            final String input = originalCommandInput.difference(commandInput);
-                            future.complete(this.mapper.mapResult(input, new EntitySelectorWrapper(commandContext, result)));
-                        } catch (final CommandSyntaxException ex) {
-                            commandInput.cursor(originalCommandInput.cursor());
-                            future.completeExceptionally(ex);
-                        } catch (final Exception ex) {
-                            future.completeExceptionally(ex);
-                        }
-                        return future;
-                    });
+            return CompletableFuture.supplyAsync(() -> {
+                final CommandInput originalCommandInput = commandInput.copy();
+                final ArgumentParseResult<Object> result = this.wrappedBrigadierParser.parse(
+                        commandContext,
+                        commandInput
+                );
+                if (result.failure().isPresent()) {
+                    return (ArgumentParseResult<T>) result;
+                }
+                final String input = originalCommandInput.difference(commandInput);
+                try {
+                    return ArgumentParseResult.success(
+                            this.mapper.mapResult(input, new EntitySelectorWrapper(commandContext, result.parsedValue().get()))
+                    );
+                } catch (final CommandSyntaxException ex) {
+                    return ArgumentParseResult.failure(ex);
+                } catch (final Exception ex) {
+                    throw rethrow(ex);
+                }
+            }, commandContext.get(BukkitCommandContextKeys.SENDER_SCHEDULER_EXECUTOR));
         }
 
         @Override
         public CompletableFuture<Iterable<@NonNull Suggestion>> suggestionsFuture(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull String input
+                final @NonNull CommandInput input
         ) {
             final Object commandSourceStack = commandContext.get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER);
             final @Nullable Field bypassField =

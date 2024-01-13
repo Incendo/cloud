@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,28 +53,28 @@ class DurationParserSuggestionsTest {
         final List<? extends Suggestion> suggestions = manager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 input
-        );
+        ).list();
         Assertions.assertEquals(suggestionList("1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
 
         final String input2 = "duration 1";
         final List<? extends Suggestion> suggestions2 = manager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 input2
-        );
+        ).list();
         Assertions.assertEquals(suggestionList("1d", "1h", "1m", "1s"), suggestions2);
 
         final String input3 = "duration 1d";
         final List<? extends Suggestion> suggestions3 = manager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 input3
-        );
+        ).list();
         Assertions.assertEquals(Collections.emptyList(), suggestions3);
 
         final String input4 = "duration 1d2";
         final List<? extends Suggestion> suggestions4 = manager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 input4
-        );
+        ).list();
         Assertions.assertTrue(suggestions4.containsAll(suggestionList("1d2h", "1d2m", "1d2s")));
         Assertions.assertFalse(suggestions4.contains(Suggestion.simple("1d2d")));
 
@@ -82,7 +82,7 @@ class DurationParserSuggestionsTest {
         final List<? extends Suggestion> suggestions9 = manager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 input9
-        );
+        ).list();
         Assertions.assertTrue(suggestions9.containsAll(suggestionList("1d22h", "1d22m", "1d22s")));
         Assertions.assertFalse(suggestions9.contains(Suggestion.simple("1d22d")));
 
@@ -90,28 +90,28 @@ class DurationParserSuggestionsTest {
         final List<? extends Suggestion> suggestions5 = manager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 input5
-        );
+        ).list();
         Assertions.assertEquals(Collections.emptyList(), suggestions5);
 
         final String input6 = "duration 1d2d";
         final List<? extends Suggestion> suggestions6 = manager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 input6
-        );
+        ).list();
         Assertions.assertEquals(Collections.emptyList(), suggestions6);
 
         final String input7 = "duration 1d2h3m4s";
         final List<? extends Suggestion> suggestions7 = manager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 input7
-        );
+        ).list();
         Assertions.assertEquals(Collections.emptyList(), suggestions7);
 
         final String input8 = "duration dd";
         final List<? extends Suggestion> suggestions8 = manager.suggestionFactory().suggestImmediately(
                 new TestCommandSender(),
                 input8
-        );
+        ).list();
         Assertions.assertEquals(Collections.emptyList(), suggestions8);
     }
 }

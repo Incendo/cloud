@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -103,7 +103,7 @@ public interface DefaultValue<C, T> {
             if (this == object) {
                 return true;
             }
-            if (object == null || getClass() != object.getClass()) {
+            if (object == null || this.getClass() != object.getClass()) {
                 return false;
             }
             final ConstantDefaultValue<?, ?> that = (ConstantDefaultValue<?, ?>) object;
@@ -134,7 +134,7 @@ public interface DefaultValue<C, T> {
             if (this == object) {
                 return true;
             }
-            if (object == null || getClass() != object.getClass()) {
+            if (object == null || this.getClass() != object.getClass()) {
                 return false;
             }
             final DynamicDefaultValue<?, ?> that = (DynamicDefaultValue<?, ?>) object;
@@ -174,7 +174,7 @@ public interface DefaultValue<C, T> {
             if (this == object) {
                 return true;
             }
-            if (object == null || getClass() != object.getClass()) {
+            if (object == null || this.getClass() != object.getClass()) {
                 return false;
             }
             final ParsedDefaultValue<?, ?> that = (ParsedDefaultValue<?, ?>) object;

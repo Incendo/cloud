@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,17 +23,31 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
+import cloud.commandframework.annotations.assembler.ArgumentAssembler;
+import cloud.commandframework.annotations.assembler.ArgumentAssemblerImpl;
+import cloud.commandframework.annotations.assembler.FlagAssembler;
+import cloud.commandframework.annotations.assembler.FlagAssemblerImpl;
+import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
+import cloud.commandframework.annotations.descriptor.CommandDescriptor;
+import cloud.commandframework.annotations.descriptor.FlagDescriptor;
 import cloud.commandframework.annotations.exception.ExceptionHandler;
 import cloud.commandframework.annotations.exception.ExceptionHandlerFactory;
+import cloud.commandframework.annotations.extractor.ArgumentExtractor;
+import cloud.commandframework.annotations.extractor.CommandExtractor;
+import cloud.commandframework.annotations.extractor.CommandExtractorImpl;
+import cloud.commandframework.annotations.extractor.FlagExtractor;
+import cloud.commandframework.annotations.extractor.FlagExtractorImpl;
+import cloud.commandframework.annotations.extractor.StandardArgumentExtractor;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.injection.RawArgs;
 import cloud.commandframework.annotations.parsers.MethodArgumentParser;
 import cloud.commandframework.annotations.parsers.Parser;
+import cloud.commandframework.annotations.processing.CommandContainer;
 import cloud.commandframework.annotations.processing.CommandContainerProcessor;
+import cloud.commandframework.annotations.string.StringProcessor;
 import cloud.commandframework.annotations.suggestions.SuggestionProviderFactory;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.flags.CommandFlag;
@@ -43,10 +57,7 @@ import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.preprocessor.RegexPreprocessor;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.Caption;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.execution.CommandExecutionHandler;
-import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.CommandMetaBuilder;
@@ -64,6 +75,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -83,12 +95,20 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import static cloud.commandframework.CommandDescription.commandDescription;
 
 /**
- * Parser that parses class instances {@link Command commands}
+ * Parser that parses class instances {@link cloud.commandframework.Command commands}
  *
  * @param <C> Command sender type
  */
 @SuppressWarnings("unused")
 public final class AnnotationParser<C> {
+
+    private static final Comparator<Class<?>> COMMAND_CONTAINER_COMPARATOR = Comparator.<Class<?>>comparingInt(clazz -> {
+        final CommandContainer commandContainer = clazz.getAnnotation(CommandContainer.class);
+        if (commandContainer == null) {
+            return 1;
+        }
+        return commandContainer.priority();
+    }).reversed();
 
     /**
      * The value of {@link Argument} that should be used to infer argument names from parameter names.
@@ -293,7 +313,7 @@ public final class AnnotationParser<C> {
 
     /**
      * Register a builder modifier for a specific annotation. The builder modifiers are
-     * allowed to act on a {@link Command.Builder} after all arguments have been added
+     * allowed to act on a {@link cloud.commandframework.Command.Builder} after all arguments have been added
      * to the builder. This allows for modifications of the builder instance before
      * the command is registered to the command manager.
      *
@@ -367,7 +387,7 @@ public final class AnnotationParser<C> {
 
     /**
      * Get the parameter injector registry instance that is used to inject non-{@link Argument argument} parameters
-     * into {@link CommandMethod} annotated {@link Method methods}
+     * into {@link Command} annotated {@link Method methods}
      *
      * @return Parameter injector registry
      * @since 1.2.0
@@ -630,28 +650,51 @@ public final class AnnotationParser<C> {
     /**
      * Parses all known {@link cloud.commandframework.annotations.processing.CommandContainer command containers}.
      *
+     * <p>This will use the {@link ClassLoader class loader} of the current class to retrieve the stored information about the
+     * command containers.</p>
+     *
      * @return Collection of parsed commands
      * @throws Exception re-throws all encountered exceptions.
      * @see cloud.commandframework.annotations.processing.CommandContainer CommandContainer for more information.
      * @since 1.7.0
      */
-    public @NonNull Collection<@NonNull Command<C>> parseContainers() throws Exception {
-        final List<Command<C>> commands = new LinkedList<>();
+    public @NonNull Collection<cloud.commandframework.@NonNull Command<C>> parseContainers() throws Exception {
+        return this.parseContainers(this.getClass().getClassLoader());
+    }
 
-        final List<String> classes;
-        try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream(CommandContainerProcessor.PATH)) {
+    /**
+     * Parses all known {@link cloud.commandframework.annotations.processing.CommandContainer command containers}.
+     *
+     * @param classLoader class loader to use to scan for {@link CommandContainerProcessor#PATH}
+     * @return Collection of parsed commands
+     * @throws Exception re-throws all encountered exceptions.
+     * @see cloud.commandframework.annotations.processing.CommandContainer CommandContainer for more information.
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull Collection<cloud.commandframework.@NonNull Command<C>> parseContainers(
+            final @NonNull ClassLoader classLoader
+    ) throws Exception {
+        final List<cloud.commandframework.Command<C>> commands = new LinkedList<>();
+
+        final List<String> classNames;
+        try (InputStream stream = classLoader.getResourceAsStream(CommandContainerProcessor.PATH)) {
             if (stream == null) {
                 return Collections.emptyList();
             }
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
-                classes = reader.lines().distinct().collect(Collectors.toList());
+                classNames = reader.lines().distinct().collect(Collectors.toList());
             }
         }
 
-        for (final String className : classes) {
-            final Class<?> commandContainer = Class.forName(className);
+        final List<Class<?>> classes = new ArrayList<>();
+        for (final String className : classNames) {
+            classes.add(Class.forName(className));
+        }
+        classes.sort(COMMAND_CONTAINER_COMPARATOR);
 
+        for (final Class<?> commandContainer : classes) {
             // We now have the class, and we now just need to decide what constructor to invoke.
             // We first try to find a constructor which takes in the parser.
             @MonotonicNonNull Object instance;
@@ -679,28 +722,38 @@ public final class AnnotationParser<C> {
     }
 
     /**
-     * Scan a class instance of {@link CommandMethod} annotations and attempt to
-     * compile them into {@link Command} instances.
+     * Scan a class instance of {@link Command} annotations and attempt to
+     * compile them into {@link cloud.commandframework.Command} instances.
      *
      * @param instance Instance to scan
      * @param <T>      Type of the instance
      * @return Collection of parsed commands
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public <T> @NonNull Collection<@NonNull Command<C>> parse(final @NonNull T instance) {
+    public <T> @NonNull Collection<cloud.commandframework.@NonNull Command<C>> parse(final @NonNull T instance) {
         this.parseSuggestions(instance);
         this.parseParsers(instance);
         this.parseExceptionHandlers(instance);
 
         final Collection<CommandDescriptor> commandDescriptors = this.commandExtractor.extractCommands(instance);
-        final Collection<Command<C>> commands = this.construct(instance, commandDescriptors);
-        for (final Command<C> command : commands) {
+        final Collection<cloud.commandframework.Command<C>> commands = this.construct(instance, commandDescriptors);
+        for (final cloud.commandframework.Command<C> command : commands) {
             ((CommandManager) this.manager).command(command);
         }
         return commands;
     }
 
-    @SuppressWarnings("deprecation")
+    /**
+     * Maps the given {@code string} into a {@link Description}.
+     *
+     * @param string description literal
+     * @return the description
+     */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.annotations.*")
+    public @NonNull Description mapDescription(final @NonNull String string) {
+        return this.descriptionMapper.map(this.processString(string));
+    }
+
     private <T> void parseSuggestions(final @NonNull T instance) {
         for (final Method method : instance.getClass().getMethods()) {
             final Suggestions suggestions = method.getAnnotation(Suggestions.class);
@@ -711,24 +764,11 @@ public final class AnnotationParser<C> {
                 method.setAccessible(true);
             }
 
-            boolean valid;
-            if (method.getParameterCount() != 2 && method.getParameterCount() != 3) {
-                valid = false;
-            } else if (method.getParameterCount() == 3) {
-                valid = method.getParameters()[0].getType().equals(CommandContext.class)
-                        && method.getParameters()[1].getType().equals(String.class)
-                        && method.getParameters()[2].getType().getSimpleName().equals("Continuation");
-            } else {
-                valid = method.getParameters()[0].getType().equals(CommandContext.class)
-                        && method.getParameters()[1].getType().equals(String.class);
-            }
-
-            valid = valid
-                    && (Iterable.class.isAssignableFrom(method.getReturnType())
+            final boolean valid = Iterable.class.isAssignableFrom(method.getReturnType())
                     || method.getReturnType().equals(Stream.class)
                     || method.getReturnType().equals(CompletableFuture.class)
                     || method.getReturnType().getSimpleName().equals("Sequence")
-                    || method.getParameterCount() == 3 /* TODO(City): Fix this... */);
+                    || method.getParameterCount() == 3; /* TODO(City): Fix this... */
 
             if (!valid) {
                 throw new IllegalArgumentException(String.format(
@@ -742,7 +782,11 @@ public final class AnnotationParser<C> {
 
                 this.manager.parserRegistry().registerSuggestionProvider(
                         this.processString(suggestions.value()),
-                        this.suggestionProviderFactory.createSuggestionProvider(instance, method)
+                        this.suggestionProviderFactory.createSuggestionProvider(
+                                instance,
+                                method,
+                                this.manager.parameterInjectorRegistry()
+                        )
                 );
             } catch (final Exception e) {
                 throw new RuntimeException(e);
@@ -764,7 +808,11 @@ public final class AnnotationParser<C> {
             try {
                 this.manager.exceptionController().registerHandler(
                         (Class<Throwable>) exceptionHandler.value(),
-                        this.exceptionHandlerFactory.createExceptionHandler(instance, method)
+                        this.exceptionHandlerFactory.createExceptionHandler(
+                                instance,
+                                method,
+                                this.manager.parameterInjectorRegistry()
+                        )
                 );
             } catch (final Exception e) {
                 throw new RuntimeException(e);
@@ -772,26 +820,11 @@ public final class AnnotationParser<C> {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private <T> void parseParsers(final @NonNull T instance) {
         for (final Method method : instance.getClass().getMethods()) {
             final Parser parser = method.getAnnotation(Parser.class);
             if (parser == null) {
                 continue;
-            }
-            if (!method.isAccessible()) {
-                method.setAccessible(true);
-            }
-            if (method.getParameterCount() != 2
-                    || method.getReturnType().equals(Void.class)
-                    || !method.getParameters()[0].getType().equals(CommandContext.class)
-                    || !method.getParameters()[1].getType().equals(CommandInput.class)
-            ) {
-                throw new IllegalArgumentException(String.format(
-                        "@Parser annotated method '%s' in class '%s' does not have the correct signature",
-                        method.getName(),
-                        instance.getClass().getCanonicalName()
-                ));
             }
             try {
                 final String suggestions = this.processString(parser.suggestions());
@@ -810,7 +843,8 @@ public final class AnnotationParser<C> {
                 final MethodArgumentParser<C, ?> methodArgumentParser = new MethodArgumentParser<>(
                         suggestionProvider,
                         instance,
-                        method
+                        method,
+                        this.manager.parameterInjectorRegistry()
                 );
                 final Function<ParserParameters, ArgumentParser<C, ?>> parserFunction =
                         parameters -> methodArgumentParser;
@@ -832,7 +866,7 @@ public final class AnnotationParser<C> {
         }
     }
 
-    private @NonNull Collection<@NonNull Command<C>> construct(
+    private @NonNull Collection<cloud.commandframework.@NonNull Command<C>> construct(
             final @NonNull Object instance,
             final @NonNull Collection<@NonNull CommandDescriptor> commandDescriptors
     ) {
@@ -842,21 +876,18 @@ public final class AnnotationParser<C> {
     }
 
     @SuppressWarnings({"unchecked"})
-    private @NonNull Collection<@NonNull Command<C>> constructCommands(
+    private @NonNull Collection<cloud.commandframework.@NonNull Command<C>> constructCommands(
             final @NonNull Object instance,
             final @NonNull CommandDescriptor commandDescriptor
     ) {
         final AnnotationAccessor classAnnotations = AnnotationAccessor.of(instance.getClass());
-        final List<Command<C>> commands = new ArrayList<>();
+        final List<cloud.commandframework.Command<C>> commands = new ArrayList<>();
 
         final Method method = commandDescriptor.method();
         final CommandManager<C> manager = this.manager;
         final CommandMetaBuilder metaBuilder = CommandMeta.builder().with(this.metaFactory.apply(method));
-        if (methodOrClassHasAnnotation(method, Confirmation.class)) {
-            metaBuilder.with(CommandConfirmationManager.META_CONFIRMATION_REQUIRED, true);
-        }
 
-        Command.Builder<C> builder = manager.commandBuilder(
+        cloud.commandframework.Command.Builder<C> builder = manager.commandBuilder(
                 commandDescriptor.commandToken(),
                 commandDescriptor.syntax().get(0).getMinor(),
                 metaBuilder.build()
@@ -908,9 +939,9 @@ public final class AnnotationParser<C> {
             }
         }
 
-        final CommandPermission commandPermission = getMethodOrClassAnnotation(method, CommandPermission.class);
-        if (commandPermission != null) {
-            builder = builder.permission(this.processString(commandPermission.value()));
+        final Permission permission = getMethodOrClassAnnotation(method, Permission.class);
+        if (permission != null) {
+            builder = builder.permission(this.processString(permission.value()));
         }
 
         if (commandDescriptor.requiredSender() != Object.class) {
@@ -963,11 +994,11 @@ public final class AnnotationParser<C> {
             if (builderModifier == null) {
                 continue;
             }
-            builder = (Command.Builder<C>) builderModifier.modifyBuilder(annotation, builder);
+            builder = (cloud.commandframework.Command.Builder<C>) builderModifier.modifyBuilder(annotation, builder);
         }
 
         /* Construct and register the command */
-        final Command<C> builtCommand = builder.build();
+        final cloud.commandframework.Command<C> builtCommand = builder.build();
         commands.add(builtCommand);
 
         if (method.isAnnotationPresent(ProxiedBy.class)) {
@@ -986,18 +1017,18 @@ public final class AnnotationParser<C> {
                         this.findSyntaxFragment(commandDescriptor.syntax(), this.processString(argumentDescriptor.name())),
                         argumentDescriptor
                 )).map(component -> Pair.of(component.name(), component))
-                .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+                .collect(Collectors.toMap(Pair::first, Pair::second));
     }
 
-    private @NonNull Command<C> constructProxy(
+    private cloud.commandframework.@NonNull Command<C> constructProxy(
             final @NonNull ProxiedBy proxyAnnotation,
-            final @NonNull Command<C> command
+            final cloud.commandframework.@NonNull Command<C> command
     ) {
         final String proxy = this.processString(proxyAnnotation.value());
         if (proxy.contains(" ")) {
             throw new IllegalArgumentException("@ProxiedBy proxies may only contain single literals");
         }
-        Command.Builder<C> proxyBuilder = this.manager.commandBuilder(proxy, command.commandMeta())
+        cloud.commandframework.Command.Builder<C> proxyBuilder = this.manager.commandBuilder(proxy, command.commandMeta())
                 .proxies(command);
         if (proxyAnnotation.hidden()) {
             proxyBuilder = proxyBuilder.hidden();
@@ -1013,10 +1044,6 @@ public final class AnnotationParser<C> {
                 .filter(fragment -> fragment.getMajor().equals(argumentName))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Argument is not declared in syntax: " + argumentName));
-    }
-
-    @NonNull Description mapDescription(final @NonNull String string) {
-        return this.descriptionMapper.map(this.processString(string));
     }
 
     @NonNull Map<@NonNull Class<@NonNull ? extends Annotation>, AnnotationMapper<?>> annotationMappers() {

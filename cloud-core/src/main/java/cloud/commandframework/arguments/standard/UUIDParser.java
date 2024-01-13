@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,6 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.Objects;
 import java.util.UUID;
@@ -70,16 +69,10 @@ public final class UUIDParser<C> implements ArgumentParser<C, UUID> {
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    UUIDParser.class,
-                    commandContext
-            ));
-        }
+        final String input = commandInput.readString();
 
         try {
-            final UUID uuid = UUID.fromString(commandInput.readString());
+            final UUID uuid = UUID.fromString(input);
             return ArgumentParseResult.success(uuid);
         } catch (IllegalArgumentException e) {
             return ArgumentParseResult.failure(new UUIDParseException(input, commandContext));
@@ -90,7 +83,6 @@ public final class UUIDParser<C> implements ArgumentParser<C, UUID> {
     @API(status = API.Status.STABLE)
     public static final class UUIDParseException extends ParserException {
 
-        private static final long serialVersionUID = 6399602590976540023L;
         private final String input;
 
         /**
@@ -113,11 +105,11 @@ public final class UUIDParser<C> implements ArgumentParser<C, UUID> {
         }
 
         /**
-         * Get the supplied input
+         * Returns the supplied input.
          *
-         * @return String value
+         * @return string value
          */
-        public String getInput() {
+        public String input() {
             return this.input;
         }
 

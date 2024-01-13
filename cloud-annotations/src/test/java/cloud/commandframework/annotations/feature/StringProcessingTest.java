@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,17 +23,16 @@
 //
 package cloud.commandframework.annotations.feature;
 
-import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
+import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.CommandDescription;
-import cloud.commandframework.annotations.CommandMethod;
-import cloud.commandframework.annotations.CommandPermission;
 import cloud.commandframework.annotations.Flag;
-import cloud.commandframework.annotations.PropertyReplacingStringProcessor;
+import cloud.commandframework.annotations.Permission;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
+import cloud.commandframework.annotations.string.PropertyReplacingStringProcessor;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.meta.CommandMeta;
@@ -65,7 +64,7 @@ class StringProcessingTest {
     }
 
     @Test
-    @DisplayName("Tests @CommandMethod, @CommandPermission, @CommandDescription, @Argument & @Flag")
+    @DisplayName("Tests @Command, @Permission, @CommandDescription, @Argument & @Flag")
     @SuppressWarnings("unchecked")
     void testStringProcessing() {
         // Arrange
@@ -94,10 +93,10 @@ class StringProcessingTest {
         this.annotationParser.parse(testClassA);
 
         // Assert
-        final List<Command<TestCommandSender>> commands = new ArrayList<>(this.commandManager.commands());
+        final List<cloud.commandframework.Command<TestCommandSender>> commands = new ArrayList<>(this.commandManager.commands());
         assertThat(commands).hasSize(1);
 
-        final Command<TestCommandSender> command = commands.get(0);
+        final cloud.commandframework.Command<TestCommandSender> command = commands.get(0);
         assertThat(command.toString()).isEqualTo(String.format("%s argument flags", testProperty));
         assertThat(command.commandPermission().permissionString()).isEqualTo(testProperty);
         assertThat(command.commandDescription().description().textDescription()).isEqualTo(testProperty);
@@ -111,15 +110,15 @@ class StringProcessingTest {
 
         final List<CommandFlag<?>> flags = new ArrayList<>(flagParser.flags());
         assertThat(flags).hasSize(1);
-        assertThat(flags.get(0).getName()).isEqualTo(testFlagName);
+        assertThat(flags.get(0).name()).isEqualTo(testFlagName);
     }
 
 
     private static class TestClassA {
 
         @CommandDescription("${property.test}")
-        @CommandPermission("${property.test}")
-        @CommandMethod("${property.test} <argument>")
+        @Permission("${property.test}")
+        @Command("${property.test} <argument>")
         public void commandA(
                 final TestCommandSender sender,
                 @Argument("${property.arg}") final String arg,

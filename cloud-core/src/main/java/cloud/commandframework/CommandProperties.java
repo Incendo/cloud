@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,23 +23,22 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.internal.ImmutableImpl;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
 /**
  * Defines properties used by {@link CommandBean command beans} to construct commands.
  *
  * @since 2.0.0
  */
+@ImmutableImpl
+@Value.Immutable
 @API(status = API.Status.STABLE, since = "2.0.0")
-public class CommandProperties {
-
-    private final String name;
-    private final Collection<@NonNull String> aliases;
+public interface CommandProperties {
 
     /**
      * Construct a new instance
@@ -48,8 +47,8 @@ public class CommandProperties {
      * @param aliases the command aliases
      * @return the created instance
      */
-    public static @NonNull CommandProperties of(final @NonNull String name, final @NonNull String @NonNull... aliases) {
-        return new CommandProperties(name, Arrays.asList(aliases));
+    static @NonNull CommandProperties of(final @NonNull String name, final @NonNull String @NonNull... aliases) {
+        return CommandPropertiesImpl.of(name, Arrays.asList(aliases));
     }
 
     /**
@@ -59,7 +58,7 @@ public class CommandProperties {
      * @param aliases the command aliases
      * @return the created instance
      */
-    public static @NonNull CommandProperties commandProperties(
+    static @NonNull CommandProperties commandProperties(
             final @NonNull String name,
             final @NonNull String @NonNull... aliases
     ) {
@@ -67,49 +66,16 @@ public class CommandProperties {
     }
 
     /**
-     * Construct a new instance
-     *
-     * @param name    the command name
-     * @param aliases the command aliases
-     */
-    protected CommandProperties(final @NonNull String name, final @NonNull Collection<@NonNull String> aliases) {
-        this.name = name;
-        this.aliases = aliases;
-    }
-
-    /**
-     * Returns the command name
+     * Returns the command name.
      *
      * @return the name
      */
-    public final @NonNull String name() {
-        return this.name;
-    }
+    @NonNull String name();
 
     /**
-     * Returns an unmodifiable view of the command aliases
+     * Returns an unmodifiable view of the command aliases.
      *
      * @return the command aliases
      */
-    public final @NonNull Collection<@NonNull String> aliases() {
-        return Collections.unmodifiableCollection(this.aliases);
-    }
-
-    @Override
-    @SuppressWarnings("UndefinedEquals")
-    public final boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final CommandProperties that = (CommandProperties) o;
-        return Objects.equals(this.name, that.name) && Objects.equals(this.aliases, that.aliases);
-    }
-
-    @Override
-    public final int hashCode() {
-        return Objects.hash(this.name, this.aliases);
-    }
+    @NonNull Collection<@NonNull String> aliases();
 }

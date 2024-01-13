@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,8 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.keys.CloudKey;
 import io.leangen.geantyref.TypeToken;
-import java.util.Set;
+import java.util.concurrent.Executor;
+import org.apiguardian.api.API;
 import org.bukkit.command.CommandSender;
 
 /**
@@ -46,15 +47,13 @@ public final class BukkitCommandContextKeys {
     );
 
     /**
-     * Key used to store the active {@link CloudBukkitCapabilities} in the {@link cloud.commandframework.context.CommandContext}.
+     * Key used to store an {@link Executor} for the command sender's scheduler.
      *
-     * @since 1.5.0
+     * @since 2.0.0
      */
-    public static final CloudKey<Set<CloudBukkitCapabilities>> CLOUD_BUKKIT_CAPABILITIES = CloudKey.of(
-            "CloudBukkitCapabilities",
-            new TypeToken<Set<CloudBukkitCapabilities>>() {
-            }
-    );
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static final CloudKey<Executor> SENDER_SCHEDULER_EXECUTOR = CloudKey.of(
+            "SenderSchedulerExecutor", Executor.class);
 
     private BukkitCommandContextKeys() {
     }

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,7 @@
 //
 package cloud.commandframework.arguments.suggestion;
 
-import cloud.commandframework.CommandManager;
 import cloud.commandframework.context.CommandContext;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import org.apiguardian.api.API;
@@ -42,27 +40,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface SuggestionFactory<C, S extends Suggestion> {
 
     /**
-     * Returns a suggestion factory that invokes the command tree to create the suggestions, and then maps them
-     * to the output type using the given {@code mapper}.
-     *
-     * @param <C>     the command sender type
-     * @param <S>     the output suggestion type
-     * @param manager the command manager
-     * @param mapper  the suggestion mapper
-     * @return the factory
-     */
-    static <C, S extends Suggestion> @NonNull SuggestionFactory<C, S> delegating(
-            final @NonNull CommandManager<C> manager,
-            final @NonNull SuggestionMapper<S> mapper
-    ) {
-        return new DelegatingSuggestionFactory<>(
-                manager,
-                manager.commandTree(),
-                mapper
-        );
-    }
-
-    /**
      * Returns command suggestions for the "next" argument that would yield a correctly
      * parsing command input
      *
@@ -70,7 +47,7 @@ public interface SuggestionFactory<C, S extends Suggestion> {
      * @param input   input provided by the sender
      * @return the suggestions
      */
-    @NonNull CompletableFuture<List<@NonNull S>> suggest(
+    @NonNull CompletableFuture<@NonNull Suggestions<C, S>> suggest(
             @NonNull CommandContext<C> context,
             @NonNull String input
     );
@@ -83,7 +60,7 @@ public interface SuggestionFactory<C, S extends Suggestion> {
      * @param input  input provided by the sender
      * @return the suggestions
      */
-    @NonNull CompletableFuture<List<@NonNull S>> suggest(
+    @NonNull CompletableFuture<@NonNull Suggestions<C, S>> suggest(
             @NonNull C sender,
             @NonNull String input
     );
@@ -96,7 +73,7 @@ public interface SuggestionFactory<C, S extends Suggestion> {
      * @param input  input provided by the sender
      * @return the suggestions
      */
-    default @NonNull List<@NonNull S> suggestImmediately(
+    default @NonNull Suggestions<C, S> suggestImmediately(
             final @NonNull C sender,
             final @NonNull String input
     ) {

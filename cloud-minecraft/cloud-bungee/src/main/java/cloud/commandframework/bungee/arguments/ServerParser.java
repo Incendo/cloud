@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,6 @@ import cloud.commandframework.bungee.BungeeCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -75,14 +74,8 @@ public final class ServerParser<C> implements ArgumentParser<C, ServerInfo> {
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    ServerParser.class,
-                    commandContext
-            ));
-        }
-        final ServerInfo server = commandContext.<ProxyServer>get("ProxyServer").getServerInfo(commandInput.readString());
+        final String input = commandInput.readString();
+        final ServerInfo server = commandContext.<ProxyServer>get("ProxyServer").getServerInfo(input);
         if (server == null) {
             return ArgumentParseResult.failure(
                     new ServerParseException(
@@ -96,7 +89,6 @@ public final class ServerParser<C> implements ArgumentParser<C, ServerInfo> {
 
     public static final class ServerParseException extends ParserException {
 
-        private static final long serialVersionUID = -3825941611365494659L;
 
         private ServerParseException(
                 final @NonNull String input,

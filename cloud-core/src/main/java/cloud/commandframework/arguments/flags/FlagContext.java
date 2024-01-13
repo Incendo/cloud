@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -68,7 +68,7 @@ public final class FlagContext {
      */
     public void addPresenceFlag(final @NonNull CommandFlag<?> flag) {
         ((List<Object>) this.flagValues.computeIfAbsent(
-                flag.getName(),
+                flag.name(),
                 $ -> new ArrayList<>()
         )).add(FLAG_PRESENCE_VALUE);
     }
@@ -85,7 +85,7 @@ public final class FlagContext {
             final @NonNull T value
     ) {
         ((List<T>) this.flagValues.computeIfAbsent(
-                flag.getName(),
+                flag.name(),
                 $ -> new ArrayList<>()
         )).add(value);
     }
@@ -139,7 +139,7 @@ public final class FlagContext {
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     public boolean isPresent(final @NonNull CommandFlag<Void> flag) {
-        return this.isPresent(flag.getName());
+        return this.isPresent(flag.name());
     }
 
     /**
@@ -183,7 +183,7 @@ public final class FlagContext {
     public <T> @NonNull Optional<T> getValue(
             final @NonNull CommandFlag<T> flag
     ) {
-        return this.getValue(flag.getName());
+        return this.getValue(flag.name());
     }
 
     /**
@@ -341,7 +341,7 @@ public final class FlagContext {
     public <T> @NonNull Collection<T> getAll(
             final @NonNull CommandFlag<T> flag
     ) {
-        final List values = this.flagValues.get(flag.getName());
+        final List values = this.flagValues.get(flag.name());
         if (values != null) {
             return Collections.unmodifiableList((List<T>) values);
         }

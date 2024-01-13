@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -64,8 +64,8 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
         for (final String string : strings) {
             builder.append(" ").append(string);
         }
-        final C sender = this.manager.getCommandSenderMapper().apply(commandSender);
-        this.manager.executeCommand(sender, builder.toString());
+        final C sender = this.manager.senderMapper().map(commandSender);
+        this.manager.commandExecutor().executeCommand(sender, builder.toString());
         return true;
     }
 }

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,13 +24,13 @@
 package cloud.commandframework.kotlin.coroutines
 
 import cloud.commandframework.CommandManager
+import cloud.commandframework.arguments.parser.ArgumentParseResult
 import cloud.commandframework.arguments.parser.ArgumentParser
 import cloud.commandframework.arguments.parser.ParserDescriptor
 import cloud.commandframework.arguments.suggestion.SuggestionFactory
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.context.CommandInput
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
-import cloud.commandframework.execution.CommandExecutionCoordinator
+import cloud.commandframework.execution.ExecutionCoordinator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.future
@@ -40,8 +40,8 @@ import kotlin.coroutines.EmptyCoroutineContext
 /**
  * Suspending version of [ArgumentParser] for use with coroutines.
  *
- * NOTE: It is highly advised to not use [CommandExecutionCoordinator.SimpleCoordinator] together
- * with coroutine support. Consider using [AsynchronousCommandExecutionCoordinator] instead.
+ * NOTE: It is highly advised to not use [ExecutionCoordinator.simpleCoordinator] together
+ * with coroutine support. Consider using [ExecutionCoordinator.asyncCoordinator] instead.
  *
  * @param C command sender type.
  */
@@ -65,7 +65,7 @@ public fun interface SuspendingArgumentParser<C : Any, T : Any> {
      * @param commandInput   Command Input
      * @return the result
      */
-    public suspend operator fun invoke(commandContext: CommandContext<C>, commandInput: CommandInput): T
+    public suspend operator fun invoke(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<T>
 
     /**
      * Creates a new [ArgumentParser] backed by this [SuspendingArgumentParser].
@@ -122,7 +122,7 @@ public inline fun <C : Any, reified T : Any> SuspendingArgumentParser<C, T>.asPa
 public suspend inline fun <C : Any, reified T : Any> suspendingArgumentParser(
     scope: CoroutineScope = GlobalScope,
     context: CoroutineContext = EmptyCoroutineContext,
-    crossinline parser: suspend (CommandContext<C>, CommandInput) -> T
+    crossinline parser: suspend (CommandContext<C>, CommandInput) -> ArgumentParseResult<T>
 ): ParserDescriptor<C, T> = SuspendingArgumentParser<C, T> { commandContext, commandInput ->
     parser(commandContext, commandInput)
 }.asParserDescriptor(scope, context)

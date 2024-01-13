@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,8 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * An argument parser which wraps another argument parser, converting the output type.
  *
@@ -57,18 +59,20 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser.Futur
      * Get the parser this one is derived from.
      *
      * @return the base parser
+     * @since 2.0.0
      */
-    public ArgumentParser<C, I> getBaseParser() {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public ArgumentParser<C, I> baseParser() {
         return this.base;
     }
 
     @Override
-    public @NonNull CompletableFuture<@NonNull O> parseFuture(
+    public @NonNull CompletableFuture<@NonNull ArgumentParseResult<O>> parseFuture(
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-       return this.base.parseFuture(commandContext, commandInput)
-               .thenCompose(result -> this.mapper.map(commandContext, result));
+        return this.base.parseFuture(commandContext, commandInput)
+                .thenCompose(result -> this.mapper.map(commandContext, result));
     }
 
     @Override
@@ -77,18 +81,13 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser.Futur
     }
 
     @Override
-    public @NonNull <O1> ArgumentParser<C, O1> map(final Mapper<C, O, O1> mapper) {
-        final Mapper<C, I, O1> composedMapper = (ctx, original) -> this.mapper.map(ctx, original)
-                .thenCompose(value -> mapper.map(ctx, value));
+    public <O1> ArgumentParser.@NonNull FutureArgumentParser<C, O1> flatMap(final Mapper<C, O, O1> mapper) {
+        requireNonNull(mapper, "mapper");
         return new MappedArgumentParser<>(
                 this.base,
-                composedMapper
+                (ctx, orig) -> this.mapper.map(ctx, orig)
+                        .thenCompose(mapped -> mapper.map(ctx, mapped))
         );
-    }
-
-    @Override
-    public int getRequestedArgumentCount() {
-        return this.base.getRequestedArgumentCount();
     }
 
     @Override
@@ -127,6 +126,9 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser.Futur
          * @param input   the input
          * @return future that completes with the output
          */
-        @NonNull CompletableFuture<O> map(@NonNull CommandContext<C> context, @NonNull I input);
+        @NonNull CompletableFuture<ArgumentParseResult<O>> map(
+                @NonNull CommandContext<C> context,
+                @NonNull ArgumentParseResult<I> input
+        );
     }
 }

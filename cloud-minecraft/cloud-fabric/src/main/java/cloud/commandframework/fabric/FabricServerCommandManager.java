@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,10 +23,9 @@
 //
 package cloud.commandframework.fabric;
 
-import cloud.commandframework.CommandTree;
+import cloud.commandframework.SenderMapper;
 import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.fabric.annotations.specifier.Center;
 import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
 import cloud.commandframework.fabric.data.Coordinates;
@@ -38,7 +37,6 @@ import cloud.commandframework.fabric.data.SinglePlayerSelector;
 import cloud.commandframework.fabric.internal.LateRegistrationCatcher;
 import cloud.commandframework.keys.CloudKey;
 import io.leangen.geantyref.TypeToken;
-import java.util.function.Function;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandSource;
@@ -47,6 +45,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -78,14 +77,14 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      *
      * @param execCoordinator Execution coordinator instance.
      * @return a new command manager
-     * @see #FabricServerCommandManager(Function, Function, Function) for a more thorough explanation
+     * @see #FabricServerCommandManager(ExecutionCoordinator, SenderMapper) for a more thorough explanation
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public static @NonNull FabricServerCommandManager<@NonNull CommandSourceStack> createNative(
-            final @NonNull Function<@NonNull CommandTree<@NonNull CommandSourceStack>,
-                    @NonNull CommandExecutionCoordinator<@NonNull CommandSourceStack>> execCoordinator
+            final @NonNull ExecutionCoordinator<CommandSourceStack> execCoordinator
     ) {
-        return new FabricServerCommandManager<>(execCoordinator, Function.identity(), Function.identity());
+        return new FabricServerCommandManager<>(execCoordinator, SenderMapper.identity());
     }
 
     /**
@@ -97,22 +96,19 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      *                                     when the parsers used in that particular platform are not thread safe. If you have
      *                                     commands that perform blocking operations, however, it might not be a good idea to
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
-     *                                     {@link AsynchronousCommandExecutionCoordinator}
-     * @param commandSourceMapper          Function that maps {@link CommandSourceStack} to the command sender type
-     * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link CommandSourceStack}
+     *                                     {@link ExecutionCoordinator#simpleCoordinator()} and
+     *                                     {@link ExecutionCoordinator#asyncCoordinator()}
+     * @param senderMapper                 Function that maps {@link CommandSourceStack} to the command sender type
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public FabricServerCommandManager(
-            final @NonNull Function<@NonNull CommandTree<@NonNull C>,
-                    @NonNull CommandExecutionCoordinator<@NonNull C>> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull CommandSourceStack, @NonNull C> commandSourceMapper,
-            final @NonNull Function<@NonNull C, @NonNull CommandSourceStack> backwardsCommandSourceMapper
+            final @NonNull ExecutionCoordinator<C> commandExecutionCoordinator,
+            final @NonNull SenderMapper<CommandSourceStack, C> senderMapper
     ) {
         super(
                 commandExecutionCoordinator,
-                commandSourceMapper,
-                backwardsCommandSourceMapper,
+                senderMapper,
                 new FabricCommandRegistrationHandler.Server<>(),
                 () -> new CommandSourceStack(
                         CommandSource.NULL,
@@ -205,7 +201,7 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      */
     @Override
     public boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
-        final CommandSourceStack source = this.backwardsCommandSourceMapper().apply(sender);
+        final CommandSourceStack source = this.senderMapper().reverse(sender);
         return Permissions.check(source, permission, source.getServer().getOperatorUserPermissionLevel());
     }
 }

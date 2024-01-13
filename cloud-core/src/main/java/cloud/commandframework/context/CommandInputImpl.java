@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ package cloud.commandframework.context;
 
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 final class CommandInputImpl implements CommandInput {
 
@@ -68,11 +69,12 @@ final class CommandInputImpl implements CommandInput {
     }
 
     @Override
-    public void cursor(final int cursor) {
+    public @This @NonNull CommandInput cursor(final int cursor) {
         if (cursor < 0 || cursor > this.length()) {
             throw new CursorOutOfBoundsException(cursor, this.length());
         }
         this.cursor = cursor;
+        return this;
     }
 
     @Override

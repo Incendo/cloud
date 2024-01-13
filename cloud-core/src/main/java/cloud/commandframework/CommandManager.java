@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,9 +31,9 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.arguments.parser.StandardParserRegistry;
+import cloud.commandframework.arguments.suggestion.DelegatingSuggestionFactory;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
-import cloud.commandframework.arguments.suggestion.SuggestionMapper;
 import cloud.commandframework.captions.CaptionFormatter;
 import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.captions.StandardCaptionRegistryFactory;
@@ -42,9 +42,8 @@ import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.StandardCommandContextFactory;
 import cloud.commandframework.exceptions.handling.ExceptionController;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.execution.CommandResult;
 import cloud.commandframework.execution.CommandSuggestionProcessor;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.execution.postprocessor.AcceptingCommandPostprocessor;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessingContext;
@@ -72,18 +71,11 @@ import cloud.commandframework.state.Stateful;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -94,58 +86,57 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  *
  * @param <C> the command sender type used to execute commands
  */
-@SuppressWarnings({"unchecked", "rawtypes", "unused"})
+@SuppressWarnings({"unchecked", "unused"})
 @API(status = API.Status.STABLE)
-public abstract class CommandManager<C> implements Stateful<RegistrationState> {
-
-    private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = new HashMap<>();
+public abstract class CommandManager<C> implements Stateful<RegistrationState>, CommandBuilderSource<C> {
 
     private final Configurable<ManagerSetting> settings = Configurable.enumConfigurable(ManagerSetting.class)
             .set(ManagerSetting.ENFORCE_INTERMEDIARY_PERMISSIONS, true);
-    private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>(this);
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private final ParserRegistry<C> parserRegistry = new StandardParserRegistry<>();
     private final Collection<Command<C>> commands = new LinkedList<>();
     private final ParameterInjectorRegistry<C> parameterInjectorRegistry = new ParameterInjectorRegistry<>();
-    private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
     private final CommandTree<C> commandTree;
     private final SuggestionFactory<C, ? extends Suggestion> suggestionFactory;
     private final Set<CloudCapability> capabilities = new HashSet<>();
     private final ExceptionController<C> exceptionController = new ExceptionController<>();
+    private final CommandExecutor<C> commandExecutor;
 
     private CaptionFormatter<C, String> captionVariableReplacementHandler = CaptionFormatter.placeholderReplacing();
-    private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
-    private CommandSuggestionProcessor<C> commandSuggestionProcessor =
-            new FilteringCommandSuggestionProcessor<>(FilteringCommandSuggestionProcessor.Filter.startsWith(true));
+    private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>(this);
+    private CommandSuggestionProcessor<C> commandSuggestionProcessor = new FilteringCommandSuggestionProcessor<>();
     private CommandRegistrationHandler<C> commandRegistrationHandler;
     private CaptionRegistry<C> captionRegistry;
-    private SuggestionMapper<? extends Suggestion> suggestionMapper = SuggestionMapper.identity();
     private HelpHandlerFactory<C> helpHandlerFactory = HelpHandlerFactory.standard(this);
     private final AtomicReference<RegistrationState> state = new AtomicReference<>(RegistrationState.BEFORE_REGISTRATION);
 
     /**
-     * Create a new command manager instance
+     * Create a new command manager instance.
      *
-     * @param commandExecutionCoordinator Execution coordinator instance. The coordinator is in charge of executing incoming
-     *                                    commands. Some considerations must be made when picking a suitable execution coordinator
-     *                                    for your platform. For example, an entirely asynchronous coordinator is not suitable
-     *                                    when the parsers used in that particular platform are not thread safe. If you have
-     *                                    commands that perform blocking operations, however, it might not be a good idea to
-     *                                    use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                    {@link CommandExecutionCoordinator#simpleCoordinator()} and
-     *                                    {@link cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator}
-     * @param commandRegistrationHandler  Command registration handler. This will get called every time a new command is
-     *                                    registered to the command manager. This may be used to forward command registration
-     *                                    to the platform.
+     * @param executionCoordinator       Execution coordinator instance. When choosing the appropriate coordinator for your
+     *                                   project, be sure to consider any limitations noted by the platform documentation.
+     * @param commandRegistrationHandler Command registration handler. This will get called every time a new command is
+     *                                   registered to the command manager. This may be used to forward command registration
+     *                                   to the platform.
      */
     protected CommandManager(
-            final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull ExecutionCoordinator<C> executionCoordinator,
             final @NonNull CommandRegistrationHandler<C> commandRegistrationHandler
     ) {
+        final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>(this);
         this.commandTree = CommandTree.newTree(this);
-        this.commandExecutionCoordinator = commandExecutionCoordinator.apply(this.commandTree);
         this.commandRegistrationHandler = commandRegistrationHandler;
-        this.suggestionFactory = SuggestionFactory.delegating(this, (suggestion) -> this.suggestionMapper.map(suggestion));
+        this.suggestionFactory = new DelegatingSuggestionFactory<>(
+                this,
+                this.commandTree,
+                commandContextFactory,
+                executionCoordinator
+        );
+        this.commandExecutor = new StandardCommandExecutor<>(
+                this,
+                executionCoordinator,
+                commandContextFactory
+        );
         /* Register service types */
         this.servicePipeline.registerServiceType(new TypeToken<CommandPreprocessor<C>>() {
         }, new AcceptingCommandPreprocessor<>());
@@ -161,97 +152,16 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
     }
 
     /**
-     * Execute a command and get a future that completes with the result. The command may be executed immediately
-     * or at some point in the future, depending on the {@link CommandExecutionCoordinator} used in the command manager.
-     * <p>
-     * The command may also be filtered out by preprocessors (see {@link CommandPreprocessor}) before they are parsed,
-     * or by the {@link CommandComponent} command components during parsing. The execution may also be filtered out
-     * after parsing by a {@link CommandPostprocessor}. In the case that a command was filtered out at any of the
-     * execution stages, the future will complete with {@code null}.
-     * <p>
-     * The future may also complete exceptionally.
-     * These exceptions will be handled using exception handlers registered in the {@link #exceptionController()}.
-     * The exceptions will be forwarded to the future, if the exception was transformed during the exception handling, then the
-     * new exception will be present in the completed future.
+     * Returns the command executor.
      *
-     * @param commandSender Sender of the command
-     * @param input         Input provided by the sender. Prefixes should be removed before the method is being called, and
-     *                      the input here will be passed directly to the command parsing pipeline, after having been tokenized.
-     * @return future that completes with the command result, or {@code null} if the execution was cancelled at any of the
-     *         processing stages.
-     */
-    public @NonNull CompletableFuture<CommandResult<C>> executeCommand(
-            final @NonNull C commandSender,
-            final @NonNull String input
-    ) {
-        return this.executeCommand(commandSender, input, context -> {});
-    }
-
-    /**
-     * Executes a command and get a future that completes with the result. The command may be executed immediately
-     * or at some point in the future, depending on the {@link CommandExecutionCoordinator} used in the command manager.
-     * <p>
-     * The command may also be filtered out by preprocessors (see {@link CommandPreprocessor}) before they are parsed,
-     * or by the {@link CommandComponent} command components during parsing. The execution may also be filtered out
-     * after parsing by a {@link CommandPostprocessor}. In the case that a command was filtered out at any of the
-     * execution stages, the future will complete with {@code null}.
-     * <p>
-     * The future may also complete exceptionally.
-     * These exceptions will be handled using exception handlers registered in the {@link #exceptionController()}.
-     * The exceptions will be forwarded to the future, if the exception was transformed during the exception handling, then the
-     * new exception will be present in the completed future.
+     * <p>The executor is used to parse &amp; execute commands.</p>
      *
-     * @param commandSender   the sender of the command
-     * @param input           the input provided by the sender. Prefixes should be removed before the method is being called, and
-     *                        the input here will be passed directly to the command parsing pipeline, after having been tokenized.
-     * @param contextConsumer consumer that accepts the context before the command is executed
-     * @return future that completes with the command result, or {@code null} if the execution was cancelled at any of the
-     *         processing stages.
+     * @return the command executor
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull CompletableFuture<CommandResult<C>> executeCommand(
-            final @NonNull C commandSender,
-            final @NonNull String input,
-            final @NonNull Consumer<CommandContext<C>> contextConsumer
-    ) {
-        final CommandContext<C> context = this.commandContextFactory.create(
-                false,
-                commandSender
-        );
-        contextConsumer.accept(context);
-        final CommandInput commandInput = CommandInput.of(input);
-        return this.executeCommand(context, commandInput).whenComplete((result, throwable) -> {
-            if (throwable == null) {
-                return;
-            }
-            try {
-                this.exceptionController.handleException(context, ExceptionController.unwrapCompletionException(throwable));
-            } catch (final RuntimeException runtimeException) {
-                throw runtimeException;
-            } catch (final Throwable e) {
-                throw new CompletionException(e);
-            }
-        });
-    }
-
-    private @NonNull CompletableFuture<CommandResult<C>> executeCommand(
-            final @NonNull CommandContext<C> context,
-            final @NonNull CommandInput commandInput
-    ) {
-        /* Store a copy of the input queue in the context */
-        context.store("__raw_input__", commandInput.copy());
-        try {
-            if (this.preprocessContext(context, commandInput) == State.ACCEPTED) {
-                return this.commandExecutionCoordinator.coordinateExecution(context, commandInput);
-            }
-        } catch (final Exception e) {
-            final CompletableFuture<CommandResult<C>> future = new CompletableFuture<>();
-            future.completeExceptionally(e);
-            return future;
-        }
-        /* Wasn't allowed to execute the command */
-        return CompletableFuture.completedFuture(null);
+    public @NonNull CommandExecutor<C> commandExecutor() {
+        return this.commandExecutor;
     }
 
     /**
@@ -326,17 +236,6 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
     @SuppressWarnings("unchecked")
     public @NonNull CommandManager<C> command(final Command.@NonNull Builder<? extends C> command) {
         return this.command(((Command.Builder<C>) command).manager(this).build());
-    }
-
-    /**
-     * Returns the factory used to create {@link CommandContext} instances.
-     *
-     * @return the command context factory
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull CommandContextFactory<C> commandContextFactory() {
-        return this.commandContextFactory;
     }
 
     /**
@@ -562,23 +461,6 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
     public abstract boolean hasPermission(@NonNull C sender, @NonNull String permission);
 
     /**
-     * Sets the suggestion mapper.
-     * <p>
-     * The suggestion mapper is invoked after the suggestions have been generated by the {@link CommandComponent command
-     * components} in the {@link CommandTree command tree}, but before the platform mappers configured using
-     * {@link #suggestionFactory()} gets to map the suggestions.
-     * This means that you can perform custom mapping to the platform-native suggestion types using your suggestion mapper.
-     *
-     * @param <S>              the custom type
-     * @param suggestionMapper the suggestion mapper
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public <S extends Suggestion> void suggestionMapper(final @NonNull SuggestionMapper<S> suggestionMapper) {
-        this.suggestionMapper = suggestionMapper;
-    }
-
-    /**
      * Deletes the given {@code rootCommand}.
      * <p>
      * This will delete all chains that originate at the root command.
@@ -628,192 +510,14 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
     }
 
     /**
-     * Create a new command builder. This will also register the creating manager in the command
-     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
-     * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
-     * <p>
-     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
-     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
+     * Invokes {@link Command.Builder#manager(CommandManager)} with {@code this} instance and returns the updated builder.
      *
-     * @param name        Command name
-     * @param aliases     Command aliases
-     * @param description Description for the root literal
-     * @param meta        Command meta
-     * @return Builder instance
-     * @since 1.4.0
+     * @param builder builder to decorate
+     * @return the decorated builder
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public Command.@NonNull Builder<C> commandBuilder(
-            final @NonNull String name,
-            final @NonNull Collection<String> aliases,
-            final @NonNull Description description,
-            final @NonNull CommandMeta meta
-    ) {
-        return Command.<C>newBuilder(
-                name,
-                meta,
-                description,
-                aliases.toArray(new String[0])
-        ).manager(this);
-    }
-
-    /**
-     * Create a new command builder with an empty description.
-     * <p>
-     * This will also register the creating manager in the command
-     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
-     * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
-     * <p>
-     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
-     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
-     *
-     * @param name    Command name
-     * @param aliases Command aliases
-     * @param meta    Command meta
-     * @return Builder instance
-     */
-    public Command.@NonNull Builder<C> commandBuilder(
-            final @NonNull String name,
-            final @NonNull Collection<String> aliases,
-            final @NonNull CommandMeta meta
-    ) {
-        return Command.<C>newBuilder(
-                name,
-                meta,
-                Description.empty(),
-                aliases.toArray(new String[0])
-        ).manager(this);
-    }
-
-    /**
-     * Create a new command builder. This will also register the creating manager in the command
-     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
-     * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
-     * <p>
-     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
-     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
-     *
-     * @param name        Command name
-     * @param meta        Command meta
-     * @param description Description for the root literal
-     * @param aliases     Command aliases
-     * @return Builder instance
-     * @since 1.4.0
-     */
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public Command.@NonNull Builder<C> commandBuilder(
-            final @NonNull String name,
-            final @NonNull CommandMeta meta,
-            final @NonNull Description description,
-            final @NonNull String... aliases
-    ) {
-        return Command.<C>newBuilder(
-                name,
-                meta,
-                description,
-                aliases
-        ).manager(this);
-    }
-
-    /**
-     * Create a new command builder with an empty description.
-     * <p>
-     * This will also register the creating manager in the command
-     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
-     * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
-     * <p>
-     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
-     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
-     *
-     * @param name    Command name
-     * @param meta    Command meta
-     * @param aliases Command aliases
-     * @return Builder instance
-     */
-    public Command.@NonNull Builder<C> commandBuilder(
-            final @NonNull String name,
-            final @NonNull CommandMeta meta,
-            final @NonNull String... aliases
-    ) {
-        return Command.<C>newBuilder(
-                name,
-                meta,
-                Description.empty(),
-                aliases
-        ).manager(this);
-    }
-
-    /**
-     * Create a new command builder using default command meta created by {@link #createDefaultCommandMeta()}.
-     * <p>
-     * This will also register the creating manager in the command
-     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
-     * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
-     * <p>
-     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
-     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
-     *
-     * @param name        Command name
-     * @param description Description for the root literal
-     * @param aliases     Command aliases
-     * @return Builder instance
-     * @throws UnsupportedOperationException If the command manager does not support default command meta creation
-     * @see #createDefaultCommandMeta() Default command meta creation
-     * @since 1.4.0
-     */
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public Command.@NonNull Builder<C> commandBuilder(
-            final @NonNull String name,
-            final @NonNull Description description,
-            final @NonNull String... aliases
-    ) {
-        return Command.<C>newBuilder(
-                name,
-                this.createDefaultCommandMeta(),
-                description,
-                aliases
-        ).manager(this);
-    }
-
-    /**
-     * Create a new command builder using default command meta created by {@link #createDefaultCommandMeta()}, and
-     * an empty description.
-     * <p>
-     * This will also register the creating manager in the command
-     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
-     * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
-     * <p>
-     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
-     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
-     *
-     * @param name    Command name
-     * @param aliases Command aliases
-     * @return Builder instance
-     * @throws UnsupportedOperationException If the command manager does not support default command meta creation
-     * @see #createDefaultCommandMeta() Default command meta creation
-     */
-    public Command.@NonNull Builder<C> commandBuilder(
-            final @NonNull String name,
-            final @NonNull String... aliases
-    ) {
-        return Command.<C>newBuilder(
-                name,
-                this.createDefaultCommandMeta(),
-                Description.empty(),
-                aliases
-        ).manager(this);
+    @Override
+    public final Command.@NonNull Builder<C> decorateBuilder(final Command.@NonNull Builder<C> builder) {
+        return builder.manager(this);
     }
 
     /**
@@ -863,11 +567,10 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
 
     /**
      * Constructs a default {@link CommandMeta} instance.
-     * <p>
-     * Returns {@link CommandMeta#empty()} by default.
      *
      * @return default command meta
      */
+    @Override
     public @NonNull CommandMeta createDefaultCommandMeta() {
         return CommandMeta.empty();
     }
@@ -916,7 +619,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput
     ) {
-        this.servicePipeline.pump(new CommandPreprocessingContext<>(context, commandInput))
+        this.servicePipeline.pump(CommandPreprocessingContext.of(context, commandInput))
                 .through(new TypeToken<CommandPreprocessor<C>>() {
                 })
                 .getResult();
@@ -937,7 +640,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
             final @NonNull CommandContext<C> context,
             final @NonNull Command<C> command
     ) {
-        this.servicePipeline.pump(new CommandPostprocessingContext<>(context, command))
+        this.servicePipeline.pump(CommandPostprocessingContext.of(context, command))
                 .through(new TypeToken<CommandPostprocessor<C>>() {
                 })
                 .getResult();
@@ -1094,17 +797,6 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState> {
     @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull Configurable<ManagerSetting> settings() {
         return this.settings;
-    }
-
-    /**
-     * Returns the command execution coordinator used in this manager
-     *
-     * @return Command execution coordinator
-     * @since 1.6.0
-     */
-    @API(status = API.Status.STABLE, since = "1.6.0")
-    public @NonNull CommandExecutionCoordinator<C> commandExecutionCoordinator() {
-        return this.commandExecutionCoordinator;
     }
 
     @Override

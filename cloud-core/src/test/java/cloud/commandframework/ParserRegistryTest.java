@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -111,8 +111,8 @@ public class ParserRegistryTest {
         @SuppressWarnings("unchecked") final IntegerParser<TestCommandSender> integerParser =
                 (IntegerParser<TestCommandSender>) parser;
 
-        assertThat(integerParser.getMin()).isEqualTo(RANGE_MIN);
-        assertThat(integerParser.getMax()).isEqualTo(RANGE_MAX);
+        assertThat(integerParser.min()).isEqualTo(RANGE_MIN);
+        assertThat(integerParser.max()).isEqualTo(RANGE_MAX);
     }
 
     @Test

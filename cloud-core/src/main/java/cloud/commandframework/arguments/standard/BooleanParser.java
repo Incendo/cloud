@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -113,10 +113,8 @@ public final class BooleanParser<C> implements ArgumentParser<C, Boolean>, Block
     }
 
     @Override
-    public @NonNull Iterable<@NonNull String> stringSuggestions(
-            final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
-    ) {
+    public @NonNull Iterable<@NonNull String> stringSuggestions(final @NonNull CommandContext<C> commandContext,
+                                                                final @NonNull CommandInput input) {
         if (!this.liberal) {
             return STRICT_LOWER;
         }
@@ -131,7 +129,6 @@ public final class BooleanParser<C> implements ArgumentParser<C, Boolean>, Block
     @API(status = API.Status.STABLE)
     public static final class BooleanParseException extends ParserException {
 
-        private static final long serialVersionUID = -2688852086944850025L;
         private final String input;
         private final boolean liberal;
 
@@ -159,20 +156,20 @@ public final class BooleanParser<C> implements ArgumentParser<C, Boolean>, Block
 
 
         /**
-         * Get the supplied input
+         * Returns the supplied input.
          *
-         * @return String value
+         * @return supplied input
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
 
         /**
-         * Get the liberal boolean value
+         * Returns whether the parser is liberal.
          *
-         * @return Liberal value
+         * @return {@code true} if the parser is liberal, {@code false} if not
          */
-        public boolean isLiberal() {
+        public boolean liberal() {
             return this.liberal;
         }
 

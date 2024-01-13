@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,7 @@ package cloud.commandframework.brigadier.node;
 
 import cloud.commandframework.brigadier.permission.BrigadierPermissionChecker;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.tree.CommandNode;
-import com.mojang.brigadier.tree.LiteralCommandNode;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -37,19 +35,17 @@ public interface BrigadierNodeFactory<C, S, N extends CommandNode<S>> {
     /**
      * Creates a Brigadier command node.
      *
-     * @param cloudCommand       the cloud command to create the node from
-     * @param root               the Brigadier root node to attach the created node to
-     * @param suggestionProvider the Brigadier suggestion provider
-     * @param executor           the Brigadier command execution handler
-     * @param permissionChecker  function that determines whether a sender has access to the command
+     * @param label             the command label
+     * @param cloudCommand      the cloud command to create the node from
+     * @param executor          the Brigadier command execution handler
+     * @param permissionChecker function that determines whether a sender has access to the command
      * @return the created command node
      */
     @NonNull N createNode(
+            @NonNull String label,
             cloud.commandframework.internal.@NonNull CommandNode<C> cloudCommand,
-            @NonNull LiteralCommandNode<S> root,
-            @NonNull SuggestionProvider<S> suggestionProvider,
             @NonNull Command<S> executor,
-            @NonNull BrigadierPermissionChecker<S> permissionChecker
+            @NonNull BrigadierPermissionChecker<C> permissionChecker
     );
 
     /**
@@ -57,16 +53,28 @@ public interface BrigadierNodeFactory<C, S, N extends CommandNode<S>> {
      *
      * @param label             the command label
      * @param cloudCommand      the cloud command
-     * @param permissionChecker function that determines whether a sender has access to the command
-     * @param forceRegister     whether to force-register an executor at every node
      * @param executor          the Brigadier command execution handler
+     * @param permissionChecker function that determines whether a sender has access to the command
      * @return the created command node
      */
     @NonNull N createNode(
             @NonNull String label,
             cloud.commandframework.@NonNull Command<C> cloudCommand,
-            @NonNull BrigadierPermissionChecker<S> permissionChecker,
-            boolean forceRegister,
+            @NonNull Command<S> executor,
+            @NonNull BrigadierPermissionChecker<C> permissionChecker
+    );
+
+    /**
+     * Creates a Brigadier command node.
+     *
+     * @param label        the command label
+     * @param cloudCommand the cloud command
+     * @param executor     the Brigadier command execution handler
+     * @return the created command node
+     */
+    @NonNull N createNode(
+            @NonNull String label,
+            cloud.commandframework.@NonNull Command<C> cloudCommand,
             @NonNull Command<S> executor
     );
 }

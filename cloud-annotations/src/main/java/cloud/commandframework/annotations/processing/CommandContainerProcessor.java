@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,7 @@ public final class CommandContainerProcessor extends AbstractProcessor {
                 this.processingEnv.getMessager().printMessage(
                         Diagnostic.Kind.ERROR,
                         String.format(
-                                "@CommandMethod found on unsupported element type '%s' (%s)",
+                                "@Command found on unsupported element type '%s' (%s)",
                                 element.getKind().name(),
                                 element.getSimpleName().toString()
                         ),
@@ -80,7 +80,7 @@ public final class CommandContainerProcessor extends AbstractProcessor {
             this.processingEnv.getMessager().printMessage(
                     Diagnostic.Kind.NOTE,
                     String.format(
-                            "Found valid @CommandMethod annotated class: %s",
+                            "Found valid @Command annotated class: %s",
                             type
                     )
             );

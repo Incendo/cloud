@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,16 @@
 package cloud.commandframework.arguments.aggregate;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.keys.CloudKey;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
@@ -57,8 +59,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgumentParser<C, O>, ParserDescriptor<C, O>,
-        SuggestionProvider<C> {
+public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgumentParser<C, O>, ParserDescriptor<C, O> {
 
     /**
      * Returns a new aggregate command parser builder. The builder is immutable, and each method returns
@@ -87,48 +88,94 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
 
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    default @NonNull CompletableFuture<@NonNull O> parseFuture(
+    default @NonNull CompletableFuture<@NonNull ArgumentParseResult<O>> parseFuture(
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
         final AggregateCommandContext<C> aggregateCommandContext = AggregateCommandContext.argumentContext(this);
-        CompletableFuture<?> future = CompletableFuture.completedFuture(null);
+        CompletableFuture<ArgumentParseResult<Object>> future = CompletableFuture.completedFuture(null);
         for (final CommandComponent<C> component : this.components()) {
             future =
-                    future.thenCompose(result -> component.parser()
-                            .parseFuture(commandContext, commandInput)
-                            .whenComplete((value, exception) -> {
-                                if (value == null || exception != null) {
-                                    return;
-                                }
-                                final CloudKey key = CloudKey.of(component.name(), component.valueType());
-                                aggregateCommandContext.store(key, value);
-                            }));
+                    future.thenCompose(result -> {
+                        if (result != null && result.failure().isPresent()) {
+                            return ArgumentParseResult.failureFuture(result.failure().get());
+                        }
+                        // Skip whitespace between arguments.
+                        commandInput.skipWhitespace(1);
+                        // Fail if there's no remaining input.
+                        if (commandInput.isEmpty()) {
+                            return ArgumentParseResult.failureFuture(new AggregateParseException(
+                                    commandContext,
+                                    component
+                            ));
+                        }
+                        return component.parser()
+                                .parseFuture(commandContext, commandInput)
+                                .thenApply(value -> {
+                                    if (value.parsedValue().isPresent()) {
+                                        final CloudKey key = CloudKey.of(component.name(), component.valueType());
+                                        aggregateCommandContext.store(key, value.parsedValue().get());
+                                    } else if (value.failure().isPresent()) {
+                                        return ArgumentParseResult.failure(new AggregateParseException(
+                                                commandContext,
+                                                "",
+                                                component,
+                                                value.failure().get()
+                                        ));
+                                    }
+                                    return (ArgumentParseResult<Object>) value;
+                                });
+                    });
         }
-        return future.thenCompose(result -> this.mapper().map(commandContext, aggregateCommandContext));
+        return future.thenCompose(result -> {
+            if (result != null && result.failure().isPresent()) {
+                return ((ArgumentParseResult<O>) result).asFuture();
+            }
+            return this.mapper().map(commandContext, aggregateCommandContext);
+        });
     }
 
     @Override
-    default @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
-            final @NonNull CommandContext<C> context,
-            final @NonNull String input
-    ) {
-        return this.components()
-                .stream()
-                .filter(arg -> !context.contains(arg.name()))
-                .map(CommandComponent::suggestionProvider)
-                .map(suggestionProvider -> suggestionProvider.suggestionsFuture(context, input))
-                .findFirst()
-                .orElse(CompletableFuture.completedFuture(Collections.emptyList()));
-    }
-
-    @Override
-    default int getRequestedArgumentCount() {
-        return this.components().stream().map(CommandComponent::parser).mapToInt(ArgumentParser::getRequestedArgumentCount).sum();
+    default @NonNull SuggestionProvider<C> suggestionProvider() {
+        return new AggregateSuggestionProvider<>(this);
     }
 
     @Override
     default @NonNull ArgumentParser<C, O> parser() {
         return this;
+    }
+
+
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    final class AggregateParseException extends ParserException {
+
+        private AggregateParseException(
+                final @NonNull CommandContext<?> context,
+                final @NonNull String input,
+                final @NonNull CommandComponent<?> component,
+                final @NonNull Throwable cause
+        ) {
+            super(
+                    cause,
+                    AggregateCommandParser.class,
+                    context,
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE,
+                    CaptionVariable.of("input", input),
+                    CaptionVariable.of("component", component.name()),
+                    CaptionVariable.of("failure", cause.getMessage())
+            );
+        }
+
+        private AggregateParseException(
+                final @NonNull CommandContext<?> context,
+                final @NonNull CommandComponent<?> component
+        ) {
+            super(
+                    AggregateCommandParser.class,
+                    context,
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_MISSING_INPUT,
+                    CaptionVariable.of("component", component.name())
+            );
+        }
     }
 }

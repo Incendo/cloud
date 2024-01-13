@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.suggestion;
 
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -46,16 +47,22 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
     /**
      * Returns the suggestions for the given {@code input}.
      *
+     * <p>The {@code input} parameter contains all sender-provided input that has not yet been consumed by the argument parsers.
+     * If the component that the suggestion provider is generating suggestions for consumes multiple tokens the suggestion
+     * provider might receive a {@link CommandInput} instance containing multiple tokens.
+     * {@link CommandInput#lastRemainingToken()} may be used to extract the part of the command that is currently being
+     * completed by the command sender.</p>
+     *
      * @param context the context of the suggestion lookup
      * @param input   the current input
      * @return the suggestions
      */
-    @NonNull Iterable<@NonNull Suggestion> suggestions(@NonNull CommandContext<C> context, @NonNull String input);
+    @NonNull Iterable<@NonNull Suggestion> suggestions(@NonNull CommandContext<C> context, @NonNull CommandInput input);
 
     @Override
     default @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> context,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         return CompletableFuture.completedFuture(this.suggestions(context, input));
     }
@@ -64,7 +71,7 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
      * Specialized variant of {@link cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider} that has {@link String} results
      * instead of {@link Suggestion} results.
      *
-     * <p>The provided default implementation of {@link #suggestions(CommandContext, String)}
+     * <p>The provided default implementation of {@link #suggestions(CommandContext, CommandInput)}
      * maps the {@link String} results to {@link Suggestion suggestions} using {@link Suggestion#simple(String)}.</p>
      *
      * @param <C> command sender type
@@ -74,10 +81,13 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
     interface Strings<C> extends cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider<C> {
 
         /**
-         * Returns a list of suggested arguments that would be correctly parsed by this parser
-         * <p>
-         * This method is likely to be called for every character provided by the sender and
-         * so it may be necessary to cache results locally to prevent unnecessary computations
+         * Returns the suggestions for the given {@code input}.
+         *
+         * <p>The {@code input} parameter contains all sender-provided input that has not yet been consumed by the argument parsers.
+         * If the component that the suggestion provider is generating suggestions for consumes multiple tokens the suggestion
+         * provider might receive a {@link CommandInput} instance containing multiple tokens.
+         * {@link CommandInput#lastRemainingToken()} may be used to extract the part of the command that is currently being
+         * completed by the command sender.</p>
          *
          * @param commandContext Command context
          * @param input          Input string
@@ -85,13 +95,13 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
          */
         @NonNull Iterable<@NonNull String> stringSuggestions(
                 @NonNull CommandContext<C> commandContext,
-                @NonNull String input
+                @NonNull CommandInput input
         );
 
         @Override
         default @NonNull Iterable<@NonNull Suggestion> suggestions(
                 final @NonNull CommandContext<C> context,
-                final @NonNull String input
+                final @NonNull CommandInput input
         ) {
             return StreamSupport.stream(this.stringSuggestions(context, input).spliterator(), false)
                     .map(Suggestion::simple)

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,8 +34,8 @@ public interface BrigadierMappings<C, S> {
     /**
      * Returns a new instance of the default implementation.
      *
-     * @param <C> the Cloud command sender type
-     * @param <S> the Brigadier command sender type
+     * @param <C> cloud command sender type
+     * @param <S> brigadier command source type
      * @return the mapping instance
      */
     static <C, S> @NonNull BrigadierMappings<C, S> create() {

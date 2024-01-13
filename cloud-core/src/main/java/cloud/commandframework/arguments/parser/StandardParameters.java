@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,10 +41,6 @@ public final class StandardParameters {
      * Maximum value accepted by a numerical parser
      */
     public static final ParserParameter<Number> RANGE_MAX = create("max", TypeToken.get(Number.class));
-    /**
-     * Command confirmation
-     */
-    public static final ParserParameter<Boolean> CONFIRMATION = create("confirmation", TypeToken.get(Boolean.class));
     /**
      * The command should be hidden from help menus, etc
      */

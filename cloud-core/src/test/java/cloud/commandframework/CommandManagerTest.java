@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,8 @@
 package cloud.commandframework;
 
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionHandler;
+import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import io.leangen.geantyref.TypeToken;
 import java.util.List;
@@ -54,7 +54,7 @@ class CommandManagerTest {
     @BeforeEach
     void setup() {
         this.commandManager = new CommandManager<TestCommandSender>(
-                CommandExecutionCoordinator.simpleCoordinator(),
+                ExecutionCoordinator.simpleCoordinator(),
                 CommandRegistrationHandler.nullCommandRegistrationHandler()
         ) {
             @Override
@@ -98,10 +98,10 @@ class CommandManagerTest {
         this.commandManager.command(commandC);
 
         // Act
-        this.commandManager.executeCommand(new TestCommandSender(), "test a").join();
-        this.commandManager.executeCommand(new TestCommandSender(), "test b").join();
-        this.commandManager.executeCommand(new TestCommandSender(), "test c").join();
-        this.commandManager.executeCommand(new TestCommandSender(), "test c 123").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test a").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test b").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test c").join();
+        this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "test c 123").join();
 
         // Assert
         ArgumentCaptor<CommandContext<TestCommandSender>> contextArgumentCaptor = ArgumentCaptor.forClass(

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2024 Incendo
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,6 @@ import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.velocity.VelocityCaptionKeys;
 import com.velocitypowered.api.proxy.Player;
@@ -78,15 +77,9 @@ public final class PlayerParser<C> implements ArgumentParser<C, Player>, Blockin
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
-        if (input.isEmpty()) {
-            return ArgumentParseResult.failure(new NoInputProvidedException(
-                    PlayerParser.class,
-                    commandContext
-            ));
-        }
+        final String input = commandInput.readString();
         final Player player = commandContext.<ProxyServer>get("ProxyServer")
-                .getPlayer(commandInput.readString())
+                .getPlayer(input)
                 .orElse(null);
         if (player == null) {
             return ArgumentParseResult.failure(
@@ -102,7 +95,7 @@ public final class PlayerParser<C> implements ArgumentParser<C, Player>, Blockin
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull String input
+            final @NonNull CommandInput input
     ) {
         return commandContext.<ProxyServer>get("ProxyServer").getAllPlayers()
                 .stream().map(Player::getUsername).collect(Collectors.toList());
@@ -110,7 +103,6 @@ public final class PlayerParser<C> implements ArgumentParser<C, Player>, Blockin
 
     public static final class PlayerParseException extends ParserException {
 
-        private static final long serialVersionUID = -4839583631837040297L;
 
         private PlayerParseException(
                 final @NonNull String input,
