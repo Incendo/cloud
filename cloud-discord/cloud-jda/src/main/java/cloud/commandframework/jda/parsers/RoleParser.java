@@ -198,7 +198,7 @@ public final class RoleParser<C> implements ArgumentParser<C, Role> {
          *
          * @return users input
          */
-        public final @NonNull String getInput() {
+        public final @NonNull String input() {
             return this.input;
         }
     }
@@ -219,7 +219,7 @@ public final class RoleParser<C> implements ArgumentParser<C, Role> {
 
         @Override
         public @NonNull String getMessage() {
-            return String.format("Too many roles found for '%s'.", getInput());
+            return String.format("Too many roles found for '%s'.", input());
         }
     }
 
@@ -239,7 +239,7 @@ public final class RoleParser<C> implements ArgumentParser<C, Role> {
 
         @Override
         public @NonNull String getMessage() {
-            return String.format("Role not found for '%s'.", getInput());
+            return String.format("Role not found for '%s'.", input());
         }
     }
 }

@@ -217,12 +217,12 @@ public class BukkitCommandManager<C> extends CommandManager<C>
     }
 
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-    protected final boolean getSplitAliases() {
+    protected final boolean splitAliases() {
         return this.splitAliases;
     }
 
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-    protected final void setSplitAliases(final boolean value) {
+    protected final void splitAliases(final boolean value) {
         this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.splitAliases = value;
     }
@@ -267,7 +267,7 @@ public class BukkitCommandManager<C> extends CommandManager<C>
             final CloudCommodoreManager<C> cloudCommodoreManager = new CloudCommodoreManager<>(this);
             cloudCommodoreManager.initialize(this);
             this.commandRegistrationHandler(cloudCommodoreManager);
-            this.setSplitAliases(true);
+            this.splitAliases(true);
         } catch (final Exception e) {
             throw new BrigadierInitializationException(
                     "Unexpected exception initializing " + CloudCommodoreManager.class.getSimpleName(), e);

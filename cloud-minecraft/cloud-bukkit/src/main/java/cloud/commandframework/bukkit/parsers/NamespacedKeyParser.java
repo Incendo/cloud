@@ -250,7 +250,7 @@ public final class NamespacedKeyParser<C> implements ArgumentParser<C, Namespace
          * @return input
          * @since 1.7.0
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
 

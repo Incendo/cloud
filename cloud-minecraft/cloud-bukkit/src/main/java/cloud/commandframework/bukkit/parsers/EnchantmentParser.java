@@ -132,11 +132,11 @@ public final class EnchantmentParser<C> implements ArgumentParser<C, Enchantment
         }
 
         /**
-         * Get the input
+         * Returns the input.
          *
-         * @return Input
+         * @return input
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
     }

@@ -141,29 +141,29 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
 
             boolean foundOptional = false;
             for (final SyntaxFragment fragment : syntaxFragments) {
-                if (fragment.getArgumentMode() == ArgumentMode.LITERAL) {
+                if (fragment.argumentMode() == ArgumentMode.LITERAL) {
                     continue;
                 }
 
-                if (!parameterArgumentNames.contains(fragment.getMajor())) {
+                if (!parameterArgumentNames.contains(fragment.major())) {
                     this.processingEnvironment.getMessager().printMessage(
                             Diagnostic.Kind.ERROR,
                             String.format(
                                     "@Argument(\"%s\") is missing from @Command (%s)",
-                                    fragment.getMajor(),
+                                    fragment.major(),
                                     e.getSimpleName()
                             ),
                             e
                     );
                 }
 
-                if (fragment.getArgumentMode() == ArgumentMode.REQUIRED) {
+                if (fragment.argumentMode() == ArgumentMode.REQUIRED) {
                     if (foundOptional) {
                         this.processingEnvironment.getMessager().printMessage(
                                 Diagnostic.Kind.ERROR,
                                 String.format(
                                         "Required argument '%s' cannot succeed an optional argument (%s)",
-                                        fragment.getMajor(),
+                                        fragment.major(),
                                         e.getSimpleName()
                                 ),
                                 e
@@ -173,7 +173,7 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
                     foundOptional = true;
                 }
 
-                parsedArgumentNames.add(fragment.getMajor());
+                parsedArgumentNames.add(fragment.major());
             }
 
             for (final String argument : annotatedArgumentNames) {

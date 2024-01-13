@@ -98,12 +98,12 @@ public class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T>, Sugge
     }
 
     /**
-     * Get the backing Brigadier {@link ArgumentType} for this parser.
+     * Returns the backing Brigadier {@link ArgumentType} for this parser.
      *
      * @return the argument type
      * @since 1.5.0
      */
-    public final ArgumentType<T> getNativeArgument() {
+    public final ArgumentType<T> nativeArgumentType() {
         return this.nativeType.get();
     }
 

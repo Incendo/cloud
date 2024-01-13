@@ -85,7 +85,7 @@ class AnnotatedMethodService<Context, Result> implements Service<Context, Result
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
         final AnnotatedMethodService<?, ?> that = (AnnotatedMethodService<?, ?>) o;

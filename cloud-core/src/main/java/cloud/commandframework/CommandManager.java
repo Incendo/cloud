@@ -617,7 +617,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
         this.servicePipeline.pump(CommandPreprocessingContext.of(context, commandInput))
                 .through(new TypeToken<CommandPreprocessor<C>>() {
                 })
-                .getResult();
+                .complete();
         return context.<String>optional(AcceptingCommandPreprocessor.PROCESSED_INDICATOR_KEY).orElse("").isEmpty()
                 ? State.REJECTED
                 : State.ACCEPTED;
@@ -638,7 +638,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
         this.servicePipeline.pump(CommandPostprocessingContext.of(context, command))
                 .through(new TypeToken<CommandPostprocessor<C>>() {
                 })
-                .getResult();
+                .complete();
         return context.<String>optional(AcceptingCommandPostprocessor.PROCESSED_INDICATOR_KEY).orElse("").isEmpty()
                 ? State.REJECTED
                 : State.ACCEPTED;

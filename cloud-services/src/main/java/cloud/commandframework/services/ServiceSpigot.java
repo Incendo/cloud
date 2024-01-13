@@ -55,11 +55,12 @@ public final class ServiceSpigot<Context, Result> {
     }
 
     /**
-     * Get the first result that is generated for the given context. This cannot return {@code null}.
-     * If nothing manages to produce a result, an exception will be thrown. If the pipeline has been
-     * constructed properly, this will never happen.
+     * Returns the first result that is generated for the given context. This cannot return {@code null}.
      *
-     * @return Generated result
+     * <p>If nothing manages to produce a result, an exception will be thrown. If the pipeline has been
+     * constructed properly, this will never happen.</p>
+     *
+     * @return generated result
      * @throws IllegalStateException If no result was found. This only happens if the pipeline has not
      *                               been constructed properly. The most likely cause is a faulty
      *                               default implementation
@@ -75,27 +76,27 @@ public final class ServiceSpigot<Context, Result> {
      *         retrieval
      */
     @SuppressWarnings("unchecked")
-    public @NonNull Result getResult()
+    public @NonNull Result complete()
             throws IllegalStateException, PipelineException {
         final LinkedList<? extends ServiceRepository<@NonNull Context, @NonNull Result>
                 .ServiceWrapper<? extends Service<@NonNull Context, @NonNull Result>>>
-                queue = this.repository.getQueue();
+                queue = this.repository.queue();
         queue.sort(null); // Sort using the built in comparator method
         ServiceRepository<Context, Result>.ServiceWrapper<? extends Service<Context, Result>>
                 wrapper;
         boolean consumerService = false;
         while ((wrapper = queue.pollLast()) != null) {
-            consumerService = wrapper.getImplementation() instanceof ConsumerService;
+            consumerService = wrapper.implementation() instanceof ConsumerService;
             if (!ServiceFilterHandler.INSTANCE.passes(wrapper, this.context)) {
                 continue;
             }
             final Result result;
             try {
-                result = wrapper.getImplementation().handle(this.context);
+                result = wrapper.implementation().handle(this.context);
             } catch (final Exception e) {
                 throw new PipelineException(String.format("Failed to retrieve result from %s", wrapper), e);
             }
-            if (wrapper.getImplementation() instanceof SideEffectService) {
+            if (wrapper.implementation() instanceof SideEffectService) {
                 if (result == null) {
                     throw new IllegalStateException(String.format("SideEffectService '%s' returned null", wrapper));
                 } else if (result == State.ACCEPTED) {
@@ -115,12 +116,13 @@ public final class ServiceSpigot<Context, Result> {
     }
 
     /**
-     * Get the first result that is generated for the given context. If nothing manages to produce a
-     * result, an exception will be thrown. If the pipeline has been constructed properly, this will
-     * never happen. The exception passed to the consumer will be unwrapped, in the case that it's a
-     * {@link PipelineException}. Thus, the actual exception will be given instead of the wrapper.
+     * Returns the first result that is generated for the given context.
      *
-     * @param consumer Result consumer. If an exception was wrong, the result will be {@code null},
+     * <p>If nothing manages to produce a result, an exception will be thrown. If the pipeline has been constructed properly,
+     * this will never happen. The exception passed to the consumer will be unwrapped, in the case that it's a
+     * {@link PipelineException}. Thus, the actual exception will be given instead of the wrapper.</p>
+     *
+     * @param consumer result consumer. If an exception was wrong, the result will be {@code null},
      *                 otherwise the exception will be non-null and the exception will be {@code
      *                 null}.
      * @throws IllegalStateException If no result was found. This only happens if the pipeline has not
@@ -128,9 +130,9 @@ public final class ServiceSpigot<Context, Result> {
      *                               default implementation
      * @throws IllegalStateException If a {@link SideEffectService} returns {@code null}
      */
-    public void getResult(final @NonNull BiConsumer<Result, Throwable> consumer) {
+    public void complete(final @NonNull BiConsumer<Result, Throwable> consumer) {
         try {
-            consumer.accept(this.getResult(), null);
+            consumer.accept(this.complete(), null);
         } catch (final PipelineException pipelineException) {
             consumer.accept(null, pipelineException.getCause());
         } catch (final Exception e) {
@@ -139,14 +141,15 @@ public final class ServiceSpigot<Context, Result> {
     }
 
     /**
-     * Get the first result that is generated for the given context. This cannot return null. If
-     * nothing manages to produce a result, an exception will be thrown. If the pipeline has been
-     * constructed properly, this will never happen.
+     * Returns the first result that is generated for the given context. This cannot return {@code null}.
      *
-     * @return Generated result
+     * <p>If nothing manages to produce a result, an exception will be thrown. If the pipeline has been
+     * constructed properly, this will never happen.</p>
+     *
+     * @return generated result
      */
-    public @NonNull CompletableFuture<Result> getResultAsynchronously() {
-        return CompletableFuture.supplyAsync(this::getResult, this.pipeline.getExecutor());
+    public @NonNull CompletableFuture<Result> completeAsynchronously() {
+        return CompletableFuture.supplyAsync(this::complete, this.pipeline.executor());
     }
 
     /**
@@ -155,7 +158,7 @@ public final class ServiceSpigot<Context, Result> {
      * @return New pump, for the result of this request
      */
     public @NonNull ServicePump<Result> forward() {
-        return this.pipeline.pump(this.getResult());
+        return this.pipeline.pump(this.complete());
     }
 
     /**
@@ -164,6 +167,6 @@ public final class ServiceSpigot<Context, Result> {
      * @return New pump, for the result of this request
      */
     public @NonNull CompletableFuture<ServicePump<Result>> forwardAsynchronously() {
-        return this.getResultAsynchronously().thenApply(this.pipeline::pump);
+        return this.completeAsynchronously().thenApply(this.pipeline::pump);
     }
 }

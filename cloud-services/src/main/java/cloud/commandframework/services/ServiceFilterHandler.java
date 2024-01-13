@@ -36,7 +36,7 @@ enum ServiceFilterHandler {
             final @NonNull Context context
     ) {
         if (!service.isDefaultImplementation()) {
-            for (final Predicate<Context> predicate : service.getFilters()) {
+            for (final Predicate<Context> predicate : service.filters()) {
                 try {
                     if (!predicate.test(context)) {
                         return false;

@@ -57,7 +57,7 @@ final class SpongePluginRegistrationHandler<C> implements CommandRegistrationHan
         this.registeredCommands.put(component, callable);
 
         return Sponge.getGame().getCommandManager().register(
-                this.manager.getOwningPlugin(),
+                this.manager.owningPlugin(),
                 callable,
                 ImmutableList.copyOf(component.aliases())
         ).isPresent();

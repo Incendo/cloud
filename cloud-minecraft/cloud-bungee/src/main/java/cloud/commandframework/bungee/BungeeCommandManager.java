@@ -119,11 +119,11 @@ public class BungeeCommandManager<C> extends CommandManager<C> implements Sender
     }
 
     /**
-     * Get the owning plugin
+     * Returns the owning plugin.
      *
-     * @return Owning plugin
+     * @return owning plugin
      */
-    public @NonNull Plugin getOwningPlugin() {
+    public @NonNull Plugin owningPlugin() {
         return this.owningPlugin;
     }
 

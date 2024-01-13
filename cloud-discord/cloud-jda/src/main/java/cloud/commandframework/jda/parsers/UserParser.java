@@ -244,7 +244,7 @@ public final class UserParser<C> implements ArgumentParser<C, User> {
          *
          * @return Users input
          */
-        public final @NonNull String getInput() {
+        public final @NonNull String input() {
             return this.input;
         }
     }
@@ -264,7 +264,7 @@ public final class UserParser<C> implements ArgumentParser<C, User> {
 
         @Override
         public @NonNull String getMessage() {
-            return String.format("Too many users found for '%s'.", getInput());
+            return String.format("Too many users found for '%s'.", input());
         }
     }
 
@@ -283,7 +283,7 @@ public final class UserParser<C> implements ArgumentParser<C, User> {
 
         @Override
         public @NonNull String getMessage() {
-            return String.format("User not found for '%s'.", getInput());
+            return String.format("User not found for '%s'.", input());
         }
     }
 }

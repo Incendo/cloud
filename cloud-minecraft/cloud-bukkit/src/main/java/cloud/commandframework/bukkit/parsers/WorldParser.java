@@ -114,7 +114,7 @@ public final class WorldParser<C> implements ArgumentParser<C, World>, BlockingS
          *
          * @return Input
          */
-        public @NonNull String getInput() {
+        public @NonNull String input() {
             return this.input;
         }
     }

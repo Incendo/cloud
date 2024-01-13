@@ -53,7 +53,7 @@ class CloudburstPluginRegistrationHandler<C> implements CommandRegistrationHandl
         if (this.registeredCommands.containsKey(component)) {
             return false;
         }
-        final Plugin plugin = this.cloudburstCommandManager.getOwningPlugin();
+        final Plugin plugin = this.cloudburstCommandManager.owningPlugin();
         final CloudburstCommand<C> cloudburstCommand = new CloudburstCommand<>(
                 component.name(),
                 component.alternativeAliases(),

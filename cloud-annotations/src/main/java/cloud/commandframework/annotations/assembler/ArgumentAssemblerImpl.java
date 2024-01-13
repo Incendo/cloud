@@ -99,7 +99,7 @@ public final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
         }
         /* Check whether the corresponding method parameter actually exists */
         final String argumentName = this.annotationParser.processString(descriptor.name());
-        if (syntaxFragment.getArgumentMode() == ArgumentMode.LITERAL) {
+        if (syntaxFragment.argumentMode() == ArgumentMode.LITERAL) {
             throw new IllegalArgumentException(String.format(
                     "Invalid command argument '%s': Missing syntax mapping", argumentName));
         }
@@ -109,7 +109,7 @@ public final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
                 .valueType(parameter.getType())
                 .name(argumentName)
                 .parser(parser)
-                .required(syntaxFragment.getArgumentMode() == ArgumentMode.REQUIRED);
+                .required(syntaxFragment.argumentMode() == ArgumentMode.REQUIRED);
 
         /* Check for Completions annotation */
         final Completions completions = parameter.getDeclaredAnnotation(Completions.class);
@@ -135,7 +135,7 @@ public final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
             componentBuilder.description(descriptor.description());
         }
 
-        if (syntaxFragment.getArgumentMode() == ArgumentMode.OPTIONAL && descriptor.defaultValue() != null) {
+        if (syntaxFragment.argumentMode() == ArgumentMode.OPTIONAL && descriptor.defaultValue() != null) {
             componentBuilder.defaultValue(DefaultValue.parsed(this.annotationParser.processString(descriptor.defaultValue())));
         }
 

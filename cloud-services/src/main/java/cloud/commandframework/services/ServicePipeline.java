@@ -203,11 +203,11 @@ public final class ServicePipeline {
     }
 
     /**
-     * Get a collection of all the recognised service types.
+     * Returns a collection of all the recognised service types.
      *
-     * @return Returns an Immutable collection of the service types registered.
+     * @return returns an Immutable collection of the service types registered.
      */
-    public @NonNull Collection<Type> getRecognizedTypes() {
+    public @NonNull Collection<Type> recognizedTypes() {
         return Collections.unmodifiableCollection(this.repositories.keySet());
     }
 
@@ -228,17 +228,17 @@ public final class ServicePipeline {
         ServiceRepository<Context, Result> repository = this.getRepository(type);
         List<TypeToken<? extends S>> collection = new LinkedList<>();
         final LinkedList<? extends ServiceRepository<Context, Result>.ServiceWrapper<? extends Service<Context, Result>>>
-                queue = repository.getQueue();
+                queue = repository.queue();
         queue.sort(null);
         Collections.reverse(queue);
         for (ServiceRepository<Context, Result>.ServiceWrapper<? extends Service<Context, Result>> wrapper : queue) {
             collection
-                    .add((TypeToken<? extends S>) TypeToken.get(wrapper.getImplementation().getClass()));
+                    .add((TypeToken<? extends S>) TypeToken.get(wrapper.implementation().getClass()));
         }
         return Collections.unmodifiableList(collection);
     }
 
-    @NonNull Executor getExecutor() {
+    @NonNull Executor executor() {
         return this.executor;
     }
 }

@@ -41,7 +41,6 @@ import cloud.commandframework.annotations.extractor.CommandExtractorImpl;
 import cloud.commandframework.annotations.extractor.FlagExtractor;
 import cloud.commandframework.annotations.extractor.FlagExtractorImpl;
 import cloud.commandframework.annotations.extractor.StandardArgumentExtractor;
-import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.injection.RawArgs;
 import cloud.commandframework.annotations.parsers.MethodArgumentParser;
 import cloud.commandframework.annotations.parsers.Parser;
@@ -221,7 +220,7 @@ public final class AnnotationParser<C> {
                 this.processString(annotation.value()),
                 Caption.of(this.processString(annotation.failureCaption()))
         ));
-        this.getParameterInjectorRegistry().registerInjector(
+        this.manager.parameterInjectorRegistry().registerInjector(
                 String[].class,
                 (context, annotations) -> annotations.annotation(RawArgs.class) == null
                         ? null
@@ -383,17 +382,6 @@ public final class AnnotationParser<C> {
     @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull Map<@NonNull Class<? extends Annotation>, @NonNull PreprocessorMapper<?, C>> preprocessorMappers() {
         return Collections.unmodifiableMap(this.preprocessorMappers);
-    }
-
-    /**
-     * Get the parameter injector registry instance that is used to inject non-{@link Argument argument} parameters
-     * into {@link Command} annotated {@link Method methods}
-     *
-     * @return Parameter injector registry
-     * @since 1.2.0
-     */
-    public @NonNull ParameterInjectorRegistry<C> getParameterInjectorRegistry() {
-        return this.manager.parameterInjectorRegistry();
     }
 
     /**
@@ -889,7 +877,7 @@ public final class AnnotationParser<C> {
 
         cloud.commandframework.Command.Builder<C> builder = manager.commandBuilder(
                 commandDescriptor.commandToken(),
-                commandDescriptor.syntax().get(0).getMinor(),
+                commandDescriptor.syntax().get(0).minor(),
                 metaBuilder.build()
         );
         for (final BuilderDecorator<C> decorator : this.builderDecorators) {
@@ -913,14 +901,14 @@ public final class AnnotationParser<C> {
                 commandNameFound = true;
                 continue;
             }
-            if (token.getArgumentMode() == ArgumentMode.LITERAL) {
-                builder = builder.literal(token.getMajor(), token.getMinor().toArray(new String[0]));
+            if (token.argumentMode() == ArgumentMode.LITERAL) {
+                builder = builder.literal(token.major(), token.minor().toArray(new String[0]));
             } else {
-                final CommandComponent<C> component = commandComponents.get(token.getMajor());
+                final CommandComponent<C> component = commandComponents.get(token.major());
                 if (component == null) {
                     throw new IllegalArgumentException(String.format(
                             "Found no mapping for argument '%s' in method '%s'",
-                            token.getMajor(), method.getName()
+                            token.major(), method.getName()
                     ));
                 }
 
@@ -1040,8 +1028,8 @@ public final class AnnotationParser<C> {
             final @NonNull List<@NonNull SyntaxFragment> fragments,
             final @NonNull String argumentName
     ) {
-        return fragments.stream().filter(fragment -> fragment.getArgumentMode() != ArgumentMode.LITERAL)
-                .filter(fragment -> fragment.getMajor().equals(argumentName))
+        return fragments.stream().filter(fragment -> fragment.argumentMode() != ArgumentMode.LITERAL)
+                .filter(fragment -> fragment.major().equals(argumentName))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Argument is not declared in syntax: " + argumentName));
     }
