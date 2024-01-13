@@ -404,15 +404,6 @@ public class Command<C> {
         return build.substring(0, build.length() - 1);
     }
 
-    /**
-     * Returns whether the command is hidden.
-     *
-     * @return {@code true} if the command is hidden, {@code false} if not
-     */
-    public boolean isHidden() {
-        return this.commandMeta().getOrDefault(CommandMeta.HIDDEN, false);
-    }
-
 
     /**
      * Builder for {@link Command} instances. The builder is immutable, and each
@@ -2259,16 +2250,6 @@ public class Command<C> {
                 builder = builder.permission(command.commandPermission());
             }
             return builder.handler(command.commandExecutionHandler);
-        }
-
-        /**
-         * Indicates that the command should be hidden from help menus
-         * and other places where commands are exposed to users.
-         *
-         * @return new builder instance that indicates that the constructed command should be hidden
-         */
-        public @NonNull Builder<C> hidden() {
-            return this.meta(CommandMeta.HIDDEN, true);
         }
 
         /**
