@@ -1037,6 +1037,16 @@ public final class CommandTree<C> {
     }
 
     /**
+     * Returns the node that all {@link #rootNodes()} share as a parent.
+     *
+     * @return the root node
+     */
+    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    public @NonNull CommandNode<C> rootNode() {
+        return this.internalTree;
+    }
+
+    /**
      * Propagates permission and sender type requirements from the {@link Command} owning the {@code leafNode}'s component down
      * the tree, merging as is appropriate for nodes shared by multiple chains.
      *
