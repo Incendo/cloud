@@ -2230,12 +2230,19 @@ public class Command<C> {
          * being built. If the current command builder does not have a permission node set, this
          * too will be copied.
          *
+         * @param <N> new command sender type
          * @param command the command to proxy
          * @return new builder that proxies the given command
          */
-        public @NonNull Builder<C> proxies(final @NonNull Command<C> command) {
-            Builder<C> builder = this;
-            for (final CommandComponent<C> component : command.components()) {
+        @SuppressWarnings("unchecked")
+        public <N extends C> @NonNull Builder<N> proxies(final @NonNull Command<N> command) {
+            Builder<N> builder;
+            if (command.senderType != null) {
+                builder = this.senderType(command.senderType);
+            } else {
+                builder = (Builder<N>) this;
+            }
+            for (final CommandComponent<N> component : command.components()) {
                 if (component.type() == CommandComponent.ComponentType.LITERAL) {
                     continue;
                 }
