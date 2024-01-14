@@ -1148,12 +1148,13 @@ public final class CommandTree<C> {
     }
 
     /**
-     * Returns all leaf nodes attached to the given {@code node} or its children
+     * Returns all leaf nodes attached to the given {@code node} or its children.
      *
      * @param node the node
      * @return the leaf nodes attached to the node
      */
-    private @NonNull List<@NonNull CommandNode<C>> getLeavesRaw(
+    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    public @NonNull List<@NonNull CommandNode<C>> getLeavesRaw(
             final @NonNull CommandNode<C> node
     ) {
         final List<CommandNode<C>> leaves = new LinkedList<>();
@@ -1168,12 +1169,13 @@ public final class CommandTree<C> {
     }
 
     /**
-     * Returns all leaf nodes attached to the given {@code node} or its children
+     * Returns all leaf nodes attached to the given {@code node} or its children.
      *
      * @param node the node
      * @return the leaf nodes attached to the node
      */
-    private @NonNull List<@NonNull CommandNode<C>> getLeaves(
+    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    public @NonNull List<@NonNull CommandNode<C>> getLeaves(
             final @NonNull CommandNode<C> node
     ) {
         return this.getLeavesRaw(node).stream()
