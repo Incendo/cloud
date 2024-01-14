@@ -53,11 +53,6 @@ dependencyResolutionManagement {
             name = "jitpack"
             content { includeGroupByRegex("com\\.github\\..*") }
         }
-        /* JDA's maven repository for cloud-jda */
-        maven("https://m2.dv8tion.net/releases") {
-            name = "dv8tion"
-            mavenContent { releasesOnly() }
-        }
     }
 }
 
@@ -74,10 +69,6 @@ include(":cloud-annotations")
 setupKotlinModule("cloud-kotlin-extensions")
 setupKotlinModule("cloud-kotlin-coroutines")
 setupKotlinModule("cloud-kotlin-coroutines-annotations")
-
-// Discord Modules
-setupDiscordModule("cloud-javacord")
-setupDiscordModule("cloud-jda")
 
 // Minecraft Modules
 setupMinecraftModule("cloud-brigadier")
@@ -97,13 +88,9 @@ setupIrcModule("cloud-pircbotx")
 setupExampleModule("example-bukkit")
 setupExampleModule("example-bungee")
 setupExampleModule("example-velocity")
-setupExampleModule("example-jda")
 
 fun setupIrcModule(name: String) =
         setupSubproject(name, file("cloud-irc/$name"))
-
-fun setupDiscordModule(name: String) =
-        setupSubproject(name, file("cloud-discord/$name"))
 
 fun setupMinecraftModule(name: String) =
         setupSubproject(name, file("cloud-minecraft/$name"))
