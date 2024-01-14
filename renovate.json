@@ -6,19 +6,10 @@
   "baseBranches" : [
     "/^[0-9].[0-9].[0-9]\\-dev$/"
   ],
-  "ignoreDeps": [
-    "com.mojang:minecraft",
-    "quiet-fabric-loom"
-  ],
   "labels": [
     "dependencies"
   ],
   "packageRules": [
-    {
-      "description": "Correct version handling for dependencies with format major.minor.patch+mcver",
-      "matchPackageNames": ["net.fabricmc.fabric-api:fabric-api", "net.fabricmc.fabric-api:fabric-api-deprecated"],
-      "versioning": "regex:^(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?(?:\\+(?<compatibility>.*))?$"
-    },
     {
       "matchManagers": ["github-actions", "gradle-wrapper"],
       "groupName": "gradle and github actions"

@@ -48,10 +48,6 @@ paperApi = "1.20.4-R0.1-SNAPSHOT"
 velocityApi = "3.1.1"
 spongeApi7 = "7.3.0"
 jetbrainsAnnotations = "24.1.0"
-fabricMinecraft = "1.20.4"
-fabricLoader = "0.15.3"
-fabricApi = "0.93.1+1.20.4"
-fabricPermissionsApi = "0.2-SNAPSHOT"
 
 # testing
 jupiterEngine = "5.10.1"
@@ -62,7 +58,6 @@ truth = "1.1.5"
 compileTesting = "0.21.0"
 
 # build-logic
-indra = "3.1.3"
 cloud-build-logic = "0.0.3"
 revapi = "1.7.0"
 
@@ -106,13 +101,6 @@ paperApi = { group = "io.papermc.paper", name = "paper-api", version.ref = "pape
 paperMojangApi = { group = "io.papermc.paper", name = "paper-mojangapi", version.ref = "paperApi" }
 spongeApi7 = { group = "org.spongepowered", name = "spongeapi", version.ref = "spongeApi7" }
 velocityApi = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocityApi" }
-fabricMinecraft = { group = "com.mojang", name = "minecraft", version.ref = "fabricMinecraft" }
-fabricLoader = { group = "net.fabricmc", name = "fabric-loader", version.ref = "fabricLoader" }
-fabricApi-bom = { module = "net.fabricmc.fabric-api:fabric-api-bom", version.ref = "fabricApi" }
-fabricApi-command-api-v2 = { module = "net.fabricmc.fabric-api:fabric-command-api-v2" }
-fabricApi-networking-api-v1 = { module = "net.fabricmc.fabric-api:fabric-networking-api-v1" }
-fabricApi-lifecycle-events-v1 = { module = "net.fabricmc.fabric-api:fabric-lifecycle-events-v1" }
-fabricPermissionsApi = { group = "me.lucko", name = "fabric-permissions-api", version.ref = "fabricPermissionsApi" }
 
 # testing
 jupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "jupiterEngine" }
