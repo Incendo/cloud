@@ -223,10 +223,5 @@ gradle-app.setting
 
 # End of https://www.toptal.com/developers/gitignore/api/git,java,eclipse,jetbrains+all,gradle
 
-### Fabric Loom run files ###
-
-/run/
-/cloud-minecraft/cloud-fabric/run/
-
 # MacOS
 **/.DS_Store
