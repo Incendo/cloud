@@ -1,16 +1,11 @@
 [plugins]
-shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }
 versions = { id = "com.github.ben-manes.versions", version = "0.50.0" }
-run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-task" }
-run-velocity = { id = "xyz.jpenilla.run-velocity", version.ref = "run-task" }
-run-waterfall = { id = "xyz.jpenilla.run-waterfall", version.ref = "run-task" }
 cloud-buildLogic-spotless = { id = "org.incendo.cloud-build-logic.spotless", version.ref = "cloud-build-logic" }
 cloud-buildLogic-rootProject-publishing = { id = "org.incendo.cloud-build-logic.publishing.root-project", version.ref = "cloud-build-logic" }
 cloud-buildLogic-rootProject-spotless = { id = "org.incendo.cloud-build-logic.spotless.root-project", version.ref = "cloud-build-logic" }
 revapi = { id = "com.palantir.revapi", version.ref = "revapi" }
 
 [versions]
-run-task = "2.2.2"
 checkstyle = "10.12.5"
 stylecheck = "0.2.1"
 checkerQual = "3.42.0"
@@ -31,19 +26,6 @@ ktlint = "0.50.0"
 
 # irc
 pircbotx = "12f5639c5d"
-
-# minecraft
-brigadier = "1.0.18"
-bukkit = "1.13.2-R0.1-SNAPSHOT"
-commodore = "2.2"
-bungeecord = "1.8-SNAPSHOT"
-cloudburst = "1.0.0-SNAPSHOT"
-adventureApi = "4.14.0"
-adventurePlatform = "4.3.1"
-paperApi = "1.20.4-R0.1-SNAPSHOT"
-velocityApi = "3.1.1"
-spongeApi7 = "7.3.0"
-jetbrainsAnnotations = "24.1.0"
 
 # testing
 jupiterEngine = "5.10.1"
@@ -77,22 +59,6 @@ coroutinesJdk8 = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-j
 
 # irc
 pircbotx = { group = "com.github.pircbotx", name = "pircbotx", version.ref = "pircbotx" }
-
-# minecraft
-brigadier = { group = "com.mojang", name = "brigadier", version.ref = "brigadier" }
-bukkit = { group = "org.bukkit", name = "bukkit", version.ref = "bukkit" }
-commodore = { group = "me.lucko", name = "commodore", version.ref = "commodore" }
-jetbrainsAnnotations = { group = "org.jetbrains", name = "annotations", version.ref = "jetbrainsAnnotations" }
-bungeecord = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungeecord" }
-cloudburst = { group = "org.cloudburstmc", name = "cloudburst-server", version.ref = "cloudburst" }
-adventureApi = { group = "net.kyori", name = "adventure-api", version.ref = "adventureApi" }
-adventurePlatformBukkit = { group = "net.kyori", name = "adventure-platform-bukkit", version.ref = "adventurePlatform" }
-adventurePlatformBungeecord = { group = "net.kyori", name = "adventure-platform-bungeecord", version.ref = "adventurePlatform" }
-adventureTextSerializerPlain = { group = "net.kyori", name = "adventure-text-serializer-plain", version.ref = "adventureApi" }
-paperApi = { group = "io.papermc.paper", name = "paper-api", version.ref = "paperApi" }
-paperMojangApi = { group = "io.papermc.paper", name = "paper-mojangapi", version.ref = "paperApi" }
-spongeApi7 = { group = "org.spongepowered", name = "spongeapi", version.ref = "spongeApi7" }
-velocityApi = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocityApi" }
 
 # testing
 jupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "jupiterEngine" }
