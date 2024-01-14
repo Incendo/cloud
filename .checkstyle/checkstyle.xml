@@ -227,6 +227,11 @@
         <!-- https://gitlab.com/stellardrift/stylecheck/-/blob/trunk/src/main/java/ca/stellardrift/stylecheck/AnnotationsCloseToType.java -->
         <module name="AnnotationsCloseToType"/>
 
+        <!-- Make the @SuppressWarnings annotations available to Checkstyle -->
+        <module name="SuppressWarningsHolder" />
+
     </module>
+
+    <module name="SuppressWarningsFilter" />
 
 </module>
