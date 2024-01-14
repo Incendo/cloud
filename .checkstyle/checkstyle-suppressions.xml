@@ -3,7 +3,6 @@
         "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
         "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 <suppressions>
-    <suppress checks="(?:(?:Member|Method)Name|DesignForExtension|Javadoc.*)" files=".*[\\/]mixin[\\/].*"/>
     <suppress checks="(?:Javadoc.*)" files=".*[\\/]bukkit[\\/]internal[\\/].*"/>
     <suppress checks="(?:Javadoc.*)" files=".*[\\/]example-.*[\\/].*"/>
 </suppressions>

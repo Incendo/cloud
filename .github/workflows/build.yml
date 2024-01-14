@@ -23,14 +23,6 @@ jobs:
         with:
           # allow master and *-dev branches to write caches (default is only master/main)
           cache-read-only: ${{ github.ref != 'refs/heads/master' && !(endsWith(github.ref, '-dev') && startsWith(github.ref, 'refs/heads/')) }}
-        # gradle-build-action doesn't support caching files in the project dir
-      - uses: actions/cache@v3
-        with:
-          path: |
-            .gradle/loom-cache
-            .gradle/caches/VanillaGradle
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/libs.versions.*', '**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: ${{ runner.os }}-gradle-
       - name: Build
         run: ./gradlew build
       - name : Test Summary

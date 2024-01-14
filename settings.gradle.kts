@@ -4,13 +4,6 @@ pluginManagement {
     repositories {
         mavenCentral()
         gradlePluginPortal()
-        maven("https://maven.fabricmc.net/") {
-            name = "fabric"
-        }
-        maven("https://repo.jpenilla.xyz/snapshots/") {
-            name = "jmpSnapshots"
-            mavenContent { snapshotsOnly() }
-        }
         maven("https://oss.sonatype.org/content/repositories/snapshots/") {
             name = "sonatypeOssSnapshots"
             mavenContent { snapshotsOnly() }
@@ -20,7 +13,6 @@ pluginManagement {
 }
 
 plugins {
-    id("quiet-fabric-loom") version "1.4-SNAPSHOT"
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
@@ -50,11 +42,6 @@ dependencyResolutionManagement {
                 snapshotsOnly()
                 includeGroup("org.cloudburstmc")
             }
-        }
-        /* The current Fabric repository */
-        maven("https://maven.fabricmc.net/") {
-            name = "fabric"
-            mavenContent { includeGroup("net.fabricmc") }
         }
         /* The current Sponge repository */
         maven("https://repo.spongepowered.org/repository/maven-public/") {
@@ -102,7 +89,6 @@ setupMinecraftModule("cloud-velocity")
 //setupMinecraftModule("cloud-sponge")
 setupMinecraftModule("cloud-sponge7")
 setupMinecraftModule("cloud-minecraft-extras")
-setupMinecraftModule("cloud-fabric")
 
 // IRC Modules
 setupIrcModule("cloud-pircbotx")
