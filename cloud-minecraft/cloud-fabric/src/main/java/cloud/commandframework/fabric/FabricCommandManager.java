@@ -44,6 +44,7 @@ import cloud.commandframework.fabric.argument.FabricVanillaArgumentParsers;
 import cloud.commandframework.fabric.argument.RegistryEntryParser;
 import cloud.commandframework.fabric.argument.TeamParser;
 import cloud.commandframework.fabric.data.MinecraftTime;
+import cloud.commandframework.permission.PermissionResult;
 import cloud.commandframework.permission.PredicatePermission;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -377,13 +378,20 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
      * Get a permission predicate which passes when the sender has the specified permission level.
      *
      * @param permissionLevel permission level to require
-     * @return a permission predicate
+     * @return a permission predicate that will provide {@link PermissionLevelResult}s
      * @since 1.5.0
      */
     public @NonNull PredicatePermission<C> permissionLevel(final int permissionLevel) {
-        return sender -> this.senderMapper()
-                .reverse(sender)
-                .hasPermission(permissionLevel);
+        return new PredicatePermission<C>() {
+            @Override
+            public @NonNull PermissionResult testPermission(final @NonNull C sender) {
+                return PermissionLevelResult.of(
+                        FabricCommandManager.this.senderMapper().reverse(sender).hasPermission(permissionLevel),
+                        this,
+                        permissionLevel
+                );
+            }
+        };
     }
 
     protected final void registerDefaultExceptionHandlers(

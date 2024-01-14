@@ -40,12 +40,20 @@ public final class AndPermission implements Permission {
     private final Set<Permission> permissions;
 
     AndPermission(final @NonNull Set<Permission> permissions) {
+        if (permissions.isEmpty()) {
+            throw new IllegalArgumentException("AndPermission may not have an empty set of permissions");
+        }
         this.permissions = Collections.unmodifiableSet(permissions);
     }
 
     @Override
     public @NonNull Collection<@NonNull Permission> permissions() {
         return this.permissions;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false; // we require the set to be non-empty
     }
 
     @Override
@@ -77,5 +85,10 @@ public final class AndPermission implements Permission {
     @Override
     public int hashCode() {
         return Objects.hash(this.permissions());
+    }
+
+    @Override
+    public @NonNull String toString() {
+        return this.permissionString();
     }
 }

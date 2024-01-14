@@ -153,7 +153,7 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      */
     @API(status = API.Status.STABLE, since = "1.6.0")
     public boolean hasPermission(final @NonNull Permission permission) {
-        return this.commandManager.hasPermission(this.commandSender, permission);
+        return this.commandManager.testPermission(this.commandSender, permission).allowed();
     }
 
     /**

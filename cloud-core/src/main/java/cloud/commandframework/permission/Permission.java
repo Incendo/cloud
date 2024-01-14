@@ -154,6 +154,18 @@ public interface Permission {
      */
     @NonNull String permissionString();
 
+
+    /**
+     * Returns true if a check for this permission should and will always return true.
+     *
+     * @return true if this permission is empty, otherwise false
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    default boolean isEmpty() {
+        return this.permissionString().isEmpty();
+    }
+
     /**
      * Returns a permission that matches either this permission or the {@code other} permission.
      *

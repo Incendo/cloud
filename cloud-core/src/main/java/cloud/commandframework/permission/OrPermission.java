@@ -40,12 +40,20 @@ public final class OrPermission implements Permission {
     private final Set<Permission> permissions;
 
     OrPermission(final @NonNull Set<Permission> permissions) {
+        if (permissions.isEmpty()) {
+            throw new IllegalArgumentException("OrPermission may not have an empty set of permissions");
+        }
         this.permissions = Collections.unmodifiableSet(permissions);
     }
 
     @Override
     public @NonNull Collection<@NonNull Permission> permissions() {
         return this.permissions;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false; // we require the permissions to be non-empty
     }
 
     @Override
@@ -77,5 +85,10 @@ public final class OrPermission implements Permission {
     @Override
     public int hashCode() {
         return Objects.hash(this.permissions());
+    }
+
+    @Override
+    public @NonNull String toString() {
+        return this.permissionString();
     }
 }

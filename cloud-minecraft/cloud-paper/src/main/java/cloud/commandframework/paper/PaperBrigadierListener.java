@@ -99,7 +99,7 @@ class PaperBrigadierListener<C> implements Listener {
                 return false;
             }
 
-            return this.paperCommandManager.hasPermission(sender, permission);
+            return this.paperCommandManager.testPermission(sender, permission).allowed();
         };
         final LiteralBrigadierNodeFactory<C, BukkitBrigadierCommandSource> literalFactory =
                 this.brigadierManager.literalBrigadierNodeFactory();

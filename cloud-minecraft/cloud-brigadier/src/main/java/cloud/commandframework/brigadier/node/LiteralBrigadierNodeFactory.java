@@ -139,7 +139,8 @@ public final class LiteralBrigadierNodeFactory<C, S> implements BrigadierNodeFac
             final cloud.commandframework.@NonNull Command<C> cloudCommand,
             final @NonNull Command<S> executor
     ) {
-        return this.createNode(label, cloudCommand, executor, this.commandManager::hasPermission);
+        return this.createNode(label, cloudCommand, executor,
+                (sender, permission) -> this.commandManager.testPermission(sender, permission).allowed());
     }
 
     private @NonNull ArgumentBuilder<S, ?> constructCommandNode(

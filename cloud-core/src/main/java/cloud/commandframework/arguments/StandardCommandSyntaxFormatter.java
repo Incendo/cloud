@@ -88,11 +88,11 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                     Collections.emptySet()
             );
             if (senderTypes.isEmpty()) {
-                return this.manager.hasPermission(sender, permission);
+                return this.manager.testPermission(sender, permission).allowed();
             }
             for (final Class<?> senderType : senderTypes) {
                 if (senderType.isInstance(sender)) {
-                    return this.manager.hasPermission(sender, permission);
+                    return this.manager.testPermission(sender, permission).allowed();
                 }
             }
             return false;

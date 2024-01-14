@@ -25,6 +25,7 @@ package cloud.commandframework.fabric;
 
 import cloud.commandframework.SenderMapper;
 import cloud.commandframework.execution.ExecutionCoordinator;
+import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.permission.PredicatePermission;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -122,7 +123,10 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      * @since 1.5.0
      */
     public static <C> @NonNull PredicatePermission<C> integratedServerRunning() {
-        return sender -> Minecraft.getInstance().hasSingleplayerServer();
+        return PredicatePermission.of(
+                CloudKey.of("integrated-server-running"),
+                sender -> Minecraft.getInstance().hasSingleplayerServer()
+        );
     }
 
     /**
@@ -133,7 +137,10 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      * @since 1.5.0
      */
     public static <C> @NonNull PredicatePermission<C> integratedServerNotRunning() {
-        return sender -> !Minecraft.getInstance().hasSingleplayerServer();
+        return PredicatePermission.of(
+                CloudKey.of("integrated-server-not-running"),
+                sender -> !Minecraft.getInstance().hasSingleplayerServer()
+        );
     }
 
     /**
@@ -161,13 +168,13 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      * @since 1.5.0
      */
     public static <C> @NonNull PredicatePermission<C> cheatsAllowed(final boolean allowOnMultiplayer) {
-        return sender -> {
+        return PredicatePermission.of(CloudKey.of("cheats-allowed"), sender -> {
             if (!Minecraft.getInstance().hasSingleplayerServer()) {
                 return allowOnMultiplayer;
             }
             return Minecraft.getInstance().getSingleplayerServer().getPlayerList().isAllowCheatsForAllPlayers()
                     || Minecraft.getInstance().getSingleplayerServer().getWorldData().getAllowCommands();
-        };
+        });
     }
 
     /**
@@ -195,12 +202,12 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      * @since 1.5.0
      */
     public static <C> @NonNull PredicatePermission<C> cheatsDisallowed(final boolean allowOnMultiplayer) {
-        return sender -> {
+        return PredicatePermission.of(CloudKey.of("cheats-disallowed"), sender -> {
             if (!Minecraft.getInstance().hasSingleplayerServer()) {
                 return allowOnMultiplayer;
             }
             return !Minecraft.getInstance().getSingleplayerServer().getPlayerList().isAllowCheatsForAllPlayers()
                     && !Minecraft.getInstance().getSingleplayerServer().getWorldData().getAllowCommands();
-        };
+        });
     }
 }

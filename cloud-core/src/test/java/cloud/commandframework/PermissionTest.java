@@ -28,6 +28,7 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.permission.Permission;
+import cloud.commandframework.permission.PermissionResult;
 import cloud.commandframework.permission.PredicatePermission;
 import java.util.Arrays;
 import java.util.List;
@@ -121,10 +122,10 @@ class PermissionTest {
         when(this.permissionFunction.apply("two")).thenReturn(true);
 
         // Act
-        final boolean result = this.manager.hasPermission(new TestCommandSender(), test);
+        final PermissionResult result = this.manager.testPermission(new TestCommandSender(), test);
 
         // Assert
-        assertThat(result).isFalse();
+        assertThat(result.allowed()).isFalse();
     }
 
 
@@ -137,10 +138,10 @@ class PermissionTest {
         when(this.permissionFunction.apply("two")).thenReturn(true);
 
         // Act
-        final boolean result = this.manager.hasPermission(new TestCommandSender(), test);
+        final PermissionResult result = this.manager.testPermission(new TestCommandSender(), test);
 
         // Assert
-        assertThat(result).isTrue();
+        assertThat(result.allowed()).isTrue();
     }
 
     @Test
@@ -149,10 +150,10 @@ class PermissionTest {
         final Permission test = Permission.of("one").or(Permission.of("two"));
 
         // Act
-        final boolean result = this.manager.hasPermission(new TestCommandSender(), test);
+        final PermissionResult result = this.manager.testPermission(new TestCommandSender(), test);
 
         // Assert
-        assertThat(result).isFalse();
+        assertThat(result.allowed()).isFalse();
     }
 
     @Test
@@ -163,10 +164,10 @@ class PermissionTest {
         when(this.permissionFunction.apply("two")).thenReturn(true);
 
         // Act
-        final boolean result = this.manager.hasPermission(new TestCommandSender(), test);
+        final PermissionResult result = this.manager.testPermission(new TestCommandSender(), test);
 
         // Assert
-        assertThat(result).isTrue();
+        assertThat(result.allowed()).isTrue();
     }
 
     @Test
@@ -174,7 +175,13 @@ class PermissionTest {
         // Arrange
         final Permission orOne = Permission.anyOf(
                 Permission.of("perm.one"),
-                (PredicatePermission<?>) (s) -> false
+                new PredicatePermission<TestCommandSender>() {
+
+                    @Override
+                    public @NonNull PermissionResult testPermission(final @NonNull TestCommandSender sender) {
+                        return PermissionResult.denied(this);
+                    }
+                }
         );
         final Permission orTwo = Permission.anyOf(
                 Permission.of("perm.two"),
@@ -186,10 +193,10 @@ class PermissionTest {
         when(this.permissionFunction.apply("perm.one")).thenReturn(true);
 
         // Act
-        final boolean result = this.manager.hasPermission(new TestCommandSender(), andPermission);
+        final PermissionResult result = this.manager.testPermission(new TestCommandSender(), andPermission);
 
         // Assert
-        assertThat(result).isFalse();
+        assertThat(result.allowed()).isFalse();
     }
 
     @Test
@@ -197,7 +204,13 @@ class PermissionTest {
         // Arrange
         final Permission orOne = Permission.anyOf(
                 Permission.of("perm.one"),
-                (PredicatePermission<?>) (s) -> false
+                new PredicatePermission<TestCommandSender>() {
+
+                    @Override
+                    public @NonNull PermissionResult testPermission(final @NonNull TestCommandSender sender) {
+                        return PermissionResult.denied(this);
+                    }
+                }
         );
         final Permission orTwo = Permission.anyOf(
                 Permission.of("perm.two"),
@@ -210,10 +223,10 @@ class PermissionTest {
         when(this.permissionFunction.apply("perm.three")).thenReturn(true);
 
         // Act
-        final boolean result = this.manager.hasPermission(new TestCommandSender(), andPermission);
+        final PermissionResult result = this.manager.testPermission(new TestCommandSender(), andPermission);
 
         // Assert
-        assertThat(result).isTrue();
+        assertThat(result.allowed()).isTrue();
     }
 
     @Test

@@ -21,39 +21,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.permission;
+package cloud.commandframework.exceptions;
 
-import cloud.commandframework.keys.CloudKey;
-import java.util.function.Predicate;
-import org.apiguardian.api.API;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import cloud.commandframework.permission.Permission;
+import cloud.commandframework.permission.PermissionResult;
+import java.util.Collections;
+import org.junit.jupiter.api.Test;
 
-@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-final class WrappingPredicatePermission<C> implements PredicatePermission<C> {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    private final CloudKey<Void> key;
-    private final Predicate<C> predicate;
+@SuppressWarnings("ThrowableNotThrown")
+class NoPermissionExceptionTest {
 
-    WrappingPredicatePermission(
-            final @NonNull CloudKey<Void> key,
-            final @NonNull Predicate<C> predicate
-    ) {
-        this.key = key;
-        this.predicate = predicate;
+    @Test
+    void testSucceededResult() {
+        PermissionResult result = PermissionResult.allowed(Permission.of("konicai"));
+        assertThrows(IllegalArgumentException.class, () -> new NoPermissionException(result, new Object(), Collections.emptyList()));
     }
 
-    @Override
-    public @NonNull PermissionResult testPermission(final @NonNull C sender) {
-        return PermissionResult.of(this.predicate.test(sender), this);
-    }
+    @Test
+    void testCommandPermission() {
+        Permission permission = Permission.of("konicai");
+        PermissionResult result = PermissionResult.denied(permission);
+        NoPermissionException exception = new NoPermissionException(result, new Object(), Collections.emptyList());
 
-    @Override
-    public @NonNull CloudKey<Void> key() {
-        return this.key;
-    }
-
-    @Override
-    public String toString() {
-        return this.key.name();
+        assertEquals(permission, exception.missingPermission());
+        assertEquals(permission, exception.permissionResult().permission());
     }
 }
