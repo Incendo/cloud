@@ -9,7 +9,7 @@ run-waterfall = { id = "xyz.jpenilla.run-waterfall", version.ref = "run-task" }
 [versions]
 run-task = "2.2.0"
 checkstyle = "10.5.0"
-checkerQual = "3.38.0"
+checkerQual = "3.42.0"
 errorprone = "2.16"
 geantyref = "1.3.14"
 jmh = "1.36"
