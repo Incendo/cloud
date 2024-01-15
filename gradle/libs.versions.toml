@@ -50,7 +50,7 @@ fabricApi = "0.87.0+1.19.4"
 fabricPermissionsApi = "0.2-SNAPSHOT"
 
 # testing
-jupiterEngine = "5.10.0"
+jupiterEngine = "5.10.1"
 mockitoCore = "4.9.0"
 mockitoKotlin = "4.1.0"
 mockitoJupiter = "4.9.0"
