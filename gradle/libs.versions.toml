@@ -19,7 +19,7 @@ immutables = "2.10.0"
 guice = "7.0.0"
 
 # kotlin
-kotlin = "1.9.21"
+kotlin = "1.9.22"
 dokka = "1.9.10"
 coroutines = "1.7.3"
 ktlint = "0.50.0"
