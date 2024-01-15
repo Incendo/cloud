@@ -3,9 +3,6 @@
   "extends": [
     "config:base"
   ],
-  "baseBranches" : [
-    "/^[0-9].[0-9].[0-9]\\-dev$/"
-  ],
   "labels": [
     "dependencies"
   ],
