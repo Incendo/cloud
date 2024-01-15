@@ -21,7 +21,7 @@ guice = "4.2.3"
 # kotlin
 kotlin = "1.7.22"
 dokka = "1.7.20"
-coroutines = "1.5.2"
+coroutines = "1.7.3"
 ktlint = "0.50.0"
 
 # discord
