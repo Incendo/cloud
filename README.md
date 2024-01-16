@@ -92,9 +92,11 @@ The core module allows you to use Cloud anywhere, simply by implementing the Com
 ### repositories
 
 - [cloud](https://github.com/incendo/cloud) - main repository
-- [cloud-processors](https://github.com/incendo/cloud-processors) - extra pre- & postprocessors
-- [cloud-neoforge](https://github.com/incendo/cloud-neoforge) - cloud implementation for neoforge
+- [cloud-minecraft](https://github.com/incendo/cloud-minecraft) - cloud implementations for minecraft
+- [cloud-minecraft-modded](https://github.com/incendo/cloud-minecraft-modded) - cloud implementations for modded minecraft
+- [cloud-discord](https://github.com/incendo/cloud-discord) - cloud implementations for discord
 - [cloud-spring](https://github.com/incendo/cloud-spring) - cloud implementation for spring-shell
+- [cloud-processors](https://github.com/incendo/cloud-processors) - extra pre- & postprocessors
 - [cloud-build-logic](https://github.com/incendo/cloud-build-logic) - gradle plugin for building cloud
 - [cloud-docs](https://github.com/incendo/cloud-docs) - documentation sources
   
