@@ -29,7 +29,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Test Results (${{ matrix.java }})
+          name: Test Results
           path: |
             **/build/test-results/test/TEST-*.xml
       - name: Determine Status
