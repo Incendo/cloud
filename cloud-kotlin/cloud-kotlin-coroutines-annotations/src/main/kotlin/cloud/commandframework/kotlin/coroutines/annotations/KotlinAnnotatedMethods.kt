@@ -185,7 +185,9 @@ private class KotlinSuggestionProvider<C>(
     override fun suggestionsFuture(context: CommandContext<C>, input: CommandInput): CompletableFuture<Iterable<Suggestion>> {
         return coroutineScope.future(coroutineContext) {
             try {
-                if (kFunction.valueParameters[1].type.classifier == String::class) {
+                if (kFunction.valueParameters.isEmpty()) {
+                    kFunction.callSuspend(instance)
+                } else if (kFunction.valueParameters[1].type.classifier == String::class) {
                     kFunction.callSuspend(instance, context, input.lastRemainingToken())
                 } else {
                     kFunction.callSuspend(instance, context, input)
