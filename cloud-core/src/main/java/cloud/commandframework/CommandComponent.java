@@ -42,6 +42,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
@@ -376,6 +377,15 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
         }
 
         /**
+         * Returns the current name, if it has been set.
+         *
+         * @return current name
+         */
+        public @MonotonicNonNull String name() {
+            return this.name;
+        }
+
+        /**
          * Sets the {@code name} of the component.
          *
          * <p>The name is used to extract the parsed values from the {@link CommandContext}.</p>
@@ -422,6 +432,18 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
         }
 
         /**
+         * Returns the current parser, if it has been set.
+         *
+         * @return current parser
+         */
+        public @MonotonicNonNull ParserDescriptor<C, T> parser() {
+            if (this.valueType == null || this.parser == null) {
+                return null;
+            }
+            return ParserDescriptor.of(this.parser, this.valueType);
+        }
+
+        /**
          * Sets the {@code parser} and {@code valueType}.
          *
          * @param parserDescriptor descriptor of the parser
@@ -429,6 +451,18 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
          */
         public @This @NonNull Builder<C, T> parser(final @NonNull ParserDescriptor<? super C, T> parserDescriptor) {
             return this.parser(parserDescriptor.parser()).valueType(parserDescriptor.valueType());
+        }
+
+        /**
+         * Returns the current default value, if it has been set.
+         *
+         * @return current default value
+         */
+        public @Nullable DefaultValue<C, T> defaultValue() {
+            if (this.defaultValue == null) {
+                return null;
+            }
+            return (DefaultValue<C, T>) this.defaultValue;
         }
 
         /**
@@ -486,6 +520,15 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
         }
 
         /**
+         * Returns the current description.
+         *
+         * @return current description
+         */
+        public @MonotonicNonNull Description description() {
+            return this.description;
+        }
+
+        /**
          * Sets the {@code description}.
          *
          * <p>Defaults to {@link Description#empty()}.</p>
@@ -496,6 +539,15 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
         public @This @NonNull Builder<C, T> description(final @NonNull Description description) {
             this.description = Objects.requireNonNull(description, "description");
             return this;
+        }
+
+        /**
+         * Returns the current suggestion provider, if it has been set.
+         *
+         * @return current suggestion provider
+         */
+        public @MonotonicNonNull SuggestionProvider<C> suggestionProvider() {
+            return this.suggestionProvider;
         }
 
         /**

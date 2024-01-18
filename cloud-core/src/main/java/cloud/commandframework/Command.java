@@ -565,6 +565,15 @@ public class Command<C> {
         }
 
         /**
+         * Returns the current command description of this command builder.
+         *
+         * @return the current description
+         */
+        public @NonNull CommandDescription commandDescription() {
+            return this.commandDescription;
+        }
+
+        /**
          * Returns the result of invoking {@link #commandDescription(CommandDescription)} with the result of
          * {@link CommandDescription#commandDescription(Description)}.
          *

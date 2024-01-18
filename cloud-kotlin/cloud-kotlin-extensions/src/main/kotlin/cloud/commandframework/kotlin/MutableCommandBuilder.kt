@@ -269,6 +269,17 @@ public class MutableCommandBuilder<C : Any>(
         meta(this, value)
 
     /**
+     * Field to get and set the command description for this command builder
+     */
+    public var commandDescription: CommandDescription
+        get() = this.commandBuilder.commandDescription()
+        set(commandDescription) {
+            onlyMutate {
+                it.commandDescription(commandDescription)
+            }
+        }
+
+    /**
      * Sets the command description meta for this command
      *
      * @param commandDescription command description
