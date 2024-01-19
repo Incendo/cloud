@@ -106,6 +106,10 @@ public final class StandardCaptionKeys {
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE = of(
             "argument.parse.failure.aggregate.failure");
+    /**
+     * Variables: {@code <input>}, {@code <primary>}, {@code <fallback>}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_EITHER = of("argument.parse.failure.either");
 
     private StandardCaptionKeys() {
     }

@@ -104,6 +104,10 @@ public class StandardCaptionRegistry<C> implements CaptionRegistry<C> {
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE}
      */
     public static final String ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE = "Invalid component '<component>': <failure>";
+    /**
+     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_EITHER}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_EITHER = "Could not resolve <primary> or <fallback> from '<input>'";
 
     private final LinkedList<@NonNull CaptionProvider<C>> providers = new LinkedList<>();
 
@@ -161,6 +165,9 @@ public class StandardCaptionRegistry<C> implements CaptionRegistry<C> {
                         ).putCaptions(
                                 StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE,
                                 ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE
+                        ).putCaptions(
+                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_EITHER,
+                                ARGUMENT_PARSE_FAILURE_EITHER
                         ).build()
         );
     }
