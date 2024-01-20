@@ -21,47 +21,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments;
+package cloud.commandframework.types.range;
 
 import cloud.commandframework.internal.ImmutableImpl;
-import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.immutables.value.Value;
 
-/**
- * A range of numbers.
- *
- * @param <N> number type
- * @since 1.0.0
- */
 @ImmutableImpl
 @Value.Immutable
-@API(status = API.Status.STABLE, since = "2.0.0")
-public interface Range<N extends Number> {
-
-    /**
-     * Creates a new range.
-     *
-     * @param <N> number type
-     * @param min min value
-     * @param max max value
-     * @return the range
-     */
-    static @NonNull <N extends Number> Range<N> of(final N min, final N max) {
-        return RangeImpl.of(min, max);
-    }
+public interface FloatRange extends Range<Float> {
 
     /**
      * Returns the minimum value (inclusive).
      *
      * @return minimum value
      */
-    @NonNull N min();
+    float minFloat();
 
     /**
      * Returns the maximum value (inclusive).
      *
      * @return maximum value
      */
-    @NonNull N max();
+    float maxFloat();
+
+    @Override
+    default @NonNull Float min() {
+        return this.minFloat();
+    }
+
+    @Override
+    default @NonNull Float max() {
+        return this.maxFloat();
+    }
 }

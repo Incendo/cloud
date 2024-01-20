@@ -24,17 +24,18 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.Range;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
+import cloud.commandframework.types.range.DoubleRange;
+import cloud.commandframework.types.range.Range;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class DoubleParser<C> extends NumberParser<C, Double> {
+public final class DoubleParser<C> extends NumberParser<C, Double, DoubleRange> {
 
     /**
      * Constant for the default/unset minimum value.
@@ -116,7 +117,7 @@ public final class DoubleParser<C> extends NumberParser<C, Double> {
      * @param max Maximum acceptable value
      */
     public DoubleParser(final double min, final double max) {
-        super(Range.of(min, max));
+        super(Range.doubleRange(min, max));
     }
 
     @Override
@@ -136,12 +137,12 @@ public final class DoubleParser<C> extends NumberParser<C, Double> {
 
     @Override
     public boolean hasMax() {
-        return this.range().max() != DEFAULT_MAXIMUM;
+        return this.range().maxDouble() != DEFAULT_MAXIMUM;
     }
 
     @Override
     public boolean hasMin() {
-        return this.range().min() != DEFAULT_MINIMUM;
+        return this.range().minDouble() != DEFAULT_MINIMUM;
     }
 
 

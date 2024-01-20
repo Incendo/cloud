@@ -23,18 +23,18 @@
 //
 package cloud.commandframework.arguments.standard;
 
-import cloud.commandframework.arguments.Range;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.types.range.Range;
 import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE, since = "2.0.0")
-public abstract class NumberParser<C, N extends Number> implements ArgumentParser<C, N> {
+public abstract class NumberParser<C, N extends Number, R extends Range<N>> implements ArgumentParser<C, N> {
 
-    private final Range<N> range;
+    private final R range;
 
-    protected NumberParser(final @NonNull Range<N> range) {
+    protected NumberParser(final @NonNull R range) {
         this.range = Objects.requireNonNull(range, "range");
     }
 
@@ -43,12 +43,15 @@ public abstract class NumberParser<C, N extends Number> implements ArgumentParse
      *
      * @return acceptable value range
      */
-    public final @NonNull Range<N> range() {
+    public final @NonNull R range() {
         return this.range;
     }
 
     /**
      * Returns whether this parser has a maximum value set.
+     *
+     * <p>In other words, whether the {@link Range#min() maximum} of it's {@link #range()} is different than the default
+     * maximum value.</p>
      *
      * @return whether the parser has a maximum set
      */
@@ -57,25 +60,10 @@ public abstract class NumberParser<C, N extends Number> implements ArgumentParse
     /**
      * Returns whether this parser has a minimum value set.
      *
+     * <p>In other words, whether the {@link Range#min() minimum} of it's {@link #range()} is different than the default
+     * minimum value.</p>
+     *
      * @return whether the parser has a minimum set
      */
     public abstract boolean hasMin();
-
-    /**
-     * Returns the minimum value that is accepted by this parser.
-     *
-     * @return min value
-     */
-    public final @NonNull N min() {
-        return this.range.min();
-    }
-
-    /**
-     * Returns the maximum value that is accepted by this parser.
-     *
-     * @return max value
-     */
-    public final @NonNull N max() {
-        return this.range.max();
-    }
 }

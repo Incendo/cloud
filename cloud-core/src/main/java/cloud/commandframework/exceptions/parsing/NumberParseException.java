@@ -23,11 +23,11 @@
 //
 package cloud.commandframework.exceptions.parsing;
 
-import cloud.commandframework.arguments.Range;
 import cloud.commandframework.arguments.standard.NumberParser;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.types.range.Range;
 import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -36,7 +36,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public abstract class NumberParseException extends ParserException {
 
     private final String input;
-    private final NumberParser<?, ?> parser;
+    private final NumberParser<?, ?, ?> parser;
 
     /**
      * Constructs a new number parse exception.
@@ -47,7 +47,7 @@ public abstract class NumberParseException extends ParserException {
      */
     protected NumberParseException(
             final @NonNull String input,
-            final @NonNull NumberParser<?, ?> parser,
+            final @NonNull NumberParser<?, ?, ?> parser,
             final @NonNull CommandContext<?> context
     ) {
         super(
@@ -74,7 +74,7 @@ public abstract class NumberParseException extends ParserException {
      *
      * @return the parser
      */
-    public final @NonNull NumberParser<?, ?> parser() {
+    public final @NonNull NumberParser<?, ?, ?> parser() {
         return this.parser;
     }
 
