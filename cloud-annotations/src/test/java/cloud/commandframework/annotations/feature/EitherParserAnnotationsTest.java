@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 
-class EitherParserTest {
+class EitherParserAnnotationsTest {
 
     private CommandManager<TestCommandSender> commandManager;
     private AnnotationParser<TestCommandSender> annotationParser;
@@ -59,7 +59,7 @@ class EitherParserTest {
     void test() {
         // Act
         final Collection<cloud.commandframework.Command<TestCommandSender>> result = this.annotationParser.parse(
-                new EitherParserTest()
+                new EitherParserAnnotationsTest()
         );
 
         // Assert
