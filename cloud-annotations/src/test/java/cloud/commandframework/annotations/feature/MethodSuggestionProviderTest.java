@@ -44,6 +44,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Named.named;
 
 class MethodSuggestionProviderTest {
 
@@ -89,13 +90,13 @@ class MethodSuggestionProviderTest {
 
     static @NonNull Stream<@NonNull Object> testSuggestionsSource() {
         return Stream.of(
-                new TestClassList(),
-                new TestClassSet(),
-                new TestClassStream(),
-                new TestClassIterable(),
-                new TestClassListString(),
-                new TestClassCommandInput(),
-                new TestInjectedValue()
+                named("list source", new TestClassList()),
+                named("set source", new TestClassSet()),
+                named("stream source", new TestClassStream()),
+                named("iterable source", new TestClassIterable()),
+                named("string list source", new TestClassListString()),
+                named("source with CommandInput injected", new TestClassCommandInput()),
+                named("source with injected value", new TestInjectedValue())
         );
     }
 
