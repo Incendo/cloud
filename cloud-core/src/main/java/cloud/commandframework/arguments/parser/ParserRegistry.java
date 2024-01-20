@@ -125,7 +125,7 @@ public interface ParserRegistry<C> {
      */
     @NonNull ParserParameters parseAnnotations(
             @NonNull TypeToken<?> parsingType,
-            @NonNull Collection<@NonNull ? extends Annotation> annotations
+            @NonNull Collection<? extends @NonNull Annotation> annotations
     );
 
     /**

@@ -50,7 +50,7 @@ final class AggregateCommandContextImpl<C> implements AggregateCommandContext<C>
     }
 
     @Override
-    public <@NonNull V> void store(final @NonNull CloudKey<V> key, final @NonNull V value) {
+    public <V> void store(final @NonNull CloudKey<V> key, final @NonNull V value) {
         this.storage.put(key, value);
     }
 
@@ -124,7 +124,7 @@ final class AggregateCommandContextImpl<C> implements AggregateCommandContext<C>
     }
 
     @Override
-    public @NonNull Map<@NonNull CloudKey<?>, @NonNull ?> all() {
+    public @NonNull Map<CloudKey<?>, ? extends @NonNull Object> all() {
         return this.storage;
     }
 }

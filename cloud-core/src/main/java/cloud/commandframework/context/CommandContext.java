@@ -374,7 +374,7 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * @since 1.3.0
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
-    public <@NonNull T> @NonNull Optional<T> inject(final @NonNull Class<T> clazz) {
+    public <T> @NonNull Optional<T> inject(final @NonNull Class<T> clazz) {
         if (this.commandManager == null) {
             throw new UnsupportedOperationException(
                     "Cannot retrieve injectable values from a command context that is not associated with a command manager"
@@ -393,7 +393,7 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public <@NonNull T> @NonNull Optional<T> inject(final @NonNull TypeToken<T> type) {
+    public <T> @NonNull Optional<T> inject(final @NonNull TypeToken<T> type) {
         if (this.commandManager == null) {
             throw new UnsupportedOperationException(
                     "Cannot retrieve injectable values from a command context that is not associated with a command manager"
@@ -403,7 +403,7 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
     }
 
     @Override
-    public final @NonNull Map<@NonNull CloudKey<?>, @NonNull ?> all() {
+    public final @NonNull Map<CloudKey<?>, ? extends @NonNull Object> all() {
         return Collections.unmodifiableMap(this.internalStorage);
     }
 }

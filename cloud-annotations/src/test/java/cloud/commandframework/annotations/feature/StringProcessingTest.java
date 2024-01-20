@@ -113,7 +113,7 @@ class StringProcessingTest {
     }
 
 
-    private static class TestClassA {
+    static class TestClassA {
 
         @CommandDescription("${property.test}")
         @Permission("${property.test}")

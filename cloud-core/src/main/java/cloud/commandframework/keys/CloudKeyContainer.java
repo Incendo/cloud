@@ -213,5 +213,5 @@ public interface CloudKeyContainer {
      *
      * @return immutable view of all values
      */
-    @NonNull Map<@NonNull CloudKey<?>, @NonNull ?> all();
+    @NonNull Map<CloudKey<?>, ? extends @NonNull Object> all();
 }
