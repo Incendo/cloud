@@ -30,7 +30,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * An inclusive range of numbers.
  *
  * @param <N> number type
- * @since 1.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface Range<N extends Number> {

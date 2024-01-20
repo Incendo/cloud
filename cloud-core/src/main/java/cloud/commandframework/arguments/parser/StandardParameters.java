@@ -42,10 +42,6 @@ public final class StandardParameters {
      */
     public static final ParserParameter<Number> RANGE_MAX = create("max", TypeToken.get(Number.class));
     /**
-     * The command should be hidden from help menus, etc
-     */
-    public static final ParserParameter<Boolean> HIDDEN = create("hidden", TypeToken.get(Boolean.class));
-    /**
      * Indicates that a string argument should be greedy
      */
     public static final ParserParameter<Boolean> GREEDY = create("greedy", TypeToken.get(Boolean.class));
