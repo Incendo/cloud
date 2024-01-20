@@ -44,7 +44,6 @@ import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.types.tuples.Pair;
 import io.leangen.geantyref.TypeToken;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -900,7 +899,7 @@ public final class CommandTree<C> {
 
                 CommandPermission permission;
                 if (existingPermission != null) {
-                    permission = OrPermission.of(Arrays.asList(commandPermission, existingPermission));
+                    permission = commandPermission.or(existingPermission);
                 } else {
                     permission = commandPermission;
                 }
@@ -915,7 +914,7 @@ public final class CommandTree<C> {
                             .getSetting(CommandManager.ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS)) {
                         permission = command.getCommandPermission();
                     } else {
-                        permission = OrPermission.of(Arrays.asList(permission, command.getCommandPermission()));
+                        permission = permission.or(command.getCommandPermission());
                     }
                 }
 

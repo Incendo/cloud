@@ -32,6 +32,8 @@ import java.util.Set;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Accepts as long as at least one of the permissions is accepted
  */
@@ -53,11 +55,7 @@ public final class OrPermission implements CommandPermission {
     public static @NonNull CommandPermission of(final @NonNull Collection<CommandPermission> permissions) {
         final Set<CommandPermission> objects = new HashSet<>();
         for (final CommandPermission permission : permissions) {
-            if (permission instanceof OrPermission) {
-                objects.addAll(permission.getPermissions());
-            } else {
-                objects.add(permission);
-            }
+            addToSet(objects, permission);
         }
         return new OrPermission(objects);
     }
@@ -65,6 +63,34 @@ public final class OrPermission implements CommandPermission {
     @Override
     public @NonNull Collection<@NonNull CommandPermission> getPermissions() {
         return this.permissions;
+    }
+
+    @Override
+    public @NonNull CommandPermission or(final @NonNull CommandPermission other) {
+        requireNonNull(other, "other");
+
+        if (this.permissions.contains(other)) {
+            return this;
+        } else {
+            final Set<CommandPermission> objects = new HashSet<>(this.permissions);
+            addToSet(objects, other);
+            return new OrPermission(objects);
+        }
+    }
+
+    @Override
+    public @NonNull CommandPermission or(final @NonNull CommandPermission @NonNull... other) {
+        if (other.length == 0) {
+            return this;
+        } else if (other.length == 1) {
+            return this.or(other[0]);
+        } else {
+            final Set<CommandPermission> objects = new HashSet<>(this.permissions);
+            for (final CommandPermission permission : other) {
+                addToSet(objects, permission);
+            }
+            return new OrPermission(objects);
+        }
     }
 
     @Override
@@ -96,5 +122,16 @@ public final class OrPermission implements CommandPermission {
     @Override
     public int hashCode() {
         return Objects.hash(this.getPermissions());
+    }
+
+    private static void addToSet(
+        @NonNull final Set<CommandPermission> objects,
+        @NonNull final CommandPermission permission
+    ) {
+        if (permission instanceof OrPermission) {
+            objects.addAll(permission.getPermissions());
+        } else {
+            objects.add(permission);
+        }
     }
 }

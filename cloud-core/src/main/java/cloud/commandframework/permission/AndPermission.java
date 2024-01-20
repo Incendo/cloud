@@ -32,6 +32,8 @@ import java.util.Set;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Accepts if every single permission is accepted.
  */
@@ -68,6 +70,34 @@ public final class AndPermission implements CommandPermission {
     }
 
     @Override
+    public @NonNull CommandPermission and(final @NonNull CommandPermission other) {
+        requireNonNull(other, "other");
+
+        if (this.permissions.contains(other)) {
+            return this;
+        } else {
+            final Set<CommandPermission> objects = new HashSet<>(this.permissions);
+            addToSet(objects, other);
+            return new AndPermission(objects);
+        }
+    }
+
+    @Override
+    public @NonNull CommandPermission and(final @NonNull CommandPermission @NonNull... other) {
+        if (other.length == 0) {
+            return this;
+        } else if (other.length == 1) {
+            return this.and(other[0]);
+        } else {
+            final Set<CommandPermission> objects = new HashSet<>(this.permissions);
+            for (final CommandPermission permission : other) {
+                addToSet(objects, permission);
+            }
+            return new AndPermission(objects);
+        }
+    }
+
+    @Override
     public String toString() {
         final StringBuilder stringBuilder = new StringBuilder();
         final Iterator<CommandPermission> iterator = this.permissions.iterator();
@@ -96,5 +126,16 @@ public final class AndPermission implements CommandPermission {
     @Override
     public int hashCode() {
         return Objects.hash(this.getPermissions());
+    }
+
+    private static void addToSet(
+        @NonNull final Set<CommandPermission> objects,
+        @NonNull final CommandPermission permission
+    ) {
+        if (permission instanceof AndPermission) {
+            objects.addAll(permission.getPermissions());
+        } else {
+            objects.add(permission);
+        }
     }
 }
