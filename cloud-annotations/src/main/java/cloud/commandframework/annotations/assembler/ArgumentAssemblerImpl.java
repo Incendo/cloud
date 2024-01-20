@@ -33,9 +33,13 @@ import cloud.commandframework.annotations.specifier.Completions;
 import cloud.commandframework.arguments.ComponentPreprocessor;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.parser.EitherParser;
+import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.types.Either;
+import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
@@ -74,7 +78,41 @@ public final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
                 .parseAnnotations(token, annotations);
         /* Create the argument parser */
         final ArgumentParser<C, ?> parser;
-        if (descriptor.parserName() == null) {
+        if (GenericTypeReflector.isSuperType(Either.class, token.getType())) {
+            final TypeToken<?> primaryType = TypeToken.get(GenericTypeReflector.getTypeParameter(
+                    parameter.getParameterizedType(),
+                    Either.class.getTypeParameters()[0]
+            ));
+            final TypeToken<?> fallbackType = TypeToken.get(GenericTypeReflector.getTypeParameter(
+                    parameter.getParameterizedType(),
+                    Either.class.getTypeParameters()[1]
+            ));
+            final ParserDescriptor<C, ?> primary = this.annotationParser.manager()
+                    .parserRegistry()
+                    .createParser(primaryType, parameters)
+                    .map(primaryParser -> ParserDescriptor.of(primaryParser, (TypeToken) primaryType))
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            String.format(
+                                    "Parameter '%s' "
+                                            + "has parser 'Either<%s, ?>' but no parser exists "
+                                            + "for that type",
+                                    parameter.getName(),
+                                    token.getType().getTypeName()
+                            )));
+            final ParserDescriptor<C, ?> fallback = this.annotationParser.manager()
+                    .parserRegistry()
+                    .createParser(fallbackType, parameters)
+                    .map(fallbackParser -> ParserDescriptor.of(fallbackParser, (TypeToken) fallbackType))
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            String.format(
+                                    "Parameter '%s' "
+                                            + "has parser 'Either<?, %s>' but no parser exists "
+                                            + "for that type",
+                                    parameter.getName(),
+                                    token.getType().getTypeName()
+                            )));
+            parser = EitherParser.eitherParser(primary, fallback).parser();
+        } else if (descriptor.parserName() == null) {
             parser = this.annotationParser.manager().parserRegistry()
                     .createParser(token, parameters)
                     .orElseThrow(() -> new IllegalArgumentException(
