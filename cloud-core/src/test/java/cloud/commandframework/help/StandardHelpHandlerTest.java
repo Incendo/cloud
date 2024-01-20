@@ -41,7 +41,6 @@ import static cloud.commandframework.arguments.standard.IntegerParser.integerPar
 import static cloud.commandframework.arguments.standard.StringParser.stringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
 
 class StandardHelpHandlerTest {
 

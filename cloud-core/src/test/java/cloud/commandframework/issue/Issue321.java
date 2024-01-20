@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 
 import static cloud.commandframework.arguments.standard.StringArrayParser.flagYieldingStringArrayParser;
 import static cloud.commandframework.util.TestUtils.createManager;
-import static com.google.common.truth.Truth8.assertThat;
+import static com.google.common.truth.Truth.assertThat;
 
 /**
  * Test for https://github.com/Incendo/cloud/issues/321.
