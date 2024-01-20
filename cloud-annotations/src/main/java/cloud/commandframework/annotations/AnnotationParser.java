@@ -1027,7 +1027,7 @@ public final class AnnotationParser<C> {
                 .orElseThrow(() -> new IllegalArgumentException("Argument is not declared in syntax: " + argumentName));
     }
 
-    @NonNull Map<@NonNull Class<@NonNull ? extends Annotation>, AnnotationMapper<?>> annotationMappers() {
+    @NonNull Map<Class<? extends @NonNull Annotation>, AnnotationMapper<?>> annotationMappers() {
         return this.annotationMappers;
     }
 }

@@ -214,7 +214,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     @SuppressWarnings("rawtypes")
     public @NonNull ParserParameters parseAnnotations(
             final @NonNull TypeToken<?> parsingType,
-            final @NonNull Collection<@NonNull ? extends Annotation> annotations
+            final @NonNull Collection<? extends @NonNull Annotation> annotations
     ) {
         final ParserParameters parserParameters = new ParserParameters();
         annotations.forEach(annotation -> {

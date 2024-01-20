@@ -38,11 +38,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <Context> Context/Request type
  * @param <Result>  Result type
  */
-public abstract class ChunkedRequestContext<@NonNull Context, @NonNull Result> {
+public abstract class ChunkedRequestContext<Context, Result> {
 
     private final Object lock = new Object();
-    private final List<@NonNull Context> requests;
-    private final Map<@NonNull Context, @NonNull Result> results;
+    private final List<Context> requests;
+    private final Map<Context, Result> results;
 
     /**
      * Initialize a new request
@@ -59,7 +59,7 @@ public abstract class ChunkedRequestContext<@NonNull Context, @NonNull Result> {
      *
      * @return unmodifiable map of results
      */
-    public final @NonNull Map<@NonNull Context, @NonNull Result> availableResults() {
+    public final @NonNull Map<Context, Result> availableResults() {
         synchronized (this.lock) {
             return Collections.unmodifiableMap(this.results);
         }
@@ -70,7 +70,7 @@ public abstract class ChunkedRequestContext<@NonNull Context, @NonNull Result> {
      *
      * @return unmodifiable list of remaining requests
      */
-    public final @NonNull List<@NonNull Context> remaining() {
+    public final @NonNull List<Context> remaining() {
         synchronized (this.lock) {
             return Collections.unmodifiableList(this.requests);
         }

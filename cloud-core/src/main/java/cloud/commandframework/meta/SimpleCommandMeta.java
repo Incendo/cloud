@@ -84,7 +84,7 @@ public class SimpleCommandMeta extends CommandMeta {
     }
 
     @Override
-    public final @NonNull Map<@NonNull CloudKey<?>, @NonNull ?> all() {
+    public final @NonNull Map<CloudKey<?>, ? extends @NonNull Object> all() {
         return new HashMap<>(this.metaMap);
     }
 

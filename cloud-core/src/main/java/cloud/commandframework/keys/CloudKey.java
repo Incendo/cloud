@@ -51,7 +51,7 @@ public abstract class CloudKey<T> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <@NonNull T> CloudKey<T> of(
+    public static <T> CloudKey<T> of(
             final @NonNull String name,
             final @NonNull TypeToken<T> type
     ) {
@@ -68,7 +68,7 @@ public abstract class CloudKey<T> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <@NonNull T> CloudKey<T> of(
+    public static <T> CloudKey<T> of(
             final @NonNull String name,
             final @NonNull Class<T> type
     ) {
@@ -97,7 +97,7 @@ public abstract class CloudKey<T> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <@NonNull T> CloudKey<T> cloudKey(
+    public static <T> CloudKey<T> cloudKey(
             final @NonNull String name,
             final @NonNull TypeToken<T> type
     ) {
@@ -114,7 +114,7 @@ public abstract class CloudKey<T> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <@NonNull T> CloudKey<T> cloudKey(
+    public static <T> CloudKey<T> cloudKey(
             final @NonNull String name,
             final @NonNull Class<T> type
     ) {

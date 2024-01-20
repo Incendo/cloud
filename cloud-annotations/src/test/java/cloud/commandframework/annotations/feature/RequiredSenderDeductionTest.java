@@ -84,7 +84,7 @@ class RequiredSenderDeductionTest {
     }
 
 
-    private static class TestClassA {
+    static class TestClassA {
 
         @Command("teststring")
         public void command(final StringSender sender) {

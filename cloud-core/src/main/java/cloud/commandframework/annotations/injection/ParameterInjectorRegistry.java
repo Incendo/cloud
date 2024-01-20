@@ -143,7 +143,7 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public <@NonNull T> @NonNull Optional<T> getInjectable(
+    public <T> @NonNull Optional<T> getInjectable(
             final @NonNull Class<T> clazz,
             final @NonNull CommandContext<C> context,
             final @NonNull AnnotationAccessor annotationAccessor
@@ -167,7 +167,7 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public <@NonNull T> @NonNull Optional<T> getInjectable(
+    public <T> @NonNull Optional<T> getInjectable(
             final @NonNull TypeToken<T> type,
             final @NonNull CommandContext<C> context,
             final @NonNull AnnotationAccessor annotationAccessor
