@@ -24,19 +24,18 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.arguments.Range;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
-import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class ByteParser<C> implements ArgumentParser<C, Byte>, BlockingSuggestionProvider.Strings<C> {
+public final class ByteParser<C> extends NumberParser<C, Byte> implements BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Constant for the default/unset minimum value.
@@ -111,9 +110,6 @@ public final class ByteParser<C> implements ArgumentParser<C, Byte>, BlockingSug
         return CommandComponent.<C, Byte>builder().parser(byteParser());
     }
 
-    private final byte min;
-    private final byte max;
-
     /**
      * Construct a new byte parser
      *
@@ -121,8 +117,7 @@ public final class ByteParser<C> implements ArgumentParser<C, Byte>, BlockingSug
      * @param max Maximum acceptable value
      */
     public ByteParser(final byte min, final byte max) {
-        this.min = min;
-        this.max = max;
+        super(Range.of(min, max));
     }
 
     @Override
@@ -130,7 +125,7 @@ public final class ByteParser<C> implements ArgumentParser<C, Byte>, BlockingSug
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        if (!commandInput.isValidByte(this.min, this.max)) {
+        if (!commandInput.isValidByte(this.range())) {
             return ArgumentParseResult.failure(new ByteParseException(
                     commandInput.peekString(),
                     this,
@@ -140,44 +135,14 @@ public final class ByteParser<C> implements ArgumentParser<C, Byte>, BlockingSug
         return ArgumentParseResult.success(commandInput.readByte());
     }
 
-    /**
-     * Returns the minimum value accepted by this parser.
-     *
-     * @return min value
-     */
-    public byte min() {
-        return this.min;
-    }
-
-    /**
-     * Returns the maximum value accepted by this parser.
-     *
-     * @return max value
-     */
-    public byte max() {
-        return this.max;
-    }
-
-    /**
-     * Get whether this parser has a maximum set.
-     * This will compare the parser's maximum to {@link #DEFAULT_MAXIMUM}.
-     *
-     * @return whether the parser has a maximum set
-     * @since 1.5.0
-     */
+    @Override
     public boolean hasMax() {
-        return this.max != DEFAULT_MAXIMUM;
+        return this.range().max() != DEFAULT_MAXIMUM;
     }
 
-    /**
-     * Get whether this parser has a minimum set.
-     * This will compare the parser's minimum to {@link #DEFAULT_MINIMUM}.
-     *
-     * @return whether the parser has a maximum set
-     * @since 1.5.0
-     */
+    @Override
     public boolean hasMin() {
-        return this.min != DEFAULT_MINIMUM;
+        return this.range().min() != DEFAULT_MINIMUM;
     }
 
     @Override
@@ -185,15 +150,12 @@ public final class ByteParser<C> implements ArgumentParser<C, Byte>, BlockingSug
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput input
     ) {
-        return IntegerParser.getSuggestions(this.min, this.max, input);
+        return IntegerParser.getSuggestions(this.range(), input);
     }
 
 
     @API(status = API.Status.STABLE)
     public static final class ByteParseException extends NumberParseException {
-
-
-        private final ByteParser<?> parser;
 
         /**
          * Create a new {@link ByteParseException}.
@@ -209,40 +171,12 @@ public final class ByteParser<C> implements ArgumentParser<C, Byte>, BlockingSug
                 final @NonNull ByteParser<?> parser,
                 final @NonNull CommandContext<?> commandContext
         ) {
-            super(input, parser.min, parser.max, ByteParser.class, commandContext);
-            this.parser = parser;
-        }
-
-        @Override
-        public boolean hasMin() {
-            return this.parser.hasMin();
-        }
-
-        @Override
-        public boolean hasMax() {
-            return this.parser.hasMax();
+            super(input, parser, commandContext);
         }
 
         @Override
         public @NonNull String numberType() {
             return "byte";
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || this.getClass() != o.getClass()) {
-                return false;
-            }
-            final ByteParseException that = (ByteParseException) o;
-            return this.parser.equals(that.parser);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.parser);
         }
     }
 }

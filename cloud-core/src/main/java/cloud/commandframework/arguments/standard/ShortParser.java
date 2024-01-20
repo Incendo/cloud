@@ -24,19 +24,18 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.arguments.Range;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
-import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class ShortParser<C> implements ArgumentParser<C, Short>, BlockingSuggestionProvider.Strings<C> {
+public final class ShortParser<C> extends NumberParser<C, Short> implements BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Constant for the default/unset minimum value.
@@ -111,9 +110,6 @@ public final class ShortParser<C> implements ArgumentParser<C, Short>, BlockingS
         return CommandComponent.<C, Short>builder().parser(shortParser());
     }
 
-    private final short min;
-    private final short max;
-
     /**
      * Construct a new short parser
      *
@@ -121,8 +117,7 @@ public final class ShortParser<C> implements ArgumentParser<C, Short>, BlockingS
      * @param max Maximum acceptable value
      */
     public ShortParser(final short min, final short max) {
-        this.min = min;
-        this.max = max;
+        super(Range.of(min, max));
     }
 
     @Override
@@ -130,7 +125,7 @@ public final class ShortParser<C> implements ArgumentParser<C, Short>, BlockingS
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        if (!commandInput.isValidShort(this.min, this.max)) {
+        if (!commandInput.isValidShort(this.range())) {
             return ArgumentParseResult.failure(new ShortParseException(
                     commandInput.peekString(),
                     this,
@@ -140,44 +135,14 @@ public final class ShortParser<C> implements ArgumentParser<C, Short>, BlockingS
         return ArgumentParseResult.success(commandInput.readShort());
     }
 
-    /**
-     * Returns the minimum value accepted by this parser.
-     *
-     * @return min value
-     */
-    public short min() {
-        return this.min;
-    }
-
-    /**
-     * Returns the maximum value accepted by this parser.
-     *
-     * @return min value
-     */
-    public short max() {
-        return this.max;
-    }
-
-    /**
-     * Get whether this parser has a maximum set.
-     * This will compare the parser's maximum to {@link #DEFAULT_MAXIMUM}.
-     *
-     * @return whether the parser has a maximum set
-     * @since 1.5.0
-     */
+    @Override
     public boolean hasMax() {
-        return this.max != DEFAULT_MAXIMUM;
+        return this.range().max() != DEFAULT_MAXIMUM;
     }
 
-    /**
-     * Get whether this parser has a minimum set.
-     * This will compare the parser's minimum to {@link #DEFAULT_MINIMUM}.
-     *
-     * @return whether the parser has a maximum set
-     * @since 1.5.0
-     */
+    @Override
     public boolean hasMin() {
-        return this.min != DEFAULT_MINIMUM;
+        return this.range().min() != DEFAULT_MINIMUM;
     }
 
     @Override
@@ -185,15 +150,12 @@ public final class ShortParser<C> implements ArgumentParser<C, Short>, BlockingS
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput input
     ) {
-        return IntegerParser.getSuggestions(this.min, this.max, input);
+        return IntegerParser.getSuggestions(this.range(), input);
     }
 
 
     @API(status = API.Status.STABLE)
     public static final class ShortParseException extends NumberParseException {
-
-
-        private final ShortParser<?> parser;
 
         /**
          * Create a new {@link ShortParseException}.
@@ -209,40 +171,12 @@ public final class ShortParser<C> implements ArgumentParser<C, Short>, BlockingS
                 final @NonNull ShortParser<?> parser,
                 final @NonNull CommandContext<?> commandContext
         ) {
-            super(input, parser.min, parser.max, ShortParser.class, commandContext);
-            this.parser = parser;
-        }
-
-        @Override
-        public boolean hasMin() {
-            return this.parser.hasMin();
-        }
-
-        @Override
-        public boolean hasMax() {
-            return this.parser.hasMax();
+            super(input, parser, commandContext);
         }
 
         @Override
         public @NonNull String numberType() {
             return "short";
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || this.getClass() != o.getClass()) {
-                return false;
-            }
-            final ShortParseException that = (ShortParseException) o;
-            return this.parser.equals(that.parser);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.parser);
         }
     }
 }

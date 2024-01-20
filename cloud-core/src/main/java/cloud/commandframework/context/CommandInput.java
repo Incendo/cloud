@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.context;
 
+import cloud.commandframework.arguments.Range;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -454,6 +455,17 @@ public interface CommandInput {
     }
 
     /**
+     * Returns whether {@link #peekString()} contain a valid {@link Byte}
+     * within the given range.
+     *
+     * @param range range of accepted numbers
+     * @return whether the input until the next whitespace contains a valid {@link Byte}
+     */
+    default @SideEffectFree boolean isValidByte(final @NonNull Range<Byte> range) {
+        return this.isValidByte(range.min(), range.max());
+    }
+
+    /**
      * Reads the {@link #readString() string until the next whitespace} and parses
      * in into a {@link Byte}.
      *
@@ -482,6 +494,17 @@ public interface CommandInput {
     }
 
     /**
+     * Returns whether {@link #peekString()} contain a valid {@link Short}
+     * within the given range.
+     *
+     * @param range range of accepted numbers
+     * @return whether the input until the next whitespace contains a valid {@link Short}
+     */
+    default @SideEffectFree boolean isValidShort(final @NonNull Range<Short> range) {
+        return this.isValidShort(range.min(), range.max());
+    }
+
+    /**
      * Reads the {@link #readString() string until the next whitespace} and parses
      * in into a {@link Short}.
      *
@@ -507,6 +530,17 @@ public interface CommandInput {
         } catch (final NumberFormatException ignored) {
             return false;
         }
+    }
+
+    /**
+     * Returns whether {@link #peekString()} contain a valid {@link Integer}
+     * within the given range.
+     *
+     * @param range range of accepted numbers
+     * @return whether the input until the next whitespace contains a valid {@link Integer}
+     */
+    default @SideEffectFree boolean isValidInteger(final @NonNull Range<Integer> range) {
+        return this.isValidInteger(range.min(), range.max());
     }
 
     /**
@@ -550,6 +584,17 @@ public interface CommandInput {
     }
 
     /**
+     * Returns whether {@link #peekString()} contain a valid {@link Long}
+     * within the given range.
+     *
+     * @param range range of accepted numbers
+     * @return whether the input until the next whitespace contains a valid {@link Long}
+     */
+    default @SideEffectFree boolean isValidLong(final @NonNull Range<Long> range) {
+        return this.isValidLong(range.min(), range.max());
+    }
+
+    /**
      * Reads the {@link #readString() string until the next whitespace} and parses
      * in into a {@link Long}.
      *
@@ -578,6 +623,17 @@ public interface CommandInput {
     }
 
     /**
+     * Returns whether {@link #peekString()} contain a valid {@link Double}
+     * within the given range.
+     *
+     * @param range range of accepted numbers
+     * @return whether the input until the next whitespace contains a valid {@link Double}
+     */
+    default @SideEffectFree boolean isValidDouble(final @NonNull Range<Double> range) {
+        return this.isValidDouble(range.min(), range.max());
+    }
+
+    /**
      * Reads the {@link #readString() string until the next whitespace} and parses
      * in into a {@link Double}.
      *
@@ -603,6 +659,17 @@ public interface CommandInput {
         } catch (final NumberFormatException ignored) {
             return false;
         }
+    }
+
+    /**
+     * Returns whether {@link #peekString()} contain a valid {@link Float}
+     * within the given range.
+     *
+     * @param range range of accepted numbers
+     * @return whether the input until the next whitespace contains a valid {@link Float}
+     */
+    default @SideEffectFree boolean isValidFloat(final @NonNull Range<Float> range) {
+        return this.isValidFloat(range.min(), range.max());
     }
 
     /**

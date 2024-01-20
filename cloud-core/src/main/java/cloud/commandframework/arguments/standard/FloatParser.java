@@ -24,18 +24,17 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.CommandComponent;
+import cloud.commandframework.arguments.Range;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
-import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class FloatParser<C> implements ArgumentParser<C, Float> {
+public final class FloatParser<C> extends NumberParser<C, Float> {
 
     /**
      * Constant for the default/unset minimum value.
@@ -110,9 +109,6 @@ public final class FloatParser<C> implements ArgumentParser<C, Float> {
         return CommandComponent.<C, Float>builder().parser(floatParser());
     }
 
-    private final float min;
-    private final float max;
-
     /**
      * Construct a new float parser
      *
@@ -120,8 +116,7 @@ public final class FloatParser<C> implements ArgumentParser<C, Float> {
      * @param max Maximum acceptable value
      */
     public FloatParser(final float min, final float max) {
-        this.min = min;
-        this.max = max;
+        super(Range.of(min, max));
     }
 
     @Override
@@ -129,7 +124,7 @@ public final class FloatParser<C> implements ArgumentParser<C, Float> {
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        if (!commandInput.isValidFloat(this.min, this.max)) {
+        if (!commandInput.isValidFloat(this.range())) {
             return ArgumentParseResult.failure(new FloatParseException(
                     commandInput.peekString(),
                     this,
@@ -139,52 +134,19 @@ public final class FloatParser<C> implements ArgumentParser<C, Float> {
         return ArgumentParseResult.success(commandInput.readFloat());
     }
 
-    /**
-     * Returns the minimum value accepted by this parser.
-     *
-     * @return min value
-     */
-    public float min() {
-        return this.min;
-    }
-
-    /**
-     * Returns the maximum value accepted by this parser.
-     *
-     * @return max value
-     */
-    public float max() {
-        return this.max;
-    }
-
-    /**
-     * Get whether this parser has a maximum set.
-     * This will compare the parser's maximum to {@link #DEFAULT_MAXIMUM}.
-     *
-     * @return whether the parser has a maximum set
-     * @since 1.5.0
-     */
+    @Override
     public boolean hasMax() {
-        return this.max != DEFAULT_MAXIMUM;
+        return this.range().max() != DEFAULT_MAXIMUM;
     }
 
-    /**
-     * Get whether this parser has a minimum set.
-     * This will compare the parser's minimum to {@link #DEFAULT_MINIMUM}.
-     *
-     * @return whether the parser has a maximum set
-     * @since 1.5.0
-     */
+    @Override
     public boolean hasMin() {
-        return this.min != DEFAULT_MINIMUM;
+        return this.range().min() != DEFAULT_MINIMUM;
     }
 
 
     @API(status = API.Status.STABLE)
     public static final class FloatParseException extends NumberParseException {
-
-
-        private final FloatParser<?> parser;
 
         /**
          * Create a new {@link FloatParseException}.
@@ -200,40 +162,12 @@ public final class FloatParser<C> implements ArgumentParser<C, Float> {
                 final @NonNull FloatParser<?> parser,
                 final @NonNull CommandContext<?> commandContext
         ) {
-            super(input, parser.min, parser.max, FloatParser.class, commandContext);
-            this.parser = parser;
-        }
-
-        @Override
-        public boolean hasMin() {
-            return this.parser.hasMin();
-        }
-
-        @Override
-        public boolean hasMax() {
-            return this.parser.hasMax();
+            super(input, parser, commandContext);
         }
 
         @Override
         public @NonNull String numberType() {
             return "float";
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || this.getClass() != o.getClass()) {
-                return false;
-            }
-            final FloatParseException that = (FloatParseException) o;
-            return this.parser.equals(that.parser);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.parser);
         }
     }
 }
