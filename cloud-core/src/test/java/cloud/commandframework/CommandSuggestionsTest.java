@@ -887,5 +887,9 @@ class CommandSuggestionsTest {
 
     static class SpecificSender extends TestCommandSender {
 
+        @Override
+        public String toString() {
+            return "SpecificSender{permissions=" + this.permissions + "}";
+        }
     }
 }
