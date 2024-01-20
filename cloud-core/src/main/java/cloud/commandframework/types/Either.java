@@ -29,6 +29,8 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.immutables.value.Value;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * An object that contains either a value of type {@link U} or type {@link V}.
  *
@@ -50,7 +52,7 @@ public interface Either<U, V> {
      * @return the instance
      */
     static <U, V> @NonNull Either<U, V> ofPrimary(final @NonNull U value) {
-        return EitherImpl.of(value, null);
+        return EitherImpl.of(requireNonNull(value, "value"), null);
     }
 
     /**
@@ -62,7 +64,7 @@ public interface Either<U, V> {
      * @return the instance
      */
     static <U, V> @NonNull Either<U, V> ofFallback(final @NonNull V value) {
-        return EitherImpl.of(null, value);
+        return EitherImpl.of(null, requireNonNull(value, "value"));
     }
 
     /**
@@ -70,12 +72,12 @@ public interface Either<U, V> {
      *
      * @return the first value
      */
-    @NonNull Optional<@NonNull U> primary();
+    @NonNull Optional<U> primary();
 
     /**
      * Returns an optional containing the value of type {@link V}, if it exists.
      *
      * @return the second value
      */
-    @NonNull Optional<@NonNull V> fallback();
+    @NonNull Optional<V> fallback();
 }
