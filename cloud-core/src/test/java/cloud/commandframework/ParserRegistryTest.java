@@ -110,8 +110,8 @@ public class ParserRegistryTest {
         @SuppressWarnings("unchecked") final IntegerParser<TestCommandSender> integerParser =
                 (IntegerParser<TestCommandSender>) parser;
 
-        assertThat(integerParser.min()).isEqualTo(RANGE_MIN);
-        assertThat(integerParser.max()).isEqualTo(RANGE_MAX);
+        assertThat(integerParser.range().min()).isEqualTo(RANGE_MIN);
+        assertThat(integerParser.range().max()).isEqualTo(RANGE_MAX);
     }
 
     @Test

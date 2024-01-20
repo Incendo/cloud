@@ -25,23 +25,23 @@ package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
+import cloud.commandframework.types.range.IntRange;
+import cloud.commandframework.types.range.Range;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class IntegerParser<C> implements ArgumentParser<C, Integer>, BlockingSuggestionProvider.Strings<C> {
+public final class IntegerParser<C> extends NumberParser<C, Integer, IntRange> implements BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Constant for the default/unset minimum value.
@@ -119,9 +119,6 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
         return CommandComponent.<C, Integer>builder().parser(integerParser());
     }
 
-    private final int min;
-    private final int max;
-
     /**
      * Construct a new integer parser
      *
@@ -129,22 +126,19 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
      * @param max Maximum acceptable value
      */
     public IntegerParser(final int min, final int max) {
-        this.min = min;
-        this.max = max;
+        super(Range.intRange(min, max));
     }
 
     /**
-     * Get integer suggestions. This supports both positive and negative numbers
+     * Returns integer suggestions. This supports both positive and negative numbers
      *
-     * @param min   Minimum value
-     * @param max   Maximum value
-     * @param input Input
-     * @return List of suggestions
+     * @param range accepted range
+     * @param input input
+     * @return list of suggestions
      */
     @SuppressWarnings("MixedMutabilityReturnType")
     public static @NonNull List<@NonNull String> getSuggestions(
-            final long min,
-            final long max,
+            final @NonNull Range<? extends Number> range,
             final @NonNull CommandInput input
     ) {
         final Set<Long> numbers = new TreeSet<>();
@@ -153,6 +147,9 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
         try {
             final long inputNum = Long.parseLong(token.equals("-") ? "-0" : token.isEmpty() ? "0" : token);
             final long inputNumAbsolute = Math.abs(inputNum);
+
+            final long min = range.min().longValue();
+            final long max = range.max().longValue();
 
             numbers.add(inputNumAbsolute); /* It's a valid number, so we suggest it */
             for (int i = 0; i < MAX_SUGGESTIONS_INCREMENT
@@ -182,7 +179,7 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        if (!commandInput.isValidInteger(this.min, this.max)) {
+        if (!commandInput.isValidInteger(this.range())) {
             return ArgumentParseResult.failure(new IntegerParseException(
                     commandInput.peekString(),
                     this,
@@ -192,44 +189,14 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
         return ArgumentParseResult.success(commandInput.readInteger());
     }
 
-    /**
-     * Returns the minimum value accepted by this parser.
-     *
-     * @return min value
-     */
-    public int min() {
-        return this.min;
-    }
-
-    /**
-     * Returns the maximum value accepted by this parser.
-     *
-     * @return max value
-     */
-    public int max() {
-        return this.max;
-    }
-
-    /**
-     * Get whether this parser has a maximum set.
-     * This will compare the parser's maximum to {@link #DEFAULT_MAXIMUM}.
-     *
-     * @return whether the parser has a maximum set
-     * @since 1.5.0
-     */
+    @Override
     public boolean hasMax() {
-        return this.max != DEFAULT_MAXIMUM;
+        return this.range().maxInt() != DEFAULT_MAXIMUM;
     }
 
-    /**
-     * Get whether this parser has a minimum set.
-     * This will compare the parser's minimum to {@link #DEFAULT_MINIMUM}.
-     *
-     * @return whether the parser has a maximum set
-     * @since 1.5.0
-     */
+    @Override
     public boolean hasMin() {
-        return this.min != DEFAULT_MINIMUM;
+        return this.range().minInt() != DEFAULT_MINIMUM;
     }
 
     @Override
@@ -237,15 +204,12 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput input
     ) {
-        return getSuggestions(this.min, this.max, input);
+        return getSuggestions(this.range(), input);
     }
 
 
     @API(status = API.Status.STABLE)
     public static final class IntegerParseException extends NumberParseException {
-
-
-        private final IntegerParser<?> parser;
 
         /**
          * Create a new {@link IntegerParseException}.
@@ -261,40 +225,12 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer>, Block
                 final @NonNull IntegerParser<?> parser,
                 final @NonNull CommandContext<?> commandContext
         ) {
-            super(input, parser.min, parser.max, IntegerParser.class, commandContext);
-            this.parser = parser;
-        }
-
-        @Override
-        public boolean hasMin() {
-            return this.parser.hasMin();
-        }
-
-        @Override
-        public boolean hasMax() {
-            return this.parser.hasMax();
+            super(input, parser, commandContext);
         }
 
         @Override
         public @NonNull String numberType() {
             return "integer";
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || this.getClass() != o.getClass()) {
-                return false;
-            }
-            final IntegerParseException that = (IntegerParseException) o;
-            return this.parser.equals(that.parser);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.parser);
         }
     }
 }
