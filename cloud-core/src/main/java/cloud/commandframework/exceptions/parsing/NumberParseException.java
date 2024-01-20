@@ -23,9 +23,12 @@
 //
 package cloud.commandframework.exceptions.parsing;
 
+import cloud.commandframework.arguments.standard.NumberParser;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.types.range.Range;
+import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -33,36 +36,30 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public abstract class NumberParseException extends ParserException {
 
     private final String input;
-    private final Number min;
-    private final Number max;
+    private final NumberParser<?, ?, ?> parser;
 
     /**
-     * Construct a new number parse exception
+     * Constructs a new number parse exception.
      *
-     * @param input       Input
-     * @param min         Maximum value
-     * @param max         Minimum value
-     * @param parserClass Parser class
-     * @param context     Command context
+     * @param input   input that failed to parser
+     * @param parser  parser that failed the parsing
+     * @param context command context
      */
     protected NumberParseException(
             final @NonNull String input,
-            final @NonNull Number min,
-            final @NonNull Number max,
-            final @NonNull Class<?> parserClass,
+            final @NonNull NumberParser<?, ?, ?> parser,
             final @NonNull CommandContext<?> context
     ) {
         super(
-                parserClass,
+                parser.getClass(),
                 context,
                 StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_NUMBER,
                 CaptionVariable.of("input", input),
-                CaptionVariable.of("min", String.valueOf(min)),
-                CaptionVariable.of("max", String.valueOf(max))
+                CaptionVariable.of("min", String.valueOf(parser.range().min())),
+                CaptionVariable.of("max", String.valueOf(parser.range().max()))
         );
         this.input = input;
-        this.min = min;
-        this.max = max;
+        this.parser = parser;
     }
 
     /**
@@ -73,18 +70,31 @@ public abstract class NumberParseException extends ParserException {
     public abstract @NonNull String numberType();
 
     /**
+     * Returns the parser.
+     *
+     * @return the parser
+     */
+    public final @NonNull NumberParser<?, ?, ?> parser() {
+        return this.parser;
+    }
+
+    /**
      * Returns whether the parser has a maximum value.
      *
      * @return {@code true} if there was a maximum value, else {@code false}
      */
-    public abstract boolean hasMax();
+    public final boolean hasMax() {
+        return this.parser.hasMax();
+    }
 
     /**
      * Returns whether the parser has a minimum value.
      *
      * @return {@code true} if there was a minimum value, else {@code false}
      */
-    public abstract boolean hasMin();
+    public final boolean hasMin() {
+        return this.parser.hasMax();
+    }
 
     /**
      * Returns the input that failed to parse.
@@ -96,20 +106,28 @@ public abstract class NumberParseException extends ParserException {
     }
 
     /**
-     * Returns the minimum accepted integer that could have been parsed.
+     * Returns the range of acceptable input.
      *
-     * @return minimum integer
+     * @return parser range
      */
-    public Number min() {
-        return this.min;
+    public final @NonNull Range<? extends Number> range() {
+        return this.parser.range();
     }
 
-    /**
-     * Returns the maximum accepted integer that could have been parsed.
-     *
-     * @return maximum integer
-     */
-    public Number max() {
-        return this.max;
+    @Override
+    public final boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || this.getClass() != o.getClass()) {
+            return false;
+        }
+        final NumberParseException that = (NumberParseException) o;
+        return this.parser().equals(that.parser());
+    }
+
+    @Override
+    public final int hashCode() {
+        return Objects.hash(this.parser());
     }
 }

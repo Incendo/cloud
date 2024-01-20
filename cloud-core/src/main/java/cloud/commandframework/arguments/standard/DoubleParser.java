@@ -25,17 +25,17 @@ package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
-import java.util.Objects;
+import cloud.commandframework.types.range.DoubleRange;
+import cloud.commandframework.types.range.Range;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class DoubleParser<C> implements ArgumentParser<C, Double> {
+public final class DoubleParser<C> extends NumberParser<C, Double, DoubleRange> {
 
     /**
      * Constant for the default/unset minimum value.
@@ -110,9 +110,6 @@ public final class DoubleParser<C> implements ArgumentParser<C, Double> {
         return CommandComponent.<C, Double>builder().parser(doubleParser());
     }
 
-    private final double min;
-    private final double max;
-
     /**
      * Construct a new double parser
      *
@@ -120,8 +117,7 @@ public final class DoubleParser<C> implements ArgumentParser<C, Double> {
      * @param max Maximum acceptable value
      */
     public DoubleParser(final double min, final double max) {
-        this.min = min;
-        this.max = max;
+        super(Range.doubleRange(min, max));
     }
 
     @Override
@@ -129,7 +125,7 @@ public final class DoubleParser<C> implements ArgumentParser<C, Double> {
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        if (!commandInput.isValidDouble(this.min, this.max)) {
+        if (!commandInput.isValidDouble(this.range())) {
             return ArgumentParseResult.failure(new DoubleParseException(
                     commandInput.peekString(),
                     this,
@@ -139,52 +135,19 @@ public final class DoubleParser<C> implements ArgumentParser<C, Double> {
         return ArgumentParseResult.success(commandInput.readDouble());
     }
 
-    /**
-     * Returns the minimum value accepted by this parser.
-     *
-     * @return min value
-     */
-    public double min() {
-        return this.min;
-    }
-
-    /**
-     * Returns the maximum value accepted by this parser.
-     *
-     * @return max value
-     */
-    public double max() {
-        return this.max;
-    }
-
-    /**
-     * Get whether this parser has a maximum set.
-     * This will compare the parser's maximum to {@link #DEFAULT_MAXIMUM}.
-     *
-     * @return whether the parser has a maximum set
-     * @since 1.5.0
-     */
+    @Override
     public boolean hasMax() {
-        return this.max != DEFAULT_MAXIMUM;
+        return this.range().maxDouble() != DEFAULT_MAXIMUM;
     }
 
-    /**
-     * Get whether this parser has a minimum set.
-     * This will compare the parser's minimum to {@link #DEFAULT_MINIMUM}.
-     *
-     * @return whether the parser has a maximum set
-     * @since 1.5.0
-     */
+    @Override
     public boolean hasMin() {
-        return this.min != DEFAULT_MINIMUM;
+        return this.range().minDouble() != DEFAULT_MINIMUM;
     }
 
 
     @API(status = API.Status.STABLE)
     public static final class DoubleParseException extends NumberParseException {
-
-
-        private final DoubleParser<?> parser;
 
         /**
          * Create a new {@link DoubleParseException}.
@@ -200,40 +163,12 @@ public final class DoubleParser<C> implements ArgumentParser<C, Double> {
                 final @NonNull DoubleParser<?> parser,
                 final @NonNull CommandContext<?> commandContext
         ) {
-            super(input, parser.min, parser.max, DoubleParser.class, commandContext);
-            this.parser = parser;
-        }
-
-        @Override
-        public boolean hasMin() {
-            return this.parser.hasMin();
-        }
-
-        @Override
-        public boolean hasMax() {
-            return this.parser.hasMax();
+            super(input, parser, commandContext);
         }
 
         @Override
         public @NonNull String numberType() {
             return "double";
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || this.getClass() != o.getClass()) {
-                return false;
-            }
-            final DoubleParseException that = (DoubleParseException) o;
-            return this.parser.equals(that.parser);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.parser);
         }
     }
 }

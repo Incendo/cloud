@@ -23,6 +23,12 @@
 //
 package cloud.commandframework.context;
 
+import cloud.commandframework.types.range.ByteRange;
+import cloud.commandframework.types.range.DoubleRange;
+import cloud.commandframework.types.range.FloatRange;
+import cloud.commandframework.types.range.IntRange;
+import cloud.commandframework.types.range.LongRange;
+import cloud.commandframework.types.range.ShortRange;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -454,6 +460,17 @@ public interface CommandInput {
     }
 
     /**
+     * Returns whether {@link #peekString()} contain a valid {@link Byte}
+     * within the given range.
+     *
+     * @param range range of accepted numbers
+     * @return whether the input until the next whitespace contains a valid {@link Byte}
+     */
+    default @SideEffectFree boolean isValidByte(final @NonNull ByteRange range) {
+        return this.isValidByte(range.minByte(), range.maxByte());
+    }
+
+    /**
      * Reads the {@link #readString() string until the next whitespace} and parses
      * in into a {@link Byte}.
      *
@@ -482,6 +499,17 @@ public interface CommandInput {
     }
 
     /**
+     * Returns whether {@link #peekString()} contain a valid {@link Short}
+     * within the given range.
+     *
+     * @param range range of accepted numbers
+     * @return whether the input until the next whitespace contains a valid {@link Short}
+     */
+    default @SideEffectFree boolean isValidShort(final @NonNull ShortRange range) {
+        return this.isValidShort(range.minShort(), range.maxShort());
+    }
+
+    /**
      * Reads the {@link #readString() string until the next whitespace} and parses
      * in into a {@link Short}.
      *
@@ -507,6 +535,17 @@ public interface CommandInput {
         } catch (final NumberFormatException ignored) {
             return false;
         }
+    }
+
+    /**
+     * Returns whether {@link #peekString()} contain a valid {@link Integer}
+     * within the given range.
+     *
+     * @param range range of accepted numbers
+     * @return whether the input until the next whitespace contains a valid {@link Integer}
+     */
+    default @SideEffectFree boolean isValidInteger(final @NonNull IntRange range) {
+        return this.isValidInteger(range.minInt(), range.maxInt());
     }
 
     /**
@@ -550,6 +589,17 @@ public interface CommandInput {
     }
 
     /**
+     * Returns whether {@link #peekString()} contain a valid {@link Long}
+     * within the given range.
+     *
+     * @param range range of accepted numbers
+     * @return whether the input until the next whitespace contains a valid {@link Long}
+     */
+    default @SideEffectFree boolean isValidLong(final @NonNull LongRange range) {
+        return this.isValidLong(range.minLong(), range.maxLong());
+    }
+
+    /**
      * Reads the {@link #readString() string until the next whitespace} and parses
      * in into a {@link Long}.
      *
@@ -578,6 +628,17 @@ public interface CommandInput {
     }
 
     /**
+     * Returns whether {@link #peekString()} contain a valid {@link Double}
+     * within the given range.
+     *
+     * @param range range of accepted numbers
+     * @return whether the input until the next whitespace contains a valid {@link Double}
+     */
+    default @SideEffectFree boolean isValidDouble(final @NonNull DoubleRange range) {
+        return this.isValidDouble(range.minDouble(), range.maxDouble());
+    }
+
+    /**
      * Reads the {@link #readString() string until the next whitespace} and parses
      * in into a {@link Double}.
      *
@@ -603,6 +664,17 @@ public interface CommandInput {
         } catch (final NumberFormatException ignored) {
             return false;
         }
+    }
+
+    /**
+     * Returns whether {@link #peekString()} contain a valid {@link Float}
+     * within the given range.
+     *
+     * @param range range of accepted numbers
+     * @return whether the input until the next whitespace contains a valid {@link Float}
+     */
+    default @SideEffectFree boolean isValidFloat(final @NonNull FloatRange range) {
+        return this.isValidFloat(range.minFloat(), range.maxFloat());
     }
 
     /**
