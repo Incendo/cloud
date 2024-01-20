@@ -24,18 +24,19 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.Range;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
+import cloud.commandframework.types.range.ByteRange;
+import cloud.commandframework.types.range.Range;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class ByteParser<C> extends NumberParser<C, Byte> implements BlockingSuggestionProvider.Strings<C> {
+public final class ByteParser<C> extends NumberParser<C, Byte, ByteRange> implements BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Constant for the default/unset minimum value.
@@ -117,7 +118,7 @@ public final class ByteParser<C> extends NumberParser<C, Byte> implements Blocki
      * @param max Maximum acceptable value
      */
     public ByteParser(final byte min, final byte max) {
-        super(Range.of(min, max));
+        super(Range.byteRange(min, max));
     }
 
     @Override
@@ -137,12 +138,12 @@ public final class ByteParser<C> extends NumberParser<C, Byte> implements Blocki
 
     @Override
     public boolean hasMax() {
-        return this.range().max() != DEFAULT_MAXIMUM;
+        return this.range().maxByte() != DEFAULT_MAXIMUM;
     }
 
     @Override
     public boolean hasMin() {
-        return this.range().min() != DEFAULT_MINIMUM;
+        return this.range().minByte() != DEFAULT_MINIMUM;
     }
 
     @Override

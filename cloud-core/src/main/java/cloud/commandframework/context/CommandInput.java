@@ -23,7 +23,12 @@
 //
 package cloud.commandframework.context;
 
-import cloud.commandframework.arguments.Range;
+import cloud.commandframework.types.range.ByteRange;
+import cloud.commandframework.types.range.DoubleRange;
+import cloud.commandframework.types.range.FloatRange;
+import cloud.commandframework.types.range.IntRange;
+import cloud.commandframework.types.range.LongRange;
+import cloud.commandframework.types.range.ShortRange;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -461,8 +466,8 @@ public interface CommandInput {
      * @param range range of accepted numbers
      * @return whether the input until the next whitespace contains a valid {@link Byte}
      */
-    default @SideEffectFree boolean isValidByte(final @NonNull Range<Byte> range) {
-        return this.isValidByte(range.min(), range.max());
+    default @SideEffectFree boolean isValidByte(final @NonNull ByteRange range) {
+        return this.isValidByte(range.minByte(), range.maxByte());
     }
 
     /**
@@ -500,8 +505,8 @@ public interface CommandInput {
      * @param range range of accepted numbers
      * @return whether the input until the next whitespace contains a valid {@link Short}
      */
-    default @SideEffectFree boolean isValidShort(final @NonNull Range<Short> range) {
-        return this.isValidShort(range.min(), range.max());
+    default @SideEffectFree boolean isValidShort(final @NonNull ShortRange range) {
+        return this.isValidShort(range.minShort(), range.maxShort());
     }
 
     /**
@@ -539,8 +544,8 @@ public interface CommandInput {
      * @param range range of accepted numbers
      * @return whether the input until the next whitespace contains a valid {@link Integer}
      */
-    default @SideEffectFree boolean isValidInteger(final @NonNull Range<Integer> range) {
-        return this.isValidInteger(range.min(), range.max());
+    default @SideEffectFree boolean isValidInteger(final @NonNull IntRange range) {
+        return this.isValidInteger(range.minInt(), range.maxInt());
     }
 
     /**
@@ -590,8 +595,8 @@ public interface CommandInput {
      * @param range range of accepted numbers
      * @return whether the input until the next whitespace contains a valid {@link Long}
      */
-    default @SideEffectFree boolean isValidLong(final @NonNull Range<Long> range) {
-        return this.isValidLong(range.min(), range.max());
+    default @SideEffectFree boolean isValidLong(final @NonNull LongRange range) {
+        return this.isValidLong(range.minLong(), range.maxLong());
     }
 
     /**
@@ -629,8 +634,8 @@ public interface CommandInput {
      * @param range range of accepted numbers
      * @return whether the input until the next whitespace contains a valid {@link Double}
      */
-    default @SideEffectFree boolean isValidDouble(final @NonNull Range<Double> range) {
-        return this.isValidDouble(range.min(), range.max());
+    default @SideEffectFree boolean isValidDouble(final @NonNull DoubleRange range) {
+        return this.isValidDouble(range.minDouble(), range.maxDouble());
     }
 
     /**
@@ -668,8 +673,8 @@ public interface CommandInput {
      * @param range range of accepted numbers
      * @return whether the input until the next whitespace contains a valid {@link Float}
      */
-    default @SideEffectFree boolean isValidFloat(final @NonNull Range<Float> range) {
-        return this.isValidFloat(range.min(), range.max());
+    default @SideEffectFree boolean isValidFloat(final @NonNull FloatRange range) {
+        return this.isValidFloat(range.minFloat(), range.maxFloat());
     }
 
     /**

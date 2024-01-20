@@ -24,18 +24,19 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.Range;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
+import cloud.commandframework.types.range.Range;
+import cloud.commandframework.types.range.ShortRange;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class ShortParser<C> extends NumberParser<C, Short> implements BlockingSuggestionProvider.Strings<C> {
+public final class ShortParser<C> extends NumberParser<C, Short, ShortRange> implements BlockingSuggestionProvider.Strings<C> {
 
     /**
      * Constant for the default/unset minimum value.
@@ -117,7 +118,7 @@ public final class ShortParser<C> extends NumberParser<C, Short> implements Bloc
      * @param max Maximum acceptable value
      */
     public ShortParser(final short min, final short max) {
-        super(Range.of(min, max));
+        super(Range.shortRange(min, max));
     }
 
     @Override
@@ -137,12 +138,12 @@ public final class ShortParser<C> extends NumberParser<C, Short> implements Bloc
 
     @Override
     public boolean hasMax() {
-        return this.range().max() != DEFAULT_MAXIMUM;
+        return this.range().maxShort() != DEFAULT_MAXIMUM;
     }
 
     @Override
     public boolean hasMin() {
-        return this.range().min() != DEFAULT_MINIMUM;
+        return this.range().minShort() != DEFAULT_MINIMUM;
     }
 
     @Override
