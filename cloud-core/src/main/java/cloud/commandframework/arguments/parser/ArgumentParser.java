@@ -47,24 +47,6 @@ import static java.util.Objects.requireNonNull;
 public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
 
     /**
-     * Creates a new parser which attempts to use the {@code primary} parser and falls back on
-     * the {@code fallback} parser if that fails.
-     *
-     * @param <C>      command sender type
-     * @param <U>      primary value type
-     * @param <V>      fallback value type
-     * @param primary  primary parser
-     * @param fallback fallback parser which gets invoked if the primary parser fails to parse the input
-     * @return the descriptor of the parser
-     */
-    static <C, U, V> @NonNull ParserDescriptor<C, Either<U, V>> firstOf(
-            final @NonNull ParserDescriptor<C, U> primary,
-            final @NonNull ParserDescriptor<C, V> fallback
-    ) {
-        return EitherParser.eitherParser(primary, fallback);
-    }
-
-    /**
      * Attempts to parse the {@code input} into an object of type {@link T}.
      *
      * <p>This method may be called when a command chain is being parsed for execution
@@ -192,6 +174,24 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
             return (SuggestionProvider<C>) this;
         }
         return SuggestionProvider.noSuggestions();
+    }
+
+    /**
+     * Creates a new parser which attempts to use the {@code primary} parser and falls back on
+     * the {@code fallback} parser if that fails.
+     *
+     * @param <C>      command sender type
+     * @param <U>      primary value type
+     * @param <V>      fallback value type
+     * @param primary  primary parser
+     * @param fallback fallback parser which gets invoked if the primary parser fails to parse the input
+     * @return the descriptor of the parser
+     */
+    static <C, U, V> @NonNull ParserDescriptor<C, Either<U, V>> firstOf(
+            final @NonNull ParserDescriptor<C, U> primary,
+            final @NonNull ParserDescriptor<C, V> fallback
+    ) {
+        return EitherParser.eitherParser(primary, fallback);
     }
 
 
