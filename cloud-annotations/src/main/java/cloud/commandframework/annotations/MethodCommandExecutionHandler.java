@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -49,10 +50,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type.
  * @since 1.6.0 (Was made public in 1.6.0)
  */
-public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> implements CommandExecutionHandler<C> {
+public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> implements
+        CommandExecutionHandler.FutureCommandExecutionHandler<C> {
 
     private final CommandMethodContext<C> context;
     private final AnnotationParser<C> annotationParser;
+    private final boolean returnsFuture;
 
     /**
      * Constructs a new method command execution handler
@@ -64,6 +67,7 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
         super(context.method, context.instance, context.annotationParser.manager().parameterInjectorRegistry());
         this.context = context;
         this.annotationParser = context.annotationParser();
+        this.returnsFuture = context.method().getReturnType().equals(CompletableFuture.class);
     }
 
     /**
@@ -80,14 +84,19 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
      * {@inheritDoc}
      */
     @Override
-    public void execute(final @NonNull CommandContext<C> commandContext) {
+    @SuppressWarnings("unchecked")
+    public CompletableFuture<Void> executeFuture(final @NonNull CommandContext<C> commandContext) {
         /* Invoke the command method */
         try {
-            this.methodHandle().invokeWithArguments(
+            final Object result = this.methodHandle().invokeWithArguments(
                     this.createParameterValues(commandContext).stream()
                             .map(ParameterValue::value)
                             .collect(Collectors.toList())
             );
+            if (this.returnsFuture) {
+                return (CompletableFuture<Void>) result;
+            }
+            return CompletableFuture.completedFuture(null);
         } catch (final Error e) {
             throw e;
         } catch (final Throwable throwable) {
