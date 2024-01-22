@@ -25,7 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.LiteralParser;
-import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
+import cloud.commandframework.arguments.aggregate.AggregateParser;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
@@ -748,7 +748,7 @@ public final class CommandTree<C> {
         }
 
         if (commandInput.isEmpty() || commandInput.remainingTokens() == 1
-                || (child.isLeaf() && child.component().parser() instanceof AggregateCommandParser)) {
+                || (child.isLeaf() && child.component().parser() instanceof AggregateParser)) {
             return this.addArgumentSuggestions(context, child, commandInput, executor);
         }
 

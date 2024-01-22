@@ -39,9 +39,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.INTERNAL, since = "2.0.0")
 final class AggregateSuggestionProvider<C> implements SuggestionProvider<C> {
 
-    private final AggregateCommandParser<C, ?> parser;
+    private final AggregateParser<C, ?> parser;
 
-    AggregateSuggestionProvider(final @NonNull AggregateCommandParser<C, ?> parser) {
+    AggregateSuggestionProvider(final @NonNull AggregateParser<C, ?> parser) {
         this.parser = parser;
     }
 

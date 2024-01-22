@@ -23,40 +23,31 @@
 //
 package cloud.commandframework.arguments.aggregate;
 
-import cloud.commandframework.CommandComponent;
-import io.leangen.geantyref.TypeToken;
-import java.util.Collections;
-import java.util.List;
+import cloud.commandframework.keys.MutableCloudKeyContainer;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class AggregateCommandParserImpl<C, O> implements AggregateCommandParser<C, O> {
+/**
+ * Context that stores the individual result of invoking the child parsers of a {@link AggregateParser}.
+ * <p>
+ * This is used in {@link AggregateResultMapper} to map to the output type using the intermediate results.
+ *
+ * @param <C> the command sender type
+ * @since 2.0.0
+ */
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface AggregateParsingContext<C> extends MutableCloudKeyContainer {
 
-    private final List<CommandComponent<C>> components;
-    private final TypeToken<O> valueType;
-    private final AggregateResultMapper<C, O> mapper;
-
-    AggregateCommandParserImpl(
-            final @NonNull List<CommandComponent<C>> components,
-            final @NonNull TypeToken<O> valueType,
-            final @NonNull AggregateResultMapper<C, O> mapper
+    /**
+     * Returns a new argument context instance that accepts values for the inner parsers of the given {@code parser}.
+     *
+     * @param <C>    the comment sender type
+     * @param parser the parser that the context is used by
+     * @return the command context
+     */
+    static <C> @NonNull AggregateParsingContext<C> argumentContext(
+            final @NonNull AggregateParser<C, ?> parser
     ) {
-        this.components = components;
-        this.valueType = valueType;
-        this.mapper = mapper;
-    }
-
-    @Override
-    public @NonNull List<@NonNull CommandComponent<C>> components() {
-        return Collections.unmodifiableList(this.components);
-    }
-
-    @Override
-    public @NonNull AggregateResultMapper<C, O> mapper() {
-        return this.mapper;
-    }
-
-    @Override
-    public @NonNull TypeToken<O> valueType() {
-        return this.valueType;
+        return new AggregateParsingContextImpl<>(parser);
     }
 }

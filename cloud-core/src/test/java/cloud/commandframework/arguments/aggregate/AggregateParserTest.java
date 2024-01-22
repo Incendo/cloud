@@ -45,9 +45,8 @@ import static cloud.commandframework.arguments.standard.StringParser.stringParse
 import static cloud.commandframework.truth.ArgumentParseResultSubject.assertThat;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Mockito.when;
 
-class AggregateCommandParserTest {
+class AggregateParserTest {
 
     private CommandContext<TestCommandSender> commandContext;
 
@@ -60,7 +59,7 @@ class AggregateCommandParserTest {
     @Test
     void testParsing() {
         // Arrange
-        final AggregateCommandParser<TestCommandSender, OutputType> parser = AggregateCommandParser.<TestCommandSender>builder()
+        final AggregateParser<TestCommandSender, OutputType> parser = AggregateParser.<TestCommandSender>builder()
                 .withComponent("number", integerParser())
                 .withComponent("string", stringParser())
                 .withMapper(
@@ -81,7 +80,7 @@ class AggregateCommandParserTest {
     @Test
     void testExceptionForwarding() {
         // Arrange
-        final AggregateCommandParser<TestCommandSender, OutputType> parser = AggregateCommandParser.<TestCommandSender>builder()
+        final AggregateParser<TestCommandSender, OutputType> parser = AggregateParser.<TestCommandSender>builder()
                 .withComponent("number", integerParser())
                 .withComponent("string", stringParser())
                 .withMapper(
@@ -95,14 +94,14 @@ class AggregateCommandParserTest {
                 parser.parseFuture(this.commandContext, CommandInput.of("abc abc")).join();
 
         // Assert
-        assertThat(outputType).hasFailureThat().isInstanceOf(AggregateCommandParser.AggregateParseException.class);
+        assertThat(outputType).hasFailureThat().isInstanceOf(AggregateParser.AggregateParseException.class);
         assertThat(outputType).hasFailureThat().hasCauseThat().isInstanceOf(IntegerParser.IntegerParseException.class);
     }
 
     @Test
     void testMultiLevelAggregateParsing() {
         // Arrange
-        final AggregateCommandParser<TestCommandSender, OutputType> inner = AggregateCommandParser.<TestCommandSender>builder()
+        final AggregateParser<TestCommandSender, OutputType> inner = AggregateParser.<TestCommandSender>builder()
                 .withComponent("number", integerParser())
                 .withComponent("string", stringParser())
                 .withMapper(
@@ -111,7 +110,7 @@ class AggregateCommandParserTest {
                                 ArgumentParseResult.successFuture(
                                         new OutputType(context.get("number"), context.get("string")))
                 ).build();
-        final AggregateCommandParser<TestCommandSender, OutputType> parser = AggregateCommandParser.<TestCommandSender>builder()
+        final AggregateParser<TestCommandSender, OutputType> parser = AggregateParser.<TestCommandSender>builder()
                 .withComponent("inner", inner)
                 .withMapper(
                         OutputType.class,
@@ -130,7 +129,7 @@ class AggregateCommandParserTest {
     @Test
     void testSuggestionsFirstArgument() {
         // Arrange
-        final AggregateCommandParser<TestCommandSender, OutputType> parser = AggregateCommandParser.<TestCommandSender>builder()
+        final AggregateParser<TestCommandSender, OutputType> parser = AggregateParser.<TestCommandSender>builder()
                 .withComponent("number", integerParser(), SuggestionProvider.blocking((ctx, in) -> Arrays.asList(
                         Suggestion.simple("1"),
                         Suggestion.simple("2"),
@@ -158,7 +157,7 @@ class AggregateCommandParserTest {
     @Test
     void testSuggestionsSecondArgument() {
         // Arrange
-        final AggregateCommandParser<TestCommandSender, OutputType> parser = AggregateCommandParser.<TestCommandSender>builder()
+        final AggregateParser<TestCommandSender, OutputType> parser = AggregateParser.<TestCommandSender>builder()
                 .withComponent("number", integerParser())
                 .withComponent("string", stringParser(), SuggestionProvider.blocking((ctx, in) -> Arrays.asList(
                         Suggestion.simple("a"),
@@ -187,7 +186,7 @@ class AggregateCommandParserTest {
     @Test
     void testFailureMissingInput() {
         // Arrange
-        final AggregateCommandParser<TestCommandSender, OutputType> parser = AggregateCommandParser.<TestCommandSender>builder()
+        final AggregateParser<TestCommandSender, OutputType> parser = AggregateParser.<TestCommandSender>builder()
                 .withComponent("number", integerParser())
                 .withComponent("string", stringParser())
                 .withMapper(
@@ -201,7 +200,7 @@ class AggregateCommandParserTest {
                 parser.parseFuture(this.commandContext, CommandInput.empty()).join();
 
         // Assert
-        assertThat(outputType).hasFailureThat().isInstanceOf(AggregateCommandParser.AggregateParseException.class);
+        assertThat(outputType).hasFailureThat().isInstanceOf(AggregateParser.AggregateParseException.class);
         final ParserException parserException = (ParserException) outputType.failure().get();
         assertThat(parserException.errorCaption()).isEqualTo(StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_MISSING_INPUT);
         assertThat(parserException.getMessage()).isEqualTo("Missing component 'number'");
@@ -210,7 +209,7 @@ class AggregateCommandParserTest {
     @Test
     void testFailureComponentParsingFailure() {
         // Arrange
-        final AggregateCommandParser<TestCommandSender, OutputType> parser = AggregateCommandParser.<TestCommandSender>builder()
+        final AggregateParser<TestCommandSender, OutputType> parser = AggregateParser.<TestCommandSender>builder()
                 .withComponent("number", integerParser())
                 .withComponent("string", stringParser())
                 .withMapper(
@@ -224,7 +223,7 @@ class AggregateCommandParserTest {
                 parser.parseFuture(this.commandContext, CommandInput.of("abc")).join();
 
         // Assert
-        assertThat(outputType).hasFailureThat().isInstanceOf(AggregateCommandParser.AggregateParseException.class);
+        assertThat(outputType).hasFailureThat().isInstanceOf(AggregateParser.AggregateParseException.class);
         final ParserException parserException = (ParserException) outputType.failure().get();
         assertThat(parserException.errorCaption())
                 .isEqualTo(StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE);
