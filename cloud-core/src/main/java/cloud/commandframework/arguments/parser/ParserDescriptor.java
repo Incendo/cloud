@@ -23,45 +23,19 @@
 //
 package cloud.commandframework.arguments.parser;
 
+import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.internal.ImmutableImpl;
 import io.leangen.geantyref.TypeToken;
-import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
+@Value.Immutable
+@ImmutableImpl
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface ParserDescriptor<C, T> {
-
-    /**
-     * Creates a new parser descriptor.
-     *
-     * @param <C> the command sender type
-     * @param <T> the type of values produced by the parser
-     * @param parser    the parser
-     * @param valueType the type of values produced by the parser
-     * @return the created descriptor
-     */
-    static <C, T> @NonNull ParserDescriptor<C, T> of(
-            final @NonNull ArgumentParser<C, T> parser,
-            final @NonNull TypeToken<T> valueType
-    ) {
-        return new ParserDescriptorImpl<>(parser, valueType);
-    }
-
-    /**
-     * Creates a new parser descriptor.
-     *
-     * @param <C> the command sender type
-     * @param <T> the type of values produced by the parser
-     * @param parser    the parser
-     * @param valueType the type of values produced by the parser
-     * @return the created descriptor
-     */
-    static <C, T> @NonNull ParserDescriptor<C, T> of(
-            final @NonNull ArgumentParser<C, T> parser,
-            final @NonNull Class<T> valueType
-    ) {
-        return new ParserDescriptorImpl<>(parser, TypeToken.get(valueType));
-    }
 
     /**
      * Returns the parser.
@@ -77,42 +51,157 @@ public interface ParserDescriptor<C, T> {
      */
     @NonNull TypeToken<T> valueType();
 
+    /**
+     * Create a descriptor for a {@link ArgumentParser#flatMap(MappedArgumentParser.Mapper) flatMapped} parser.
+     *
+     * @param mappedType mapped parser result type
+     * @param mapper     mapper
+     * @param <O>        mapped parser result type
+     * @return mapped parser descriptor
+     */
+    default <O> @NonNull ParserDescriptor<C, O> flatMap(
+            final @NonNull TypeToken<O> mappedType,
+            final MappedArgumentParser.@NonNull Mapper<C, T, O> mapper
+    ) {
+        return parserDescriptor(this.parser().flatMap(mapper), mappedType);
+    }
 
-    final class ParserDescriptorImpl<C, T> implements ParserDescriptor<C, T> {
+    /**
+     * Create a descriptor for a {@link ArgumentParser#flatMap(MappedArgumentParser.Mapper) flatMapped} parser.
+     *
+     * @param mappedType mapped parser result type
+     * @param mapper     mapper
+     * @param <O>        mapped parser result type
+     * @return mapped parser descriptor
+     */
+    default <O> @NonNull ParserDescriptor<C, O> flatMap(
+            final @NonNull Class<O> mappedType,
+            final MappedArgumentParser.@NonNull Mapper<C, T, O> mapper
+    ) {
+        return parserDescriptor(this.parser().flatMap(mapper), mappedType);
+    }
 
-        private final ArgumentParser<C, T> parser;
-        private final TypeToken<T> valueType;
+    /**
+     * Create a descriptor for a {@link ArgumentParser#flatMapSuccess(BiFunction) flatMapped} parser.
+     *
+     * @param mappedType mapped parser result type
+     * @param mapper     mapper
+     * @param <O>        mapped parser result type
+     * @return mapped parser descriptor
+     */
+    default <O> @NonNull ParserDescriptor<C, O> flatMapSuccess(
+            final @NonNull TypeToken<O> mappedType,
+            final @NonNull BiFunction<CommandContext<C>, T, CompletableFuture<ArgumentParseResult<O>>> mapper
+    ) {
+        return parserDescriptor(this.parser().flatMapSuccess(mapper), mappedType);
+    }
 
-        private ParserDescriptorImpl(final @NonNull ArgumentParser<C, T> parser, final @NonNull TypeToken<T> valueType) {
-            this.parser = parser;
-            this.valueType = valueType;
-        }
+    /**
+     * Create a descriptor for a {@link ArgumentParser#flatMapSuccess(BiFunction) flatMapped} parser.
+     *
+     * @param mappedType mapped parser result type
+     * @param mapper     mapper
+     * @param <O>        mapped parser result type
+     * @return mapped parser descriptor
+     */
+    default <O> @NonNull ParserDescriptor<C, O> flatMapSuccess(
+            final @NonNull Class<O> mappedType,
+            final @NonNull BiFunction<CommandContext<C>, T, CompletableFuture<ArgumentParseResult<O>>> mapper
+    ) {
+        return parserDescriptor(this.parser().flatMapSuccess(mapper), mappedType);
+    }
 
-        @Override
-        public @NonNull ArgumentParser<C, T> parser() {
-            return this.parser;
-        }
+    /**
+     * Create a descriptor for a {@link ArgumentParser#mapSuccess(BiFunction) mapped} parser.
+     *
+     * @param mappedType mapped parser result type
+     * @param mapper     mapper
+     * @param <O>        mapped parser result type
+     * @return mapped parser descriptor
+     */
+    default <O> @NonNull ParserDescriptor<C, O> mapSuccess(
+            final @NonNull TypeToken<O> mappedType,
+            final @NonNull BiFunction<CommandContext<C>, T, CompletableFuture<O>> mapper
+    ) {
+        return parserDescriptor(this.parser().mapSuccess(mapper), mappedType);
+    }
 
-        @Override
-        public @NonNull TypeToken<T> valueType() {
-            return this.valueType;
-        }
+    /**
+     * Create a descriptor for a {@link ArgumentParser#mapSuccess(BiFunction) mapped} parser.
+     *
+     * @param mappedType mapped parser result type
+     * @param mapper     mapper
+     * @param <O>        mapped parser result type
+     * @return mapped parser descriptor
+     */
+    default <O> @NonNull ParserDescriptor<C, O> mapSuccess(
+            final @NonNull Class<O> mappedType,
+            final @NonNull BiFunction<CommandContext<C>, T, CompletableFuture<O>> mapper
+    ) {
+        return parserDescriptor(this.parser().mapSuccess(mapper), mappedType);
+    }
 
-        @Override
-        public boolean equals(final Object object) {
-            if (this == object) {
-                return true;
-            }
-            if (!(object instanceof ParserDescriptor)) {
-                return false;
-            }
-            final ParserDescriptor<?, ?> that = (ParserDescriptor<?, ?>) object;
-            return Objects.equals(this.parser(), that.parser()) && Objects.equals(this.valueType(), that.valueType());
-        }
+    /**
+     * Creates a new parser descriptor.
+     *
+     * @param <C>       the command sender type
+     * @param <T>       the type of values produced by the parser
+     * @param parser    the parser
+     * @param valueType the type of values produced by the parser
+     * @return the created descriptor
+     */
+    static <C, T> @NonNull ParserDescriptor<C, T> of(
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull TypeToken<T> valueType
+    ) {
+        return ParserDescriptorImpl.of(parser, valueType);
+    }
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.parser(), this.valueType());
-        }
+    /**
+     * Creates a new parser descriptor.
+     *
+     * @param <C>       the command sender type
+     * @param <T>       the type of values produced by the parser
+     * @param parser    the parser
+     * @param valueType the type of values produced by the parser
+     * @return the created descriptor
+     */
+    static <C, T> @NonNull ParserDescriptor<C, T> of(
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull Class<T> valueType
+    ) {
+        return ParserDescriptorImpl.of(parser, TypeToken.get(valueType));
+    }
+
+    /**
+     * Creates a new parser descriptor.
+     *
+     * @param <C>       the command sender type
+     * @param <T>       the type of values produced by the parser
+     * @param parser    the parser
+     * @param valueType the type of values produced by the parser
+     * @return the created descriptor
+     */
+    static <C, T> @NonNull ParserDescriptor<C, T> parserDescriptor(
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull TypeToken<T> valueType
+    ) {
+        return of(parser, valueType);
+    }
+
+    /**
+     * Creates a new parser descriptor.
+     *
+     * @param <C>       the command sender type
+     * @param <T>       the type of values produced by the parser
+     * @param parser    the parser
+     * @param valueType the type of values produced by the parser
+     * @return the created descriptor
+     */
+    static <C, T> @NonNull ParserDescriptor<C, T> parserDescriptor(
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull Class<T> valueType
+    ) {
+        return of(parser, TypeToken.get(valueType));
     }
 }
