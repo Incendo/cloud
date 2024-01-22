@@ -1,5 +1,5 @@
 <div align="center">
-<img src="icons/CloudNew.png" width="300px"/>
+<img src="img/CloudNew.png" width="300px"/>
 <br/>
 <h1>cloud command framework</h1>
 
@@ -19,67 +19,41 @@ Cloud commands consist out of deterministic chains of strongly typed arguments. 
 you know exactly what type of data you're going to be working with, and you know that there will be no
 ambiguity at runtime. Cloud promotes writing reusable code, making it very easy to define new commands.
 
-Cloud allows you to use command builders, in Java:
-```java
-manager.command(
-    manager.commandBuilder("command", "alias")
-        .literal("literal")
-        .required("number", integerParser())
-        .optional("string", stringParser(), ArgumentDescription.of("A string!"))
-        .handler(commandContext -> {
-            final int number = commandContext.get("number");
-            final String string = commandContext.getOrDefault("string", "");
-            // ...
-        })
-);
-```
-or in Kotlin:
-```kotlin
-manager.buildAndRegister("command", aliases = arrayOf("alias")) {
-    literal("literal")
-    required("number", integerParser())
-    optional("string", stringParser()) {
-        description { "A string!" }
-    }
-    handler { context ->
-        val number: Int = context["number"]
-        val string: String = context.getOrDefault("string", "")
-        // ...
-    }
-}
-```
+Cloud allows you to build commands in many different ways, according to your preferences:
 
-or using annotated methods, in Java:
-```java
-@Command("command literal <number> [string]")
-public void yourCommand(
-        CommandSender sender,
-        int number, // @Argument is optional!
-        @Argument(value = "string") @Default("string!") String str
-) {
-    // ...
-}
-```
-or in Kotlin:
-```kotlin
-@Command("command literal <number> [string]")
-public suspend fun yourCommand(
-    sender: CommandSender,
-    number: Int, // @Argument is optional!
-    @Argument("string") str: String = "string!"
-) {
-    // ...
-}
-```
+<div align="center">
+<picture>
+    <source media="(prefers-color-scheme: dark)" srcset="img/code/builder_java_dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="img/code/builder_java_light.png">
+    <img src="img/code/builder_java_light.png">
+</picture>
 
-depending on your preference.
+<picture>
+    <source media="(prefers-color-scheme: dark)" srcset="img/code/builder_kotlin_dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="img/code/builder_kotlin_light.png">
+    <img src="img/code/builder_kotlin_light.png">
+</picture>
+
+<picture>
+    <source media="(prefers-color-scheme: dark)" srcset="img/code/annotations_java_dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="img/code/annotations_java_light.png">
+    <img src="img/code/annotations_java_light.png">
+</picture>
+
+<picture>
+    <source media="(prefers-color-scheme: dark)" srcset="img/code/annotations_kotlin_dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="img/code/annotations_kotlin_light.png">
+    <img src="img/code/annotations_kotlin_light.png">
+</picture>
+</div>
 
 Cloud is built to be very customisable, in order to fit your needs. You can inject handlers and processors
 along the entire command chain. If the pre-existing command parsers aren't enough for your needs, you're easily
 able to create your own parsers. If you use the annotation parsing system, you can also define your own annotations
 and register them to further customise the behaviour of the library.
 
-Cloud by default ships with implementations and mappings for the most common Minecraft server platforms, JDA and javacord for
+Cloud by default ships with implementations and mappings for the most common Minecraft server platforms, 
+Discord4J, JDA4, JDA5, Kord and Javacord for
 Discord bots, PircBotX for IRC and [cloud-spring](https://github.com/incendo/cloud-spring) for Spring Shell.
 The core module allows you to use Cloud anywhere, simply by implementing the CommandManager for the platform of your choice.
 
@@ -106,97 +80,6 @@ To clone the repository, use `git clone https://github.com/Incendo/cloud.git`.
 
 To then build it, use `./gradlew clean build`. If you want to build the examples as well, use `./gradlew clean build
 -Pcompile-examples`.
-
-## use
-
-To use `cloud` you will first need to add it as a dependency to your project.
-
-Release builds of Cloud are available through the Maven central repository.
-Snapshot builds of Cloud are available through the [Sonatype OSS Snapshot repository](https://oss.sonatype.org/content/repositories/snapshots).
-
-**maven**:
-```xml
-<dependency>  
- <groupId>cloud.commandframework</groupId>
- <artifactId>cloud-PLATFORM</artifactId>
- <version>2.0.0-SNAPSHOT</version>
-</dependency>
-<!-- 
-~    Optional: Allows you to use annotated methods
-~    to declare commands 
--->
-<dependency>  
- <groupId>cloud.commandframework</groupId>
- <artifactId>cloud-annotations</artifactId>
- <version>2.0.0-SNAPSHOT</version>
-</dependency>
-``` 
-
-```xml
-<!-- For snapshot builds -->
-<repository>
- <id>sonatype-snapshots</id>
- <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-</repository>
-```
-
-If you are shading in cloud, it is highly recommended that you relocate all of our classes to prevent issues
-with conflicting dependencies:
-
-```xml
-<build>
-   <plugins>
-      <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-shade-plugin</artifactId>
-         <version>3.2.4</version>
-         <executions>
-            <execution>
-               <phase>package</phase>
-               <goals>
-                  <goal>shade</goal>
-               </goals>
-               <configuration>
-                  <createDependencyReducedPom>false</createDependencyReducedPom>
-               </configuration>
-            </execution>
-         </executions>
-         <configuration>
-            <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
-            <relocations>
-               <relocation>
-                  <pattern>cloud.commandframework</pattern>
-                  <shadedPattern>YOUR.PACKAGE.HERE.shaded.cloud</shadedPattern> <!-- Replace this -->
-               </relocation>
-               <relocation>
-                  <pattern>io.leangen.geantyref</pattern>
-                  <shadedPattern>YOUR.PACKAGE.HERE.shaded.typetoken</shadedPattern> <!-- Replace this -->
-               </relocation>
-            </relocations>
-         </configuration>
-      </plugin>
-   </plugins>
-</build>
-```
-
-**gradle**:
-```kotlin
-repositories {
-    mavenCentral()
-    maven("https://oss.sonatype.org/content/repositories/snapshots") // For snapshot builds
-}
-```
-
-```kotlin
-dependencies {
-    implementation("cloud.commandframework", "cloud-PLATFORM", "2.0.0-SNAPSHOT")
-}
-```
-
-To shade and relocate cloud use [Gradle Shadow](https://github.com/johnrengelman/shadow).
-
-Replace `PLATFORM` with your platform of choice. We currently support: `bukkit`, `paper`, `bungee` and `velocity`for minecraft and `jda` and `javacord` for discord. All modules use the same versions.
-More information about the Minecraft specific modules can be found [here](https://github.com/Incendo/cloud/tree/master/cloud-minecraft).
 
 ## attributions, links &amp; acknowledgements  
   
