@@ -52,13 +52,16 @@ class ParameterInjectionTest {
     @Test
     void testInjection() {
         // Arrange
-        this.commandManager.parameterInjectorRegistry().registerInjector(Integer.class, ParameterInjector.constantInjector(5));
-        this.commandManager.parameterInjectorRegistry().registerInjector(new TypeToken<StringWrapper>() {
-        }, ParameterInjector.constantInjector(new StringWrapper("abc")));
-        this.commandManager.parameterInjectorRegistry().registerInjector(new TypeToken<Wrapper<Boolean>>() {
-        }, ParameterInjector.constantInjector(new Wrapper<>(true)));
-        this.commandManager.parameterInjectorRegistry().registerInjector(SomeImplementation.class,
-                ParameterInjector.constantInjector(new SomeImplementation()));
+        this.commandManager.parameterInjectorRegistry()
+                .registerInjector(Integer.class, ParameterInjector.constantInjector(5))
+                .registerInjector(new TypeToken<StringWrapper>() {}, ParameterInjector.constantInjector(new StringWrapper("abc")))
+                .registerInjector(
+                        new TypeToken<Wrapper<Boolean>>() {},
+                        ParameterInjector.constantInjector(new Wrapper<>(true))
+                ).registerInjector(
+                        SomeImplementation.class,
+                        ParameterInjector.constantInjector(new SomeImplementation())
+                );
         this.annotationParser.parse(new TestClass());
 
         // Act

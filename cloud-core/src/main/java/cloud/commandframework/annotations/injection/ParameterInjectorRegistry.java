@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * Registry containing mappings between {@link Class} {@link Predicate Predicates}
@@ -71,12 +72,13 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      * @param <T>      injected type
      * @param clazz    type that the injector should inject for
      * @param injector the injector that should inject the value into the command method
+     * @return {@code this}
      */
-    public synchronized <T> void registerInjector(
+    public synchronized <T> @This @NonNull ParameterInjectorRegistry<C> registerInjector(
             final @NonNull Class<T> clazz,
             final @NonNull ParameterInjector<C, T> injector
     ) {
-        this.registerInjector(TypeToken.get(clazz), injector);
+        return this.registerInjector(TypeToken.get(clazz), injector);
     }
 
     /**
@@ -85,14 +87,15 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      * @param <T>      injected type
      * @param type     type that the injector should inject for
      * @param injector the injector that should inject the value into the command method
+     * @return {@code this}
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public synchronized <T> void registerInjector(
+    public synchronized <T> @This @NonNull ParameterInjectorRegistry<C> registerInjector(
             final @NonNull TypeToken<T> type,
             final @NonNull ParameterInjector<C, T> injector
     ) {
-        this.registerInjector(cl -> GenericTypeReflector.isSuperType(cl.getType(), type.getType()), injector);
+        return this.registerInjector(cl -> GenericTypeReflector.isSuperType(cl.getType(), type.getType()), injector);
     }
 
     /**
@@ -107,14 +110,16 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      * @param <T>       injected type
      * @param predicate a predicate that matches if the injector should be used for a type
      * @param injector  the injector that should inject the value into the command method
+     * @return {@code this}
      * @since 1.8.0
      */
     @API(status = API.Status.STABLE, since = "1.8.0")
-    public synchronized <T> void registerInjector(
+    public synchronized <T> @This @NonNull ParameterInjectorRegistry<C> registerInjector(
             final @NonNull Predicate<TypeToken<?>> predicate,
             final @NonNull ParameterInjector<C, T> injector
     ) {
         this.injectors.add(Pair.of(predicate, injector));
+        return this;
     }
 
     @Override
@@ -205,12 +210,14 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      * {@link #getInjectable(Class, CommandContext, AnnotationAccessor)}.
      *
      * @param service Service implementation
+     * @return {@code this}
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public void registerInjectionService(final InjectionService<C> service) {
+    public @This @NonNull ParameterInjectorRegistry<C> registerInjectionService(final InjectionService<C> service) {
         this.servicePipeline.registerServiceImplementation(new TypeToken<InjectionService<C>>() {
         }, service, Collections.emptyList());
+        return this;
     }
 
     private synchronized <T> @NonNull Collection<@NonNull ParameterInjector<C, ?>> injectors(final @NonNull TypeToken<T> type) {
