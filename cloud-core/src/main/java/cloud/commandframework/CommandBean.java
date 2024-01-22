@@ -95,7 +95,7 @@ public abstract class CommandBean<C> implements CommandExecutionHandler<C>, Comm
      * @param builder the command builder
      * @return the updated builder
      */
-    protected abstract Command.@NonNull Builder<C> configure(Command.@NonNull Builder<C> builder);
+    protected abstract Command.@NonNull Builder<? extends C> configure(Command.@NonNull Builder<C> builder);
 
     /**
      * Default command handler for this command bean. Does nothing unless override.

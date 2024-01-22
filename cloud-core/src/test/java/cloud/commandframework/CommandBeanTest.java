@@ -67,7 +67,8 @@ class CommandBeanTest {
         assertThat(command.commandExecutionHandler()).isEqualTo(testCommandBean);
     }
 
-    public static class TestCommandBean extends CommandBean<TestCommandSender> {
+
+    public static final class TestCommandBean extends CommandBean<TestCommandSender> {
 
         @Override
         protected @NonNull CommandProperties properties() {
@@ -80,8 +81,16 @@ class CommandBeanTest {
         }
 
         @Override
-        protected Command.@NonNull Builder<TestCommandSender> configure(final Command.@NonNull Builder<TestCommandSender> builder) {
-            return builder.required("argument", IntegerParser.integerParser());
+        protected Command.@NonNull Builder<? extends TestCommandSender> configure(
+                final Command.@NonNull Builder<TestCommandSender> builder
+        ) {
+            return builder.senderType(ChildTestCommandSender.class)
+                    .required("argument", IntegerParser.integerParser());
         }
+    }
+
+
+    public static final class ChildTestCommandSender extends TestCommandSender {
+
     }
 }
