@@ -24,7 +24,7 @@
 package cloud.commandframework.kotlin.extension
 
 import cloud.commandframework.CommandComponent
-import cloud.commandframework.arguments.aggregate.AggregateCommandParserBuilder
+import cloud.commandframework.arguments.aggregate.AggregateParserBuilder
 
 /**
  * Creates a new command component using the given [builderDecorator].
@@ -32,6 +32,6 @@ import cloud.commandframework.arguments.aggregate.AggregateCommandParserBuilder
  * @param builderDecorator decorator that prepares the command component
  * @return the updated builder
  */
-public fun <C, T> AggregateCommandParserBuilder<C>.withComponent(
+public fun <C, T> AggregateParserBuilder<C>.withComponent(
     builderDecorator: CommandComponent.Builder<C, T>.() -> Unit
-): AggregateCommandParserBuilder<C> = withComponent(CommandComponent.builder<C, T>().apply(builderDecorator).build())
+): AggregateParserBuilder<C> = withComponent(CommandComponent.builder<C, T>().apply(builderDecorator).build())

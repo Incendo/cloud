@@ -35,15 +35,15 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE, since = "2.0.0")
-public class AggregateCommandParserBuilder<C> {
+public class AggregateParserBuilder<C> {
 
     private final List<CommandComponent<C>> components;
 
-    AggregateCommandParserBuilder(final @NonNull List<CommandComponent<C>> components) {
+    AggregateParserBuilder(final @NonNull List<CommandComponent<C>> components) {
         this.components = Collections.unmodifiableList(components);
     }
 
-    AggregateCommandParserBuilder() {
+    AggregateParserBuilder() {
         this.components = Collections.emptyList();
     }
 
@@ -55,11 +55,11 @@ public class AggregateCommandParserBuilder<C> {
      * @param mapper    the mapper
      * @return the new builder
      */
-    public final <O> @NonNull MappedAggregateCommandParserBuilder<C, O> withMapper(
+    public final <O> @NonNull MappedAggregateParserBuilder<C, O> withMapper(
             final @NonNull TypeToken<O> valueType,
             final @NonNull AggregateResultMapper<C, O> mapper
     ) {
-        return new MappedAggregateCommandParserBuilder<>(this.components(), valueType, mapper);
+        return new MappedAggregateParserBuilder<>(this.components(), valueType, mapper);
     }
 
     /**
@@ -73,11 +73,11 @@ public class AggregateCommandParserBuilder<C> {
      * @param mapper    the mapper
      * @return the new builder
      */
-    public final <O> @NonNull MappedAggregateCommandParserBuilder<C, O> withMapper(
+    public final <O> @NonNull MappedAggregateParserBuilder<C, O> withMapper(
             final @NonNull Class<O> valueType,
             final @NonNull AggregateResultMapper<C, O> mapper
     ) {
-        return new MappedAggregateCommandParserBuilder<>(this.components(), TypeToken.get(valueType), mapper);
+        return new MappedAggregateParserBuilder<>(this.components(), TypeToken.get(valueType), mapper);
     }
 
     /**
@@ -90,11 +90,11 @@ public class AggregateCommandParserBuilder<C> {
      * @param mapper    the mapper
      * @return the new builder
      */
-    public final <O> @NonNull MappedAggregateCommandParserBuilder<C, O> withDirectMapper(
+    public final <O> @NonNull MappedAggregateParserBuilder<C, O> withDirectMapper(
             final @NonNull Class<O> valueType,
             final AggregateResultMapper.@NonNull DirectAggregateResultMapper<C, O> mapper
     ) {
-        return new MappedAggregateCommandParserBuilder<>(this.components(), TypeToken.get(valueType), mapper);
+        return new MappedAggregateParserBuilder<>(this.components(), TypeToken.get(valueType), mapper);
     }
 
     /**
@@ -107,11 +107,11 @@ public class AggregateCommandParserBuilder<C> {
      * @param mapper    the mapper
      * @return the new builder
      */
-    public final <O> @NonNull MappedAggregateCommandParserBuilder<C, O> withDirectMapper(
+    public final <O> @NonNull MappedAggregateParserBuilder<C, O> withDirectMapper(
             final @NonNull TypeToken<O> valueType,
             final AggregateResultMapper.@NonNull DirectAggregateResultMapper<C, O> mapper
     ) {
-        return new MappedAggregateCommandParserBuilder<>(this.components(), valueType, mapper);
+        return new MappedAggregateParserBuilder<>(this.components(), valueType, mapper);
     }
 
     /**
@@ -120,12 +120,12 @@ public class AggregateCommandParserBuilder<C> {
      * @param component the component
      * @return the new builder
      */
-    public @NonNull AggregateCommandParserBuilder<C> withComponent(
+    public @NonNull AggregateParserBuilder<C> withComponent(
             final @NonNull CommandComponent<C> component
     ) {
         final List<CommandComponent<C>> components = new ArrayList<>(this.components());
         components.add(component);
-        return new AggregateCommandParserBuilder<>(components);
+        return new AggregateParserBuilder<>(components);
     }
 
     /**
@@ -136,7 +136,7 @@ public class AggregateCommandParserBuilder<C> {
      * @param parserDescriptor the parser
      * @return the new builder
      */
-    public <T> @NonNull AggregateCommandParserBuilder<C> withComponent(
+    public <T> @NonNull AggregateParserBuilder<C> withComponent(
             final @NonNull String name,
             final @NonNull ParserDescriptor<C, T> parserDescriptor
     ) {
@@ -152,7 +152,7 @@ public class AggregateCommandParserBuilder<C> {
      * @param suggestionProvider custom suggestion provider
      * @return the new builder
      */
-    public <T> @NonNull AggregateCommandParserBuilder<C> withComponent(
+    public <T> @NonNull AggregateParserBuilder<C> withComponent(
             final @NonNull String name,
             final @NonNull ParserDescriptor<C, T> parserDescriptor,
             final @NonNull SuggestionProvider<C> suggestionProvider
@@ -174,7 +174,7 @@ public class AggregateCommandParserBuilder<C> {
      * @param parserDescriptor the parser
      * @return the new builder
      */
-    public <T> @NonNull AggregateCommandParserBuilder<C> withComponent(
+    public <T> @NonNull AggregateParserBuilder<C> withComponent(
             final @NonNull CloudKey<T> name,
             final @NonNull ParserDescriptor<C, T> parserDescriptor
     ) {
@@ -190,7 +190,7 @@ public class AggregateCommandParserBuilder<C> {
      * @param suggestionProvider custom suggestion provider
      * @return the new builder
      */
-    public <T> @NonNull AggregateCommandParserBuilder<C> withComponent(
+    public <T> @NonNull AggregateParserBuilder<C> withComponent(
             final @NonNull CloudKey<T> name,
             final @NonNull ParserDescriptor<C, T> parserDescriptor,
             final @NonNull SuggestionProvider<C> suggestionProvider
@@ -209,12 +209,12 @@ public class AggregateCommandParserBuilder<C> {
     }
 
 
-    public static final class MappedAggregateCommandParserBuilder<C, O> extends AggregateCommandParserBuilder<C> {
+    public static final class MappedAggregateParserBuilder<C, O> extends AggregateParserBuilder<C> {
 
         private final AggregateResultMapper<C, O> mapper;
         private final TypeToken<O> valueType;
 
-        MappedAggregateCommandParserBuilder(
+        MappedAggregateParserBuilder(
                 final @NonNull List<CommandComponent<C>> components,
                 final @NonNull TypeToken<O> valueType,
                 final @NonNull AggregateResultMapper<C, O> mapper
@@ -225,16 +225,16 @@ public class AggregateCommandParserBuilder<C> {
         }
 
         @Override
-        public @NonNull MappedAggregateCommandParserBuilder<C, O> withComponent(
+        public @NonNull MappedAggregateParserBuilder<C, O> withComponent(
                 final @NonNull CommandComponent<C> component
         ) {
             final List<CommandComponent<C>> components = new ArrayList<>(this.components());
             components.add(component);
-            return new MappedAggregateCommandParserBuilder<>(components, this.valueType, this.mapper);
+            return new MappedAggregateParserBuilder<>(components, this.valueType, this.mapper);
         }
 
         @Override
-        public @NonNull <T> MappedAggregateCommandParserBuilder<C, O> withComponent(
+        public @NonNull <T> MappedAggregateParserBuilder<C, O> withComponent(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<C, T> parserDescriptor
         ) {
@@ -242,7 +242,7 @@ public class AggregateCommandParserBuilder<C> {
         }
 
         @Override
-        public <T> @NonNull MappedAggregateCommandParserBuilder<C, O> withComponent(
+        public <T> @NonNull MappedAggregateParserBuilder<C, O> withComponent(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<C, T> parserDescriptor,
                 final @NonNull SuggestionProvider<C> suggestionProvider
@@ -257,7 +257,7 @@ public class AggregateCommandParserBuilder<C> {
         }
 
         @Override
-        public @NonNull <T> MappedAggregateCommandParserBuilder<C, O> withComponent(
+        public @NonNull <T> MappedAggregateParserBuilder<C, O> withComponent(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<C, T> parserDescriptor
         ) {
@@ -265,7 +265,7 @@ public class AggregateCommandParserBuilder<C> {
         }
 
         @Override
-        public @NonNull <T> MappedAggregateCommandParserBuilder<C, O> withComponent(
+        public @NonNull <T> MappedAggregateParserBuilder<C, O> withComponent(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<C, T> parserDescriptor,
                 final @NonNull SuggestionProvider<C> suggestionProvider
@@ -284,8 +284,8 @@ public class AggregateCommandParserBuilder<C> {
          *
          * @return the parser
          */
-        public @NonNull AggregateCommandParser<C, O> build() {
-            return new AggregateCommandParserImpl<>(this.components(), this.valueType, this.mapper);
+        public @NonNull AggregateParser<C, O> build() {
+            return new AggregateParserImpl<>(this.components(), this.valueType, this.mapper);
         }
     }
 }

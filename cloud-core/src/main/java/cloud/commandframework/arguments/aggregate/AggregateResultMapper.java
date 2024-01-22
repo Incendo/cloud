@@ -30,7 +30,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Mapper that maps the result of invoking the inner parsers of a {@link AggregateCommandParser}.
+ * Mapper that maps the result of invoking the inner parsers of a {@link AggregateParser}.
  *
  * @param <C> the command sender type
  * @param <O> the output type
@@ -48,7 +48,7 @@ public interface AggregateResultMapper<C, O> {
      */
     @NonNull CompletableFuture<ArgumentParseResult<O>> map(
             @NonNull CommandContext<C> commandContext,
-            @NonNull AggregateCommandContext<C> context
+            @NonNull AggregateParsingContext<C> context
     );
 
 
@@ -64,13 +64,13 @@ public interface AggregateResultMapper<C, O> {
          */
         @NonNull ArgumentParseResult<O> mapImmediately(
                 @NonNull CommandContext<C> commandContext,
-                @NonNull AggregateCommandContext<C> context
+                @NonNull AggregateParsingContext<C> context
         );
 
         @Override
         default @NonNull CompletableFuture<ArgumentParseResult<O>> map(
                 @NonNull CommandContext<C> commandContext,
-                @NonNull AggregateCommandContext<C> context
+                @NonNull AggregateParsingContext<C> context
         ) {
             final CompletableFuture<ArgumentParseResult<O>> result = new CompletableFuture<>();
             try {
