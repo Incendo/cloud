@@ -35,13 +35,13 @@ import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @SuppressWarnings("unchecked")
-final class AggregateCommandContextImpl<C> implements AggregateCommandContext<C> {
+final class AggregateParsingContextImpl<C> implements AggregateParsingContext<C> {
 
     private final Map<CloudKey<?>, Object> storage = new HashMap<>();
     private final Collection<@NonNull String> validKeys;
 
-    AggregateCommandContextImpl(
-            final @NonNull AggregateCommandParser<C, ?> parser
+    AggregateParsingContextImpl(
+            final @NonNull AggregateParser<C, ?> parser
     ) {
         this.validKeys = parser.components()
                 .stream()

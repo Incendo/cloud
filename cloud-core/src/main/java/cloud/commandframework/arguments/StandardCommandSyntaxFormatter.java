@@ -25,7 +25,7 @@ package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
+import cloud.commandframework.arguments.aggregate.AggregateParser;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.internal.CommandNode;
@@ -110,8 +110,8 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
             final CommandComponent<C> commandComponent = iterator.next();
             if (commandComponent.type() == CommandComponent.ComponentType.LITERAL) {
                 formattingInstance.appendLiteral(commandComponent);
-            } else if (commandComponent.parser() instanceof AggregateCommandParser<?, ?>) {
-                final AggregateCommandParser<?, ?> aggregateParser = (AggregateCommandParser<?, ?>) commandComponent.parser();
+            } else if (commandComponent.parser() instanceof AggregateParser<?, ?>) {
+                final AggregateParser<?, ?> aggregateParser = (AggregateParser<?, ?>) commandComponent.parser();
                 formattingInstance.appendAggregate(commandComponent, aggregateParser);
             } else if (commandComponent.type() == CommandComponent.ComponentType.FLAG) {
                 formattingInstance.appendFlag((CommandFlagParser<?>) commandComponent.parser());
@@ -162,8 +162,8 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 break;
             }
             final CommandComponent<C> component = tail.children().get(0).component();
-            if (component.parser() instanceof AggregateCommandParser<?, ?>) {
-                final AggregateCommandParser<?, ?> aggregateParser = (AggregateCommandParser<?, ?>) component.parser();
+            if (component.parser() instanceof AggregateParser<?, ?>) {
+                final AggregateParser<?, ?> aggregateParser = (AggregateParser<?, ?>) component.parser();
                 formattingInstance.appendBlankSpace();
                 formattingInstance.appendAggregate(component, aggregateParser);
             } else if (component.type() == CommandComponent.ComponentType.FLAG) {
@@ -234,7 +234,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
         @API(status = API.Status.STABLE, since = "2.0.0")
         public void appendAggregate(
                 final @NonNull CommandComponent<?> component,
-                final @NonNull AggregateCommandParser<?, ?> parser
+                final @NonNull AggregateParser<?, ?> parser
         ) {
             final String prefix = component.required() ? this.requiredPrefix() : this.optionalPrefix();
             final String suffix = component.required() ? this.requiredSuffix() : this.optionalSuffix();

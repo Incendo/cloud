@@ -24,7 +24,7 @@
 package cloud.commandframework.arguments.compound;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.aggregate.AggregateCommandParser;
+import cloud.commandframework.arguments.aggregate.AggregateParser;
 import cloud.commandframework.arguments.aggregate.AggregateResultMapper;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -40,7 +40,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
-public final class CompoundParser<T extends Tuple, C, O> implements AggregateCommandParser<C, O> {
+public final class CompoundParser<T extends Tuple, C, O> implements AggregateParser<C, O> {
 
     private final List<CommandComponent<C>> components;
     private final BiFunction<C, T, O> mapper;

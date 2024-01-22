@@ -47,7 +47,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * {@link #builder()}.
  * <p>
  * The parsers {@link #components()} will be invoked in the order of the returned collection.
- * When parsing, each parser will be invoked and the result will be stored in a {@link AggregateCommandContext}.
+ * When parsing, each parser will be invoked and the result will be stored in a {@link AggregateParsingContext}.
  * After parsing, the {@link #mapper()} will be invoked, turning the intermediate results into the output type which is then
  * returned by this parser.
  * <p>
@@ -59,7 +59,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgumentParser<C, O>, ParserDescriptor<C, O> {
+public interface AggregateParser<C, O> extends ArgumentParser.FutureArgumentParser<C, O>, ParserDescriptor<C, O> {
 
     /**
      * Returns a new aggregate command parser builder. The builder is immutable, and each method returns
@@ -68,8 +68,8 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
      * @param <C> the command sender type
      * @return the builder
      */
-    static <C> @NonNull AggregateCommandParserBuilder<C> builder() {
-        return new AggregateCommandParserBuilder<>();
+    static <C> @NonNull AggregateParserBuilder<C> builder() {
+        return new AggregateParserBuilder<>();
     }
 
     /**
@@ -92,7 +92,7 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final AggregateCommandContext<C> aggregateCommandContext = AggregateCommandContext.argumentContext(this);
+        final AggregateParsingContext<C> aggregateParsingContext = AggregateParsingContext.argumentContext(this);
         CompletableFuture<ArgumentParseResult<Object>> future = CompletableFuture.completedFuture(null);
         for (final CommandComponent<C> component : this.components()) {
             future =
@@ -114,7 +114,7 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
                                 .thenApply(value -> {
                                     if (value.parsedValue().isPresent()) {
                                         final CloudKey key = CloudKey.of(component.name(), component.valueType());
-                                        aggregateCommandContext.store(key, value.parsedValue().get());
+                                        aggregateParsingContext.store(key, value.parsedValue().get());
                                     } else if (value.failure().isPresent()) {
                                         return ArgumentParseResult.failure(new AggregateParseException(
                                                 commandContext,
@@ -131,7 +131,7 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
             if (result != null && result.failure().isPresent()) {
                 return ((ArgumentParseResult<O>) result).asFuture();
             }
-            return this.mapper().map(commandContext, aggregateCommandContext);
+            return this.mapper().map(commandContext, aggregateParsingContext);
         });
     }
 
@@ -157,7 +157,7 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
         ) {
             super(
                     cause,
-                    AggregateCommandParser.class,
+                    AggregateParser.class,
                     context,
                     StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE,
                     CaptionVariable.of("input", input),
@@ -171,7 +171,7 @@ public interface AggregateCommandParser<C, O> extends ArgumentParser.FutureArgum
                 final @NonNull CommandComponent<?> component
         ) {
             super(
-                    AggregateCommandParser.class,
+                    AggregateParser.class,
                     context,
                     StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_MISSING_INPUT,
                     CaptionVariable.of("component", component.name())
