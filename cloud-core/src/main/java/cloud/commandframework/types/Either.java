@@ -25,6 +25,7 @@ package cloud.commandframework.types;
 
 import cloud.commandframework.internal.ImmutableImpl;
 import java.util.Optional;
+import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.immutables.value.Value;
@@ -80,4 +81,42 @@ public interface Either<U, V> {
      * @return the second value
      */
     @NonNull Optional<V> fallback();
+
+    /**
+     * Extract {@link #primary()}, or if it's not present, map {@link #fallback()} to {@code U}.
+     *
+     * @param mapFallback function mapping the fallback type to {@code U}
+     * @return extracted or mapped value
+     */
+    default @NonNull U primaryOrMapFallback(final @NonNull Function<V, U> mapFallback) {
+        return this.primary().orElseGet(() -> mapFallback.apply(this.fallback().get()));
+    }
+
+    /**
+     * Extract {@link #fallback()}, or if it's not present, map {@link #primary()} to {@code V}.
+     *
+     * @param mapPrimary function mapping the primary type to {@code V}
+     * @return extracted or mapped value
+     */
+    default @NonNull V fallbackOrMapPrimary(final @NonNull Function<U, V> mapPrimary) {
+        return this.fallback().orElseGet(() -> mapPrimary.apply(this.primary().get()));
+    }
+
+    /**
+     * Extract {@link #primary()} or {@link #fallback()}, in that order, applying the appropriate function
+     * to map the result to {@code R}.
+     *
+     * @param mapPrimary  function mapping the primary type to {@code R}
+     * @param mapFallback function mapping the fallback type to {@code R}
+     * @param <R>         mapped type
+     * @return mapped value
+     */
+    default @NonNull <R> R mapEither(
+            final @NonNull Function<U, R> mapPrimary,
+            final @NonNull Function<V, R> mapFallback
+    ) {
+        return this.primary()
+                .map(mapPrimary)
+                .orElseGet(() -> this.fallback().map(mapFallback).get());
+    }
 }
