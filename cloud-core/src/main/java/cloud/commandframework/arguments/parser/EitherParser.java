@@ -32,6 +32,7 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.types.Either;
 import io.leangen.geantyref.GenericTypeReflector;
+import io.leangen.geantyref.TypeFactory;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collections;
 import java.util.Objects;
@@ -64,12 +65,21 @@ public final class EitherParser<C, U, V> implements ArgumentParser.FutureArgumen
      * @param fallback fallback parser which gets invoked if the primary parser fails to parse the input
      * @return the descriptor of the parser
      */
+    @SuppressWarnings("unchecked")
     public static <C, U, V> ParserDescriptor<C, Either<U, V>> eitherParser(
             final @NonNull ParserDescriptor<C, U> primary,
             final @NonNull ParserDescriptor<C, V> fallback
     ) {
-        return ParserDescriptor.of(new EitherParser<>(primary, fallback), new TypeToken<Either<U, V>>() {
-        });
+        return ParserDescriptor.of(
+                new EitherParser<>(primary, fallback),
+                (TypeToken<Either<U, V>>) TypeToken.get(
+                        TypeFactory.parameterizedClass(
+                                Either.class,
+                                primary.valueType().getType(),
+                                fallback.valueType().getType()
+                        )
+                )
+        );
     }
 
     private final ParserDescriptor<C, U> primary;
