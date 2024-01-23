@@ -29,9 +29,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
- * Registry that allows for messages to be configurable per-sender
+ * Registry that allows for messages to be configurable per-sender. Delegates to registered {@link CaptionProvider
+ * CaptionProviders}.
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.STABLE)
 public interface CaptionRegistry<C> {
@@ -58,4 +59,14 @@ public interface CaptionRegistry<C> {
      * @return {@code this}
      */
     @This @NonNull CaptionRegistry<C> registerProvider(@NonNull CaptionProvider<C> provider);
+
+    /**
+     * Creates a new caption registry with no providers registered.
+     *
+     * @param <C> command sender type
+     * @return new caption registry
+     */
+    static <C> CaptionRegistry<C> captionRegistry() {
+        return new CaptionRegistryImpl<>();
+    }
 }

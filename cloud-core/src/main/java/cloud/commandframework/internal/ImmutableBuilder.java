@@ -44,7 +44,8 @@ import org.immutables.value.Value;
         headerComments = true,
         jacksonIntegration = false,
         builderVisibility = Value.Style.BuilderVisibility.SAME,
-        defaultAsDefault = true
+        defaultAsDefault = true,
+        depluralize = true
 )
 @InjectAnnotation(
         type = API.class,

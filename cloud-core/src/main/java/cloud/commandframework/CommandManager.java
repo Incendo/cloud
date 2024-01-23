@@ -36,7 +36,7 @@ import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
 import cloud.commandframework.captions.CaptionFormatter;
 import cloud.commandframework.captions.CaptionRegistry;
-import cloud.commandframework.captions.StandardCaptionRegistryFactory;
+import cloud.commandframework.captions.StandardCaptionsProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.CommandInput;
@@ -143,7 +143,8 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
         this.servicePipeline.registerServiceType(new TypeToken<CommandPostprocessor<C>>() {
         }, new AcceptingCommandPostprocessor<>());
         /* Create the caption registry */
-        this.captionRegistry = new StandardCaptionRegistryFactory<C>().create();
+        this.captionRegistry = CaptionRegistry.captionRegistry();
+        this.captionRegistry.registerProvider(new StandardCaptionsProvider<>());
         /* Register default injectors */
         this.parameterInjectorRegistry().registerInjector(
                 CommandContext.class,

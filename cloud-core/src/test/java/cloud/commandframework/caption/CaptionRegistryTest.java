@@ -26,9 +26,9 @@ package cloud.commandframework.caption;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionProvider;
+import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.captions.StandardCaptionKeys;
-import cloud.commandframework.captions.StandardCaptionRegistry;
-import cloud.commandframework.captions.StandardCaptionRegistryFactory;
+import cloud.commandframework.captions.StandardCaptionsProvider;
 import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,13 +39,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class StandardCaptionRegistryTest {
+class CaptionRegistryTest {
 
-    private StandardCaptionRegistry<TestCommandSender> captionRegistry;
+    private CaptionRegistry<TestCommandSender> captionRegistry;
 
     @BeforeEach
     void setup() {
-        this.captionRegistry = new StandardCaptionRegistryFactory<TestCommandSender>().create();
+        this.captionRegistry = CaptionRegistry.captionRegistry();
+        this.captionRegistry.registerProvider(new StandardCaptionsProvider<>());
     }
 
     @ParameterizedTest

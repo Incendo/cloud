@@ -23,23 +23,38 @@
 //
 package cloud.commandframework.captions;
 
+import java.util.LinkedList;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
-/**
- * Factory creating {@link StandardCaptionRegistry} instances
- *
- * @param <C> Command sender type
- */
-@API(status = API.Status.STABLE)
-public final class StandardCaptionRegistryFactory<C> {
+@API(status = API.Status.INTERNAL)
+public final class CaptionRegistryImpl<C> implements CaptionRegistry<C> {
 
-    /**
-     * Create a new simple caption registry instance
-     *
-     * @return Created instance
-     */
-    public @NonNull StandardCaptionRegistry<C> create() {
-        return new StandardCaptionRegistry<>();
+    private final LinkedList<@NonNull CaptionProvider<C>> providers = new LinkedList<>();
+
+    CaptionRegistryImpl() {
+    }
+
+    @Override
+    public @NonNull String caption(
+            final @NonNull Caption caption,
+            final @NonNull C sender
+    ) {
+        for (final CaptionProvider<C> provider : this.providers) {
+            final String result = provider.provide(caption, sender);
+            if (result != null) {
+                return result;
+            }
+        }
+        throw new IllegalArgumentException(String.format("There is no caption stored with key '%s'", caption));
+    }
+
+    @Override
+    public @This @NonNull CaptionRegistry<C> registerProvider(
+            final @NonNull CaptionProvider<C> provider
+    ) {
+        this.providers.addFirst(provider);
+        return this;
     }
 }
