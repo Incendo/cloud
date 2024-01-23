@@ -35,10 +35,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class StandardCaptionsProvider<C> extends DelegatingCaptionProvider<C> {
 
     /**
-     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED}.
-     */
-    public static final String ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED = "No input was provided";
-    /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_BOOLEAN}.
      */
     public static final String ARGUMENT_PARSE_FAILURE_BOOLEAN = "Could not parse boolean from '<input>'";
@@ -109,9 +105,6 @@ public final class StandardCaptionsProvider<C> extends DelegatingCaptionProvider
 
     private static final CaptionProvider<?> PROVIDER = CaptionProvider.constantProvider()
             .putCaption(
-                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED,
-                    ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED
-            ).putCaption(
                     StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_BOOLEAN,
                     ARGUMENT_PARSE_FAILURE_BOOLEAN
             ).putCaption(
