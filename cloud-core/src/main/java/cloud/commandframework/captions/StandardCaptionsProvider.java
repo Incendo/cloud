@@ -23,23 +23,17 @@
 //
 package cloud.commandframework.captions;
 
-import java.util.LinkedList;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
- * Caption registry that registers constant values for all {@link StandardCaptionKeys}.
+ * Provides default captions for all {@link StandardCaptionKeys}.
  *
- * @param <C> the command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.STABLE)
-public class StandardCaptionRegistry<C> implements CaptionRegistry<C> {
+public final class StandardCaptionsProvider<C> extends DelegatingCaptionProvider<C> {
 
-    /**
-     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED}.
-     */
-    public static final String ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED = "No input was provided";
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_BOOLEAN}.
      */
@@ -109,88 +103,64 @@ public class StandardCaptionRegistry<C> implements CaptionRegistry<C> {
      */
     public static final String ARGUMENT_PARSE_FAILURE_EITHER = "Could not resolve <primary> or <fallback> from '<input>'";
 
-    private final LinkedList<@NonNull CaptionProvider<C>> providers = new LinkedList<>();
+    private static final CaptionProvider<?> PROVIDER = CaptionProvider.constantProvider()
+            .putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_BOOLEAN,
+                    ARGUMENT_PARSE_FAILURE_BOOLEAN
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_NUMBER,
+                    ARGUMENT_PARSE_FAILURE_NUMBER
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_CHAR,
+                    ARGUMENT_PARSE_FAILURE_CHAR
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_ENUM,
+                    ARGUMENT_PARSE_FAILURE_ENUM
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_STRING,
+                    ARGUMENT_PARSE_FAILURE_STRING
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_UUID,
+                    ARGUMENT_PARSE_FAILURE_UUID
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_REGEX,
+                    ARGUMENT_PARSE_FAILURE_REGEX
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_COLOR,
+                    ARGUMENT_PARSE_FAILURE_COLOR
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_DURATION,
+                    ARGUMENT_PARSE_FAILURE_DURATION
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG,
+                    ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG,
+                    ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED,
+                    ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT,
+                    ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_NO_PERMISSION,
+                    ARGUMENT_PARSE_FAILURE_FLAG_NO_PERMISSION
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_MISSING_INPUT,
+                    ARGUMENT_PARSE_FAILURE_AGGREGATE_MISSING_INPUT
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE,
+                    ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE
+            ).putCaption(
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_EITHER,
+                    ARGUMENT_PARSE_FAILURE_EITHER
+            )
+            .build();
 
-    protected StandardCaptionRegistry() {
-        this.registerProvider(
-                CaptionProvider.<C>constantProvider()
-                        .putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED,
-                                ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_BOOLEAN,
-                                ARGUMENT_PARSE_FAILURE_BOOLEAN
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_NUMBER,
-                                ARGUMENT_PARSE_FAILURE_NUMBER
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_CHAR,
-                                ARGUMENT_PARSE_FAILURE_CHAR
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_ENUM,
-                                ARGUMENT_PARSE_FAILURE_ENUM
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_STRING,
-                                ARGUMENT_PARSE_FAILURE_STRING
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_UUID,
-                                ARGUMENT_PARSE_FAILURE_UUID
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_REGEX,
-                                ARGUMENT_PARSE_FAILURE_REGEX
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_COLOR,
-                                ARGUMENT_PARSE_FAILURE_COLOR
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_DURATION,
-                                ARGUMENT_PARSE_FAILURE_DURATION
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG,
-                                ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG,
-                                ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED,
-                                ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT,
-                                ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_NO_PERMISSION,
-                                ARGUMENT_PARSE_FAILURE_FLAG_NO_PERMISSION
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_MISSING_INPUT,
-                                ARGUMENT_PARSE_FAILURE_AGGREGATE_MISSING_INPUT
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE,
-                                ARGUMENT_PARSE_FAILURE_AGGREGATE_COMPONENT_FAILURE
-                        ).putCaptions(
-                                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_EITHER,
-                                ARGUMENT_PARSE_FAILURE_EITHER
-                        ).build()
-        );
-    }
-
+    @SuppressWarnings("unchecked")
     @Override
-    public final @NonNull String caption(
-            final @NonNull Caption caption,
-            final @NonNull C sender
-    ) {
-        for (final CaptionProvider<C> provider : this.providers) {
-            final String result = provider.provide(caption, sender);
-            if (result != null) {
-                return result;
-            }
-        }
-        throw new IllegalArgumentException(String.format("There is no caption stored with key '%s'", caption));
-    }
-
-    @Override
-    public final @This @NonNull StandardCaptionRegistry<C> registerProvider(
-            final @NonNull CaptionProvider<C> provider
-    ) {
-        this.providers.addFirst(provider);
-        return this;
+    public @NonNull CaptionProvider<C> delegate() {
+        return (CaptionProvider<C>) PROVIDER;
     }
 }

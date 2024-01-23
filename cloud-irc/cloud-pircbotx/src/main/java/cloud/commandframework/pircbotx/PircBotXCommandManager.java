@@ -26,7 +26,7 @@ package cloud.commandframework.pircbotx;
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.captions.Caption;
-import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
+import cloud.commandframework.captions.CaptionProvider;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -126,12 +126,9 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
         this.commandPrefix = commandPrefix;
         this.userMapper = userMapper;
         this.pircBotX.getConfiguration().getListenerManager().addListener(new CloudListenerAdapter<>(this));
-        if (this.captionRegistry() instanceof FactoryDelegatingCaptionRegistry) {
-            ((FactoryDelegatingCaptionRegistry<C>) this.captionRegistry()).registerMessageFactory(
-                    ARGUMENT_PARSE_FAILURE_USER_KEY,
-                    (caption, user) -> ARGUMENT_PARSE_FAILURE_USER
-            );
-        }
+        this.captionRegistry().registerProvider(
+                CaptionProvider.constantProvider(ARGUMENT_PARSE_FAILURE_USER_KEY, ARGUMENT_PARSE_FAILURE_USER)
+        );
         this.registerCommandPreProcessor(context -> context.commandContext().store(PIRCBOTX_META_KEY, pircBotX));
         this.parserRegistry().registerParser(UserParser.userParser());
 

@@ -50,7 +50,7 @@ public interface CaptionProvider<C> {
      * @return the provider
      */
     static <C> @NonNull CaptionProvider<C> constantProvider(final @NonNull Caption caption, final @NonNull String value) {
-        return CaptionProvider.<C>constantProvider().putCaptions(caption, value).build();
+        return CaptionProvider.<C>constantProvider().putCaption(caption, value).build();
     }
 
     /**

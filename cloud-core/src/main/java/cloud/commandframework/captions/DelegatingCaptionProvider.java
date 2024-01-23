@@ -23,26 +23,25 @@
 //
 package cloud.commandframework.captions;
 
-import java.util.function.BiFunction;
-import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Caption registry that delegates to factory methods
+ * Caption provider that delegates to another provider.
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
-@API(status = API.Status.STABLE)
-public interface FactoryDelegatingCaptionRegistry<C> extends CaptionRegistry<C> {
+public abstract class DelegatingCaptionProvider<C> implements CaptionProvider<C> {
 
     /**
-     * Register a message factory
+     * Returns the provider to delegate to.
      *
-     * @param caption Caption key
-     * @param factory Message factory
+     * @return delegate provider
      */
-    void registerMessageFactory(
-            @NonNull Caption caption,
-            @NonNull BiFunction<Caption, C, String> factory
-    );
+    public abstract @NonNull CaptionProvider<C> delegate();
+
+    @Override
+    public final @Nullable String provide(final @NonNull Caption caption, final @NonNull C recipient) {
+        return this.delegate().provide(caption, recipient);
+    }
 }
