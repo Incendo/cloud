@@ -23,8 +23,12 @@
 //
 package cloud.commandframework.kotlin.extension
 
+import cloud.commandframework.arguments.parser.ArgumentParseResult
 import cloud.commandframework.arguments.parser.ArgumentParser
+import cloud.commandframework.arguments.parser.MappedArgumentParser.Mapper
 import cloud.commandframework.arguments.parser.ParserDescriptor
+import cloud.commandframework.context.CommandContext
+import java.util.concurrent.CompletableFuture
 
 /**
  * Returns a [ParserDescriptor] that describes [this] parser.
@@ -41,3 +45,23 @@ public inline fun <C, reified T> ArgumentParser<C, T>.asDescriptor(): ParserDesc
  */
 public inline fun <C, reified T> parserDescriptor(parser: ArgumentParser<C, T>): ParserDescriptor<C, T> =
     parser.asDescriptor()
+
+/**
+ * Creates a descriptor for a flat-mapped parser.
+ */
+public inline fun <C, T, reified O> ParserDescriptor<C, T>.flatMap(mapper: Mapper<C, T, O>): ParserDescriptor<C, O> =
+    flatMap(O::class.java, mapper)
+
+/**
+ * Creates a descriptor for a flat-mapped parser.
+ */
+public inline fun <C, T, reified O> ParserDescriptor<C, T>.flatMapSuccess(
+    noinline mapper: (CommandContext<C>, T) -> CompletableFuture<ArgumentParseResult<O>>
+): ParserDescriptor<C, O> = flatMapSuccess(O::class.java, mapper)
+
+/**
+ * Creates a descriptor for a mapped parser.
+ */
+public inline fun <C, T, reified O> ParserDescriptor<C, T>.mapSuccess(
+    noinline mapper: (CommandContext<C>, T) -> CompletableFuture<O>
+): ParserDescriptor<C, O> = mapSuccess(O::class.java, mapper)
