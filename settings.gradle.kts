@@ -24,11 +24,6 @@ dependencyResolutionManagement {
             name = "sonatypeOssSnapshots"
             mavenContent { snapshotsOnly() }
         }
-        /* JitPack, used for random dependencies */
-        maven("https://jitpack.io") {
-            name = "jitpack"
-            content { includeGroupByRegex("com\\.github\\..*") }
-        }
     }
 }
 
@@ -45,12 +40,6 @@ include(":cloud-annotations")
 setupKotlinModule("cloud-kotlin-extensions")
 setupKotlinModule("cloud-kotlin-coroutines")
 setupKotlinModule("cloud-kotlin-coroutines-annotations")
-
-// IRC Modules
-setupIrcModule("cloud-pircbotx")
-
-fun setupIrcModule(name: String) =
-        setupSubproject(name, file("cloud-irc/$name"))
 
 fun setupKotlinModule(name: String) =
         setupSubproject(name, file("cloud-kotlin/$name"))
