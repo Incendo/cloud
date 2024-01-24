@@ -21,15 +21,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.component.parser;
+package cloud.commandframework.parser.standard;
 
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.parser.ArgumentParseResult;
-import cloud.commandframework.parser.EitherParser;
-import cloud.commandframework.parser.standard.BooleanParser;
-import cloud.commandframework.parser.standard.IntegerParser;
 import cloud.commandframework.suggestion.Suggestion;
 import cloud.commandframework.type.Either;
 import org.junit.jupiter.api.BeforeEach;

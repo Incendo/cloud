@@ -26,6 +26,7 @@ package cloud.commandframework.parser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.execution.CommandExecutor;
+import cloud.commandframework.parser.standard.EitherParser;
 import cloud.commandframework.suggestion.SuggestionFactory;
 import cloud.commandframework.suggestion.SuggestionProvider;
 import cloud.commandframework.suggestion.SuggestionProviderHolder;
