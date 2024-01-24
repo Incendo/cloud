@@ -21,35 +21,48 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments.suggestion;
+package cloud.commandframework.suggestion;
 
-import org.apiguardian.api.API;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Maps from {@link cloud.commandframework.arguments.suggestion.Suggestion} to {@link S}.
- *
- * @param <S> the suggestion type
- * @since 2.0.0
- */
-@FunctionalInterface
-@API(status = API.Status.STABLE, since = "2.0.0")
-public interface SuggestionMapper<S extends Suggestion> {
+final class SimpleSuggestion implements Suggestion {
 
-    /**
-     * Returns a suggestion mapper that maps from {@link Suggestion} to {@link Suggestion}.
-     *
-     * @return the identity mapper
-     */
-    static @NonNull SuggestionMapper<Suggestion> identity() {
-        return suggestion -> suggestion;
+    private final String suggestion;
+
+    SimpleSuggestion(final @NonNull String suggestion) {
+        this.suggestion = suggestion;
     }
 
-    /**
-     * Maps the suggestion to the responding suggestion of type {@link S}.
-     *
-     * @param suggestion the input suggestion
-     * @return the output suggestion
-     */
-    @NonNull S map(@NonNull Suggestion suggestion);
+    @Override
+    public @NonNull String suggestion() {
+        return this.suggestion;
+    }
+
+    @Override
+    public @NonNull Suggestion withSuggestion(final @NonNull String suggestion) {
+        return new SimpleSuggestion(suggestion);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || this.getClass() != o.getClass()) {
+            return false;
+        }
+        final SimpleSuggestion that = (SimpleSuggestion) o;
+        return Objects.equals(this.suggestion, that.suggestion);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.suggestion);
+    }
+
+    @Override
+    public String toString() {
+        return this.suggestion;
+    }
 }

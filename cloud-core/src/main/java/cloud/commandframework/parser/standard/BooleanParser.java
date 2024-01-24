@@ -24,7 +24,6 @@
 package cloud.commandframework.parser.standard;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
@@ -33,6 +32,7 @@ import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.parser.ArgumentParseResult;
 import cloud.commandframework.parser.ArgumentParser;
 import cloud.commandframework.parser.ParserDescriptor;
+import cloud.commandframework.suggestion.BlockingSuggestionProvider;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;

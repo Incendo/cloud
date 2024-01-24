@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.parser;
 
-import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.suggestion.BlockingSuggestionProvider;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;

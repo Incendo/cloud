@@ -25,7 +25,7 @@ package cloud.commandframework.parser.standard;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.suggestion.Suggestion;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;

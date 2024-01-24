@@ -25,8 +25,8 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.suggestion.Suggestion;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;

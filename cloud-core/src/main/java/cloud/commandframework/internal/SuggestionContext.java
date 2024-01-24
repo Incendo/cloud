@@ -23,11 +23,11 @@
 //
 package cloud.commandframework.internal;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.execution.CommandSuggestionProcessor;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
+import cloud.commandframework.suggestion.Suggestion;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

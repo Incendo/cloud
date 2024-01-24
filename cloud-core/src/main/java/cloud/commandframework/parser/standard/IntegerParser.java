@@ -24,12 +24,12 @@
 package cloud.commandframework.parser.standard;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
 import cloud.commandframework.parser.ArgumentParseResult;
 import cloud.commandframework.parser.ParserDescriptor;
+import cloud.commandframework.suggestion.BlockingSuggestionProvider;
 import cloud.commandframework.types.range.IntRange;
 import cloud.commandframework.types.range.Range;
 import java.util.Collections;

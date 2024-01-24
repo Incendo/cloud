@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.execution;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
+import cloud.commandframework.suggestion.Suggestion;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

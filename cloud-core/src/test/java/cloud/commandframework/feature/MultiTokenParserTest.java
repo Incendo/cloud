@@ -25,8 +25,6 @@ package cloud.commandframework.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.execution.CommandResult;
@@ -34,6 +32,8 @@ import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.parser.ArgumentParseResult;
 import cloud.commandframework.parser.ArgumentParser;
 import cloud.commandframework.parser.ParserDescriptor;
+import cloud.commandframework.suggestion.Suggestion;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import io.leangen.geantyref.TypeToken;
 import java.util.Arrays;
 import java.util.Collections;

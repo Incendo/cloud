@@ -23,11 +23,11 @@
 //
 package cloud.commandframework.kotlin.coroutines
 
-import cloud.commandframework.arguments.suggestion.Suggestion
-import cloud.commandframework.arguments.suggestion.SuggestionProvider
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.context.CommandInput
 import cloud.commandframework.execution.ExecutionCoordinator
+import cloud.commandframework.suggestion.Suggestion
+import cloud.commandframework.suggestion.SuggestionProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.future
@@ -77,11 +77,12 @@ public fun interface SuspendingSuggestionProvider<C : Any> {
             scope: CoroutineScope = GlobalScope,
             context: CoroutineContext = EmptyCoroutineContext,
             provider: SuspendingSuggestionProvider<C>
-        ): SuggestionProvider<C> = SuggestionProvider { ctx, input ->
-            scope.future(context) {
-                provider(ctx, input).toList()
+        ): SuggestionProvider<C> =
+            SuggestionProvider { ctx, input ->
+                scope.future(context) {
+                    provider(ctx, input).toList()
+                }
             }
-        }
     }
 }
 

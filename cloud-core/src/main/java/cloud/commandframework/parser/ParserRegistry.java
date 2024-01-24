@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.parser;
 
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;
 import java.util.Collection;

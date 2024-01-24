@@ -24,7 +24,6 @@
 package cloud.commandframework.parser.aggregate;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
@@ -34,6 +33,7 @@ import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.parser.ArgumentParseResult;
 import cloud.commandframework.parser.ArgumentParser;
 import cloud.commandframework.parser.ParserDescriptor;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;

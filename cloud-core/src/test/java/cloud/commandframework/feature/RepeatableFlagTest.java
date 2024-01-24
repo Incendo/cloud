@@ -25,8 +25,8 @@ package cloud.commandframework.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.CommandResult;
+import cloud.commandframework.suggestion.Suggestion;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

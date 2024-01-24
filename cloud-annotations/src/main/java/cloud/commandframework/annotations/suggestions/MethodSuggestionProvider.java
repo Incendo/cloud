@@ -25,11 +25,11 @@ package cloud.commandframework.annotations.suggestions;
 
 import cloud.commandframework.annotations.method.AnnotatedMethodHandler;
 import cloud.commandframework.annotations.method.ParameterValue;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.injection.ParameterInjectorRegistry;
+import cloud.commandframework.suggestion.Suggestion;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;

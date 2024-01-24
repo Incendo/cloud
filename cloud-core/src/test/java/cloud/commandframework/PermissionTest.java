@@ -23,13 +23,13 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PermissionResult;
 import cloud.commandframework.permission.PredicatePermission;
+import cloud.commandframework.suggestion.Suggestion;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletionException;

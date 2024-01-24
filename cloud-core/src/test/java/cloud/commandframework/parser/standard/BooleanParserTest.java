@@ -24,10 +24,10 @@
 package cloud.commandframework.parser.standard;
 
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.parser.ArgumentParseResult;
+import cloud.commandframework.suggestion.Suggestion;
 import java.util.List;
 import java.util.Locale;
 import java.util.Queue;

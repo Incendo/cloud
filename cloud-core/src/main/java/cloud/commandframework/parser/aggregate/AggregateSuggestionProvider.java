@@ -24,11 +24,11 @@
 package cloud.commandframework.parser.aggregate;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.parser.ArgumentParseResult;
+import cloud.commandframework.suggestion.Suggestion;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

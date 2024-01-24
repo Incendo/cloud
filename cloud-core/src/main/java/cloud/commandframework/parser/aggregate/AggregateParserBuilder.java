@@ -24,9 +24,9 @@
 package cloud.commandframework.parser.aggregate;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.parser.ParserDescriptor;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import io.leangen.geantyref.TypeToken;
 import java.util.ArrayList;
 import java.util.Collections;

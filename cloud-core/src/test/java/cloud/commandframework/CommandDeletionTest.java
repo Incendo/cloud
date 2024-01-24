@@ -23,11 +23,11 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import cloud.commandframework.suggestion.Suggestion;
 import java.util.concurrent.CompletionException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;

@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments.suggestion;
+package cloud.commandframework.suggestion;
 
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
@@ -68,7 +68,7 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
     }
 
     /**
-     * Specialized variant of {@link cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider} that has {@link String} results
+     * Specialized variant of {@link BlockingSuggestionProvider} that has {@link String} results
      * instead of {@link Suggestion} results.
      *
      * <p>The provided default implementation of {@link #suggestions(CommandContext, CommandInput)}
@@ -78,7 +78,7 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
      */
     @FunctionalInterface
     @API(status = API.Status.STABLE, since = "2.0.0")
-    interface Strings<C> extends cloud.commandframework.arguments.suggestion.BlockingSuggestionProvider<C> {
+    interface Strings<C> extends BlockingSuggestionProvider<C> {
 
         /**
          * Returns the suggestions for the given {@code input}.

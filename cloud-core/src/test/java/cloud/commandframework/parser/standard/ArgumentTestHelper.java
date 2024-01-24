@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.parser.standard;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.suggestion.Suggestion;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;

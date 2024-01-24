@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.execution;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.internal.CommandInputTokenizer;
+import cloud.commandframework.suggestion.Suggestion;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;

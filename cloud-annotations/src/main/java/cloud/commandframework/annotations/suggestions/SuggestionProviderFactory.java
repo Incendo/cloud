@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.annotations.suggestions;
 
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.injection.ParameterInjectorRegistry;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import java.lang.reflect.Method;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;

@@ -28,13 +28,13 @@ import cloud.commandframework.annotations.AnnotationParser
 import cloud.commandframework.annotations.Argument
 import cloud.commandframework.annotations.Command
 import cloud.commandframework.annotations.suggestions.Suggestions
-import cloud.commandframework.arguments.suggestion.Suggestion
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.context.CommandInput
 import cloud.commandframework.context.StandardCommandContextFactory
 import cloud.commandframework.exceptions.CommandExecutionException
 import cloud.commandframework.execution.ExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
+import cloud.commandframework.suggestion.Suggestion
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await

@@ -24,8 +24,6 @@
 package cloud.commandframework.parser.flag;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
@@ -35,6 +33,8 @@ import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.parser.ArgumentParseResult;
 import cloud.commandframework.parser.ArgumentParser;
+import cloud.commandframework.suggestion.Suggestion;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.Collections;

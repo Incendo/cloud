@@ -24,8 +24,8 @@
 package cloud.commandframework.annotations.descriptor;
 
 import cloud.commandframework.Description;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.internal.ImmutableBuilder;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import java.lang.reflect.Parameter;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;

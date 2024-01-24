@@ -24,10 +24,10 @@
 package cloud.commandframework.execution;
 
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.Suggestions;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.suggestion.Suggestion;
+import cloud.commandframework.suggestion.Suggestions;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;

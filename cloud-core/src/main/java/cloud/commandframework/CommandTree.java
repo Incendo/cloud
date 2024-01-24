@@ -24,8 +24,6 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.Suggestions;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.ParsingContext;
@@ -45,6 +43,8 @@ import cloud.commandframework.parser.flag.CommandFlagParser;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PermissionResult;
 import cloud.commandframework.setting.ManagerSetting;
+import cloud.commandframework.suggestion.Suggestion;
+import cloud.commandframework.suggestion.Suggestions;
 import cloud.commandframework.util.CompletableFutures;
 import java.util.ArrayList;
 import java.util.Collection;

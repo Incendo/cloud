@@ -23,8 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.internal.CommandRegistrationHandler;
@@ -33,6 +31,8 @@ import cloud.commandframework.parser.compound.ArgumentTriplet;
 import cloud.commandframework.parser.standard.IntegerParser;
 import cloud.commandframework.parser.standard.StringParser;
 import cloud.commandframework.setting.ManagerSetting;
+import cloud.commandframework.suggestion.Suggestion;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
 import cloud.commandframework.util.StringUtils;

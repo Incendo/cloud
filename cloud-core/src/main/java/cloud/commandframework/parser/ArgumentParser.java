@@ -23,11 +23,11 @@
 //
 package cloud.commandframework.parser;
 
-import cloud.commandframework.arguments.suggestion.SuggestionFactory;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
-import cloud.commandframework.arguments.suggestion.SuggestionProviderHolder;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.suggestion.SuggestionFactory;
+import cloud.commandframework.suggestion.SuggestionProvider;
+import cloud.commandframework.suggestion.SuggestionProviderHolder;
 import cloud.commandframework.types.Either;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;

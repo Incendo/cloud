@@ -24,7 +24,6 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.AmbiguousNodeException;
@@ -35,6 +34,7 @@ import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.parser.flag.CommandFlag;
 import cloud.commandframework.parser.standard.StringParser;
+import cloud.commandframework.suggestion.Suggestion;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collections;
 import java.util.List;

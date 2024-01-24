@@ -23,7 +23,6 @@
 //
 package cloud.commandframework.parser;
 
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.parser.specifier.FlagYielding;
 import cloud.commandframework.parser.specifier.Greedy;
 import cloud.commandframework.parser.specifier.Liberal;
@@ -42,6 +41,7 @@ import cloud.commandframework.parser.standard.ShortParser;
 import cloud.commandframework.parser.standard.StringArrayParser;
 import cloud.commandframework.parser.standard.StringParser;
 import cloud.commandframework.parser.standard.UUIDParser;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import io.leangen.geantyref.AnnotatedTypeMap;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;

@@ -21,18 +21,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments.suggestion;
+package cloud.commandframework.suggestion;
 
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface SuggestionProviderHolder<C> {
+public interface Suggestion {
 
     /**
-     * Returns the suggestion provider.
+     * Returns a simple suggestion that returns the given {@code suggestion}
      *
-     * @return the suggestion provider
+     * @param suggestion the suggestion string
+     * @return the created suggestion
      */
-    @NonNull SuggestionProvider<C> suggestionProvider();
+    static @NonNull Suggestion simple(final @NonNull String suggestion) {
+        return new SimpleSuggestion(suggestion);
+    }
+
+    /**
+     * Returns a string representation of this suggestion, which can be parsed by the parser that suggested it
+     *
+     * @return the suggestions
+     */
+    @NonNull String suggestion();
+
+    /**
+     * Returns a copy of this suggestion instance using the given {@code suggestion}
+     *
+     * @param suggestion the suggestion string
+     * @return the new suggestion
+     */
+    @NonNull Suggestion withSuggestion(@NonNull String suggestion);
 }

@@ -23,11 +23,11 @@
 //
 package cloud.commandframework.annotations.parsers;
 
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.parser.ArgumentParseResult;
 import cloud.commandframework.parser.ParserRegistry;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

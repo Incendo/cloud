@@ -27,8 +27,8 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.parser.ParserDescriptor;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

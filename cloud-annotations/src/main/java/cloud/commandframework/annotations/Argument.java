@@ -25,8 +25,8 @@ package cloud.commandframework.annotations;
 
 import cloud.commandframework.annotations.extractor.ParameterNameExtractor;
 import cloud.commandframework.annotations.extractor.StandardArgumentExtractor;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.parser.ParserRegistry;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
