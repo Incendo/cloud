@@ -21,10 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.execution;
+package cloud.commandframework.suggestion;
 
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
-import cloud.commandframework.suggestion.Suggestion;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,9 +33,9 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.INTERNAL)
-final class ChainedCommandSuggestionProcessor<C> implements CommandSuggestionProcessor<C> {
+final class ChainedSuggestionProcessor<C> implements SuggestionProcessor<C> {
 
-    private final List<CommandSuggestionProcessor<C>> links;
+    private final List<SuggestionProcessor<C>> links;
 
     /**
      * Creates a chained processor from the provided processors. Chained processors will be
@@ -44,19 +43,19 @@ final class ChainedCommandSuggestionProcessor<C> implements CommandSuggestionPro
      *
      * @param links processors to chain
      */
-    ChainedCommandSuggestionProcessor(final List<CommandSuggestionProcessor<C>> links) {
-        final List<CommandSuggestionProcessor<C>> list = new ArrayList<>();
+    ChainedSuggestionProcessor(final List<SuggestionProcessor<C>> links) {
+        final List<SuggestionProcessor<C>> list = new ArrayList<>();
         flattenChain(list, links);
         this.links = Collections.unmodifiableList(list);
     }
 
     private static <C> void flattenChain(
-            final @NonNull List<CommandSuggestionProcessor<C>> into,
-            final @NonNull Collection<CommandSuggestionProcessor<C>> links
+            final @NonNull List<SuggestionProcessor<C>> into,
+            final @NonNull Collection<SuggestionProcessor<C>> links
     ) {
-        for (final CommandSuggestionProcessor<C> link : links) {
-            if (link instanceof ChainedCommandSuggestionProcessor) {
-                flattenChain(into, ((ChainedCommandSuggestionProcessor<C>) link).links);
+        for (final SuggestionProcessor<C> link : links) {
+            if (link instanceof ChainedSuggestionProcessor) {
+                flattenChain(into, ((ChainedSuggestionProcessor<C>) link).links);
             } else {
                 into.add(link);
             }
@@ -69,7 +68,7 @@ final class ChainedCommandSuggestionProcessor<C> implements CommandSuggestionPro
             final @NonNull Stream<@NonNull Suggestion> suggestions
     ) {
         Stream<Suggestion> currentLink = suggestions;
-        for (final CommandSuggestionProcessor<C> link : this.links) {
+        for (final SuggestionProcessor<C> link : this.links) {
             currentLink = link.process(context, currentLink);
         }
         return currentLink;

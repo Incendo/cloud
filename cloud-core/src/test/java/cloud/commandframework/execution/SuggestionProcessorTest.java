@@ -28,19 +28,14 @@ import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.suggestion.Suggestion;
 import cloud.commandframework.suggestion.SuggestionProvider;
 import java.util.List;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.Test;
 
-import static cloud.commandframework.parser.standard.ArgumentTestHelper.suggestionList;
-import static cloud.commandframework.parser.standard.StringParser.greedyStringParser;
+import static cloud.commandframework.parser.standard.StringParser.stringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-class FilteringCommandSuggestionProcessorTest {
+class SuggestionProcessorTest {
 
     private CommandManager<TestCommandSender> commandManager;
 
@@ -49,40 +44,49 @@ class FilteringCommandSuggestionProcessorTest {
         this.commandManager = createManager();
     }
 
-    @ParameterizedTest
-    @MethodSource
-    void testPartialTokenMatches(final String input, final List<Suggestion> expected) {
+    @Test
+    void testModifying() {
         // Arrange
-        this.commandManager.commandSuggestionProcessor(
-                new FilteringCommandSuggestionProcessor<>(
-                        FilteringCommandSuggestionProcessor.Filter.partialTokenMatches(true)
+        this.commandManager.suggestionProcessor((ctx, suggestions) -> suggestions.map(s -> s.withSuggestion(
+                String.format("test-%s", s.suggestion()))
+        ));
+        this.commandManager.command(
+                this.commandManager.commandBuilder("test").required(
+                        "arg",
+                        stringParser(),
+                        SuggestionProvider.suggestingStrings("suggestion")
                 )
         );
-        this.commandManager.command(this.commandManager.commandBuilder("test1").required(
-                "arg",
-                greedyStringParser(),
-                SuggestionProvider.suggestingStrings(
-                        "a b c d e",
-                        "x y z a"
-                )
-        ));
 
         // Act
-        final List<? extends Suggestion> suggestions = this.commandManager.suggestionFactory()
-                .suggestImmediately(new TestCommandSender(), input)
-                .list();
+        final List<? extends Suggestion> suggestions = this.commandManager.suggestionFactory().suggestImmediately(
+                new TestCommandSender(),
+                "test "
+        ).list();
 
         // Assert
-        assertThat(suggestions).containsExactlyElementsIn(expected);
+        assertThat(suggestions).containsExactly(Suggestion.simple("test-suggestion"));
     }
 
-    static Stream<Arguments> testPartialTokenMatches() {
-        return Stream.of(
-                arguments("test1 ", suggestionList("a b c d e", "x y z a")),
-                arguments("test1 a", suggestionList("a b c d e", "x y z a")),
-                arguments("test1 a e", suggestionList("a b c d e")),
-                arguments("test1 a e a", suggestionList()),
-                arguments("test1 z", suggestionList("x y z a"))
+    @Test
+    void testFiltering() {
+        // Arrange
+        this.commandManager.suggestionProcessor((ctx, suggestions) -> suggestions.limit(0));
+        this.commandManager.command(
+                this.commandManager.commandBuilder("test").required(
+                        "arg",
+                        stringParser(),
+                        SuggestionProvider.suggestingStrings("suggestion")
+                )
         );
+
+        // Act
+        final List<? extends Suggestion> suggestions = this.commandManager.suggestionFactory().suggestImmediately(
+                new TestCommandSender(),
+                "test "
+        ).list();
+
+        // Assert
+        assertThat(suggestions).isEmpty();
     }
 }

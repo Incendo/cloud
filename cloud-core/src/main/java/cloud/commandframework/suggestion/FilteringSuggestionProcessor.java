@@ -21,11 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.execution;
+package cloud.commandframework.suggestion;
 
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.internal.CommandInputTokenizer;
-import cloud.commandframework.suggestion.Suggestion;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -44,27 +43,27 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> command sender type
  */
 @API(status = API.Status.STABLE)
-public final class FilteringCommandSuggestionProcessor<C> implements CommandSuggestionProcessor<C> {
+public final class FilteringSuggestionProcessor<C> implements SuggestionProcessor<C> {
 
     private final @NonNull Filter<C> filter;
 
     /**
-     * Create a new {@link FilteringCommandSuggestionProcessor} filtering with {@link Filter#partialTokenMatches(boolean)} that
+     * Create a new {@link FilteringSuggestionProcessor} filtering with {@link Filter#partialTokenMatches(boolean)} that
      * ignores case.
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public FilteringCommandSuggestionProcessor() {
+    public FilteringSuggestionProcessor() {
         this(Filter.partialTokenMatches(true));
     }
 
     /**
-     * Create a new {@link FilteringCommandSuggestionProcessor}.
+     * Create a new {@link FilteringSuggestionProcessor}.
      *
      * @param filter mode
      * @since 1.8.0
      */
     @API(status = API.Status.STABLE, since = "1.8.0")
-    public FilteringCommandSuggestionProcessor(final @NonNull Filter<C> filter) {
+    public FilteringSuggestionProcessor(final @NonNull Filter<C> filter) {
         this.filter = filter;
     }
 

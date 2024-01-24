@@ -21,12 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework;
+package cloud.commandframework.execution;
 
 import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.execution.CommandResult;
-import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import java.util.concurrent.CompletableFuture;

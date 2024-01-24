@@ -32,9 +32,8 @@ import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.StandardCommandContextFactory;
 import cloud.commandframework.exception.handling.ExceptionController;
-import cloud.commandframework.execution.CommandSuggestionProcessor;
+import cloud.commandframework.execution.CommandExecutor;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.execution.postprocessor.AcceptingCommandPostprocessor;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessingContext;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
@@ -65,8 +64,10 @@ import cloud.commandframework.setting.ManagerSetting;
 import cloud.commandframework.state.RegistrationState;
 import cloud.commandframework.state.Stateful;
 import cloud.commandframework.suggestion.DelegatingSuggestionFactory;
+import cloud.commandframework.suggestion.FilteringSuggestionProcessor;
 import cloud.commandframework.suggestion.Suggestion;
 import cloud.commandframework.suggestion.SuggestionFactory;
+import cloud.commandframework.suggestion.SuggestionProcessor;
 import cloud.commandframework.syntax.CommandSyntaxFormatter;
 import cloud.commandframework.syntax.StandardCommandSyntaxFormatter;
 import io.leangen.geantyref.TypeToken;
@@ -105,7 +106,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
 
     private CaptionFormatter<C, String> captionVariableReplacementHandler = CaptionFormatter.placeholderReplacing();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>(this);
-    private CommandSuggestionProcessor<C> commandSuggestionProcessor = new FilteringCommandSuggestionProcessor<>();
+    private SuggestionProcessor<C> suggestionProcessor = new FilteringSuggestionProcessor<>();
     private CommandRegistrationHandler<C> commandRegistrationHandler;
     private CaptionRegistry<C> captionRegistry;
     private HelpHandlerFactory<C> helpHandlerFactory = HelpHandlerFactory.standard(this);
@@ -616,12 +617,10 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * Returns the command suggestion processor used in this command manager.
      *
      * @return the command suggestion processor
-     * @since 1.7.0
-     * @see #commandSuggestionProcessor(CommandSuggestionProcessor)
+     * @see #suggestionProcessor(SuggestionProcessor)
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
-    public @NonNull CommandSuggestionProcessor<C> commandSuggestionProcessor() {
-        return this.commandSuggestionProcessor;
+    public @NonNull SuggestionProcessor<C> suggestionProcessor() {
+        return this.suggestionProcessor;
     }
 
     /**
@@ -630,13 +629,11 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * This will be called every time {@link SuggestionFactory#suggest(CommandContext, String)} is called, to process the list
      * of suggestions before it's returned to the caller.
      *
-     * @param commandSuggestionProcessor the new command suggestion processor
-     * @since 1.7.0
-     * @see #commandSuggestionProcessor()
+     * @param suggestionProcessor the new command suggestion processor
+     * @see #suggestionProcessor()
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
-    public void commandSuggestionProcessor(final @NonNull CommandSuggestionProcessor<C> commandSuggestionProcessor) {
-        this.commandSuggestionProcessor = commandSuggestionProcessor;
+    public void suggestionProcessor(final @NonNull SuggestionProcessor<C> suggestionProcessor) {
+        this.suggestionProcessor = suggestionProcessor;
     }
 
     /**

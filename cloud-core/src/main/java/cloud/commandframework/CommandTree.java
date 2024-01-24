@@ -604,7 +604,7 @@ public final class CommandTree<C> {
             final @NonNull Executor executor
     ) {
         final SuggestionContext<C> suggestionContext = new SuggestionContext<>(
-                this.commandManager.commandSuggestionProcessor(),
+                this.commandManager.suggestionProcessor(),
                 context,
                 commandInput
         );

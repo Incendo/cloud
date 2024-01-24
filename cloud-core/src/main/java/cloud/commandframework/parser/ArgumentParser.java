@@ -25,6 +25,7 @@ package cloud.commandframework.parser;
 
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.execution.CommandExecutor;
 import cloud.commandframework.suggestion.SuggestionFactory;
 import cloud.commandframework.suggestion.SuggestionProvider;
 import cloud.commandframework.suggestion.SuggestionProviderHolder;
@@ -50,7 +51,7 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      * Attempts to parse the {@code input} into an object of type {@link T}.
      *
      * <p>This method may be called when a command chain is being parsed for execution
-     * (using {@link cloud.commandframework.CommandExecutor#executeCommand(Object, String)})
+     * (using {@link CommandExecutor#executeCommand(Object, String)})
      * or when a command is being parsed to provide context for suggestions
      * (using {@link SuggestionFactory#suggest(Object, String)}).
      * It is possible to use {@link CommandContext#isSuggestions()}} to see what the purpose of the
@@ -78,7 +79,7 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      * Returns a future that completes with the result of parsing the given {@code commandInput}.
      *
      * <p>This method may be called when a command chain is being parsed for execution
-     * (using {@link cloud.commandframework.CommandExecutor#executeCommand(Object, String)})
+     * (using {@link CommandExecutor#executeCommand(Object, String)})
      * or when a command is being parsed to provide context for suggestions
      * (using {@link SuggestionFactory#suggest(Object, String)}).
      * It is possible to use {@link CommandContext#isSuggestions()}} to see what the purpose of the

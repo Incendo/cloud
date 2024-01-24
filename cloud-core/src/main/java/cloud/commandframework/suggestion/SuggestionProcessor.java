@@ -21,10 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.execution;
+package cloud.commandframework.suggestion;
 
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
-import cloud.commandframework.suggestion.Suggestion;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -40,15 +39,15 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 @FunctionalInterface
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface CommandSuggestionProcessor<C> {
+public interface SuggestionProcessor<C> {
 
     /**
-     * Creates a {@link CommandSuggestionProcessor} that simply returns the input suggestions.
+     * Creates a {@link SuggestionProcessor} that simply returns the input suggestions.
      *
      * @param <C> command sender type
      * @return the processor
      */
-    static <C> @NonNull CommandSuggestionProcessor<C> passThrough() {
+    static <C> @NonNull SuggestionProcessor<C> passThrough() {
         return (ctx, suggestions) -> suggestions;
     }
 
@@ -65,14 +64,14 @@ public interface CommandSuggestionProcessor<C> {
     );
 
     /**
-     * Create a chained {@link CommandSuggestionProcessor processor} that invokes {@code this} processor and then the
+     * Create a chained {@link SuggestionProcessor processor} that invokes {@code this} processor and then the
      * {@code nextProcessor} with the result.
      *
      * @param nextProcessor next suggestion processor
      * @return chained processor
      */
-    default @NonNull CommandSuggestionProcessor<C> and(final @NonNull CommandSuggestionProcessor<C> nextProcessor) {
+    default @NonNull SuggestionProcessor<C> and(final @NonNull SuggestionProcessor<C> nextProcessor) {
         Objects.requireNonNull(nextProcessor, "nextProcessor");
-        return new ChainedCommandSuggestionProcessor<>(Arrays.asList(this, nextProcessor));
+        return new ChainedSuggestionProcessor<>(Arrays.asList(this, nextProcessor));
     }
 }

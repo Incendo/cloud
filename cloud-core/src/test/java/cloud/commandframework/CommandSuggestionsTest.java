@@ -25,13 +25,13 @@ package cloud.commandframework;
 
 import cloud.commandframework.description.Description;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.parser.ArgumentParseResult;
 import cloud.commandframework.parser.compound.ArgumentTriplet;
 import cloud.commandframework.parser.standard.IntegerParser;
 import cloud.commandframework.parser.standard.StringParser;
 import cloud.commandframework.setting.ManagerSetting;
+import cloud.commandframework.suggestion.FilteringSuggestionProcessor;
 import cloud.commandframework.suggestion.Suggestion;
 import cloud.commandframework.suggestion.SuggestionProvider;
 import cloud.commandframework.type.tuple.Pair;
@@ -679,9 +679,9 @@ class CommandSuggestionsTest {
                         .required("string", greedyStringParser(),
                                 SuggestionProvider.blocking((c, i) -> suggestionList("hello world")))
         );
-        this.manager.commandSuggestionProcessor(
-                new FilteringCommandSuggestionProcessor<>(
-                        FilteringCommandSuggestionProcessor.Filter.<TestCommandSender>startsWith(true).and(
+        this.manager.suggestionProcessor(
+                new FilteringSuggestionProcessor<>(
+                        FilteringSuggestionProcessor.Filter.<TestCommandSender>startsWith(true).and(
                                 (ctx, s, in) ->
                                         StringUtils.trimBeforeLastSpace(s, in))));
 
