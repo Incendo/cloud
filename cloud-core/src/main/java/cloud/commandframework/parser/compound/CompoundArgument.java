@@ -25,7 +25,7 @@ package cloud.commandframework.parser.compound;
 
 import cloud.commandframework.parser.ArgumentParser;
 import cloud.commandframework.parser.ParserDescriptor;
-import cloud.commandframework.types.tuples.Tuple;
+import cloud.commandframework.type.tuple.Tuple;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.BiFunction;
 import java.util.function.Function;

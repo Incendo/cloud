@@ -1,4 +1,4 @@
 /**
  * Types used throughout Cloud.
  */
-package cloud.commandframework.types;
+package cloud.commandframework.type;

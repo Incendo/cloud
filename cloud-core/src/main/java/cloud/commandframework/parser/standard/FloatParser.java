@@ -29,8 +29,8 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exception.parsing.NumberParseException;
 import cloud.commandframework.parser.ArgumentParseResult;
 import cloud.commandframework.parser.ParserDescriptor;
-import cloud.commandframework.types.range.FloatRange;
-import cloud.commandframework.types.range.Range;
+import cloud.commandframework.type.range.FloatRange;
+import cloud.commandframework.type.range.Range;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

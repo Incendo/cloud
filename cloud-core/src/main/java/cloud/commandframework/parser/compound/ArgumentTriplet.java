@@ -27,7 +27,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.parser.ArgumentParser;
 import cloud.commandframework.parser.ParserParameters;
 import cloud.commandframework.parser.ParserRegistry;
-import cloud.commandframework.types.tuples.Triplet;
+import cloud.commandframework.type.tuple.Triplet;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.BiFunction;
 import org.apiguardian.api.API;

@@ -27,7 +27,7 @@ import cloud.commandframework.caption.CaptionVariable;
 import cloud.commandframework.caption.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.parser.standard.NumberParser;
-import cloud.commandframework.types.range.Range;
+import cloud.commandframework.type.range.Range;
 import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;

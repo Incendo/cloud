@@ -28,7 +28,7 @@ import cloud.commandframework.parser.ArgumentParseResult;
 import cloud.commandframework.parser.ArgumentParser;
 import cloud.commandframework.parser.aggregate.AggregateParser;
 import cloud.commandframework.parser.aggregate.AggregateResultMapper;
-import cloud.commandframework.types.tuples.Tuple;
+import cloud.commandframework.type.tuple.Tuple;
 import io.leangen.geantyref.TypeToken;
 import java.util.ArrayList;
 import java.util.Collections;

@@ -24,7 +24,7 @@
 package cloud.commandframework.parser.standard;
 
 import cloud.commandframework.parser.ArgumentParser;
-import cloud.commandframework.types.range.Range;
+import cloud.commandframework.type.range.Range;
 import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;

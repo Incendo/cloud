@@ -42,8 +42,8 @@ import cloud.commandframework.parser.flag.CommandFlagParser;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PredicatePermission;
 import cloud.commandframework.suggestion.SuggestionProvider;
-import cloud.commandframework.types.tuples.Pair;
-import cloud.commandframework.types.tuples.Triplet;
+import cloud.commandframework.type.tuple.Pair;
+import cloud.commandframework.type.tuple.Triplet;
 import io.leangen.geantyref.TypeToken;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1791,7 +1791,7 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument pair that maps to {@link cloud.commandframework.types.tuples.Triplet}
+         * Create a new argument pair that maps to {@link cloud.commandframework.type.tuple.Triplet}
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
@@ -1827,7 +1827,7 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument pair that maps to {@link cloud.commandframework.types.tuples.Triplet}
+         * Create a new argument pair that maps to {@link cloud.commandframework.type.tuple.Triplet}
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
@@ -1863,7 +1863,7 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument pair that maps to {@link cloud.commandframework.types.tuples.Triplet}
+         * Create a new argument pair that maps to {@link cloud.commandframework.type.tuple.Triplet}
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
@@ -1899,7 +1899,7 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument pair that maps to {@link cloud.commandframework.types.tuples.Triplet}
+         * Create a new argument pair that maps to {@link cloud.commandframework.type.tuple.Triplet}
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance

@@ -38,7 +38,7 @@ import cloud.commandframework.parser.ParserParameters;
 import cloud.commandframework.parser.specifier.Completions;
 import cloud.commandframework.suggestion.Suggestion;
 import cloud.commandframework.suggestion.SuggestionProvider;
-import cloud.commandframework.types.Either;
+import cloud.commandframework.type.Either;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;

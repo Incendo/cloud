@@ -28,7 +28,7 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.suggestion.SuggestionFactory;
 import cloud.commandframework.suggestion.SuggestionProvider;
 import cloud.commandframework.suggestion.SuggestionProviderHolder;
-import cloud.commandframework.types.Either;
+import cloud.commandframework.type.Either;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import org.apiguardian.api.API;

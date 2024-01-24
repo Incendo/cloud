@@ -21,42 +21,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.types.tuples;
+package cloud.commandframework.type.range;
 
-import org.apiguardian.api.API;
+import cloud.commandframework.internal.ImmutableImpl;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
-/**
- * Dynamic sized tuple backed by a {@code Object[]}
- */
-@API(status = API.Status.STABLE)
-public final class DynamicTuple implements Tuple {
-
-    private final Object[] internalArray;
-
-    private DynamicTuple(final @NonNull Object @NonNull [] internalArray) {
-        this.internalArray = internalArray;
-    }
+@ImmutableImpl
+@Value.Immutable
+public interface ByteRange extends Range<Byte> {
 
     /**
-     * Create a new dynamic tuple, containing the given elements
+     * Returns the minimum value (inclusive).
      *
-     * @param elements Elements that should be contained in the tuple
-     * @return Created tuple, preserving the order of the given elements
+     * @return minimum value
      */
-    public static @NonNull DynamicTuple of(final @NonNull Object... elements) {
-        return new DynamicTuple(elements);
+    byte minByte();
+
+    /**
+     * Returns the maximum value (inclusive).
+     *
+     * @return maximum value
+     */
+    byte maxByte();
+
+    @Override
+    default @NonNull Byte min() {
+        return this.minByte();
     }
 
     @Override
-    public int size() {
-        return this.internalArray.length;
-    }
-
-    @Override
-    public @NonNull Object @NonNull [] toArray() {
-        final @NonNull Object @NonNull [] newArray = new Object[this.internalArray.length];
-        System.arraycopy(this.internalArray, 0, newArray, 0, this.internalArray.length);
-        return newArray;
+    default @NonNull Byte max() {
+        return this.maxByte();
     }
 }

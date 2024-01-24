@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.types.range;
+package cloud.commandframework.type.range;
 
 import cloud.commandframework.internal.ImmutableImpl;
 import org.checkerframework.checker.nullness.qual.NonNull;

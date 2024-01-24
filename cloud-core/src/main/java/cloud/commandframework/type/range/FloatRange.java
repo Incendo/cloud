@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.types.range;
+package cloud.commandframework.type.range;
 
 import cloud.commandframework.internal.ImmutableImpl;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -29,29 +29,29 @@ import org.immutables.value.Value;
 
 @ImmutableImpl
 @Value.Immutable
-public interface DoubleRange extends Range<Double> {
+public interface FloatRange extends Range<Float> {
 
     /**
      * Returns the minimum value (inclusive).
      *
      * @return minimum value
      */
-    double minDouble();
+    float minFloat();
 
     /**
      * Returns the maximum value (inclusive).
      *
      * @return maximum value
      */
-    double maxDouble();
+    float maxFloat();
 
     @Override
-    default @NonNull Double min() {
-        return this.minDouble();
+    default @NonNull Float min() {
+        return this.minFloat();
     }
 
     @Override
-    default @NonNull Double max() {
-        return this.maxDouble();
+    default @NonNull Float max() {
+        return this.maxFloat();
     }
 }

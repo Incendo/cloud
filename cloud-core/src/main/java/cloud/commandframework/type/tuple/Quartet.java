@@ -21,64 +21,96 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.types.tuples;
+package cloud.commandframework.type.tuple;
 
 import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Immutable generic 2-tuple
+ * Immutable generic 5-tuple
  *
  * @param <U> First type
  * @param <V> Second type
+ * @param <W> Third type
+ * @param <X> Fourth type
  */
 @API(status = API.Status.STABLE)
-public class Pair<U, V> implements Tuple {
+public class Quartet<U, V, W, X> implements Tuple {
 
     private final U first;
     private final V second;
+    private final W third;
+    private final X fourth;
 
-    protected Pair(
-            final U first,
-            final V second
+    protected Quartet(
+            final @NonNull U first,
+            final @NonNull V second,
+            final @NonNull W third,
+            final @NonNull X fourth
     ) {
         this.first = first;
         this.second = second;
+        this.third = third;
+        this.fourth = fourth;
     }
 
     /**
-     * Create a new 2-tuple
+     * Create a new 4-tuple
      *
      * @param first  First value
      * @param second Second value
+     * @param third  Third value
+     * @param fourth Fourth value
      * @param <U>    First type
      * @param <V>    Second type
-     * @return Created pair
+     * @param <W>    Third type
+     * @param <X>    Fourth type
+     * @return Created quartet
      */
-    public static <U, V> @NonNull Pair<U, V> of(
-            final U first,
-            final V second
+    public static <U, V, W, X> @NonNull Quartet<@NonNull U, @NonNull V, @NonNull W, @NonNull X> of(
+            final @NonNull U first,
+            final @NonNull V second,
+            final @NonNull W third,
+            final @NonNull X fourth
     ) {
-        return new Pair<>(first, second);
+        return new Quartet<>(first, second, third, fourth);
     }
 
     /**
-     * Returns the first value.
+     * Get the first value
      *
-     * @return first value
+     * @return First value
      */
-    public final U first() {
+    public final @NonNull U first() {
         return this.first;
     }
 
     /**
-     * Returns the second value.
+     * Get the second value
      *
-     * @return second value
+     * @return Second value
      */
-    public final V second() {
+    public final @NonNull V second() {
         return this.second;
+    }
+
+    /**
+     * Get the third value
+     *
+     * @return Third value
+     */
+    public final @NonNull W third() {
+        return this.third;
+    }
+
+    /**
+     * Get the fourth value
+     *
+     * @return Fourth value
+     */
+    public final @NonNull X fourth() {
+        return this.fourth;
     }
 
     @Override
@@ -89,31 +121,35 @@ public class Pair<U, V> implements Tuple {
         if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        final Pair<?, ?> pair = (Pair<?, ?>) o;
-        return Objects.equals(this.first(), pair.first())
-                && Objects.equals(this.second(), pair.second());
+        final Quartet<?, ?, ?, ?> quartet = (Quartet<?, ?, ?, ?>) o;
+        return Objects.equals(this.first(), quartet.first())
+                && Objects.equals(this.second(), quartet.second())
+                && Objects.equals(this.third(), quartet.third())
+                && Objects.equals(this.fourth(), quartet.fourth());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(this.first(), this.second());
+        return Objects.hash(this.first(), this.second(), this.third(), this.fourth());
     }
 
     @Override
     public final String toString() {
-        return String.format("(%s, %s)", this.first, this.second);
+        return String.format("(%s, %s, %s, %s)", this.first, this.second, this.third, this.fourth);
     }
 
     @Override
     public final int size() {
-        return 2;
+        return 4;
     }
 
     @Override
     public final @NonNull Object @NonNull [] toArray() {
-        final Object[] array = new Object[2];
+        final Object[] array = new Object[4];
         array[0] = this.first;
         array[1] = this.second;
+        array[2] = this.third;
+        array[3] = this.fourth;
         return array;
     }
 }

@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.types.tuples;
+package cloud.commandframework.type.tuple;
 
 import java.util.Objects;
 import org.apiguardian.api.API;
@@ -34,47 +34,54 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <V> Second type
  * @param <W> Third type
  * @param <X> Fourth type
+ * @param <Y> Fifth type
  */
 @API(status = API.Status.STABLE)
-public class Quartet<U, V, W, X> implements Tuple {
+public class Quintet<U, V, W, X, Y> implements Tuple {
 
     private final U first;
     private final V second;
     private final W third;
     private final X fourth;
+    private final Y fifth;
 
-    protected Quartet(
+    protected Quintet(
             final @NonNull U first,
             final @NonNull V second,
             final @NonNull W third,
-            final @NonNull X fourth
+            final @NonNull X fourth,
+            final @NonNull Y fifth
     ) {
         this.first = first;
         this.second = second;
         this.third = third;
         this.fourth = fourth;
+        this.fifth = fifth;
     }
 
     /**
-     * Create a new 4-tuple
+     * Create a new 5-tuple
      *
      * @param first  First value
      * @param second Second value
      * @param third  Third value
      * @param fourth Fourth value
+     * @param fifth  fifth value
      * @param <U>    First type
      * @param <V>    Second type
      * @param <W>    Third type
      * @param <X>    Fourth type
-     * @return Created quartet
+     * @param <Y>    Fifth type
+     * @return Created quintet
      */
-    public static <U, V, W, X> @NonNull Quartet<@NonNull U, @NonNull V, @NonNull W, @NonNull X> of(
+    public static <U, V, W, X, Y> @NonNull Quintet<@NonNull U, @NonNull V, @NonNull W, @NonNull X, @NonNull Y> of(
             final @NonNull U first,
             final @NonNull V second,
             final @NonNull W third,
-            final @NonNull X fourth
+            final @NonNull X fourth,
+            final @NonNull Y fifth
     ) {
-        return new Quartet<>(first, second, third, fourth);
+        return new Quintet<>(first, second, third, fourth, fifth);
     }
 
     /**
@@ -113,6 +120,15 @@ public class Quartet<U, V, W, X> implements Tuple {
         return this.fourth;
     }
 
+    /**
+     * Get the fifth value
+     *
+     * @return Fifth value
+     */
+    public final @NonNull Y fifth() {
+        return this.fifth;
+    }
+
     @Override
     public final boolean equals(final Object o) {
         if (this == o) {
@@ -121,35 +137,37 @@ public class Quartet<U, V, W, X> implements Tuple {
         if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        final Quartet<?, ?, ?, ?> quartet = (Quartet<?, ?, ?, ?>) o;
-        return Objects.equals(this.first(), quartet.first())
-                && Objects.equals(this.second(), quartet.second())
-                && Objects.equals(this.third(), quartet.third())
-                && Objects.equals(this.fourth(), quartet.fourth());
+        final Quintet<?, ?, ?, ?, ?> quintet = (Quintet<?, ?, ?, ?, ?>) o;
+        return Objects.equals(this.first(), quintet.first())
+                && Objects.equals(this.second(), quintet.second())
+                && Objects.equals(this.third(), quintet.third())
+                && Objects.equals(this.fourth(), quintet.fourth())
+                && Objects.equals(this.fifth(), quintet.fifth());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(this.first(), this.second(), this.third(), this.fourth());
+        return Objects.hash(this.first(), this.second(), this.third(), this.fourth(), this.fifth());
     }
 
     @Override
     public final String toString() {
-        return String.format("(%s, %s, %s, %s)", this.first, this.second, this.third, this.fourth);
+        return String.format("(%s, %s, %s, %s, %s)", this.first, this.second, this.third, this.fourth, this.fifth);
     }
 
     @Override
     public final int size() {
-        return 4;
+        return 5;
     }
 
     @Override
     public final @NonNull Object @NonNull [] toArray() {
-        final Object[] array = new Object[4];
+        final Object[] array = new Object[5];
         array[0] = this.first;
         array[1] = this.second;
         array[2] = this.third;
         array[3] = this.fourth;
+        array[4] = this.fifth;
         return array;
     }
 }

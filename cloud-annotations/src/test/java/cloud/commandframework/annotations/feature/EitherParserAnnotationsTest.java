@@ -32,7 +32,7 @@ import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.parser.EitherParser;
 import cloud.commandframework.parser.standard.BooleanParser;
 import cloud.commandframework.parser.standard.IntegerParser;
-import cloud.commandframework.types.Either;
+import cloud.commandframework.type.Either;
 import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;

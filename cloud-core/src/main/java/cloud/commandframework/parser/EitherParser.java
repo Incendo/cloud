@@ -30,7 +30,7 @@ import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exception.parsing.ParserException;
 import cloud.commandframework.suggestion.Suggestion;
 import cloud.commandframework.suggestion.SuggestionProvider;
-import cloud.commandframework.types.Either;
+import cloud.commandframework.type.Either;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeFactory;
 import io.leangen.geantyref.TypeToken;

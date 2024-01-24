@@ -60,7 +60,7 @@ import cloud.commandframework.parser.ParserParameter;
 import cloud.commandframework.parser.ParserParameters;
 import cloud.commandframework.parser.flag.CommandFlag;
 import cloud.commandframework.suggestion.SuggestionProvider;
-import cloud.commandframework.types.tuples.Pair;
+import cloud.commandframework.type.tuple.Pair;
 import cloud.commandframework.util.annotation.AnnotationAccessor;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;

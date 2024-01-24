@@ -26,7 +26,7 @@ package cloud.commandframework.injection;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exception.InjectionException;
 import cloud.commandframework.services.ServicePipeline;
-import cloud.commandframework.types.tuples.Pair;
+import cloud.commandframework.type.tuple.Pair;
 import cloud.commandframework.util.annotation.AnnotationAccessor;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;

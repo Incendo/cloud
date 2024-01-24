@@ -31,7 +31,7 @@ import cloud.commandframework.parser.EitherParser;
 import cloud.commandframework.parser.standard.BooleanParser;
 import cloud.commandframework.parser.standard.IntegerParser;
 import cloud.commandframework.suggestion.Suggestion;
-import cloud.commandframework.types.Either;
+import cloud.commandframework.type.Either;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

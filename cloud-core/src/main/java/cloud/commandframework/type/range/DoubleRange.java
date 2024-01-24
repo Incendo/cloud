@@ -21,28 +21,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.types.tuples;
+package cloud.commandframework.type.range;
 
-import org.apiguardian.api.API;
+import cloud.commandframework.internal.ImmutableImpl;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.immutables.value.Value;
 
-/**
- * Tuple type
- */
-@API(status = API.Status.STABLE)
-public interface Tuple {
-
-    /**
-     * Returns the tuple size.
-     *
-     * @return tuple size
-     */
-    int size();
+@ImmutableImpl
+@Value.Immutable
+public interface DoubleRange extends Range<Double> {
 
     /**
-     * Turns the tuple into a type erased array.
+     * Returns the minimum value (inclusive).
      *
-     * @return created array
+     * @return minimum value
      */
-    @NonNull Object @NonNull[] toArray();
+    double minDouble();
+
+    /**
+     * Returns the maximum value (inclusive).
+     *
+     * @return maximum value
+     */
+    double maxDouble();
+
+    @Override
+    default @NonNull Double min() {
+        return this.minDouble();
+    }
+
+    @Override
+    default @NonNull Double max() {
+        return this.maxDouble();
+    }
 }

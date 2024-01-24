@@ -31,7 +31,7 @@ import cloud.commandframework.exception.CommandParseException;
 import cloud.commandframework.services.State;
 import cloud.commandframework.suggestion.Suggestion;
 import cloud.commandframework.suggestion.Suggestions;
-import cloud.commandframework.types.tuples.Pair;
+import cloud.commandframework.type.tuple.Pair;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;

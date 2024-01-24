@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.types.tuples;
+package cloud.commandframework.type.tuple;
 
 import java.util.Objects;
 import org.apiguardian.api.API;

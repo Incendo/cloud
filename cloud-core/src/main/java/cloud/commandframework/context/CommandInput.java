@@ -23,12 +23,12 @@
 //
 package cloud.commandframework.context;
 
-import cloud.commandframework.types.range.ByteRange;
-import cloud.commandframework.types.range.DoubleRange;
-import cloud.commandframework.types.range.FloatRange;
-import cloud.commandframework.types.range.IntRange;
-import cloud.commandframework.types.range.LongRange;
-import cloud.commandframework.types.range.ShortRange;
+import cloud.commandframework.type.range.ByteRange;
+import cloud.commandframework.type.range.DoubleRange;
+import cloud.commandframework.type.range.FloatRange;
+import cloud.commandframework.type.range.IntRange;
+import cloud.commandframework.type.range.LongRange;
+import cloud.commandframework.type.range.ShortRange;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
