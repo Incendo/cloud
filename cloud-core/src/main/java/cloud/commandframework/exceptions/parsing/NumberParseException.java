@@ -23,10 +23,10 @@
 //
 package cloud.commandframework.exceptions.parsing;
 
-import cloud.commandframework.arguments.standard.NumberParser;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.parser.standard.NumberParser;
 import cloud.commandframework.types.range.Range;
 import java.util.Objects;
 import org.apiguardian.api.API;

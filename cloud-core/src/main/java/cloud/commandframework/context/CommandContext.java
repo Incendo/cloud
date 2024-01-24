@@ -25,7 +25,6 @@ package cloud.commandframework.context;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.flags.FlagContext;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionFormatter;
 import cloud.commandframework.captions.CaptionRegistry;
@@ -33,6 +32,7 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.injection.ParameterInjectorRegistry;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.MutableCloudKeyContainer;
+import cloud.commandframework.parser.flag.FlagContext;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.util.annotation.AnnotationAccessor;
 import io.leangen.geantyref.TypeToken;

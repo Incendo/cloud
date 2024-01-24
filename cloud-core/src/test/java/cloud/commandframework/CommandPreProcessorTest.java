@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
+import static cloud.commandframework.parser.standard.EnumParser.enumParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 
 public class CommandPreProcessorTest {

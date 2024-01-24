@@ -25,6 +25,7 @@ package cloud.commandframework.annotations;
 
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.parser.ParserRegistry;
+import cloud.commandframework.parser.flag.CommandFlag;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -33,7 +34,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Indicates that the parameter should be treated like a {@link cloud.commandframework.arguments.flags.CommandFlag}.
+ * Indicates that the parameter should be treated like a {@link CommandFlag}.
  * <ul>
  *     <li>If the parameter is a {@code boolean}, a presence flag will be created</li>
  *     <li>If the parameter is of any other type, a value flag will be created and the parser

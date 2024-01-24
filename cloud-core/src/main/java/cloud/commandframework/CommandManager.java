@@ -25,7 +25,6 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandSyntaxFormatter;
 import cloud.commandframework.arguments.StandardCommandSyntaxFormatter;
-import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.suggestion.DelegatingSuggestionFactory;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
@@ -57,6 +56,7 @@ import cloud.commandframework.parser.ArgumentParser;
 import cloud.commandframework.parser.ParserParameter;
 import cloud.commandframework.parser.ParserRegistry;
 import cloud.commandframework.parser.StandardParserRegistry;
+import cloud.commandframework.parser.flag.CommandFlag;
 import cloud.commandframework.permission.AndPermission;
 import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.permission.Permission;

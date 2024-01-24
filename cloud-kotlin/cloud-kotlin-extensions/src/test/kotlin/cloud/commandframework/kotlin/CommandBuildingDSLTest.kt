@@ -25,7 +25,6 @@ package cloud.commandframework.kotlin
 
 import cloud.commandframework.CommandDescription
 import cloud.commandframework.CommandManager
-import cloud.commandframework.arguments.standard.StringParser.stringParser
 import cloud.commandframework.execution.ExecutionCoordinator
 import cloud.commandframework.help.result.CommandEntry
 import cloud.commandframework.internal.CommandRegistrationHandler
@@ -35,6 +34,7 @@ import cloud.commandframework.kotlin.extension.buildAndRegister
 import cloud.commandframework.kotlin.extension.cloudKey
 import cloud.commandframework.kotlin.extension.command
 import cloud.commandframework.kotlin.extension.commandBuilder
+import cloud.commandframework.parser.standard.StringParser.stringParser
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

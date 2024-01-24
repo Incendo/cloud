@@ -24,19 +24,19 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.LiteralParser;
 import cloud.commandframework.arguments.PreprocessorHolder;
-import cloud.commandframework.arguments.compound.ArgumentPair;
-import cloud.commandframework.arguments.compound.ArgumentTriplet;
-import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
 import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.parser.LiteralParser;
 import cloud.commandframework.parser.ParserDescriptor;
 import cloud.commandframework.parser.ParserRegistry;
+import cloud.commandframework.parser.compound.ArgumentPair;
+import cloud.commandframework.parser.compound.ArgumentTriplet;
+import cloud.commandframework.parser.flag.CommandFlag;
+import cloud.commandframework.parser.flag.CommandFlagParser;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PredicatePermission;
 import cloud.commandframework.types.tuples.Pair;

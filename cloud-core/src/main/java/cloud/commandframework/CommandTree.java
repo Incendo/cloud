@@ -24,9 +24,6 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.LiteralParser;
-import cloud.commandframework.arguments.aggregate.AggregateParser;
-import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.Suggestions;
 import cloud.commandframework.context.CommandContext;
@@ -42,6 +39,9 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.SuggestionContext;
 import cloud.commandframework.parser.ArgumentParseResult;
+import cloud.commandframework.parser.LiteralParser;
+import cloud.commandframework.parser.aggregate.AggregateParser;
+import cloud.commandframework.parser.flag.CommandFlagParser;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PermissionResult;
 import cloud.commandframework.setting.ManagerSetting;

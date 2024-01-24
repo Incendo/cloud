@@ -47,7 +47,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static cloud.commandframework.arguments.standard.BooleanParser.booleanParser;
+import static cloud.commandframework.parser.standard.BooleanParser.booleanParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 

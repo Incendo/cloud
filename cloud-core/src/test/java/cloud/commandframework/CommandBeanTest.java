@@ -23,10 +23,10 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.parser.standard.IntegerParser;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

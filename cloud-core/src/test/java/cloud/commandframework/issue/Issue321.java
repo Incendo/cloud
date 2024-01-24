@@ -25,12 +25,12 @@ package cloud.commandframework.issue;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.flags.FlagContext;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandResult;
+import cloud.commandframework.parser.flag.FlagContext;
 import org.junit.jupiter.api.Test;
 
-import static cloud.commandframework.arguments.standard.StringArrayParser.flagYieldingStringArrayParser;
+import static cloud.commandframework.parser.standard.StringArrayParser.flagYieldingStringArrayParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 

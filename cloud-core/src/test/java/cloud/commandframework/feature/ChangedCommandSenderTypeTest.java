@@ -32,7 +32,7 @@ import cloud.commandframework.parser.ParserDescriptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
+import static cloud.commandframework.parser.standard.IntegerParser.integerParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 
 class ChangedCommandSenderTypeTest {

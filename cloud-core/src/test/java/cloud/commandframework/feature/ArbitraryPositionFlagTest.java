@@ -25,9 +25,9 @@ package cloud.commandframework.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.execution.CommandResult;
+import cloud.commandframework.parser.flag.CommandFlagParser;
 import cloud.commandframework.setting.ManagerSetting;
 import com.google.common.truth.ThrowableSubject;
 import java.util.Arrays;
@@ -37,7 +37,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-import static cloud.commandframework.arguments.standard.StringParser.greedyFlagYieldingStringParser;
+import static cloud.commandframework.parser.standard.StringParser.greedyFlagYieldingStringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;

@@ -34,8 +34,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static cloud.commandframework.arguments.standard.ArgumentTestHelper.suggestionList;
-import static cloud.commandframework.arguments.standard.StringParser.greedyStringParser;
+import static cloud.commandframework.parser.standard.ArgumentTestHelper.suggestionList;
+import static cloud.commandframework.parser.standard.StringParser.greedyStringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;

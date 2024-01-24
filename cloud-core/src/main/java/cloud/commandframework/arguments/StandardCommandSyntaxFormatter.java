@@ -25,10 +25,10 @@ package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.aggregate.AggregateParser;
-import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.flags.CommandFlagParser;
 import cloud.commandframework.internal.CommandNode;
+import cloud.commandframework.parser.aggregate.AggregateParser;
+import cloud.commandframework.parser.flag.CommandFlag;
+import cloud.commandframework.parser.flag.CommandFlagParser;
 import cloud.commandframework.permission.Permission;
 import java.util.Collections;
 import java.util.Iterator;
