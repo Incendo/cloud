@@ -5,7 +5,7 @@ on:
     tags-ignore: [ "**" ]
   pull_request:
   release:
-    types: [ released ]
+    types: [ published ]
 jobs:
   build:
     # Only run on PRs if the source branch is on someone else's repo
