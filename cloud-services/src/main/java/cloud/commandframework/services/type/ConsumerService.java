@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.services.types;
+package cloud.commandframework.services.type;
 
 import cloud.commandframework.services.State;
 import java.util.function.Consumer;

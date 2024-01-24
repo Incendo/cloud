@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.services.mock;
 
-import cloud.commandframework.services.annotations.ServiceImplementation;
+import cloud.commandframework.services.annotation.ServiceImplementation;
 
 public class AnnotatedMethodTest {
 

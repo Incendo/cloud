@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.services;
 
-import cloud.commandframework.services.types.Service;
+import cloud.commandframework.services.type.Service;
 import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -90,7 +90,7 @@ public final class ServicePipeline {
     }
 
     /**
-     * Scan a given class for methods annotated with {@link cloud.commandframework.services.annotations.ServiceImplementation}
+     * Scan a given class for methods annotated with {@link cloud.commandframework.services.annotation.ServiceImplementation}
      * and register them as service implementations.
      * <p>
      * The methods should be of the form:

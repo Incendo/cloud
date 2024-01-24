@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.services;
 
-import cloud.commandframework.services.annotations.ServiceImplementation;
-import cloud.commandframework.services.types.Service;
+import cloud.commandframework.services.annotation.ServiceImplementation;
+import cloud.commandframework.services.type.Service;
 import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Method;
 import java.util.HashMap;

@@ -26,7 +26,7 @@ package cloud.commandframework;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.services.types.ConsumerService;
+import cloud.commandframework.services.type.ConsumerService;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;

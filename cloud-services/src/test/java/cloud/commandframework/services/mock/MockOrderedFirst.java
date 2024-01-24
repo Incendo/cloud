@@ -24,7 +24,7 @@
 package cloud.commandframework.services.mock;
 
 import cloud.commandframework.services.ExecutionOrder;
-import cloud.commandframework.services.annotations.Order;
+import cloud.commandframework.services.annotation.Order;
 
 @Order(ExecutionOrder.FIRST)
 public class MockOrderedFirst implements MockService {

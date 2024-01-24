@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.services.mock;
 
-import cloud.commandframework.services.types.SideEffectService;
+import cloud.commandframework.services.type.SideEffectService;
 
 public interface MockSideEffectService extends SideEffectService<MockSideEffectService.MockPlayer> {
 

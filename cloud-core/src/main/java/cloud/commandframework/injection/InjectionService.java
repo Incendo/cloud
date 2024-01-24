@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.injection;
 
-import cloud.commandframework.services.types.Service;
+import cloud.commandframework.services.type.Service;
 import org.apiguardian.api.API;
 
 /**

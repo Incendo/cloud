@@ -21,25 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.services.annotations;
-
-import cloud.commandframework.services.ExecutionOrder;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * Used to specify the relative priority of a service implementation
+ * Service implementation types
  */
-@Target({ElementType.TYPE, ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Order {
-
-    /**
-     * The priority of the implementation
-     *
-     * @return Priority
-     */
-    ExecutionOrder value() default ExecutionOrder.SOON;
-}
+package cloud.commandframework.services.type;

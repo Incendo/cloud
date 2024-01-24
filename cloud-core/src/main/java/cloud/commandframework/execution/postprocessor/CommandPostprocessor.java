@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.execution.postprocessor;
 
-import cloud.commandframework.services.types.ConsumerService;
+import cloud.commandframework.services.type.ConsumerService;
 import org.apiguardian.api.API;
 
 /**

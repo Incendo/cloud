@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.services.mock;
 
-import cloud.commandframework.services.types.ConsumerService;
+import cloud.commandframework.services.type.ConsumerService;
 
 public class InterruptingMockConsumer implements MockConsumerService {
 
