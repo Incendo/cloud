@@ -26,8 +26,8 @@ package cloud.commandframework.kotlin.coroutines.annotations
 import cloud.commandframework.annotations.AnnotationParser
 import cloud.commandframework.annotations.MethodCommandExecutionHandler
 import cloud.commandframework.annotations.method.ParameterValue
-import cloud.commandframework.annotations.suggestions.MethodSuggestionProvider
-import cloud.commandframework.annotations.suggestions.SuggestionProviderFactory
+import cloud.commandframework.annotations.suggestion.MethodSuggestionProvider
+import cloud.commandframework.annotations.suggestion.SuggestionProviderFactory
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.context.CommandInput
 import cloud.commandframework.injection.ParameterInjectorRegistry

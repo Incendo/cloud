@@ -24,8 +24,8 @@
 package cloud.commandframework.annotations;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.annotations.parsers.Parser;
-import cloud.commandframework.annotations.suggestions.Suggestions;
+import cloud.commandframework.annotations.parser.Parser;
+import cloud.commandframework.annotations.suggestion.Suggestions;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.parser.ArgumentParser;

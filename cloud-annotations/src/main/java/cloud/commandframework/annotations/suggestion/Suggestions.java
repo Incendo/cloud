@@ -21,60 +21,54 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations.parsers;
+package cloud.commandframework.annotations.suggestion;
 
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.parser.ArgumentParseResult;
-import cloud.commandframework.parser.ParserRegistry;
-import cloud.commandframework.suggestion.SuggestionProvider;
+import cloud.commandframework.suggestion.Suggestion;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.stream.Stream;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * This annotation allows you to create annotated methods that behave like argument parsers.
+ * This annotation allows you to create annotated methods that behave like suggestion providers.
  *
  * <p>The method parameters can be any combination of: <ul>
  *  <li>{@link CommandContext}</li>
  *  <li>{@link CommandInput}</li>
+ *  <li>{@link String}, which receives {@link CommandInput#lastRemainingToken()}</li>
  *  <li>the command sender type</li>
  *  <li>any type that can be injected using {@link CommandContext#inject(Class)}</li>
  * </ul>
  *
- * <p>The method can throw exceptions, and the thrown exceptions will automatically be
- * wrapped by a {@link ArgumentParseResult#failure(Throwable)}.</p>
+ * <p>The return type must be an {@link Iterable} or a {@link Stream} of {@link String} or {@link Suggestion}
+ * or a future that completes with any of the supported return types.</p>
+ *
+ * <p>Example signatures: <pre>{@code
+ * ﹫Suggestions("name")
+ * public List<String> methodName(CommandContext<YourSender> sender, CommandInput input)}</pre>
+ * <pre>{@code
+ * ﹫Suggestions("name")
+ * public List<Suggestion> methodName(CommandContext<YourSender> sender, CommandInput input)}</pre>
+ * <pre>{@code
+ * ﹫Suggestions("name")
+ * public Stream<Suggestion> methodName(CommandContext<YourSender> sender, String input)}</pre>
  *
  * @since 1.3.0
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Parser {
+public @interface Suggestions {
 
     /**
-     * Returns name of the parser.
+     * Returns the name of the suggestion provider.
      *
-     * <p>If this is left empty, the parser will
-     * be registered as a default parser for the return type of the method.</p>
+     * <p>This should be the same as the name specified in your command arguments.</p>
      *
-     * @return Parser name
+     * @return suggestion provider name
      */
-    String name() default "";
-
-    /**
-     * Returns the of the suggestion provider to use.
-     *
-     * <p>If the string is left empty, the default
-     * provider for the {@link cloud.commandframework.annotations.Argument} will be used. Otherwise,
-     * the {@link ParserRegistry} instance in the
-     * {@link cloud.commandframework.CommandManager} will be queried for a matching suggestion provider.</p>
-     *
-     * <p>For this to work, the suggestion needs to be registered in the parser registry. To do this, use
-     * {@link ParserRegistry#registerSuggestionProvider(String, SuggestionProvider)}.
-     * The registry instance can be retrieved using {@link cloud.commandframework.CommandManager#parserRegistry()}.</p>
-     *
-     * @return The name of the suggestion provider, or {@code ""}
-     */
-    String suggestions() default "";
+    @NonNull String value();
 }

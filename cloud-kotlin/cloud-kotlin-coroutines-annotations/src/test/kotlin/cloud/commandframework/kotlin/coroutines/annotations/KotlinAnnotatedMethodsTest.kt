@@ -27,7 +27,7 @@ import cloud.commandframework.CommandManager
 import cloud.commandframework.annotations.AnnotationParser
 import cloud.commandframework.annotations.Argument
 import cloud.commandframework.annotations.Command
-import cloud.commandframework.annotations.suggestions.Suggestions
+import cloud.commandframework.annotations.suggestion.Suggestions
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.context.CommandInput
 import cloud.commandframework.context.StandardCommandContextFactory
