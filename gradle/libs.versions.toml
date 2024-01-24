@@ -24,9 +24,6 @@ dokka = "1.9.10"
 coroutines = "1.7.3"
 ktlint = "0.50.0"
 
-# irc
-pircbotx = "12f5639c5d"
-
 # testing
 jupiterEngine = "5.10.1"
 mockitoCore = "4.11.0"
@@ -56,9 +53,6 @@ guice = { group = "com.google.inject", name = "guice", version.ref = "guice" }
 # kotlin
 coroutinesCore = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutinesJdk8 = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk8", version.ref = "coroutines" }
-
-# irc
-pircbotx = { group = "com.github.pircbotx", name = "pircbotx", version.ref = "pircbotx" }
 
 # testing
 jupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "jupiterEngine" }
