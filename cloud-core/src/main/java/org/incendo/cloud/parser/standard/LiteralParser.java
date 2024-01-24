@@ -23,14 +23,17 @@
 //
 package org.incendo.cloud.parser.standard;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
 import org.incendo.cloud.parser.ArgumentParseResult;
@@ -62,6 +65,7 @@ public final class LiteralParser<C> implements ArgumentParser<C, String>, Blocki
     private final String name;
 
     private LiteralParser(final @NonNull String name, final @NonNull String... aliases) {
+        validateNames(name, aliases);
         this.name = name;
         this.allAcceptedAliases.add(this.name);
         this.allAcceptedAliases.addAll(Arrays.asList(aliases));
@@ -119,7 +123,35 @@ public final class LiteralParser<C> implements ArgumentParser<C, String>, Blocki
      * @param alias New alias
      */
     public void insertAlias(final @NonNull String alias) {
+        validateNames("valid", new String[]{alias});
         this.allAcceptedAliases.add(alias);
         this.alternativeAliases.add(alias);
+    }
+
+    private static void validateNames(final String name, final @NonNull String[] aliases) {
+        @Nullable List<String> errors = null;
+        errors = validateName(name, false, errors);
+        for (final String alias : aliases) {
+            errors = validateName(alias, true, errors);
+        }
+        if (errors != null && !errors.isEmpty()) {
+            throw new IllegalArgumentException(String.join("\n", errors));
+        }
+    }
+
+    @SuppressWarnings("checkstyle:FinalParameters")
+    private static @Nullable List<String> validateName(
+            final @NonNull String name,
+            final boolean alias,
+            @Nullable List<String> errors
+    ) {
+        final int found = name.codePoints().filter(Character::isWhitespace).findFirst().orElse(Integer.MIN_VALUE);
+        if (found != Integer.MIN_VALUE) {
+            if (errors == null) {
+                errors = new ArrayList<>();
+            }
+            errors.add(String.format("%s '%s' is invalid: contains whitespace", alias ? "Alias" : "Name", name));
+        }
+        return errors;
     }
 }
