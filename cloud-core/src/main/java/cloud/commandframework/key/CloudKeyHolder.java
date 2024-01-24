@@ -32,7 +32,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <T> The type of the key value.
  */
 @FunctionalInterface
-@API(status = API.Status.STABLE, since = "1.4.0")
+@API(status = API.Status.STABLE)
 public interface CloudKeyHolder<T> {
 
     /**

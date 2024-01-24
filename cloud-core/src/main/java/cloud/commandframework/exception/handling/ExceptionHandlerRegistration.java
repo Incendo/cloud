@@ -35,7 +35,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <T> the exception type
  */
 @SuppressWarnings("unused")
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public final class ExceptionHandlerRegistration<C, T extends Throwable> {
 
     /**

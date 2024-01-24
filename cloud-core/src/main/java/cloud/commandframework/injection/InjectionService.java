@@ -36,7 +36,7 @@ import org.apiguardian.api.API;
  * @param <C> command sender type
  */
 @FunctionalInterface
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface InjectionService<C> extends Service<InjectionRequest<C>, Object> {
 
 }

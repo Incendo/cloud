@@ -35,8 +35,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Parses command syntax into syntax fragments.
- * <p>
- * Public since 1.7.0.
  */
 public final class SyntaxParserImpl implements SyntaxParser {
 

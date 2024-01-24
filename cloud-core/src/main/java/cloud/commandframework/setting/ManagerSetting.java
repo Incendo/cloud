@@ -31,7 +31,7 @@ import org.apiguardian.api.API;
  *
  * @see CommandManager#settings() to access the settings
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public enum ManagerSetting implements Setting {
     /**
      * Do not create a compound permission and do not look greedily

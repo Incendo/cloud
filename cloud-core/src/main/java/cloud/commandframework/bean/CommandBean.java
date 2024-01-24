@@ -48,7 +48,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> the command sender type
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public abstract class CommandBean<C> implements CommandExecutionHandler<C>, CommandFactory<C> {
 
     protected CommandBean() {

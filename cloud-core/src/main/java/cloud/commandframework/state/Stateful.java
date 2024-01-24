@@ -31,7 +31,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <S> the state type
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface Stateful<S extends State> {
 
     /**

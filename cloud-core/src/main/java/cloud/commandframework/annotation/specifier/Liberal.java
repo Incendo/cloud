@@ -36,7 +36,7 @@ import org.apiguardian.api.API;
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-@API(status = API.Status.STABLE, since = "1.6.0")
+@API(status = API.Status.STABLE)
 public @interface Liberal {
 
 }

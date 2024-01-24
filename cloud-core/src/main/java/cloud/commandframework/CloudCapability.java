@@ -30,7 +30,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents a capability that a cloud implementation may have.
  *
  */
-@API(status = API.Status.STABLE, since = "1.7.0")
+@API(status = API.Status.STABLE)
 public interface CloudCapability {
 
     /**

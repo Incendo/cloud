@@ -38,7 +38,7 @@ import org.apiguardian.api.API;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-@API(status = API.Status.STABLE, since = "1.7.0")
+@API(status = API.Status.STABLE)
 public @interface FlagYielding {
 
 }

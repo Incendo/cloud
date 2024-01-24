@@ -41,7 +41,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @param <C> command sender type
  */
-@API(status = API.Status.STABLE, since = "1.4.0")
+@API(status = API.Status.STABLE)
 public final class GuiceInjectionService<C> implements InjectionService<C> {
 
     /**

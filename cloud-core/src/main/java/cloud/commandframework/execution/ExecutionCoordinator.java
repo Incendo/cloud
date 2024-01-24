@@ -43,7 +43,7 @@ import org.checkerframework.dataflow.qual.Pure;
  *
  * @param <C> command sender type
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface ExecutionCoordinator<C> {
 
     /**

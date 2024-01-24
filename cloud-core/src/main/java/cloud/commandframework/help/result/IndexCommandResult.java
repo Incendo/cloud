@@ -42,7 +42,7 @@ import org.immutables.value.Value;
  */
 @ImmutableImpl
 @Value.Immutable
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface IndexCommandResult<C> extends HelpQueryResult<C>, Iterable<CommandEntry<C>> {
 
     /**

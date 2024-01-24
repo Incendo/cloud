@@ -29,6 +29,6 @@ import org.apiguardian.api.API;
  * Something that represents a state in a state machine.
  *
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface State {
 }

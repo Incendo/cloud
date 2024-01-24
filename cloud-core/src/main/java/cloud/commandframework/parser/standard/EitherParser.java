@@ -53,7 +53,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <U> primary value type
  * @param <V> fallback value type
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public final class EitherParser<C, U, V> implements ArgumentParser.FutureArgumentParser<C, Either<U, V>>, SuggestionProvider<C> {
 
     /**

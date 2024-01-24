@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public class StandardHelpHandler<C> implements HelpHandler<C> {
 
     private final CommandManager<C> commandManager;

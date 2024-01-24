@@ -33,7 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> command sender type
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface HelpQueryResult<C> {
 
     /**

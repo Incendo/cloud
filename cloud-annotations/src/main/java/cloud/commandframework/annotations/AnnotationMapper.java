@@ -33,7 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <A> annotation type
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 @FunctionalInterface
 public interface AnnotationMapper<A extends Annotation> {
 

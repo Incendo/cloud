@@ -36,7 +36,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 @SuppressWarnings("unused")
 @FunctionalInterface
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface ExceptionHandler<C, T extends Throwable> {
 
     /**

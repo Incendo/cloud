@@ -42,7 +42,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @param <C> command sender type
  */
-@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "2.0.0")
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class CommandNode<C> {
 
     public static final String META_KEY_PERMISSION = "permission";

@@ -36,7 +36,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * The flag instances are then assembled by a {@link FlagAssembler}.
  *
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface FlagExtractor {
 
     /**

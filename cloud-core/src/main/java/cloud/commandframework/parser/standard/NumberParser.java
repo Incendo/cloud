@@ -29,7 +29,7 @@ import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public abstract class NumberParser<C, N extends Number, R extends Range<N>> implements ArgumentParser<C, N> {
 
     private final R range;

@@ -37,7 +37,7 @@ import java.util.stream.Stream;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "2.0.0")
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class SuggestionContext<C> {
 
     private final List<Suggestion> suggestions = new ArrayList<>();

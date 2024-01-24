@@ -33,7 +33,7 @@ import org.immutables.value.Value;
 
 @Value.Immutable
 @ImmutableImpl
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface Suggestions<C, S extends Suggestion> {
 
     /**

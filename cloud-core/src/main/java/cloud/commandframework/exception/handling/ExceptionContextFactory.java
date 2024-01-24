@@ -27,7 +27,7 @@ import cloud.commandframework.context.CommandContext;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.INTERNAL, since = "2.0.0")
+@API(status = API.Status.INTERNAL)
 public final class ExceptionContextFactory<C> {
 
     private final ExceptionController<C> controller;

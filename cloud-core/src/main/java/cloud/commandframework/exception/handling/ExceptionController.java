@@ -43,7 +43,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  * @param <C> the command sender type
  */
 @SuppressWarnings("unused")
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public final class ExceptionController<C> {
 
     private final ExceptionContextFactory<C> exceptionContextFactory = new ExceptionContextFactory<>(this);

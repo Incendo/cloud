@@ -57,7 +57,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  *
  * @param <C> command sender type
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public class CommandComponent<C> implements Comparable<CommandComponent<C>>, PreprocessorHolder<C>, Describable {
 
     private final String name;

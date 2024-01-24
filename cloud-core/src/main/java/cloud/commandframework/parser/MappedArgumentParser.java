@@ -40,7 +40,7 @@ import static java.util.Objects.requireNonNull;
  * @param <I> base output type
  * @param <O> mapped output type
  */
-@API(status = API.Status.STABLE, since = "1.5.0")
+@API(status = API.Status.STABLE)
 public final class MappedArgumentParser<C, I, O> implements ArgumentParser.FutureArgumentParser<C, O> {
 
     private final ArgumentParser<C, I> base;

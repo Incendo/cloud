@@ -35,7 +35,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Managed access for {@link java.lang.annotation.Annotation} instances
  *
  */
-@API(status = API.Status.STABLE, since = "1.2.0")
+@API(status = API.Status.STABLE)
 public interface AnnotationAccessor {
 
     /**
@@ -95,7 +95,7 @@ public interface AnnotationAccessor {
      * Annotation accessor that cannot access any annotations
      *
      */
-    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "1.3.0")
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     final class NullAnnotationAccessor implements AnnotationAccessor {
 
         @Override

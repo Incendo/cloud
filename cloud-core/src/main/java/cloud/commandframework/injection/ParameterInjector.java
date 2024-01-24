@@ -38,7 +38,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <T> Type of the value that is injected by this injector
  */
 @FunctionalInterface
-@API(status = API.Status.STABLE, since = "1.2.0")
+@API(status = API.Status.STABLE)
 public interface ParameterInjector<C, T> {
 
     /**

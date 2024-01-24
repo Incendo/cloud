@@ -34,7 +34,7 @@ import org.immutables.value.Value;
 
 @ImmutableBuilder
 @Value.Immutable
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface ArgumentDescriptor extends Descriptor {
 
     /**

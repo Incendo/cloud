@@ -32,7 +32,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Assembles {@link CommandFlag flags} from {@link FlagDescriptor flag descriptors}.
  *
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface FlagAssembler {
 
     /**

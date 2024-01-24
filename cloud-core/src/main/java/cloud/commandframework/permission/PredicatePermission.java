@@ -35,7 +35,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> command sender type
  */
 @FunctionalInterface
-@API(status = API.Status.STABLE, since = "1.4.0")
+@API(status = API.Status.STABLE)
 public interface PredicatePermission<C> extends Permission, CloudKeyHolder<Void> {
 
     /**

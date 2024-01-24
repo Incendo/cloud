@@ -33,7 +33,7 @@ import org.immutables.value.Value;
 
 @ImmutableImpl
 @Value.Immutable
-@API(status = API.Status.INTERNAL, since = "2.0.0")
+@API(status = API.Status.INTERNAL)
 public interface ParameterValue {
 
     /**

@@ -37,7 +37,7 @@ import org.immutables.value.Value;
  */
 @ImmutableImpl
 @Value.Immutable
-@API(status = API.Status.STABLE, since = "1.4.0")
+@API(status = API.Status.STABLE)
 public abstract class CloudKey<T> {
 
     /**

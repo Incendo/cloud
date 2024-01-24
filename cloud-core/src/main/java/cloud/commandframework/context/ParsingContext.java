@@ -30,7 +30,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-@API(status = API.Status.MAINTAINED, since = "2.0.0")
+@API(status = API.Status.MAINTAINED)
 public final class ParsingContext<C> {
 
     private final CommandComponent<@NonNull C> component;

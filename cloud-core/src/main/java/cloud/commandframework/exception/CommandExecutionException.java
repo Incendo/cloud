@@ -33,7 +33,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  */
 @SuppressWarnings("serial")
-@API(status = API.Status.STABLE, since = "1.2.0")
+@API(status = API.Status.STABLE)
 public class CommandExecutionException extends IllegalArgumentException {
 
     private final CommandContext<?> commandContext;
@@ -54,7 +54,7 @@ public class CommandExecutionException extends IllegalArgumentException {
      * @param cause          Exception thrown during the execution of a command handler
      * @param commandContext Command context
      */
-    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "1.4.0")
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public CommandExecutionException(final @NonNull Throwable cause, final @Nullable CommandContext<?> commandContext) {
         super(cause);
         this.commandContext = commandContext;

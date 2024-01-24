@@ -47,8 +47,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * A command execution handler that invokes a method.
  *
- * @param <C> command sender type.
- * @since 1.6.0 (Was made public in 1.6.0)
+ * @param <C> command sender type
  */
 public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> implements
         CommandExecutionHandler.FutureCommandExecutionHandler<C> {

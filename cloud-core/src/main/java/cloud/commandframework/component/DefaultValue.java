@@ -34,7 +34,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> command sender type
  * @param <T> type of the owning argument
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 @FunctionalInterface
 public interface DefaultValue<C, T> {
 

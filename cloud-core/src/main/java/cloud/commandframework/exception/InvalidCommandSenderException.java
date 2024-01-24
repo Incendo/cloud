@@ -64,7 +64,7 @@ public final class InvalidCommandSenderException extends CommandParseException {
      * @param currentChain   Chain leading up to the exception
      * @param command        Command
      */
-    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "1.4.0")
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public InvalidCommandSenderException(
             final @NonNull Object commandSender,
             final @NonNull Class<?> requiredSender,

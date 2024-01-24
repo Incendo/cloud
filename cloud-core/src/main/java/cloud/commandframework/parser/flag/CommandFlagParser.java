@@ -52,7 +52,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "2.0.0")
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class CommandFlagParser<C> implements ArgumentParser.FutureArgumentParser<C, Object>, SuggestionProvider<C> {
 
     /**

@@ -45,7 +45,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @param <C> command sender type
  */
-@API(status = API.Status.INTERNAL, since = "2.0.0")
+@API(status = API.Status.INTERNAL)
 public abstract class AnnotatedMethodHandler<C> {
 
     private final Parameter[] parameters;

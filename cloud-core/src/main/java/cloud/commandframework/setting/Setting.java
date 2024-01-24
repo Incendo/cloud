@@ -29,7 +29,7 @@ import org.apiguardian.api.API;
  * Something that represents a setting that can be configured.
  *
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface Setting {
 
 }

@@ -31,7 +31,7 @@ import org.immutables.value.Value;
 @ImmutableImpl
 @Value.Immutable
 @SuppressWarnings("unused")
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface CommandDescription extends Describable {
 
     /**

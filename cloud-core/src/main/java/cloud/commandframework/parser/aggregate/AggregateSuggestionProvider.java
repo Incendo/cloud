@@ -36,7 +36,7 @@ import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.INTERNAL, since = "2.0.0")
+@API(status = API.Status.INTERNAL)
 final class AggregateSuggestionProvider<C> implements SuggestionProvider<C> {
 
     private final AggregateParser<C, ?> parser;

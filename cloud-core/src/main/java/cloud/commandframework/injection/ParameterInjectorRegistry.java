@@ -51,7 +51,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  * @param <C> command sender type
  */
 @SuppressWarnings("ALL")
-@API(status = API.Status.STABLE, since = "1.2.0")
+@API(status = API.Status.STABLE)
 public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
 
     private final List<Pair<Predicate<TypeToken<?>>, ParameterInjector<C, ?>>> injectors = new ArrayList<>();

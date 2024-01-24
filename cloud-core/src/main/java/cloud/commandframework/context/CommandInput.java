@@ -42,7 +42,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 
-@API(status = API.Status.EXPERIMENTAL, since = "2.0.0")
+@API(status = API.Status.EXPERIMENTAL)
 public interface CommandInput {
 
     List<String> BOOLEAN_STRICT = Collections.unmodifiableList(Arrays.asList("TRUE", "FALSE"));

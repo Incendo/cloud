@@ -39,7 +39,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> command sender type
  * @param <O> Output type
  */
-@API(status = API.Status.INTERNAL, since = "2.0.0")
+@API(status = API.Status.INTERNAL)
 public class CompoundArgument<T extends Tuple, C, O> implements ParserDescriptor<C, O> {
 
     private final ParserDescriptor<C, O> parser;
