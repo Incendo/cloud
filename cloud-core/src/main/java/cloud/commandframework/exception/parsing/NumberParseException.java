@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.exception.parsing;
 
-import cloud.commandframework.captions.CaptionVariable;
-import cloud.commandframework.captions.StandardCaptionKeys;
+import cloud.commandframework.caption.CaptionVariable;
+import cloud.commandframework.caption.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.parser.standard.NumberParser;
 import cloud.commandframework.types.range.Range;

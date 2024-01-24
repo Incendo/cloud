@@ -48,7 +48,7 @@ public @interface Regex {
 
     /**
      * Key for the caption used to generate the failure exception.
-     * Defaults to {@link cloud.commandframework.captions.StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_REGEX}
+     * Defaults to {@link cloud.commandframework.caption.StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_REGEX}
      *
      * @return Failure caption key
      */

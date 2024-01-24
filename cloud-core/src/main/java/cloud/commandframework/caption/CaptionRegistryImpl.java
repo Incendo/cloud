@@ -21,35 +21,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.captions;
+package cloud.commandframework.caption;
 
-import cloud.commandframework.internal.ImmutableImpl;
+import java.util.LinkedList;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.immutables.value.Value;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
-/**
- * This is a reference to a caption and does not contain any message itself.
- */
-@ImmutableImpl
-@Value.Immutable
-@API(status = API.Status.STABLE)
-public interface Caption {
+@API(status = API.Status.INTERNAL)
+public final class CaptionRegistryImpl<C> implements CaptionRegistry<C> {
 
-    /**
-     * Creates a new caption with a given key
-     *
-     * @param key the caption key
-     * @return the created caption
-     */
-    static @NonNull Caption of(final @NonNull String key) {
-        return CaptionImpl.of(key);
+    private final LinkedList<@NonNull CaptionProvider<C>> providers = new LinkedList<>();
+
+    CaptionRegistryImpl() {
     }
 
-    /**
-     * Returns the caption key.
-     *
-     * @return the caption key
-     */
-    @NonNull String key();
+    @Override
+    public @NonNull String caption(
+            final @NonNull Caption caption,
+            final @NonNull C sender
+    ) {
+        for (final CaptionProvider<C> provider : this.providers) {
+            final String result = provider.provide(caption, sender);
+            if (result != null) {
+                return result;
+            }
+        }
+        throw new IllegalArgumentException(String.format("There is no caption stored with key '%s'", caption));
+    }
+
+    @Override
+    public @This @NonNull CaptionRegistry<C> registerProvider(
+            final @NonNull CaptionProvider<C> provider
+    ) {
+        this.providers.addFirst(provider);
+        return this;
+    }
 }

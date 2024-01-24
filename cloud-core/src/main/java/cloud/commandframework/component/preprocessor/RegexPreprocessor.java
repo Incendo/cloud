@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.component.preprocessor;
 
-import cloud.commandframework.captions.Caption;
-import cloud.commandframework.captions.CaptionVariable;
-import cloud.commandframework.captions.StandardCaptionKeys;
+import cloud.commandframework.caption.Caption;
+import cloud.commandframework.caption.CaptionVariable;
+import cloud.commandframework.caption.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.parser.ArgumentParseResult;
@@ -57,7 +57,7 @@ public final class RegexPreprocessor<C> implements ComponentPreprocessor<C> {
     }
 
     /**
-     * Create a new preprocessor using {@link cloud.commandframework.captions.StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_REGEX}
+     * Create a new preprocessor using {@link cloud.commandframework.caption.StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_REGEX}
      * as the failure caption
      *
      * @param pattern Regular expression

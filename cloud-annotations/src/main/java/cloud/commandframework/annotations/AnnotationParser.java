@@ -47,7 +47,7 @@ import cloud.commandframework.annotations.processing.CommandContainerProcessor;
 import cloud.commandframework.annotations.string.StringProcessor;
 import cloud.commandframework.annotations.suggestions.SuggestionProviderFactory;
 import cloud.commandframework.annotations.suggestions.Suggestions;
-import cloud.commandframework.captions.Caption;
+import cloud.commandframework.caption.Caption;
 import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.component.preprocessor.RegexPreprocessor;
 import cloud.commandframework.description.Description;

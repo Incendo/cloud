@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.pircbotx.arguments;
 
-import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.caption.CaptionVariable;
 import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;

@@ -23,9 +23,9 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.captions.CaptionFormatter;
-import cloud.commandframework.captions.CaptionRegistry;
-import cloud.commandframework.captions.StandardCaptionsProvider;
+import cloud.commandframework.caption.CaptionFormatter;
+import cloud.commandframework.caption.CaptionRegistry;
+import cloud.commandframework.caption.StandardCaptionsProvider;
 import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;

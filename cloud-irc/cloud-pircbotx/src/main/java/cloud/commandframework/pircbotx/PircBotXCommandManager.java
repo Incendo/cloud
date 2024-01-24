@@ -25,8 +25,8 @@ package cloud.commandframework.pircbotx;
 
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.captions.Caption;
-import cloud.commandframework.captions.CaptionProvider;
+import cloud.commandframework.caption.Caption;
+import cloud.commandframework.caption.CaptionProvider;
 import cloud.commandframework.exception.ArgumentParseException;
 import cloud.commandframework.exception.CommandExecutionException;
 import cloud.commandframework.exception.InvalidCommandSenderException;

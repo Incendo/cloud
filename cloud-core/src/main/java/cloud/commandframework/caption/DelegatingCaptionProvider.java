@@ -21,29 +21,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.captions;
+package cloud.commandframework.caption;
 
-import cloud.commandframework.internal.ImmutableBuilder;
-import java.util.Map;
-import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.immutables.value.Value;
 
-@ImmutableBuilder
-@Value.Immutable
-@API(status = API.Status.STABLE, since = "2.0.0")
-public abstract class ConstantCaptionProvider<C> implements CaptionProvider<C> {
+/**
+ * Caption provider that delegates to another provider.
+ *
+ * @param <C> command sender type
+ */
+public abstract class DelegatingCaptionProvider<C> implements CaptionProvider<C> {
 
     /**
-     * Returns all recognized captions and their corresponding constant values.
+     * Returns the provider to delegate to.
      *
-     * @return the captions
+     * @return delegate provider
      */
-    public abstract @NonNull Map<@NonNull Caption, @NonNull String> captions();
+    public abstract @NonNull CaptionProvider<C> delegate();
 
     @Override
     public final @Nullable String provide(final @NonNull Caption caption, final @NonNull C recipient) {
-        return this.captions().get(caption);
+        return this.delegate().provide(caption, recipient);
     }
 }

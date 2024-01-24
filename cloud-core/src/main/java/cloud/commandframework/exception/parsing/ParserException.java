@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.exception.parsing;
 
-import cloud.commandframework.captions.Caption;
-import cloud.commandframework.captions.CaptionFormatter;
-import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.caption.Caption;
+import cloud.commandframework.caption.CaptionFormatter;
+import cloud.commandframework.caption.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import java.util.Arrays;
 import org.apiguardian.api.API;

@@ -21,40 +21,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.captions;
+package cloud.commandframework.caption;
 
-import java.util.LinkedList;
+import cloud.commandframework.internal.ImmutableBuilder;
+import java.util.Map;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.immutables.value.Value;
 
-@API(status = API.Status.INTERNAL)
-public final class CaptionRegistryImpl<C> implements CaptionRegistry<C> {
+@ImmutableBuilder
+@Value.Immutable
+@API(status = API.Status.STABLE, since = "2.0.0")
+public abstract class ConstantCaptionProvider<C> implements CaptionProvider<C> {
 
-    private final LinkedList<@NonNull CaptionProvider<C>> providers = new LinkedList<>();
-
-    CaptionRegistryImpl() {
-    }
-
-    @Override
-    public @NonNull String caption(
-            final @NonNull Caption caption,
-            final @NonNull C sender
-    ) {
-        for (final CaptionProvider<C> provider : this.providers) {
-            final String result = provider.provide(caption, sender);
-            if (result != null) {
-                return result;
-            }
-        }
-        throw new IllegalArgumentException(String.format("There is no caption stored with key '%s'", caption));
-    }
+    /**
+     * Returns all recognized captions and their corresponding constant values.
+     *
+     * @return the captions
+     */
+    public abstract @NonNull Map<@NonNull Caption, @NonNull String> captions();
 
     @Override
-    public @This @NonNull CaptionRegistry<C> registerProvider(
-            final @NonNull CaptionProvider<C> provider
-    ) {
-        this.providers.addFirst(provider);
-        return this;
+    public final @Nullable String provide(final @NonNull Caption caption, final @NonNull C recipient) {
+        return this.captions().get(caption);
     }
 }

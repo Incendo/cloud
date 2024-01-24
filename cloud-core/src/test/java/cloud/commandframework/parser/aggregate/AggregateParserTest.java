@@ -25,7 +25,7 @@ package cloud.commandframework.parser.aggregate;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.captions.StandardCaptionKeys;
+import cloud.commandframework.caption.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.StandardCommandContextFactory;

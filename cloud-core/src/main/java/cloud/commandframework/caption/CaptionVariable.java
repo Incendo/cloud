@@ -21,27 +21,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.captions;
+package cloud.commandframework.caption;
 
+import cloud.commandframework.internal.ImmutableImpl;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.immutables.value.Value;
 
 /**
- * Caption provider that delegates to another provider.
- *
- * @param <C> command sender type
+ * Key-value pair used to replace variables in captions.
  */
-public abstract class DelegatingCaptionProvider<C> implements CaptionProvider<C> {
+@ImmutableImpl
+@Value.Immutable
+@API(status = API.Status.STABLE)
+public interface CaptionVariable {
 
     /**
-     * Returns the provider to delegate to.
+     * Creates a new caption variable instance.
      *
-     * @return delegate provider
+     * @param key   the key
+     * @param value the value that replaces the placeholder
+     * @return the variable instance
      */
-    public abstract @NonNull CaptionProvider<C> delegate();
-
-    @Override
-    public final @Nullable String provide(final @NonNull Caption caption, final @NonNull C recipient) {
-        return this.delegate().provide(caption, recipient);
+    static @NonNull CaptionVariable of(final @NonNull String key, final @NonNull String value) {
+        return CaptionVariableImpl.of(key, value);
     }
+
+    /**
+     * Returns the variable key.
+     *
+     * @return the key
+     */
+    @NonNull String key();
+
+    /**
+     * Returns the variable value
+     *
+     * @return the value
+     */
+    @NonNull String value();
 }

@@ -24,10 +24,10 @@
 package cloud.commandframework.context;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.captions.Caption;
-import cloud.commandframework.captions.CaptionFormatter;
-import cloud.commandframework.captions.CaptionRegistry;
-import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.caption.Caption;
+import cloud.commandframework.caption.CaptionFormatter;
+import cloud.commandframework.caption.CaptionRegistry;
+import cloud.commandframework.caption.CaptionVariable;
 import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.injection.ParameterInjectorRegistry;
 import cloud.commandframework.keys.CloudKey;
