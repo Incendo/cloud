@@ -1,2 +1,2 @@
-cloud.commandframework.annotations.processing.CommandContainerProcessor
-cloud.commandframework.annotations.processing.CommandMethodProcessor
+org.incendo.cloud.annotations.processing.CommandContainerProcessor
+org.incendo.cloud.annotations.processing.CommandMethodProcessor

@@ -1,4 +1,4 @@
-import cloud.commandframework.annotations.Command;
+import org.incendo.cloud.annotations.Command;
 
 public class TestCommandMethodWithoutArgumentAnnotations {
 
