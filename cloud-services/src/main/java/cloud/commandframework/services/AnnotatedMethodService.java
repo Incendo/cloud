@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.services;
 
-import cloud.commandframework.services.annotations.Order;
-import cloud.commandframework.services.types.Service;
+import cloud.commandframework.services.annotation.Order;
+import cloud.commandframework.services.type.Service;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;

@@ -23,28 +23,29 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.LiteralParser;
-import cloud.commandframework.arguments.aggregate.AggregateParser;
-import cloud.commandframework.arguments.flags.CommandFlagParser;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.Suggestions;
+import cloud.commandframework.component.CommandComponent;
+import cloud.commandframework.component.DefaultValue;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.ParsingContext;
-import cloud.commandframework.exceptions.AmbiguousNodeException;
-import cloud.commandframework.exceptions.ArgumentParseException;
-import cloud.commandframework.exceptions.InvalidCommandSenderException;
-import cloud.commandframework.exceptions.InvalidSyntaxException;
-import cloud.commandframework.exceptions.NoCommandInLeafException;
-import cloud.commandframework.exceptions.NoPermissionException;
-import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.exception.AmbiguousNodeException;
+import cloud.commandframework.exception.ArgumentParseException;
+import cloud.commandframework.exception.InvalidCommandSenderException;
+import cloud.commandframework.exception.InvalidSyntaxException;
+import cloud.commandframework.exception.NoCommandInLeafException;
+import cloud.commandframework.exception.NoPermissionException;
+import cloud.commandframework.exception.NoSuchCommandException;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.SuggestionContext;
+import cloud.commandframework.parser.ArgumentParseResult;
+import cloud.commandframework.parser.aggregate.AggregateParser;
+import cloud.commandframework.parser.flag.CommandFlagParser;
+import cloud.commandframework.parser.standard.LiteralParser;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PermissionResult;
 import cloud.commandframework.setting.ManagerSetting;
+import cloud.commandframework.suggestion.Suggestion;
+import cloud.commandframework.suggestion.Suggestions;
 import cloud.commandframework.util.CompletableFutures;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -89,7 +90,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * or a {@link InvalidSyntaxException} otherwise. Only the fourth scenario would result in a complete
  * command being parsed.
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class CommandTree<C> {
@@ -118,9 +119,8 @@ public final class CommandTree<C> {
      * Returns the command manager that was used to create this command tree
      *
      * @return Command manager
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CommandManager<C> commandManager() {
         return this.commandManager;
     }
@@ -129,9 +129,8 @@ public final class CommandTree<C> {
      * Returns an immutable view containing of the root nodes of the command tree
      *
      * @return immutable view of the root nodes
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull Collection<@NonNull CommandNode<C>> rootNodes() {
         return this.internalTree.children();
     }
@@ -164,9 +163,8 @@ public final class CommandTree<C> {
      * @param commandInput    command input
      * @param parsingExecutor executor to schedule parsing logic on
      * @return parsed command, if one could be found
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CompletableFuture<@Nullable Command<C>> parse(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput,
@@ -586,9 +584,8 @@ public final class CommandTree<C> {
      * @param commandInput Input
      * @param executor     executor to schedule suggestion logic on
      * @return String suggestions. These should be filtered based on {@link String#startsWith(String)}
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CompletableFuture<@NonNull Suggestions<C, Suggestion>> getSuggestions(
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput,
@@ -603,7 +600,7 @@ public final class CommandTree<C> {
             final @NonNull Executor executor
     ) {
         final SuggestionContext<C> suggestionContext = new SuggestionContext<>(
-                this.commandManager.commandSuggestionProcessor(),
+                this.commandManager.suggestionProcessor(),
                 context,
                 commandInput
         );
@@ -1041,7 +1038,7 @@ public final class CommandTree<C> {
      *
      * @return the root node
      */
-    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    @API(status = API.Status.INTERNAL)
     public @NonNull CommandNode<C> rootNode() {
         return this.internalTree;
     }
@@ -1163,7 +1160,7 @@ public final class CommandTree<C> {
      * @param node the node
      * @return the leaf nodes attached to the node
      */
-    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    @API(status = API.Status.INTERNAL)
     public @NonNull List<@NonNull CommandNode<C>> getLeavesRaw(
             final @NonNull CommandNode<C> node
     ) {
@@ -1184,7 +1181,7 @@ public final class CommandTree<C> {
      * @param node the node
      * @return the leaf nodes attached to the node
      */
-    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    @API(status = API.Status.INTERNAL)
     public @NonNull List<@NonNull CommandNode<C>> getLeaves(
             final @NonNull CommandNode<C> node
     ) {

@@ -23,11 +23,11 @@
 //
 package cloud.commandframework.internal;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.execution.CommandSuggestionProcessor;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
+import cloud.commandframework.suggestion.Suggestion;
+import cloud.commandframework.suggestion.SuggestionProcessor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,12 +37,12 @@ import java.util.stream.Stream;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "2.0.0")
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class SuggestionContext<C> {
 
     private final List<Suggestion> suggestions = new ArrayList<>();
     private final CommandPreprocessingContext<C> preprocessingContext;
-    private final CommandSuggestionProcessor<C> processor;
+    private final SuggestionProcessor<C> processor;
     private final CommandContext<C> commandContext;
 
     /**
@@ -53,7 +53,7 @@ public final class SuggestionContext<C> {
      * @param commandInput   the command input
      */
     public SuggestionContext(
-            final CommandSuggestionProcessor<C> processor,
+            final SuggestionProcessor<C> processor,
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {

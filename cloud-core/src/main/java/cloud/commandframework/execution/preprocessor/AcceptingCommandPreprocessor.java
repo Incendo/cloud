@@ -30,7 +30,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * {@link CommandPreprocessor} that does nothing besides indicating that the context
  * has been properly processed
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class AcceptingCommandPreprocessor<C> implements CommandPreprocessor<C> {

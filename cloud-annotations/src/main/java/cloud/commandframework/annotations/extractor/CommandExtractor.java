@@ -31,7 +31,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Extracts {@link CommandDescriptor command descriptors} from command class instances.
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface CommandExtractor {
 
     /**

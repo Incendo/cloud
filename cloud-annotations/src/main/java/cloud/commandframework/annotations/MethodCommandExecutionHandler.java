@@ -23,15 +23,15 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.CommandComponent;
 import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
 import cloud.commandframework.annotations.descriptor.FlagDescriptor;
-import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.method.AnnotatedMethodHandler;
 import cloud.commandframework.annotations.method.ParameterValue;
+import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.CommandExecutionException;
+import cloud.commandframework.exception.CommandExecutionException;
 import cloud.commandframework.execution.CommandExecutionHandler;
+import cloud.commandframework.injection.ParameterInjectorRegistry;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Collection;
@@ -47,8 +47,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * A command execution handler that invokes a method.
  *
- * @param <C> Command sender type.
- * @since 1.6.0 (Was made public in 1.6.0)
+ * @param <C> command sender type
  */
 public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> implements
         CommandExecutionHandler.FutureCommandExecutionHandler<C> {
@@ -61,7 +60,6 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
      * Constructs a new method command execution handler
      *
      * @param context The context
-     * @since 1.6.0
      */
     public MethodCommandExecutionHandler(final @NonNull CommandMethodContext<C> context) {
         super(context.method, context.instance, context.annotationParser.manager().parameterInjectorRegistry());
@@ -74,7 +72,6 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
      * Returns the command method context
      *
      * @return The context
-     * @since 1.6.0
      */
     public @NonNull CommandMethodContext<C> context() {
         return this.context;
@@ -161,8 +158,7 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
     /**
      * Context for command methods
      *
-     * @param <C> Command sender type
-     * @since 1.6.0
+     * @param <C> command sender type
      */
     public static class CommandMethodContext<C> {
 
@@ -196,7 +192,6 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
          * The instance that owns the command method
          *
          * @return The instance
-         * @since 1.6.0
          */
         public @NonNull Object instance() {
             return this.instance;
@@ -206,7 +201,6 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
          * The command method
          *
          * @return The method
-         * @since 1.6.0
          */
         public final @NonNull Method method() {
             return this.method;
@@ -216,7 +210,6 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
          * The compiled command arguments
          *
          * @return Compiled command arguments
-         * @since 2.0.0
          */
         public final @NonNull Map<@NonNull String, @NonNull CommandComponent<C>> commandComponents() {
             return this.commandComponents;
@@ -226,7 +219,6 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
          * The injector registry
          *
          * @return Injector registry
-         * @since 1.6.0
          */
         public final @NonNull ParameterInjectorRegistry<C> injectorRegistry() {
             return this.injectorRegistry;
@@ -236,7 +228,6 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
          * The annotation parser
          *
          * @return Annotation parser
-         * @since 1.7.0
          */
         public @NonNull AnnotationParser<C> annotationParser() {
             return this.annotationParser;
@@ -246,9 +237,8 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
          * Returns the argument descriptors
          *
          * @return the argument descriptors
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Collection<@NonNull ArgumentDescriptor> argumentDescriptors() {
             return Collections.unmodifiableCollection(this.argumentDescriptors);
         }
@@ -257,9 +247,8 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
          * Returns the flag descriptors
          *
          * @return the flag descriptors
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Collection<@NonNull FlagDescriptor> flagDescriptors() {
             return Collections.unmodifiableCollection(this.flagDescriptors);
         }

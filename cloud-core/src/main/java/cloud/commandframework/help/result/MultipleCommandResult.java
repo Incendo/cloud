@@ -40,11 +40,10 @@ import org.immutables.value.Value;
  * {@link #childSuggestions()}} are the commands that share that common path.
  *
  * @param <C> the command sender type
- * @since 2.0.0
  */
 @ImmutableImpl
 @Value.Immutable
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface MultipleCommandResult<C> extends HelpQueryResult<C> {
 
     /**

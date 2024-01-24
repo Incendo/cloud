@@ -32,8 +32,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Annotation that modifies the command builder
- * to invoke {@link Command.Builder#commandDescription(cloud.commandframework.CommandDescription)}
- * using {@link cloud.commandframework.CommandDescription#commandDescription(String)}.
+ * to invoke {@link Command.Builder#commandDescription(cloud.commandframework.description.CommandDescription)}
+ * using {@link cloud.commandframework.description.CommandDescription#commandDescription(String)}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})

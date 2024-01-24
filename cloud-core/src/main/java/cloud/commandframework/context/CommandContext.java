@@ -23,17 +23,18 @@
 //
 package cloud.commandframework.context;
 
-import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.annotations.AnnotationAccessor;
-import cloud.commandframework.arguments.flags.FlagContext;
-import cloud.commandframework.captions.Caption;
-import cloud.commandframework.captions.CaptionFormatter;
-import cloud.commandframework.captions.CaptionRegistry;
-import cloud.commandframework.captions.CaptionVariable;
-import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.MutableCloudKeyContainer;
+import cloud.commandframework.caption.Caption;
+import cloud.commandframework.caption.CaptionFormatter;
+import cloud.commandframework.caption.CaptionRegistry;
+import cloud.commandframework.caption.CaptionVariable;
+import cloud.commandframework.component.CommandComponent;
+import cloud.commandframework.injection.ParameterInjectorRegistry;
+import cloud.commandframework.key.CloudKey;
+import cloud.commandframework.key.MutableCloudKeyContainer;
+import cloud.commandframework.parser.flag.FlagContext;
 import cloud.commandframework.permission.Permission;
+import cloud.commandframework.util.annotation.AnnotationAccessor;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,7 +51,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Command context used to assist in the parsing of commands
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.STABLE)
 public class CommandContext<C> implements MutableCloudKeyContainer {
@@ -70,9 +71,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      *
      * @param commandSender  the sender of the command
      * @param commandManager command manager
-     * @since 1.3.0
      */
-    @API(status = API.Status.STABLE, since = "1.3.0")
+    @API(status = API.Status.STABLE)
     public CommandContext(final @NonNull C commandSender, final @NonNull CommandManager<C> commandManager) {
         this(false, commandSender, commandManager);
     }
@@ -83,9 +83,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * @param suggestions    whether the context is created for command suggestions
      * @param commandSender  the sender of the command
      * @param commandManager command manager
-     * @since 1.3.0
      */
-    @API(status = API.Status.STABLE, since = "1.3.0")
+    @API(status = API.Status.STABLE)
     public CommandContext(
             final boolean suggestions,
             final @NonNull C commandSender,
@@ -137,9 +136,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * Returns the sender that executed the command.
      *
      * @return the command sender
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull C sender() {
         return this.commandSender;
     }
@@ -149,9 +147,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      *
      * @param permission the permission
      * @return {@code true} if the {@link #sender()} has the permission, else {@code false}
-     * @since 1.6.0
      */
-    @API(status = API.Status.STABLE, since = "1.6.0")
+    @API(status = API.Status.STABLE)
     public boolean hasPermission(final @NonNull Permission permission) {
         return this.commandManager.testPermission(this.commandSender, permission).allowed();
     }
@@ -161,9 +158,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      *
      * @param permission the permission
      * @return {@code true} if the {@link #sender()} has the permission, else {@code false}
-     * @since 1.6.0
      */
-    @API(status = API.Status.STABLE, since = "1.6.0")
+    @API(status = API.Status.STABLE)
     public boolean hasPermission(final @NonNull String permission) {
         return this.commandManager.hasPermission(this.commandSender, permission);
     }
@@ -254,9 +250,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * Returns a copy of the raw input.
      *
      * @return raw input
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CommandInput rawInput() {
         return this.getOrDefault("__raw_input__", CommandInput.empty()).copy();
     }
@@ -266,9 +261,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      *
      * @param component the component
      * @return the created context
-     * @since 2.0.0
      */
-    @API(status = API.Status.MAINTAINED, since = "2.0.0")
+    @API(status = API.Status.MAINTAINED)
     public @NonNull ParsingContext<C> createParsingContext(final @NonNull CommandComponent<C> component) {
         final ParsingContext<C> parsingContext = new ParsingContext<>(component);
         this.parsingContexts.add(parsingContext);
@@ -281,9 +275,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * @param component the component
      * @return the context
      * @param <T> the type of the component
-     * @since 2.0.0
      */
-    @API(status = API.Status.MAINTAINED, since = "2.0.0")
+    @API(status = API.Status.MAINTAINED)
     public <T> @NonNull ParsingContext<C> parsingContext(final @NonNull CommandComponent<C> component) {
         return this.parsingContexts.stream()
                 .filter(context -> context.component().equals(component))
@@ -296,9 +289,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      *
      * @param position the position
      * @return the context
-     * @since 2.0.0
      */
-    @API(status = API.Status.MAINTAINED, since = "1.9.0")
+    @API(status = API.Status.MAINTAINED)
     public @NonNull ParsingContext<C> parsingContext(final int position) {
         return this.parsingContexts.get(position);
     }
@@ -308,9 +300,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      *
      * @param name the name
      * @return the context
-     * @since 2.0.0
      */
-    @API(status = API.Status.MAINTAINED, since = "1.9.0")
+    @API(status = API.Status.MAINTAINED)
     public @NonNull ParsingContext<C> parsingContext(final String name) {
         return this.parsingContexts.stream()
                 .filter(context -> context.component().name().equals(name))
@@ -322,9 +313,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * Returns an unmodifiable view of the stored parsing contexts.
      *
      * @return the contexts
-     * @since 2.0.0
      */
-    @API(status = API.Status.MAINTAINED, since = "2.0.0")
+    @API(status = API.Status.MAINTAINED)
     public @NonNull List<@NonNull ParsingContext<@NonNull C>> parsingContexts() {
         return Collections.unmodifiableList(this.parsingContexts);
     }
@@ -344,9 +334,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * suggestions or parse a new command argument.
      *
      * @return the {@link CommandComponent} that is currently being parsed, or {@code null}
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @Nullable CommandComponent<C> currentComponent() {
         return this.currentComponent;
     }
@@ -357,23 +346,21 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * suggestions or parse a new command argument.
      *
      * @param component the component that is currently being parsed, or {@code null}
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public void currentComponent(final @Nullable CommandComponent<C> component) {
         this.currentComponent = component;
     }
 
     /**
      * Attempts to retrieve a value that has been registered to the associated command manager's
-     * {@link cloud.commandframework.annotations.injection.ParameterInjectorRegistry}.
+     * {@link ParameterInjectorRegistry}.
      *
      * @param <T>   type to inject
      * @param clazz class of type to inject
      * @return optional that may contain the created value
-     * @since 1.3.0
      */
-    @API(status = API.Status.STABLE, since = "1.3.0")
+    @API(status = API.Status.STABLE)
     public <T> @NonNull Optional<T> inject(final @NonNull Class<T> clazz) {
         if (this.commandManager == null) {
             throw new UnsupportedOperationException(
@@ -385,14 +372,13 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
 
     /**
      * Attempts to retrieve a value that has been registered to the associated command manager's
-     * {@link cloud.commandframework.annotations.injection.ParameterInjectorRegistry}.
+     * {@link ParameterInjectorRegistry}.
      *
      * @param <T>  type to inject
      * @param type type to inject
      * @return optional that may contain the created value
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public <T> @NonNull Optional<T> inject(final @NonNull TypeToken<T> type) {
         if (this.commandManager == null) {
             throw new UnsupportedOperationException(

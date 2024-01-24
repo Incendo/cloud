@@ -40,7 +40,7 @@ import cloud.commandframework.services.mock.MockSideEffectService;
 import cloud.commandframework.services.mock.SecondaryMockService;
 import cloud.commandframework.services.mock.SecondaryMockSideEffectService;
 import cloud.commandframework.services.mock.StateSettingConsumerService;
-import cloud.commandframework.services.types.Service;
+import cloud.commandframework.services.type.Service;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Type;

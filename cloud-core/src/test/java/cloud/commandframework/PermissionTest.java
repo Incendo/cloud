@@ -23,13 +23,13 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.exceptions.NoPermissionException;
+import cloud.commandframework.exception.NoPermissionException;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.key.CloudKey;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PermissionResult;
 import cloud.commandframework.permission.PredicatePermission;
+import cloud.commandframework.suggestion.Suggestion;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletionException;
@@ -42,7 +42,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
+import static cloud.commandframework.parser.standard.IntegerParser.integerParser;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;

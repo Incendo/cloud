@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.kotlin.extension
 
-import cloud.commandframework.CommandComponent
-import cloud.commandframework.arguments.aggregate.AggregateParserBuilder
+import cloud.commandframework.component.CommandComponent
+import cloud.commandframework.parser.aggregate.AggregateParserBuilder
 
 /**
  * Creates a new command component using the given [builderDecorator].

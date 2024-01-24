@@ -23,11 +23,11 @@
 //
 package cloud.commandframework.annotations.extractor;
 
-import cloud.commandframework.annotations.AnnotationAccessor;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.descriptor.CommandDescriptor;
 import cloud.commandframework.annotations.descriptor.ImmutableCommandDescriptor;
+import cloud.commandframework.util.annotation.AnnotationAccessor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;

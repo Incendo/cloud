@@ -28,7 +28,7 @@ import cloud.commandframework.help.result.IndexCommandResult;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface HelpHandler<C> {
 
     /**

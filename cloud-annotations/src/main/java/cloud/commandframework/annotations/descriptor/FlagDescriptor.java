@@ -23,10 +23,10 @@
 //
 package cloud.commandframework.annotations.descriptor;
 
-import cloud.commandframework.Description;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.description.Description;
 import cloud.commandframework.internal.ImmutableBuilder;
 import cloud.commandframework.permission.Permission;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import java.lang.reflect.Parameter;
 import java.util.Collection;
 import org.apiguardian.api.API;
@@ -36,7 +36,7 @@ import org.immutables.value.Value;
 
 @ImmutableBuilder
 @Value.Immutable
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface FlagDescriptor extends Descriptor {
 
     /**
@@ -80,11 +80,11 @@ public interface FlagDescriptor extends Descriptor {
     /**
      * Returns the name of the suggestion provider to use. If the string is {@code null}, the default
      * provider for the argument parser will be used. Otherwise,
-     * the {@link cloud.commandframework.arguments.parser.ParserRegistry} instance in the
+     * the {@link cloud.commandframework.parser.ParserRegistry} instance in the
      * {@link cloud.commandframework.CommandManager} will be queried for a matching suggestion provider.
      * <p>
      * For this to work, the suggestion needs to be registered in the parser registry. To do this, use
-     * {@link cloud.commandframework.arguments.parser.ParserRegistry#registerSuggestionProvider(String, SuggestionProvider)}.
+     * {@link cloud.commandframework.parser.ParserRegistry#registerSuggestionProvider(String, SuggestionProvider)}.
      * The registry instance can be retrieved using {@link cloud.commandframework.CommandManager#parserRegistry()}.
      *
      * @return the name of the suggestion provider, or {@code null}

@@ -29,9 +29,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Represents a capability that a cloud implementation may have.
  *
- * @since 1.7.0
  */
-@API(status = API.Status.STABLE, since = "1.7.0")
+@API(status = API.Status.STABLE)
 public interface CloudCapability {
 
     /**
@@ -46,9 +45,8 @@ public interface CloudCapability {
     /**
      * Standard {@link CloudCapability capabilities}.
      *
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     enum StandardCapabilities implements CloudCapability {
         /**
          * The capability to delete root commands using {@link CommandManager#deleteRootCommand(String)}.
@@ -66,9 +64,8 @@ public interface CloudCapability {
      * Exception thrown when a {@link CloudCapability} is missing, when a method that requires the presence of that
      * capability is invoked.
      *
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     final class CloudCapabilityMissingException extends RuntimeException {
 
 

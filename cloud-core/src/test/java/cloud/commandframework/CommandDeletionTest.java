@@ -23,17 +23,17 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.exception.NoSuchCommandException;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import cloud.commandframework.suggestion.Suggestion;
 import java.util.concurrent.CompletionException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static cloud.commandframework.arguments.standard.StringParser.stringParser;
+import static cloud.commandframework.parser.standard.StringParser.stringParser;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;

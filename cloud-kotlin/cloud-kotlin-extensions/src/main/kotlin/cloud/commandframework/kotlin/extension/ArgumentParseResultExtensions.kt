@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.kotlin.extension
 
-import cloud.commandframework.arguments.parser.ArgumentParseResult
+import cloud.commandframework.parser.ArgumentParseResult
 import kotlin.jvm.optionals.getOrNull
 
 /**

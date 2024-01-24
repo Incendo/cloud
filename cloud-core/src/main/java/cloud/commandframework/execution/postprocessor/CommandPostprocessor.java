@@ -23,13 +23,13 @@
 //
 package cloud.commandframework.execution.postprocessor;
 
-import cloud.commandframework.services.types.ConsumerService;
+import cloud.commandframework.services.type.ConsumerService;
 import org.apiguardian.api.API;
 
 /**
  * Command postprocessor that acts on commands before execution
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.STABLE)
 public interface CommandPostprocessor<C> extends ConsumerService<CommandPostprocessingContext<C>> {

@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.services;
 
-import cloud.commandframework.services.types.Service;
+import cloud.commandframework.services.type.Service;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.Predicate;
 import org.checkerframework.checker.nullness.qual.NonNull;

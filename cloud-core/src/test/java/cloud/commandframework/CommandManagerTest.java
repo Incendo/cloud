@@ -23,7 +23,9 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.description.Description;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
@@ -35,7 +37,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
+import static cloud.commandframework.parser.standard.IntegerParser.integerParser;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;

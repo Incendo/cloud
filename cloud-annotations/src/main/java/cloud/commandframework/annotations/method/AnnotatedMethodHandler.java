@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.annotations.method;
 
-import cloud.commandframework.annotations.AnnotationAccessor;
-import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.injection.ParameterInjectorRegistry;
+import cloud.commandframework.util.annotation.AnnotationAccessor;
 import io.leangen.geantyref.TypeToken;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -44,9 +44,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Handler that invokes an annotated method.
  *
  * @param <C> command sender type
- * @since 2.0.0
  */
-@API(status = API.Status.INTERNAL, since = "2.0.0")
+@API(status = API.Status.INTERNAL)
 public abstract class AnnotatedMethodHandler<C> {
 
     private final Parameter[] parameters;

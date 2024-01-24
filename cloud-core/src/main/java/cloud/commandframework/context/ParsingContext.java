@@ -23,14 +23,14 @@
 //
 package cloud.commandframework.context;
 
-import cloud.commandframework.CommandComponent;
+import cloud.commandframework.component.CommandComponent;
 import java.time.Duration;
 import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-@API(status = API.Status.MAINTAINED, since = "2.0.0")
+@API(status = API.Status.MAINTAINED)
 public final class ParsingContext<C> {
 
     private final CommandComponent<@NonNull C> component;
@@ -137,9 +137,8 @@ public final class ParsingContext<C> {
      * Returns the consumed input.
      *
      * @return the consumed input
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull String consumedInput() {
         return Objects.requireNonNull(this.consumed);
     }
@@ -161,9 +160,8 @@ public final class ParsingContext<C> {
      * Index the parser consumed from.
      *
      * @return consumed from index
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public int consumedFrom() {
         return this.consumedFrom;
     }
@@ -172,9 +170,8 @@ public final class ParsingContext<C> {
      * Index the parser consumed to.
      *
      * @return consumed to index
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public int consumedTo() {
         return this.consumedTo;
     }

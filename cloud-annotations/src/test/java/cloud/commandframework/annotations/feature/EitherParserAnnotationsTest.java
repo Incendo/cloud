@@ -23,16 +23,16 @@
 //
 package cloud.commandframework.annotations.feature;
 
-import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
-import cloud.commandframework.arguments.parser.EitherParser;
-import cloud.commandframework.arguments.standard.BooleanParser;
-import cloud.commandframework.arguments.standard.IntegerParser;
-import cloud.commandframework.types.Either;
+import cloud.commandframework.component.CommandComponent;
+import cloud.commandframework.parser.standard.BooleanParser;
+import cloud.commandframework.parser.standard.EitherParser;
+import cloud.commandframework.parser.standard.IntegerParser;
+import cloud.commandframework.type.Either;
 import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;

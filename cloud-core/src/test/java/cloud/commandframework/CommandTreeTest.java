@@ -23,18 +23,19 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.standard.StringParser;
-import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.component.CommandComponent;
+import cloud.commandframework.component.DefaultValue;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.AmbiguousNodeException;
-import cloud.commandframework.exceptions.NoPermissionException;
+import cloud.commandframework.exception.AmbiguousNodeException;
+import cloud.commandframework.exception.NoPermissionException;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.key.CloudKey;
 import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.parser.flag.CommandFlag;
+import cloud.commandframework.parser.standard.StringParser;
+import cloud.commandframework.suggestion.Suggestion;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collections;
 import java.util.List;
@@ -47,10 +48,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
-import static cloud.commandframework.arguments.standard.FloatParser.floatParser;
-import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
-import static cloud.commandframework.arguments.standard.StringParser.stringParser;
+import static cloud.commandframework.parser.standard.EnumParser.enumParser;
+import static cloud.commandframework.parser.standard.FloatParser.floatParser;
+import static cloud.commandframework.parser.standard.IntegerParser.integerParser;
+import static cloud.commandframework.parser.standard.StringParser.stringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;

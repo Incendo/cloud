@@ -30,9 +30,8 @@ import org.apiguardian.api.API;
  * Configurable command related settings
  *
  * @see CommandManager#settings() to access the settings
- * @since 2.0.0
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public enum ManagerSetting implements Setting {
     /**
      * Do not create a compound permission and do not look greedily
@@ -54,17 +53,15 @@ public enum ManagerSetting implements Setting {
      * this will allow modifying the command tree after it has been sent, as long as these modifications are not blocked by
      * the underlying platform
      *
-     * @since 1.2.0
      */
-    @API(status = API.Status.STABLE, since = "1.2.0")
+    @API(status = API.Status.STABLE)
     ALLOW_UNSAFE_REGISTRATION,
 
     /**
      * Enables overriding of existing commands on supported platforms.
      *
-     * @since 1.2.0
      */
-    @API(status = API.Status.STABLE, since = "1.2.0")
+    @API(status = API.Status.STABLE)
     OVERRIDE_EXISTING_COMMANDS,
 
     /**
@@ -72,8 +69,7 @@ public enum ManagerSetting implements Setting {
      * It can have some conflicts when integrating with other command systems like Brigadier,
      * and code inspecting the command tree may need to be adjusted.
      *
-     * @since 1.8.0
      */
-    @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
+    @API(status = API.Status.EXPERIMENTAL)
     LIBERAL_FLAG_PARSING
 }

@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.parser.ParserParameters;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.function.Function;

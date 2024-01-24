@@ -23,22 +23,22 @@
 //
 package cloud.commandframework.annotations.assembler;
 
-import cloud.commandframework.CommandComponent;
+import cloud.commandframework.annotation.specifier.Completions;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.ArgumentMode;
 import cloud.commandframework.annotations.PreprocessorMapper;
 import cloud.commandframework.annotations.SyntaxFragment;
 import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
-import cloud.commandframework.annotations.specifier.Completions;
-import cloud.commandframework.arguments.ComponentPreprocessor;
-import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.parser.EitherParser;
-import cloud.commandframework.arguments.parser.ParserDescriptor;
-import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
-import cloud.commandframework.types.Either;
+import cloud.commandframework.component.CommandComponent;
+import cloud.commandframework.component.DefaultValue;
+import cloud.commandframework.component.preprocessor.ComponentPreprocessor;
+import cloud.commandframework.parser.ArgumentParser;
+import cloud.commandframework.parser.ParserDescriptor;
+import cloud.commandframework.parser.ParserParameters;
+import cloud.commandframework.parser.standard.EitherParser;
+import cloud.commandframework.suggestion.Suggestion;
+import cloud.commandframework.suggestion.SuggestionProvider;
+import cloud.commandframework.type.Either;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;

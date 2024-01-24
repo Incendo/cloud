@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.kotlin.extension
 
-import cloud.commandframework.types.Either
+import cloud.commandframework.type.Either
 import kotlin.jvm.optionals.getOrNull
 
 /**

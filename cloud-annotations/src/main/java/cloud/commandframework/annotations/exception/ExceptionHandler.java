@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.annotations.exception;
 
-import cloud.commandframework.exceptions.handling.ExceptionContext;
+import cloud.commandframework.exception.handling.ExceptionContext;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -32,24 +32,23 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Annotation used to map methods to {@link cloud.commandframework.exceptions.handling.ExceptionHandler exception handlers}.
+ * Annotation used to map methods to {@link cloud.commandframework.exception.handling.ExceptionHandler exception handlers}.
  * <p>
  * The method signature is not fixed, and the parameters can be any combination of: <ul>
- *  <li>{@link cloud.commandframework.exceptions.handling.ExceptionContext}</li>
+ *  <li>{@link cloud.commandframework.exception.handling.ExceptionContext}</li>
  *  <li>{@link #value()}</li>
  *  <li>{@link cloud.commandframework.context.CommandContext}</li>
  *  <li>the command sender type</li>
  *  <li>any type that can be injected using {@link cloud.commandframework.context.CommandContext#inject(Class)}</li>
  * </ul>
  * <p>
- * See {@link cloud.commandframework.exceptions.handling.ExceptionHandler#handle(ExceptionContext)} for information about
+ * See {@link cloud.commandframework.exception.handling.ExceptionHandler#handle(ExceptionContext)} for information about
  * the exception handler behavior.
  *
- * @since 2.0.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public @interface ExceptionHandler {
 
     /**

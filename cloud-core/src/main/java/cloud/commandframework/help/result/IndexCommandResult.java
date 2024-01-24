@@ -39,11 +39,10 @@ import org.immutables.value.Value;
  * but may also be empty in the case that no results were found.
  *
  * @param <C> the command sender type
- * @since 2.0.0
  */
 @ImmutableImpl
 @Value.Immutable
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface IndexCommandResult<C> extends HelpQueryResult<C>, Iterable<CommandEntry<C>> {
 
     /**

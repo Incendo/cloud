@@ -28,7 +28,7 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.exception.NoSuchCommandException;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import java.util.concurrent.CompletionException;
 import org.junit.jupiter.api.Assertions;

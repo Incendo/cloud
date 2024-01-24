@@ -23,7 +23,9 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.parser.ParserRegistry;
+import cloud.commandframework.parser.flag.CommandFlag;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -32,7 +34,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Indicates that the parameter should be treated like a {@link cloud.commandframework.arguments.flags.CommandFlag}.
+ * Indicates that the parameter should be treated like a {@link CommandFlag}.
  * <ul>
  *     <li>If the parameter is a {@code boolean}, a presence flag will be created</li>
  *     <li>If the parameter is of any other type, a value flag will be created and the parser
@@ -68,16 +70,15 @@ public @interface Flag {
     /**
      * Name of the suggestion provider to use. If the string is left empty, the default
      * provider for the argument parser will be used. Otherwise,
-     * the {@link cloud.commandframework.arguments.parser.ParserRegistry} instance in the
+     * the {@link ParserRegistry} instance in the
      * {@link cloud.commandframework.CommandManager} will be queried for a matching suggestion provider.
      * <p>
      * For this to work, the suggestion needs to be registered in the parser registry. To do this, use
-     * {@link cloud.commandframework.arguments.parser.ParserRegistry#registerSuggestionProvider(String, SuggestionProvider)}.
+     * {@link ParserRegistry#registerSuggestionProvider(String, SuggestionProvider)}.
      * The registry instance can be retrieved using {@link cloud.commandframework.CommandManager#parserRegistry()}.
      *
      * @return The name of the suggestion provider, or {@code ""} if the default suggestion provider for the argument parser
      *         should be used instead
-     * @since 1.2.0
      */
     @NonNull String suggestions() default "";
 
@@ -92,7 +93,6 @@ public @interface Flag {
      * The flag permission
      *
      * @return Flag permission
-     * @since 1.6.0
      */
     @NonNull String permission() default "";
 
@@ -100,8 +100,7 @@ public @interface Flag {
      * Whether the flag can be repeated.
      *
      * @return whether the flag can be repeated
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     boolean repeatable() default false;
 }

@@ -25,7 +25,8 @@ package cloud.commandframework.annotations;
 
 import cloud.commandframework.annotations.extractor.ParameterNameExtractor;
 import cloud.commandframework.annotations.extractor.StandardArgumentExtractor;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.parser.ParserRegistry;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -64,16 +65,15 @@ public @interface Argument {
     /**
      * Name of the suggestion provider to use. If the string is left empty, the default
      * provider for the argument parser will be used. Otherwise,
-     * the {@link cloud.commandframework.arguments.parser.ParserRegistry} instance in the
+     * the {@link ParserRegistry} instance in the
      * {@link cloud.commandframework.CommandManager} will be queried for a matching suggestion provider.
      * <p>
      * For this to work, the suggestion needs to be registered in the parser registry. To do this, use
-     * {@link cloud.commandframework.arguments.parser.ParserRegistry#registerSuggestionProvider(String, SuggestionProvider)}.
+     * {@link ParserRegistry#registerSuggestionProvider(String, SuggestionProvider)}.
      * The registry instance can be retrieved using {@link cloud.commandframework.CommandManager#parserRegistry()}.
      *
      * @return The name of the suggestion provider, or {@code ""} if the default suggestion provider for the argument parser
      *         should be used instead
-     * @since 1.1.0
      */
     @NonNull String suggestions() default "";
 

@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.kotlin.extension
 
-import cloud.commandframework.keys.CloudKey
-import cloud.commandframework.keys.CloudKeyContainer
-import cloud.commandframework.keys.CloudKeyHolder
+import cloud.commandframework.key.CloudKey
+import cloud.commandframework.key.CloudKeyContainer
+import cloud.commandframework.key.CloudKeyHolder
 
 /**
  * Returns the value associated with the given [key], if it exists.

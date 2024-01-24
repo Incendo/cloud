@@ -23,12 +23,13 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.description.Description;
 import cloud.commandframework.meta.CommandMeta;
 import java.util.Collection;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface CommandBuilderSource<C> {
 
     /**
@@ -173,6 +174,6 @@ public interface CommandBuilderSource<C> {
      * @param builder builder to decorate
      * @return the decorated builder
      */
-    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    @API(status = API.Status.INTERNAL)
     Command.@NonNull Builder<C> decorateBuilder(Command.@NonNull Builder<C> builder);
 }

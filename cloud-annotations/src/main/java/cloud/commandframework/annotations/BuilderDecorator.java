@@ -24,7 +24,7 @@
 package cloud.commandframework.annotations;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.CommandDescription;
+import cloud.commandframework.description.CommandDescription;
 import cloud.commandframework.permission.Permission;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -33,9 +33,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Decorators that get to modify a command builder that is used to construct the command for annotated command methods.
  *
  * @param <C> the command sender type
- * @since 2.0.0
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface BuilderDecorator<C> {
 
     /**

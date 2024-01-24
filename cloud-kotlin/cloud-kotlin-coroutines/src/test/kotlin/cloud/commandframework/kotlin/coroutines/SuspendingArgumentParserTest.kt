@@ -24,11 +24,11 @@
 package cloud.commandframework.kotlin.coroutines
 
 import cloud.commandframework.CommandManager
-import cloud.commandframework.arguments.parser.ArgumentParseResult
-import cloud.commandframework.arguments.suggestion.Suggestion
 import cloud.commandframework.execution.ExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
 import cloud.commandframework.kotlin.extension.buildAndRegister
+import cloud.commandframework.parser.ArgumentParseResult
+import cloud.commandframework.suggestion.Suggestion
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.future.await

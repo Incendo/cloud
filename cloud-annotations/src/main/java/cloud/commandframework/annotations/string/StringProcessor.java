@@ -28,7 +28,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Processor that intercepts all cloud annotation strings.
  *
- * @since 1.7.0
  */
 @FunctionalInterface
 public interface StringProcessor {

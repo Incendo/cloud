@@ -23,14 +23,14 @@
 //
 package cloud.commandframework.annotations.exception;
 
-import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
-import cloud.commandframework.exceptions.handling.ExceptionHandler;
+import cloud.commandframework.exception.handling.ExceptionHandler;
+import cloud.commandframework.injection.ParameterInjectorRegistry;
 import java.lang.reflect.Method;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @FunctionalInterface
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface ExceptionHandlerFactory<C> {
 
     /**

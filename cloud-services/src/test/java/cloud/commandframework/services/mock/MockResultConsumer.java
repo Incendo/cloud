@@ -24,7 +24,7 @@
 package cloud.commandframework.services.mock;
 
 import cloud.commandframework.services.State;
-import cloud.commandframework.services.types.SideEffectService;
+import cloud.commandframework.services.type.SideEffectService;
 
 public class MockResultConsumer implements SideEffectService<MockService.MockResult> {
 

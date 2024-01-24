@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.execution.preprocessor;
 
-import cloud.commandframework.services.types.ConsumerService;
+import cloud.commandframework.services.type.ConsumerService;
 import org.apiguardian.api.API;
 
 /**
@@ -33,7 +33,7 @@ import org.apiguardian.api.API;
  * Command preprocessors may filter out invalid commands by using
  * {@link ConsumerService#interrupt()}
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.STABLE)
 public interface CommandPreprocessor<C> extends ConsumerService<CommandPreprocessingContext<C>> {

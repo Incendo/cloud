@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.annotations.assembler;
 
-import cloud.commandframework.CommandComponent;
 import cloud.commandframework.annotations.SyntaxFragment;
 import cloud.commandframework.annotations.descriptor.ArgumentDescriptor;
+import cloud.commandframework.component.CommandComponent;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -33,9 +33,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Assembles {@link CommandComponent command componets} from {@link ArgumentDescriptor argument descriptors}.
  *
  * @param <C> the command sender type
- * @since 2.0.0
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface ArgumentAssembler<C> {
 
     /**

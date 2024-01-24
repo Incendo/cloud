@@ -23,14 +23,14 @@
 //
 package cloud.commandframework.meta;
 
-import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.key.CloudKey;
 import java.util.HashMap;
 import java.util.Map;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public class CommandMetaBuilder {
 
     private final Map<CloudKey<?>, Object> map = new HashMap<>();

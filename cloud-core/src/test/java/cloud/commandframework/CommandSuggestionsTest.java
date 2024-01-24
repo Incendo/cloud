@@ -23,18 +23,19 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.compound.ArgumentTriplet;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.standard.IntegerParser;
-import cloud.commandframework.arguments.standard.StringParser;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.description.Description;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import cloud.commandframework.parser.ArgumentParseResult;
+import cloud.commandframework.parser.compound.ArgumentTriplet;
+import cloud.commandframework.parser.standard.IntegerParser;
+import cloud.commandframework.parser.standard.StringParser;
 import cloud.commandframework.setting.ManagerSetting;
-import cloud.commandframework.types.tuples.Pair;
-import cloud.commandframework.types.tuples.Triplet;
+import cloud.commandframework.suggestion.FilteringSuggestionProcessor;
+import cloud.commandframework.suggestion.Suggestion;
+import cloud.commandframework.suggestion.SuggestionProvider;
+import cloud.commandframework.type.tuple.Pair;
+import cloud.commandframework.type.tuple.Triplet;
 import cloud.commandframework.util.StringUtils;
 import java.util.Collections;
 import java.util.List;
@@ -48,17 +49,17 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static cloud.commandframework.arguments.standard.ArgumentTestHelper.suggestionList;
-import static cloud.commandframework.arguments.standard.BooleanParser.booleanParser;
-import static cloud.commandframework.arguments.standard.DurationParser.durationParser;
-import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
-import static cloud.commandframework.arguments.standard.IntegerParser.integerComponent;
-import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
-import static cloud.commandframework.arguments.standard.StringArrayParser.flagYieldingStringArrayParser;
-import static cloud.commandframework.arguments.standard.StringParser.greedyFlagYieldingStringParser;
-import static cloud.commandframework.arguments.standard.StringParser.greedyStringParser;
-import static cloud.commandframework.arguments.standard.StringParser.stringComponent;
-import static cloud.commandframework.arguments.standard.StringParser.stringParser;
+import static cloud.commandframework.parser.standard.ArgumentTestHelper.suggestionList;
+import static cloud.commandframework.parser.standard.BooleanParser.booleanParser;
+import static cloud.commandframework.parser.standard.DurationParser.durationParser;
+import static cloud.commandframework.parser.standard.EnumParser.enumParser;
+import static cloud.commandframework.parser.standard.IntegerParser.integerComponent;
+import static cloud.commandframework.parser.standard.IntegerParser.integerParser;
+import static cloud.commandframework.parser.standard.StringArrayParser.flagYieldingStringArrayParser;
+import static cloud.commandframework.parser.standard.StringParser.greedyFlagYieldingStringParser;
+import static cloud.commandframework.parser.standard.StringParser.greedyStringParser;
+import static cloud.commandframework.parser.standard.StringParser.stringComponent;
+import static cloud.commandframework.parser.standard.StringParser.stringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -678,9 +679,9 @@ class CommandSuggestionsTest {
                         .required("string", greedyStringParser(),
                                 SuggestionProvider.blocking((c, i) -> suggestionList("hello world")))
         );
-        this.manager.commandSuggestionProcessor(
-                new FilteringCommandSuggestionProcessor<>(
-                        FilteringCommandSuggestionProcessor.Filter.<TestCommandSender>startsWith(true).and(
+        this.manager.suggestionProcessor(
+                new FilteringSuggestionProcessor<>(
+                        FilteringSuggestionProcessor.Filter.<TestCommandSender>startsWith(true).and(
                                 (ctx, s, in) ->
                                         StringUtils.trimBeforeLastSpace(s, in))));
 

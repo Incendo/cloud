@@ -33,7 +33,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * {@link PropertyReplacementProvider} that replaces all sub-strings with the format
  * {@code ${some.property}} with a function-generated string.
  *
- * @since 1.7.0
  */
 public class PropertyReplacingStringProcessor extends PatternReplacingStringProcessor {
 

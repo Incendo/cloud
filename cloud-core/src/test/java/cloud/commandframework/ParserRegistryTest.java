@@ -23,13 +23,13 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.annotations.specifier.Range;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.arguments.parser.ParserRegistry;
-import cloud.commandframework.arguments.parser.StandardParameters;
-import cloud.commandframework.arguments.parser.StandardParserRegistry;
-import cloud.commandframework.arguments.standard.IntegerParser;
+import cloud.commandframework.annotation.specifier.Range;
+import cloud.commandframework.parser.ArgumentParser;
+import cloud.commandframework.parser.ParserParameters;
+import cloud.commandframework.parser.ParserRegistry;
+import cloud.commandframework.parser.StandardParameters;
+import cloud.commandframework.parser.StandardParserRegistry;
+import cloud.commandframework.parser.standard.IntegerParser;
 import cloud.commandframework.setting.ManagerSetting;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;

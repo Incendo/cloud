@@ -36,9 +36,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import static cloud.commandframework.CommandDescription.commandDescription;
-import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
-import static cloud.commandframework.arguments.standard.StringParser.stringParser;
+import static cloud.commandframework.description.CommandDescription.commandDescription;
+import static cloud.commandframework.parser.standard.IntegerParser.integerParser;
+import static cloud.commandframework.parser.standard.StringParser.stringParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 

@@ -23,11 +23,11 @@
 //
 package cloud.commandframework.annotations.exception;
 
-import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.method.AnnotatedMethodHandler;
 import cloud.commandframework.annotations.method.ParameterValue;
-import cloud.commandframework.exceptions.handling.ExceptionContext;
-import cloud.commandframework.exceptions.handling.ExceptionHandler;
+import cloud.commandframework.exception.handling.ExceptionContext;
+import cloud.commandframework.exception.handling.ExceptionHandler;
+import cloud.commandframework.injection.ParameterInjectorRegistry;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -39,9 +39,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents a method annotated with {@link cloud.commandframework.annotations.exception.ExceptionHandler}.
  *
  * @param <C> the command sender type
- * @since 2.0.0
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public final class MethodExceptionHandler<C> extends AnnotatedMethodHandler<C> implements ExceptionHandler<C, Throwable> {
 
     /**

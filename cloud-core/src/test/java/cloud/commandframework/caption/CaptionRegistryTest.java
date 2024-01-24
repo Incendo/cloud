@@ -24,11 +24,6 @@
 package cloud.commandframework.caption;
 
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.captions.Caption;
-import cloud.commandframework.captions.CaptionProvider;
-import cloud.commandframework.captions.CaptionRegistry;
-import cloud.commandframework.captions.StandardCaptionKeys;
-import cloud.commandframework.captions.StandardCaptionsProvider;
 import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;

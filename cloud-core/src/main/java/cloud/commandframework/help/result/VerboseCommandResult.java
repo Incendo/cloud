@@ -35,11 +35,10 @@ import org.immutables.value.Value;
  * This is displayed when the help query is precise enough to point to a single command.
  *
  * @param <C> the command sender type
- * @since 2.0.0
  */
 @ImmutableImpl
 @Value.Immutable
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface VerboseCommandResult<C> extends HelpQueryResult<C> {
 
     /**

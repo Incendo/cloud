@@ -34,11 +34,10 @@ import org.immutables.value.Value;
  * Context for {@link CommandPreprocessor command preprocessors}.
  *
  * @param <C> command sender type
- * @since 2.0.0
  */
 @Value.Immutable
 @ImmutableImpl
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface CommandPreprocessingContext<C> {
 
     /**

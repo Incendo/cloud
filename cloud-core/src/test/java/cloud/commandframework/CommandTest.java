@@ -27,7 +27,7 @@ import cloud.commandframework.meta.CommandMeta;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
+import static cloud.commandframework.parser.standard.IntegerParser.integerParser;
 import static com.google.common.truth.Truth.assertThat;
 
 class CommandTest {

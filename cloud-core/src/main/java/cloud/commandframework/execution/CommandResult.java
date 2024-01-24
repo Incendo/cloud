@@ -33,11 +33,10 @@ import org.immutables.value.Value;
  * The result of a command execution.
  *
  * @param <C> command sender type
- * @since 2.0.0
  */
 @ImmutableImpl
 @Value.Immutable
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface CommandResult<C> {
 
     /**

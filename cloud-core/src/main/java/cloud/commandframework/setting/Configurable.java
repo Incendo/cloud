@@ -31,9 +31,8 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  * Something with configurable {@link Setting settings}.
  *
  * @param <S> setting type
- * @since 2.0.0
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface Configurable<S extends Setting> {
 
     /**

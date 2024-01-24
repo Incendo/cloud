@@ -23,12 +23,12 @@
 //
 package cloud.commandframework.context;
 
-import cloud.commandframework.types.range.ByteRange;
-import cloud.commandframework.types.range.DoubleRange;
-import cloud.commandframework.types.range.FloatRange;
-import cloud.commandframework.types.range.IntRange;
-import cloud.commandframework.types.range.LongRange;
-import cloud.commandframework.types.range.ShortRange;
+import cloud.commandframework.type.range.ByteRange;
+import cloud.commandframework.type.range.DoubleRange;
+import cloud.commandframework.type.range.FloatRange;
+import cloud.commandframework.type.range.IntRange;
+import cloud.commandframework.type.range.LongRange;
+import cloud.commandframework.type.range.ShortRange;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +42,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 
-@API(status = API.Status.EXPERIMENTAL, since = "2.0.0")
+@API(status = API.Status.EXPERIMENTAL)
 public interface CommandInput {
 
     List<String> BOOLEAN_STRICT = Collections.unmodifiableList(Arrays.asList("TRUE", "FALSE"));
@@ -785,7 +785,7 @@ public interface CommandInput {
         return this.difference(that, false);
     }
 
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     class CursorOutOfBoundsException extends NoSuchElementException {
 
         CursorOutOfBoundsException(

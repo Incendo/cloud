@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.permission;
 
-import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.CloudKeyHolder;
+import cloud.commandframework.key.CloudKey;
+import cloud.commandframework.key.CloudKeyHolder;
 import java.util.function.Predicate;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -33,10 +33,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * A functional {@link Permission} implementation
  *
  * @param <C> command sender type
- * @since 1.4.0
  */
 @FunctionalInterface
-@API(status = API.Status.STABLE, since = "1.4.0")
+@API(status = API.Status.STABLE)
 public interface PredicatePermission<C> extends Permission, CloudKeyHolder<Void> {
 
     /**
@@ -83,9 +82,8 @@ public interface PredicatePermission<C> extends Permission, CloudKeyHolder<Void>
      *
      * @param sender sender to check for
      * @return a {@link PermissionResult} representing the check result
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     @NonNull PermissionResult testPermission(@NonNull C sender);
 
     @Override

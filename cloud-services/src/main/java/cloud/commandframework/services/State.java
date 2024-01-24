@@ -24,7 +24,7 @@
 package cloud.commandframework.services;
 
 /**
- * This indicates how a {@link cloud.commandframework.services.types.Service} responded to a given context
+ * This indicates how a {@link cloud.commandframework.services.type.Service} responded to a given context
  */
 public enum State {
     /**

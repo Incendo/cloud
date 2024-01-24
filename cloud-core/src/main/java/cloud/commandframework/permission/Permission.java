@@ -42,11 +42,10 @@ import static java.util.Objects.requireNonNull;
  * different environments.</p>
  *
  * @see PredicatePermission
- * @since 2.0.0
  */
 @ImmutableImpl
 @Value.Immutable
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface Permission {
 
     Permission EMPTY = permission("");
@@ -159,9 +158,8 @@ public interface Permission {
      * Returns true if a check for this permission should and will always return true.
      *
      * @return true if this permission is empty, otherwise false
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     default boolean isEmpty() {
         return this.permissionString().isEmpty();
     }
@@ -171,9 +169,8 @@ public interface Permission {
      *
      * @param other the other permission to test
      * @return a new {@code or} permission
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     default @NonNull Permission or(final @NonNull Permission other) {
         requireNonNull(other, "other");
         final Set<Permission> permission = new HashSet<>(2);
@@ -187,9 +184,8 @@ public interface Permission {
      *
      * @param other the other permission to test
      * @return a new {@code or} permission
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     default @NonNull Permission or(final @NonNull Permission @NonNull... other) {
         requireNonNull(other, "other");
         final Set<Permission> permission = new HashSet<>(other.length + 1);
@@ -203,9 +199,8 @@ public interface Permission {
      *
      * @param other the other permission to test
      * @return a new {@code and} permission
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     default @NonNull Permission and(final @NonNull Permission other) {
         requireNonNull(other, "other");
         final Set<Permission> permission = new HashSet<>(2);
@@ -219,9 +214,8 @@ public interface Permission {
      *
      * @param other the other permission to test
      * @return a new {@code and} permission
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     default @NonNull Permission and(final @NonNull Permission @NonNull... other) {
         requireNonNull(other, "other");
         final Set<Permission> permission = new HashSet<>(other.length + 1);

@@ -23,7 +23,6 @@
 //
 package cloud.commandframework.annotations.feature;
 
-import cloud.commandframework.CommandComponent;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.Command;
@@ -33,9 +32,10 @@ import cloud.commandframework.annotations.Permission;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
 import cloud.commandframework.annotations.string.PropertyReplacingStringProcessor;
-import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.flags.CommandFlagParser;
+import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.parser.flag.CommandFlag;
+import cloud.commandframework.parser.flag.CommandFlagParser;
 import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.List;

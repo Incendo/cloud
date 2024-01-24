@@ -33,9 +33,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * {@link CompletableFuture} extensions.
  *
- * @since 2.0.0
  */
-@API(status = API.Status.INTERNAL, since = "2.0.0")
+@API(status = API.Status.INTERNAL)
 public final class CompletableFutures {
 
     private CompletableFutures() {

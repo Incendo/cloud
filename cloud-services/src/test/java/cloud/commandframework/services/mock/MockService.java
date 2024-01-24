@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.services.mock;
 
-import cloud.commandframework.services.types.Service;
+import cloud.commandframework.services.type.Service;
 
 public interface MockService extends Service<MockService.MockContext, MockService.MockResult> {
 

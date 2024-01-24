@@ -25,14 +25,14 @@ package cloud.commandframework.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.DefaultValue;
+import cloud.commandframework.component.DefaultValue;
 import cloud.commandframework.execution.CommandResult;
-import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.key.CloudKey;
 import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
+import static cloud.commandframework.parser.standard.IntegerParser.integerParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 

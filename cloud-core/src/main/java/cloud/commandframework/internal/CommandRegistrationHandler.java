@@ -24,7 +24,7 @@
 package cloud.commandframework.internal;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.CommandComponent;
+import cloud.commandframework.component.CommandComponent;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -62,9 +62,8 @@ public interface CommandRegistrationHandler<C> {
      * Requests that the given {@code rootCommand} should be unregistered.
      *
      * @param rootCommand The command to delete
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     default void unregisterRootCommand(final @NonNull CommandComponent<C> rootCommand) {
     }
 

@@ -24,14 +24,14 @@
 package cloud.commandframework.execution;
 
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.Suggestions;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.CommandExecutionException;
-import cloud.commandframework.exceptions.CommandParseException;
+import cloud.commandframework.exception.CommandExecutionException;
+import cloud.commandframework.exception.CommandParseException;
 import cloud.commandframework.services.State;
-import cloud.commandframework.types.tuples.Pair;
+import cloud.commandframework.suggestion.Suggestion;
+import cloud.commandframework.suggestion.Suggestions;
+import cloud.commandframework.type.tuple.Pair;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;

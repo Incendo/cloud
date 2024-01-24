@@ -23,11 +23,11 @@
 //
 package cloud.commandframework.kotlin.extension
 
-import cloud.commandframework.CommandComponent
-import cloud.commandframework.Description
-import cloud.commandframework.arguments.DefaultValue
-import cloud.commandframework.arguments.parser.ParserDescriptor
-import cloud.commandframework.arguments.suggestion.SuggestionProvider
+import cloud.commandframework.component.CommandComponent
+import cloud.commandframework.component.DefaultValue
+import cloud.commandframework.description.Description
+import cloud.commandframework.parser.ParserDescriptor
+import cloud.commandframework.suggestion.SuggestionProvider
 
 /**
  * The description of the command component.

@@ -55,7 +55,7 @@ import org.immutables.value.Value;
 )
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.PACKAGE})
 @Retention(RetentionPolicy.SOURCE)
-@API(status = API.Status.INTERNAL, since = "2.0.0")
+@API(status = API.Status.INTERNAL)
 public @interface ImmutableImpl {
 
 }

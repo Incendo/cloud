@@ -23,15 +23,15 @@
 //
 package cloud.commandframework.annotations.assembler;
 
-import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.Description;
 import cloud.commandframework.annotations.descriptor.FlagDescriptor;
-import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.parser.ParserRegistry;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.component.CommandComponent;
+import cloud.commandframework.description.Description;
+import cloud.commandframework.parser.ArgumentParser;
+import cloud.commandframework.parser.ParserRegistry;
+import cloud.commandframework.parser.flag.CommandFlag;
 import cloud.commandframework.permission.Permission;
+import cloud.commandframework.suggestion.SuggestionProvider;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;

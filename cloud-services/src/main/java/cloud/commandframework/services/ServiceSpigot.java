@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.services;
 
-import cloud.commandframework.services.types.ConsumerService;
-import cloud.commandframework.services.types.Service;
-import cloud.commandframework.services.types.SideEffectService;
+import cloud.commandframework.services.type.ConsumerService;
+import cloud.commandframework.services.type.Service;
+import cloud.commandframework.services.type.SideEffectService;
 import io.leangen.geantyref.TypeToken;
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;

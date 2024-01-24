@@ -24,9 +24,6 @@
 package cloud.commandframework.caption;
 
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.captions.Caption;
-import cloud.commandframework.captions.CaptionFormatter;
-import cloud.commandframework.captions.CaptionVariable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

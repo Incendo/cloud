@@ -24,7 +24,7 @@
 package cloud.commandframework.internal;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.CommandComponent;
+import cloud.commandframework.component.CommandComponent;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -40,10 +40,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Very simple tree structure
  *
- * @param <C> Command sender type
- * @since 2.0.0
+ * @param <C> command sender type
  */
-@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "2.0.0")
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class CommandNode<C> {
 
     public static final String META_KEY_PERMISSION = "permission";

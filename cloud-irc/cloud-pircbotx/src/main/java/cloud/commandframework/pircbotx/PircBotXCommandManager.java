@@ -25,19 +25,19 @@ package cloud.commandframework.pircbotx;
 
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.captions.Caption;
-import cloud.commandframework.captions.CaptionProvider;
-import cloud.commandframework.exceptions.ArgumentParseException;
-import cloud.commandframework.exceptions.CommandExecutionException;
-import cloud.commandframework.exceptions.InvalidCommandSenderException;
-import cloud.commandframework.exceptions.InvalidSyntaxException;
-import cloud.commandframework.exceptions.NoPermissionException;
-import cloud.commandframework.exceptions.NoSuchCommandException;
-import cloud.commandframework.exceptions.handling.ExceptionContext;
-import cloud.commandframework.exceptions.handling.ExceptionHandler;
+import cloud.commandframework.caption.Caption;
+import cloud.commandframework.caption.CaptionProvider;
+import cloud.commandframework.exception.ArgumentParseException;
+import cloud.commandframework.exception.CommandExecutionException;
+import cloud.commandframework.exception.InvalidCommandSenderException;
+import cloud.commandframework.exception.InvalidSyntaxException;
+import cloud.commandframework.exception.NoPermissionException;
+import cloud.commandframework.exception.NoSuchCommandException;
+import cloud.commandframework.exception.handling.ExceptionContext;
+import cloud.commandframework.exception.handling.ExceptionHandler;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.key.CloudKey;
 import cloud.commandframework.pircbotx.arguments.UserParser;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -50,8 +50,7 @@ import org.pircbotx.hooks.types.GenericMessageEvent;
 /**
  * Command manager implementation for PircBotX 2.0
  *
- * @param <C> Command sender type
- * @since 1.1.0
+ * @param <C> command sender type
  */
 public class PircBotXCommandManager<C> extends CommandManager<C> {
 
@@ -63,9 +62,8 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
 
     /**
      * Key used to access the generic message event from the command context.
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static final CloudKey<GenericMessageEvent> PIRCBOTX_MESSAGE_EVENT_KEY = CloudKey.of(
             "__internal_generic_message_event__",
             GenericMessageEvent.class

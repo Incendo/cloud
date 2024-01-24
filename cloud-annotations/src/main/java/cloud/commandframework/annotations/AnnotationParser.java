@@ -23,9 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.Description;
 import cloud.commandframework.annotations.assembler.ArgumentAssembler;
 import cloud.commandframework.annotations.assembler.ArgumentAssemblerImpl;
 import cloud.commandframework.annotations.assembler.FlagAssembler;
@@ -42,25 +40,28 @@ import cloud.commandframework.annotations.extractor.FlagExtractor;
 import cloud.commandframework.annotations.extractor.FlagExtractorImpl;
 import cloud.commandframework.annotations.extractor.StandardArgumentExtractor;
 import cloud.commandframework.annotations.injection.RawArgs;
-import cloud.commandframework.annotations.parsers.MethodArgumentParser;
-import cloud.commandframework.annotations.parsers.Parser;
+import cloud.commandframework.annotations.parser.MethodArgumentParser;
+import cloud.commandframework.annotations.parser.Parser;
 import cloud.commandframework.annotations.processing.CommandContainer;
 import cloud.commandframework.annotations.processing.CommandContainerProcessor;
 import cloud.commandframework.annotations.string.StringProcessor;
-import cloud.commandframework.annotations.suggestions.SuggestionProviderFactory;
-import cloud.commandframework.annotations.suggestions.Suggestions;
-import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.parser.ParserParameter;
-import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.arguments.preprocessor.RegexPreprocessor;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
-import cloud.commandframework.captions.Caption;
+import cloud.commandframework.annotations.suggestion.SuggestionProviderFactory;
+import cloud.commandframework.annotations.suggestion.Suggestions;
+import cloud.commandframework.caption.Caption;
+import cloud.commandframework.component.CommandComponent;
+import cloud.commandframework.component.preprocessor.RegexPreprocessor;
+import cloud.commandframework.description.Description;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.CommandMetaBuilder;
-import cloud.commandframework.types.tuples.Pair;
+import cloud.commandframework.parser.ArgumentParser;
+import cloud.commandframework.parser.ParserParameter;
+import cloud.commandframework.parser.ParserParameters;
+import cloud.commandframework.parser.flag.CommandFlag;
+import cloud.commandframework.suggestion.SuggestionProvider;
+import cloud.commandframework.type.tuple.Pair;
+import cloud.commandframework.util.annotation.AnnotationAccessor;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import java.io.BufferedReader;
@@ -91,12 +92,12 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import static cloud.commandframework.CommandDescription.commandDescription;
+import static cloud.commandframework.description.CommandDescription.commandDescription;
 
 /**
  * Parser that parses class instances {@link cloud.commandframework.Command commands}
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @SuppressWarnings("unused")
 public final class AnnotationParser<C> {
@@ -187,9 +188,8 @@ public final class AnnotationParser<C> {
      *                          command methods. These annotations will be mapped to
      *                          {@link ParserParameter}. Mappers for the
      *                          parser parameters can be registered using {@link #registerAnnotationMapper(Class, AnnotationMapper)}
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public AnnotationParser(
             final @NonNull CommandManager<C> manager,
             final @NonNull TypeToken<C> commandSenderType,
@@ -288,7 +288,6 @@ public final class AnnotationParser<C> {
      * Returns the command manager that was used to create this parser
      *
      * @return Command manager
-     * @since 1.6.0
      */
     public @NonNull CommandManager<C> manager() {
         return this.manager;
@@ -300,9 +299,8 @@ public final class AnnotationParser<C> {
      *
      * @param predicate the predicate that decides whether to apply the custom execution handler to the given method
      * @param factory   the function that produces the command execution handler
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public void registerCommandExecutionMethodFactory(
             final @NonNull Predicate<@NonNull Method> predicate,
             final @NonNull CommandMethodExecutionHandlerFactory<C> factory
@@ -336,9 +334,8 @@ public final class AnnotationParser<C> {
      * All other steps of the command construction process take priority over the decorators.
      *
      * @param decorator the decorator
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public void registerBuilderDecorator(final @NonNull BuilderDecorator<C> decorator) {
         this.builderDecorators.add(decorator);
     }
@@ -363,9 +360,8 @@ public final class AnnotationParser<C> {
      * @param annotation         annotation class
      * @param preprocessorMapper preprocessor mapper
      * @param <A>                annotation type
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public <A extends Annotation> void registerPreprocessorMapper(
             final @NonNull Class<A> annotation,
             final @NonNull PreprocessorMapper<A, C> preprocessorMapper
@@ -377,9 +373,8 @@ public final class AnnotationParser<C> {
      * Returns an unmodifiable view of the preprocessor mappers.
      *
      * @return the preprocessor mappers
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull Map<@NonNull Class<? extends Annotation>, @NonNull PreprocessorMapper<?, C>> preprocessorMappers() {
         return Collections.unmodifiableMap(this.preprocessorMappers);
     }
@@ -388,7 +383,6 @@ public final class AnnotationParser<C> {
      * Returns the string processor used by this parser.
      *
      * @return the string processor
-     * @since 1.7.0
      */
     public @NonNull StringProcessor stringProcessor() {
         return this.stringProcessor;
@@ -398,7 +392,6 @@ public final class AnnotationParser<C> {
      * Replaces the string processor of this parser.
      *
      * @param stringProcessor the new string processor
-     * @since 1.7.0
      */
     public void stringProcessor(final @NonNull StringProcessor stringProcessor) {
         this.stringProcessor = stringProcessor;
@@ -409,7 +402,6 @@ public final class AnnotationParser<C> {
      *
      * @param input the input string
      * @return the processed string
-     * @since 1.7.0
      */
     public @NonNull String processString(final @NonNull String input) {
         return this.stringProcessor().processString(input);
@@ -420,7 +412,6 @@ public final class AnnotationParser<C> {
      *
      * @param strings the input strings
      * @return the processed strings
-     * @since 1.7.0
      */
     public @NonNull String[] processStrings(final @NonNull String[] strings) {
         return Arrays.stream(strings).map(this::processString).toArray(String[]::new);
@@ -431,9 +422,8 @@ public final class AnnotationParser<C> {
      *
      * @param strings the input strings
      * @return the processed strings
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull List<@NonNull String> processStrings(final @NonNull Collection<@NonNull String> strings) {
         return strings.stream().map(this::processString).collect(Collectors.toList());
     }
@@ -442,7 +432,6 @@ public final class AnnotationParser<C> {
      * Returns the syntax parser.
      *
      * @return the syntax parser
-     * @since 2.0.0
      */
     public @NonNull SyntaxParser syntaxParser() {
         return this.syntaxParser;
@@ -452,9 +441,8 @@ public final class AnnotationParser<C> {
      * Sets the syntax parser.
      *
      * @param syntaxParser new syntax parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public void syntaxParser(final @NonNull SyntaxParser syntaxParser) {
         this.syntaxParser = syntaxParser;
     }
@@ -463,9 +451,8 @@ public final class AnnotationParser<C> {
      * Returns the argument extractor.
      *
      * @return the argument extractor
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull ArgumentExtractor argumentExtractor() {
         return this.argumentExtractor;
     }
@@ -474,9 +461,8 @@ public final class AnnotationParser<C> {
      * Sets the argument extractor.
      *
      * @param argumentExtractor new argument extractor
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public void argumentExtractor(final @NonNull ArgumentExtractor argumentExtractor) {
         this.argumentExtractor = argumentExtractor;
     }
@@ -485,9 +471,8 @@ public final class AnnotationParser<C> {
      * Returns the argument assembler.
      *
      * @return the argument assembler
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull ArgumentAssembler<C> argumentAssembler() {
         return this.argumentAssembler;
     }
@@ -496,9 +481,8 @@ public final class AnnotationParser<C> {
      * Sets the argument assembler
      *
      * @param argumentAssembler new argument assembler
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public void argumentAssembler(final @NonNull ArgumentAssembler<C> argumentAssembler) {
         this.argumentAssembler = argumentAssembler;
     }
@@ -507,9 +491,8 @@ public final class AnnotationParser<C> {
      * Returns the flag extractor.
      *
      * @return the flag extractor
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull FlagExtractor flagExtractor() {
         return this.flagExtractor;
     }
@@ -518,9 +501,8 @@ public final class AnnotationParser<C> {
      * Sets the flag extractor.
      *
      * @param flagExtractor new flag extractor
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public void flagExtractor(final @NonNull FlagExtractor flagExtractor) {
         this.flagExtractor = flagExtractor;
     }
@@ -529,9 +511,8 @@ public final class AnnotationParser<C> {
      * Returns the flag assembler.
      *
      * @return the flag assembler
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull FlagAssembler flagAssembler() {
         return this.flagAssembler;
     }
@@ -540,9 +521,8 @@ public final class AnnotationParser<C> {
      * Sets the flag assembler
      *
      * @param flagAssembler new flag assembler
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public void flagAssembler(final @NonNull FlagAssembler flagAssembler) {
         this.flagAssembler = flagAssembler;
     }
@@ -551,9 +531,8 @@ public final class AnnotationParser<C> {
      * Returns the command extractor.
      *
      * @return the command extractor
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CommandExtractor commandExtractor() {
         return this.commandExtractor;
     }
@@ -562,9 +541,8 @@ public final class AnnotationParser<C> {
      * Sets the command extractor.
      *
      * @param commandExtractor new command extractor
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public void commandExtractor(final @NonNull CommandExtractor commandExtractor) {
         this.commandExtractor = commandExtractor;
     }
@@ -573,9 +551,8 @@ public final class AnnotationParser<C> {
      * Returns the suggestion provider factory.
      *
      * @return the suggestion provider factory
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull SuggestionProviderFactory<C> suggestionProviderFactory() {
         return this.suggestionProviderFactory;
     }
@@ -584,9 +561,8 @@ public final class AnnotationParser<C> {
      * Sets the suggestion provider factory.
      *
      * @param suggestionProviderFactory new suggestion provider factory
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public void suggestionProviderFactory(final @NonNull SuggestionProviderFactory<C> suggestionProviderFactory) {
         this.suggestionProviderFactory = suggestionProviderFactory;
     }
@@ -595,9 +571,8 @@ public final class AnnotationParser<C> {
      * Returns the exception provider factory.
      *
      * @return the exception provider factory
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull ExceptionHandlerFactory<C> exceptionHandlerFactory() {
         return this.exceptionHandlerFactory;
     }
@@ -606,9 +581,8 @@ public final class AnnotationParser<C> {
      * Sets the exception provider factory.
      *
      * @param exceptionHandlerFactory new exception provider factory
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public void exceptionHandlerFactory(final @NonNull ExceptionHandlerFactory<C> exceptionHandlerFactory) {
         this.exceptionHandlerFactory = exceptionHandlerFactory;
     }
@@ -617,9 +591,8 @@ public final class AnnotationParser<C> {
      * Returns the description mapper.
      *
      * @return the description mapper
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull DescriptionMapper descriptionMapper() {
         return this.descriptionMapper;
     }
@@ -628,9 +601,8 @@ public final class AnnotationParser<C> {
      * Sets the description mapper.
      *
      * @param descriptionMapper new description mapper
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public void descriptionMapper(final @NonNull DescriptionMapper descriptionMapper) {
         this.descriptionMapper = descriptionMapper;
     }
@@ -644,7 +616,6 @@ public final class AnnotationParser<C> {
      * @return Collection of parsed commands
      * @throws Exception re-throws all encountered exceptions.
      * @see cloud.commandframework.annotations.processing.CommandContainer CommandContainer for more information.
-     * @since 1.7.0
      */
     public @NonNull Collection<cloud.commandframework.@NonNull Command<C>> parseContainers() throws Exception {
         return this.parseContainers(this.getClass().getClassLoader());
@@ -657,9 +628,8 @@ public final class AnnotationParser<C> {
      * @return Collection of parsed commands
      * @throws Exception re-throws all encountered exceptions.
      * @see cloud.commandframework.annotations.processing.CommandContainer CommandContainer for more information.
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull Collection<cloud.commandframework.@NonNull Command<C>> parseContainers(
             final @NonNull ClassLoader classLoader
     ) throws Exception {

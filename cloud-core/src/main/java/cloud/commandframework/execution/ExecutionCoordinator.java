@@ -24,10 +24,10 @@
 package cloud.commandframework.execution;
 
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.Suggestions;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.suggestion.Suggestion;
+import cloud.commandframework.suggestion.Suggestions;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
@@ -42,9 +42,8 @@ import org.checkerframework.dataflow.qual.Pure;
  * for example, disallow concurrent command execution.
  *
  * @param <C> command sender type
- * @since 2.0.0
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface ExecutionCoordinator<C> {
 
     /**
@@ -137,9 +136,8 @@ public interface ExecutionCoordinator<C> {
      * will continue in the current one).</p>
      *
      * @param <C> command sender type
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     interface Builder<C> {
 
         /**

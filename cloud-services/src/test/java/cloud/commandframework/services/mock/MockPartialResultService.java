@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.services.mock;
 
-import cloud.commandframework.services.types.PartialResultService;
+import cloud.commandframework.services.type.PartialResultService;
 
 public interface MockPartialResultService extends
         PartialResultService<MockChunkedRequest.Animal, MockChunkedRequest.Sound, MockChunkedRequest> {

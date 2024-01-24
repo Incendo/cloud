@@ -25,7 +25,7 @@ package cloud.commandframework.kotlin.extension
 
 import cloud.commandframework.Command
 import cloud.commandframework.CommandManager
-import cloud.commandframework.Description
+import cloud.commandframework.description.Description
 import cloud.commandframework.kotlin.MutableCommandBuilder
 import kotlin.reflect.KClass
 
@@ -36,7 +36,6 @@ import kotlin.reflect.KClass
  * @param description description for the root command node
  * @param aliases aliases for the root command node
  * @param lambda receiver lambda which will be invoked on the new builder
- * @since 1.4.0
  */
 public fun <C : Any> CommandManager<C>.commandBuilder(
     name: String,
@@ -53,7 +52,6 @@ public fun <C : Any> CommandManager<C>.commandBuilder(
  * @param description description for the root command node
  * @param aliases aliases for the root command node
  * @param lambda receiver lambda which will be invoked on the new builder
- * @since 1.4.0
  */
 public fun <C : Any> CommandManager<C>.buildAndRegister(
     name: String,
@@ -69,7 +67,6 @@ public fun <C : Any> CommandManager<C>.buildAndRegister(
  * @param commands mutable command builder(s) to register
  * @return the command manager
  * @see [CommandManager.command]
- * @since 1.3.0
  */
 public fun <C : Any> CommandManager<C>.command(
     vararg commands: MutableCommandBuilder<C>
@@ -80,7 +77,6 @@ public fun <C : Any> CommandManager<C>.command(
  *
  * @param type required sender type
  * @return New builder instance using the required sender type
- * @since 1.3.0
  */
 public fun <C : Any> Command.Builder<C>.senderType(type: KClass<out C>): Command.Builder<C> =
     senderType(type.java)
@@ -89,7 +85,6 @@ public fun <C : Any> Command.Builder<C>.senderType(type: KClass<out C>): Command
  * Create a new [MutableCommandBuilder].
  *
  * @param commandManager the command manager, which will own this command.
- * @since 1.7.0
  */
 public fun <C : Any> Command.Builder<C>.toMutable(
     commandManager: CommandManager<C>
@@ -100,7 +95,6 @@ public fun <C : Any> Command.Builder<C>.toMutable(
  *
  * @param commandManager the command manager, which will own this command.
  * @param lambda receiver lambda, which will be invoked on the new builder.
- * @since 1.7.0
  */
 public fun <C : Any> Command.Builder<C>.mutate(
     commandManager: CommandManager<C>,
@@ -112,7 +106,6 @@ public fun <C : Any> Command.Builder<C>.mutate(
  *
  * @param description description string
  * @return the description
- * @since 1.4.0
  */
 public fun argumentDescription(description: String = ""): Description =
     if (description.isEmpty()) Description.empty() else Description.of(description)

@@ -23,7 +23,7 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.annotations.AnnotationAccessor;
+import cloud.commandframework.util.annotation.AnnotationAccessor;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

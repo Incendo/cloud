@@ -24,16 +24,15 @@
 package cloud.commandframework.annotations.assembler;
 
 import cloud.commandframework.annotations.descriptor.FlagDescriptor;
-import cloud.commandframework.arguments.flags.CommandFlag;
+import cloud.commandframework.parser.flag.CommandFlag;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Assembles {@link CommandFlag flags} from {@link FlagDescriptor flag descriptors}.
  *
- * @since 2.0.0
  */
-@API(status = API.Status.STABLE, since = "2.0.0")
+@API(status = API.Status.STABLE)
 public interface FlagAssembler {
 
     /**
