@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.parser.aggregate;
 
-import cloud.commandframework.CommandComponent;
+import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.keys.CloudKey;
 import java.util.Collection;
 import java.util.HashMap;

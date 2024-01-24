@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.kotlin.extension
 
-import cloud.commandframework.CommandComponent
+import cloud.commandframework.component.CommandComponent
 import cloud.commandframework.parser.aggregate.AggregateParserBuilder
 
 /**

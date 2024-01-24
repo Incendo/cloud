@@ -26,7 +26,7 @@ package cloud.commandframework.feature;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.DefaultValue;
+import cloud.commandframework.component.DefaultValue;
 import cloud.commandframework.parser.ParserDescriptor;
 import cloud.commandframework.suggestion.SuggestionProvider;
 import org.junit.jupiter.api.BeforeEach;

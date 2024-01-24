@@ -23,7 +23,6 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
 import cloud.commandframework.annotations.assembler.ArgumentAssembler;
@@ -49,8 +48,9 @@ import cloud.commandframework.annotations.processing.CommandContainerProcessor;
 import cloud.commandframework.annotations.string.StringProcessor;
 import cloud.commandframework.annotations.suggestions.SuggestionProviderFactory;
 import cloud.commandframework.annotations.suggestions.Suggestions;
-import cloud.commandframework.arguments.preprocessor.RegexPreprocessor;
 import cloud.commandframework.captions.Caption;
+import cloud.commandframework.component.CommandComponent;
+import cloud.commandframework.component.preprocessor.RegexPreprocessor;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.meta.CommandMeta;

@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.parser.flag;
 
-import cloud.commandframework.CommandComponent;
 import cloud.commandframework.Description;
-import cloud.commandframework.TypedCommandComponent;
+import cloud.commandframework.component.CommandComponent;
+import cloud.commandframework.component.TypedCommandComponent;
 import cloud.commandframework.parser.ParserDescriptor;
 import cloud.commandframework.permission.Permission;
 import java.util.Arrays;

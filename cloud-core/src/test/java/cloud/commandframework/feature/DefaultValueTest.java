@@ -25,7 +25,7 @@ package cloud.commandframework.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.DefaultValue;
+import cloud.commandframework.component.DefaultValue;
 import cloud.commandframework.execution.CommandResult;
 import cloud.commandframework.keys.CloudKey;
 import java.util.concurrent.ThreadLocalRandom;

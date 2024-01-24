@@ -24,8 +24,8 @@
 package cloud.commandframework.help;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.help.result.CommandEntry;
 import cloud.commandframework.help.result.HelpQueryResult;
 import cloud.commandframework.help.result.IndexCommandResult;

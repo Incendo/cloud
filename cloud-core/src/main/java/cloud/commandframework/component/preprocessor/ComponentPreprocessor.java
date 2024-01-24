@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments;
+package cloud.commandframework.component.preprocessor;
 
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;

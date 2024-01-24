@@ -23,6 +23,7 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.meta.CommandMeta;

@@ -24,7 +24,7 @@
 package cloud.commandframework.internal;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.CommandComponent;
+import cloud.commandframework.component.CommandComponent;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;

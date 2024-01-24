@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments;
+package cloud.commandframework.component;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
@@ -29,6 +29,8 @@ import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import cloud.commandframework.syntax.CommandSyntaxFormatter;
+import cloud.commandframework.syntax.StandardCommandSyntaxFormatter;
 import java.util.Collections;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;

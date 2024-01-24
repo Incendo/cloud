@@ -23,12 +23,12 @@
 //
 package cloud.commandframework.context;
 
-import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionFormatter;
 import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.injection.ParameterInjectorRegistry;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.MutableCloudKeyContainer;

@@ -23,11 +23,10 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandSyntaxFormatter;
-import cloud.commandframework.arguments.StandardCommandSyntaxFormatter;
 import cloud.commandframework.captions.CaptionFormatter;
 import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.captions.StandardCaptionsProvider;
+import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.CommandInput;
@@ -68,6 +67,8 @@ import cloud.commandframework.state.Stateful;
 import cloud.commandframework.suggestion.DelegatingSuggestionFactory;
 import cloud.commandframework.suggestion.Suggestion;
 import cloud.commandframework.suggestion.SuggestionFactory;
+import cloud.commandframework.syntax.CommandSyntaxFormatter;
+import cloud.commandframework.syntax.StandardCommandSyntaxFormatter;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.Collections;

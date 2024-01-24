@@ -23,10 +23,10 @@
 //
 package cloud.commandframework.annotations.assembler;
 
-import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
 import cloud.commandframework.annotations.descriptor.FlagDescriptor;
+import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.parser.ArgumentParser;
 import cloud.commandframework.parser.ParserRegistry;
 import cloud.commandframework.parser.flag.CommandFlag;

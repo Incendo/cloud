@@ -21,11 +21,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework;
+package cloud.commandframework.component;
 
-import cloud.commandframework.arguments.ComponentPreprocessor;
-import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.PreprocessorHolder;
+import cloud.commandframework.CommandManager;
+import cloud.commandframework.Describable;
+import cloud.commandframework.Description;
+import cloud.commandframework.component.preprocessor.ComponentPreprocessor;
+import cloud.commandframework.component.preprocessor.PreprocessorHolder;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.keys.CloudKey;

@@ -23,7 +23,8 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.DefaultValue;
+import cloud.commandframework.component.CommandComponent;
+import cloud.commandframework.component.DefaultValue;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.AmbiguousNodeException;

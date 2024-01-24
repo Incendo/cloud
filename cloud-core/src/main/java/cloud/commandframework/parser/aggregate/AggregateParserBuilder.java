@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.parser.aggregate;
 
-import cloud.commandframework.CommandComponent;
+import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.parser.ParserDescriptor;
 import cloud.commandframework.suggestion.SuggestionProvider;

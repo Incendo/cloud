@@ -23,12 +23,12 @@
 //
 package cloud.commandframework.annotations.feature;
 
-import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Command;
 import cloud.commandframework.annotations.TestCommandManager;
 import cloud.commandframework.annotations.TestCommandSender;
+import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.parser.EitherParser;
 import cloud.commandframework.parser.standard.BooleanParser;
 import cloud.commandframework.parser.standard.IntegerParser;

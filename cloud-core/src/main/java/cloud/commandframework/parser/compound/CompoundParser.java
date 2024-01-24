@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.parser.compound;
 
-import cloud.commandframework.CommandComponent;
+import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.parser.ArgumentParseResult;
 import cloud.commandframework.parser.ArgumentParser;
 import cloud.commandframework.parser.aggregate.AggregateParser;

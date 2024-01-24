@@ -21,10 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments;
+package cloud.commandframework.syntax;
 
-import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.parser.aggregate.AggregateParser;
 import cloud.commandframework.parser.flag.CommandFlag;

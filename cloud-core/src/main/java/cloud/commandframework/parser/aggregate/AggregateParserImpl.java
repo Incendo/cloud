@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.parser.aggregate;
 
-import cloud.commandframework.CommandComponent;
+import cloud.commandframework.component.CommandComponent;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collections;
 import java.util.List;

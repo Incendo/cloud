@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.exceptions;
 
-import cloud.commandframework.CommandComponent;
+import cloud.commandframework.component.CommandComponent;
 import java.util.Collections;
 import java.util.List;
 import org.apiguardian.api.API;

@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.context;
 
-import cloud.commandframework.CommandComponent;
+import cloud.commandframework.component.CommandComponent;
 import java.time.Duration;
 import java.util.Objects;
 import org.apiguardian.api.API;

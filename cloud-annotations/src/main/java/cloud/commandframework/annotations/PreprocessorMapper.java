@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.arguments.ComponentPreprocessor;
+import cloud.commandframework.component.preprocessor.ComponentPreprocessor;
 import java.lang.annotation.Annotation;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;

@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments.parser;
+package cloud.commandframework.component.parser;
 
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.context.CommandContext;

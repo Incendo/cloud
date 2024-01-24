@@ -21,10 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework;
+package cloud.commandframework.component;
 
-import cloud.commandframework.arguments.ComponentPreprocessor;
-import cloud.commandframework.arguments.DefaultValue;
+import cloud.commandframework.Description;
+import cloud.commandframework.component.preprocessor.ComponentPreprocessor;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
 import cloud.commandframework.parser.ArgumentParser;

@@ -24,7 +24,7 @@
 package cloud.commandframework.exceptions;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.CommandComponent;
+import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PermissionResult;
 import java.util.List;
