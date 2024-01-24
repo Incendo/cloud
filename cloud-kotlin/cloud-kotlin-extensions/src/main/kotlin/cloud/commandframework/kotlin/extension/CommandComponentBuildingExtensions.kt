@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.kotlin.extension
 
-import cloud.commandframework.Description
 import cloud.commandframework.component.CommandComponent
 import cloud.commandframework.component.DefaultValue
+import cloud.commandframework.description.Description
 import cloud.commandframework.parser.ParserDescriptor
 import cloud.commandframework.suggestion.SuggestionProvider
 

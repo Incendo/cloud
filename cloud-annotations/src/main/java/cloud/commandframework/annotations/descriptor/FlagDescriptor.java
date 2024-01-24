@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.annotations.descriptor;
 
-import cloud.commandframework.Description;
+import cloud.commandframework.description.Description;
 import cloud.commandframework.internal.ImmutableBuilder;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.suggestion.SuggestionProvider;

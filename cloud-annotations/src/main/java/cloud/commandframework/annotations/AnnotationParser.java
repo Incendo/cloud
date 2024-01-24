@@ -24,7 +24,6 @@
 package cloud.commandframework.annotations;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.Description;
 import cloud.commandframework.annotations.assembler.ArgumentAssembler;
 import cloud.commandframework.annotations.assembler.ArgumentAssemblerImpl;
 import cloud.commandframework.annotations.assembler.FlagAssembler;
@@ -51,6 +50,7 @@ import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.component.preprocessor.RegexPreprocessor;
+import cloud.commandframework.description.Description;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.meta.CommandMeta;
@@ -92,7 +92,7 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import static cloud.commandframework.CommandDescription.commandDescription;
+import static cloud.commandframework.description.CommandDescription.commandDescription;
 
 /**
  * Parser that parses class instances {@link cloud.commandframework.Command commands}

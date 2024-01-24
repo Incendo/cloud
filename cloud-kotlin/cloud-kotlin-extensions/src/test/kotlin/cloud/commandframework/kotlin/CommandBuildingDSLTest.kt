@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.kotlin
 
-import cloud.commandframework.CommandDescription
 import cloud.commandframework.CommandManager
+import cloud.commandframework.description.CommandDescription
 import cloud.commandframework.execution.ExecutionCoordinator
 import cloud.commandframework.help.result.CommandEntry
 import cloud.commandframework.internal.CommandRegistrationHandler

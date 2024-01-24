@@ -25,7 +25,7 @@ package cloud.commandframework.kotlin.extension
 
 import cloud.commandframework.Command
 import cloud.commandframework.CommandManager
-import cloud.commandframework.Description
+import cloud.commandframework.description.Description
 import cloud.commandframework.kotlin.MutableCommandBuilder
 import kotlin.reflect.KClass
 

@@ -24,7 +24,7 @@
 package cloud.commandframework.annotations;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.CommandDescription;
+import cloud.commandframework.description.CommandDescription;
 import cloud.commandframework.permission.Permission;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;

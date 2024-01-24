@@ -23,6 +23,7 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.description.Description;
 import cloud.commandframework.meta.CommandMeta;
 import java.util.Collection;
 import org.apiguardian.api.API;

@@ -24,12 +24,12 @@
 package cloud.commandframework.component;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.Describable;
-import cloud.commandframework.Description;
 import cloud.commandframework.component.preprocessor.ComponentPreprocessor;
 import cloud.commandframework.component.preprocessor.PreprocessorHolder;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.description.Describable;
+import cloud.commandframework.description.Description;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.parser.ArgumentParseResult;
 import cloud.commandframework.parser.ArgumentParser;

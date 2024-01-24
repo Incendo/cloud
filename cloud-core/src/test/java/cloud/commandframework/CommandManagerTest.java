@@ -25,6 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.description.Description;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;

@@ -24,11 +24,11 @@
 package cloud.commandframework.kotlin
 
 import cloud.commandframework.Command
-import cloud.commandframework.CommandDescription
 import cloud.commandframework.CommandManager
-import cloud.commandframework.Description
 import cloud.commandframework.component.CommandComponent
 import cloud.commandframework.component.TypedCommandComponent
+import cloud.commandframework.description.CommandDescription
+import cloud.commandframework.description.Description
 import cloud.commandframework.execution.CommandExecutionHandler
 import cloud.commandframework.keys.CloudKey
 import cloud.commandframework.kotlin.extension.command
