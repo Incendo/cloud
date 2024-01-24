@@ -82,9 +82,8 @@ public interface PredicatePermission<C> extends Permission, CloudKeyHolder<Void>
      *
      * @param sender sender to check for
      * @return a {@link PermissionResult} representing the check result
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     @NonNull PermissionResult testPermission(@NonNull C sender);
 
     @Override

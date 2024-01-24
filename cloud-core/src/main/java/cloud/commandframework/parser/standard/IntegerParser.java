@@ -66,9 +66,8 @@ public final class IntegerParser<C> extends NumberParser<C, Integer, IntRange> i
      *
      * @param <C> the command sender type
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Integer> integerParser() {
         return integerParser(IntegerParser.DEFAULT_MINIMUM, IntegerParser.DEFAULT_MAXIMUM);
     }
@@ -79,9 +78,8 @@ public final class IntegerParser<C> extends NumberParser<C, Integer, IntRange> i
      * @param <C>      the command sender type
      * @param minValue the minimum value accepted by the parser
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Integer> integerParser(
             final int minValue
     ) {
@@ -95,9 +93,8 @@ public final class IntegerParser<C> extends NumberParser<C, Integer, IntRange> i
      * @param minValue the minimum value accepted by the parser
      * @param maxValue the maximum value accepted by the parser
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Integer> integerParser(
             final int minValue,
             final int maxValue
@@ -110,9 +107,8 @@ public final class IntegerParser<C> extends NumberParser<C, Integer, IntRange> i
      *
      * @param <C> the command sender type
      * @return the component builder
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> CommandComponent.@NonNull Builder<C, Integer> integerComponent() {
         return CommandComponent.<C, Integer>builder().parser(integerParser());
     }

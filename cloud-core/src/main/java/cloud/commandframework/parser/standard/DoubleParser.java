@@ -57,9 +57,8 @@ public final class DoubleParser<C> extends NumberParser<C, Double, DoubleRange> 
      *
      * @param <C> the command sender type
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Double> doubleParser() {
         return doubleParser(DoubleParser.DEFAULT_MINIMUM, DoubleParser.DEFAULT_MAXIMUM);
     }
@@ -70,9 +69,8 @@ public final class DoubleParser<C> extends NumberParser<C, Double, DoubleRange> 
      * @param <C>      the command sender type
      * @param minValue the minimum value accepted by the parser
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Double> doubleParser(
             final double minValue
     ) {
@@ -86,9 +84,8 @@ public final class DoubleParser<C> extends NumberParser<C, Double, DoubleRange> 
      * @param minValue the minimum value accepted by the parser
      * @param maxValue the maximum value accepted by the parser
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Double> doubleParser(
             final double minValue,
             final double maxValue
@@ -101,9 +98,8 @@ public final class DoubleParser<C> extends NumberParser<C, Double, DoubleRange> 
      *
      * @param <C> the command sender type
      * @return the component builder
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> CommandComponent.@NonNull Builder<C, Double> doubleComponent() {
         return CommandComponent.<C, Double>builder().parser(doubleParser());
     }

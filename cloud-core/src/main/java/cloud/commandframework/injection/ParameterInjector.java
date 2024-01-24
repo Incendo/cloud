@@ -48,9 +48,8 @@ public interface ParameterInjector<C, T> {
      * @param <T>   type of the value
      * @param value value to inject
      * @return the injector
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     static <C, T> @NonNull ParameterInjector<C, T> constantInjector(final @NonNull T value) {
         return new ConstantInjector<>(value);
     }

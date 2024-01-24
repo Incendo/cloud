@@ -44,9 +44,8 @@ public final class CharacterParser<C> implements ArgumentParser<C, Character> {
      *
      * @param <C> command sender type
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Character> characterParser() {
         return ParserDescriptor.of(new CharacterParser<>(), Character.class);
     }
@@ -56,9 +55,8 @@ public final class CharacterParser<C> implements ArgumentParser<C, Character> {
      *
      * @param <C> the command sender type
      * @return the component builder
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> CommandComponent.@NonNull Builder<C, Character> characterComponent() {
         return CommandComponent.<C, Character>builder().parser(characterParser());
     }

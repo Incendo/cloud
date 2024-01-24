@@ -75,10 +75,9 @@ public class ParserException extends IllegalArgumentException {
      * @param <T>        the type produced by the formatter
      * @param formatter the formatter
      * @return the formatted caption
-     * @since 2.0.0
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public final <T> @NonNull T formatCaption(final @NonNull CaptionFormatter<?, T> formatter) {
         return (T) this.context.formatCaption((CaptionFormatter) formatter, this.errorCaption, this.captionVariables());
     }

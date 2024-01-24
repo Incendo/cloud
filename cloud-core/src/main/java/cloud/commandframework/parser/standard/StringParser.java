@@ -53,9 +53,8 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
      * @param <C>  the command sender type
      * @param mode the parsing mode
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, String> stringParser(final @NonNull StringMode mode) {
         return ParserDescriptor.of(new StringParser<>(mode), String.class);
     }
@@ -65,9 +64,8 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
      *
      * @param <C> the command sender type
      * @return the created parser.
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, String> stringParser() {
         return stringParser(StringMode.SINGLE);
     }
@@ -77,9 +75,8 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
      *
      * @param <C> the command sender type
      * @return the created parser.
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, String> greedyStringParser() {
         return stringParser(StringMode.GREEDY);
     }
@@ -89,9 +86,8 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
      *
      * @param <C> the command sender type
      * @return the created parser.
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, String> greedyFlagYieldingStringParser() {
         return stringParser(StringMode.GREEDY_FLAG_YIELDING);
     }
@@ -102,9 +98,8 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
      *
      * @param <C> the command sender type
      * @return the created parser.
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, String> quotedStringParser() {
         return stringParser(StringMode.QUOTED);
     }
@@ -115,9 +110,8 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
      * @param <C>  the command sender type
      * @param mode the parsing mode
      * @return the component builder
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> CommandComponent.@NonNull Builder<C, String> stringComponent(final @NonNull StringMode mode) {
         return CommandComponent.<C, String>builder().parser(stringParser(mode));
     }
@@ -128,9 +122,8 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
      *
      * @param <C> the command sender type
      * @return the component builder
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> CommandComponent.@NonNull Builder<C, String> stringComponent() {
         return CommandComponent.<C, String>builder().parser(stringParser(StringMode.SINGLE));
     }

@@ -125,9 +125,8 @@ public final class CommandFlag<T> {
      * Returns the command component, if this is a value flag.
      *
      * @return command component, or {@code null} if this is a presence flag
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @Nullable CommandComponent<?> commandComponent() {
         return this.commandComponent;
     }
@@ -212,9 +211,8 @@ public final class CommandFlag<T> {
          *
          * @param aliases Flag aliases
          * @return New builder instance
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Builder<T> withAliases(final @NonNull Collection<@NonNull String> aliases) {
             final Set<String> filteredAliases = new HashSet<>();
             for (final String alias : aliases) {

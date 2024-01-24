@@ -42,7 +42,6 @@ import static java.util.Objects.requireNonNull;
  * different environments.</p>
  *
  * @see PredicatePermission
- * @since 2.0.0
  */
 @ImmutableImpl
 @Value.Immutable
@@ -159,9 +158,8 @@ public interface Permission {
      * Returns true if a check for this permission should and will always return true.
      *
      * @return true if this permission is empty, otherwise false
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     default boolean isEmpty() {
         return this.permissionString().isEmpty();
     }

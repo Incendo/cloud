@@ -56,9 +56,8 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
      *
      * @param <C> command sender type
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Duration> durationParser() {
         return ParserDescriptor.of(new DurationParser<>(), Duration.class);
     }
@@ -68,9 +67,8 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
      *
      * @param <C> the command sender type
      * @return the component builder
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> CommandComponent.@NonNull Builder<C, Duration> durationComponent() {
         return CommandComponent.<C, Duration>builder().parser(durationParser());
     }

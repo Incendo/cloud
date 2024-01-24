@@ -35,7 +35,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * <p>
  * This is required in order for {@link Command} to be repeatable.
  *
- * @since 2.0.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})

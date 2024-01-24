@@ -42,7 +42,6 @@ import org.pircbotx.exception.DaoException;
  * {@link ArgumentParser Argument parser} that parses PircBotX {@link User users}
  *
  * @param <C> command sender type
- * @since 2.0.0
  */
 public final class UserParser<C> implements ArgumentParser<C, User> {
 
@@ -51,9 +50,8 @@ public final class UserParser<C> implements ArgumentParser<C, User> {
      *
      * @param <C> command sender type
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, User> userParser() {
         return ParserDescriptor.of(new UserParser<>(), User.class);
     }
@@ -63,9 +61,8 @@ public final class UserParser<C> implements ArgumentParser<C, User> {
      *
      * @param <C> the command sender type
      * @return the component builder
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> CommandComponent.@NonNull Builder<C, User> userComponent() {
         return CommandComponent.<C, User>builder().parser(userParser());
     }

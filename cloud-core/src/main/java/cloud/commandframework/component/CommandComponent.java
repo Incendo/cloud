@@ -56,7 +56,6 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  * If you need access to the underlying types, use {@link TypedCommandComponent}.
  *
  * @param <C> command sender type
- * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public class CommandComponent<C> implements Comparable<CommandComponent<C>>, PreprocessorHolder<C>, Describable {
@@ -340,7 +339,7 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
 
 
     @SuppressWarnings("unchecked")
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static class Builder<C, T> {
 
         private CommandManager<C> commandManager;
@@ -654,7 +653,7 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
     }
 
 
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public enum ComponentType {
         /**
          * A literal component that can be parsed by its name, or any of its aliases.

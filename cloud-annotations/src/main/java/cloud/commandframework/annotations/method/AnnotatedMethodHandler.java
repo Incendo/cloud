@@ -44,7 +44,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Handler that invokes an annotated method.
  *
  * @param <C> command sender type
- * @since 2.0.0
  */
 @API(status = API.Status.INTERNAL, since = "2.0.0")
 public abstract class AnnotatedMethodHandler<C> {

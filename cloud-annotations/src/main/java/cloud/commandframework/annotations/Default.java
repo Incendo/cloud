@@ -34,7 +34,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Used to give an optional command component a
  * {@link cloud.commandframework.component.DefaultValue#parsed(String) parsed default value}.
  *
- * @since 2.0.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)

@@ -211,7 +211,6 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
          * The compiled command arguments
          *
          * @return Compiled command arguments
-         * @since 2.0.0
          */
         public final @NonNull Map<@NonNull String, @NonNull CommandComponent<C>> commandComponents() {
             return this.commandComponents;
@@ -239,9 +238,8 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
          * Returns the argument descriptors
          *
          * @return the argument descriptors
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Collection<@NonNull ArgumentDescriptor> argumentDescriptors() {
             return Collections.unmodifiableCollection(this.argumentDescriptors);
         }
@@ -250,9 +248,8 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
          * Returns the flag descriptors
          *
          * @return the flag descriptors
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Collection<@NonNull FlagDescriptor> flagDescriptors() {
             return Collections.unmodifiableCollection(this.flagDescriptors);
         }

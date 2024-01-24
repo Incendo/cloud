@@ -34,7 +34,6 @@ import org.apiguardian.api.API;
  * injection frameworks.</p>
  *
  * @param <C> command sender type
- * @since 2.0.0
  */
 @FunctionalInterface
 @API(status = API.Status.STABLE, since = "2.0.0")

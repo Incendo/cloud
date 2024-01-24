@@ -785,7 +785,7 @@ public interface CommandInput {
         return this.difference(that, false);
     }
 
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     class CursorOutOfBoundsException extends NoSuchElementException {
 
         CursorOutOfBoundsException(

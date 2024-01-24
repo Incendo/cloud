@@ -40,7 +40,6 @@ public interface ComponentPreprocessor<C> {
      * @param function the function
      * @return the wrapped function
      * @param <C> the command sender type
-     * @since 2.0.0
      */
     static <C> @NonNull ComponentPreprocessor<C> wrap(
             final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput,

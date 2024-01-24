@@ -39,7 +39,6 @@ import org.immutables.value.Value;
  * but may also be empty in the case that no results were found.
  *
  * @param <C> the command sender type
- * @since 2.0.0
  */
 @ImmutableImpl
 @Value.Immutable

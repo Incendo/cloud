@@ -77,7 +77,7 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
      * @param <C> command sender type
      */
     @FunctionalInterface
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     interface Strings<C> extends BlockingSuggestionProvider<C> {
 
         /**

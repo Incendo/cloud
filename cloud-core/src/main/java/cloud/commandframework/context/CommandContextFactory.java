@@ -40,8 +40,7 @@ public interface CommandContextFactory<C> {
      * @param suggestions whether we're generating suggestions
      * @param sender      the command sender
      * @return Command context
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     @NonNull CommandContext<C> create(boolean suggestions, @NonNull C sender);
 }

@@ -50,7 +50,6 @@ public interface SuggestionProviderFactory<C> {
      * @param method           suggestion method
      * @param injectorRegistry injector registry
      * @return the suggestion provider
-     * @since 2.0.0
      */
     @NonNull SuggestionProvider<C> createSuggestionProvider(
             @NonNull Object instance,

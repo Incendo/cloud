@@ -33,7 +33,6 @@ import org.immutables.value.Value;
 /**
  * Defines properties used by {@link CommandBean command beans} to construct commands.
  *
- * @since 2.0.0
  */
 @ImmutableImpl
 @Value.Immutable

@@ -119,9 +119,8 @@ public final class CommandTree<C> {
      * Returns the command manager that was used to create this command tree
      *
      * @return Command manager
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CommandManager<C> commandManager() {
         return this.commandManager;
     }
@@ -130,9 +129,8 @@ public final class CommandTree<C> {
      * Returns an immutable view containing of the root nodes of the command tree
      *
      * @return immutable view of the root nodes
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull Collection<@NonNull CommandNode<C>> rootNodes() {
         return this.internalTree.children();
     }
@@ -165,9 +163,8 @@ public final class CommandTree<C> {
      * @param commandInput    command input
      * @param parsingExecutor executor to schedule parsing logic on
      * @return parsed command, if one could be found
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CompletableFuture<@Nullable Command<C>> parse(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput,
@@ -587,9 +584,8 @@ public final class CommandTree<C> {
      * @param commandInput Input
      * @param executor     executor to schedule suggestion logic on
      * @return String suggestions. These should be filtered based on {@link String#startsWith(String)}
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CompletableFuture<@NonNull Suggestions<C, Suggestion>> getSuggestions(
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput,
@@ -1042,7 +1038,7 @@ public final class CommandTree<C> {
      *
      * @return the root node
      */
-    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    @API(status = API.Status.INTERNAL)
     public @NonNull CommandNode<C> rootNode() {
         return this.internalTree;
     }
@@ -1164,7 +1160,7 @@ public final class CommandTree<C> {
      * @param node the node
      * @return the leaf nodes attached to the node
      */
-    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    @API(status = API.Status.INTERNAL)
     public @NonNull List<@NonNull CommandNode<C>> getLeavesRaw(
             final @NonNull CommandNode<C> node
     ) {
@@ -1185,7 +1181,7 @@ public final class CommandTree<C> {
      * @param node the node
      * @return the leaf nodes attached to the node
      */
-    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    @API(status = API.Status.INTERNAL)
     public @NonNull List<@NonNull CommandNode<C>> getLeaves(
             final @NonNull CommandNode<C> node
     ) {

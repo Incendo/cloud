@@ -58,9 +58,8 @@ public final class ByteParser<C> extends NumberParser<C, Byte, ByteRange> implem
      *
      * @param <C> the command sender type
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Byte> byteParser() {
         return byteParser(ByteParser.DEFAULT_MINIMUM, ByteParser.DEFAULT_MAXIMUM);
     }
@@ -71,9 +70,8 @@ public final class ByteParser<C> extends NumberParser<C, Byte, ByteRange> implem
      * @param <C>      the command sender type
      * @param minValue the minimum value accepted by the parser
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Byte> byteParser(
             final byte minValue
     ) {
@@ -87,9 +85,8 @@ public final class ByteParser<C> extends NumberParser<C, Byte, ByteRange> implem
      * @param minValue the minimum value accepted by the parser
      * @param maxValue the maximum value accepted by the parser
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Byte> byteParser(
             final byte minValue,
             final byte maxValue
@@ -102,9 +99,8 @@ public final class ByteParser<C> extends NumberParser<C, Byte, ByteRange> implem
      *
      * @param <C> the command sender type
      * @return the component builder
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> CommandComponent.@NonNull Builder<C, Byte> byteComponent() {
         return CommandComponent.<C, Byte>builder().parser(byteParser());
     }

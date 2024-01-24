@@ -41,7 +41,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Very simple tree structure
  *
  * @param <C> command sender type
- * @since 2.0.0
  */
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "2.0.0")
 public final class CommandNode<C> {

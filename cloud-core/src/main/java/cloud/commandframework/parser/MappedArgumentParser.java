@@ -58,9 +58,8 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser.Futur
      * Get the parser this one is derived from.
      *
      * @return the base parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public ArgumentParser<C, I> baseParser() {
         return this.base;
     }
@@ -115,7 +114,7 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser.Futur
 
 
     @FunctionalInterface
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public interface Mapper<C, I, O> {
 
         /**

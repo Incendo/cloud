@@ -51,9 +51,8 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
      * @param <E>       the enum type
      * @param enumClass the enum class
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C, E extends Enum<E>> @NonNull ParserDescriptor<C, E> enumParser(final @NonNull Class<E> enumClass) {
         return ParserDescriptor.of(new EnumParser<>(enumClass), enumClass);
     }
@@ -65,9 +64,8 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
      * @param <E>       the enum type
      * @param enumClass the enum class
      * @return the component builder
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C, E extends Enum<E>> CommandComponent.@NonNull Builder<C, E> enumComponent(
             final @NonNull Class<E> enumClass
     ) {

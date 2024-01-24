@@ -28,7 +28,6 @@ import org.apiguardian.api.API;
 /**
  * The point in the registration lifecycle for this commands manager
  *
- * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public enum RegistrationState implements State {

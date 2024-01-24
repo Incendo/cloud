@@ -33,7 +33,6 @@ import static java.util.Objects.requireNonNull;
 /**
  * A description for a command or a command component.
  *
- * @since 2.0.0
  */
 @ImmutableImpl
 @Value.Immutable

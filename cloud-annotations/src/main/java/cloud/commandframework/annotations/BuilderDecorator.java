@@ -33,7 +33,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Decorators that get to modify a command builder that is used to construct the command for annotated command methods.
  *
  * @param <C> the command sender type
- * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface BuilderDecorator<C> {

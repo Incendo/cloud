@@ -33,7 +33,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> the command sender type
  * @param <T> the exception type
- * @since 2.0.0
  */
 @SuppressWarnings("unused")
 @API(status = API.Status.STABLE, since = "2.0.0")
@@ -118,7 +117,7 @@ public final class ExceptionHandlerRegistration<C, T extends Throwable> {
     }
 
 
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static final class ExceptionControllerBuilder<C, T extends Throwable> {
 
         private final TypeToken<T> exceptionType;
@@ -176,7 +175,7 @@ public final class ExceptionHandlerRegistration<C, T extends Throwable> {
     }
 
     @FunctionalInterface
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public interface BuilderDecorator<C, T extends Throwable> {
 
         /**

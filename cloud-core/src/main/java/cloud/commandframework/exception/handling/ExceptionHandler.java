@@ -33,7 +33,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> the command sender type
  * @param <T> the exception type
- * @since 2.0.0
  */
 @SuppressWarnings("unused")
 @FunctionalInterface

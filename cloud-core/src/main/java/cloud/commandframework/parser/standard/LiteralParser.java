@@ -47,9 +47,8 @@ public final class LiteralParser<C> implements ArgumentParser<C, String>, Blocki
      * @param aliases the aliases
      * @param <C>     the command sender type
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, String> literal(
             final @NonNull String name,
             final @NonNull String @NonNull... aliases
@@ -95,9 +94,8 @@ public final class LiteralParser<C> implements ArgumentParser<C, String>, Blocki
      * component then an empty collection is returned.
      *
      * @return unmodifiable view of the aliases
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull Collection<@NonNull String> aliases() {
         return Collections.unmodifiableCollection(this.allAcceptedAliases);
     }
@@ -109,9 +107,8 @@ public final class LiteralParser<C> implements ArgumentParser<C, String>, Blocki
      * component then an empty collection is returned.
      *
      * @return unmodifiable view of the aliases
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull Collection<@NonNull String> alternativeAliases() {
         return Collections.unmodifiableCollection(this.alternativeAliases);
     }

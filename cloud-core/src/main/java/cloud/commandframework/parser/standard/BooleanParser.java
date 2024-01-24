@@ -55,9 +55,8 @@ public final class BooleanParser<C> implements ArgumentParser<C, Boolean>, Block
      *
      * @param <C> the command sender type
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Boolean> booleanParser() {
         return booleanParser(false /* liberal */);
     }
@@ -69,9 +68,8 @@ public final class BooleanParser<C> implements ArgumentParser<C, Boolean>, Block
      * @param <C>     the command sender type
      * @param liberal whether the parser should be liberal, see {@link CommandInput#isValidBoolean(boolean)}
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Boolean> booleanParser(final boolean liberal) {
         return ParserDescriptor.of(new BooleanParser<>(liberal), Boolean.class);
     }
@@ -81,9 +79,8 @@ public final class BooleanParser<C> implements ArgumentParser<C, Boolean>, Block
      *
      * @param <C> the command sender type
      * @return the component builder
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> CommandComponent.@NonNull Builder<C, Boolean> booleanComponent() {
         return CommandComponent.<C, Boolean>builder().parser(booleanParser());
     }

@@ -45,9 +45,8 @@ public final class UUIDParser<C> implements ArgumentParser<C, UUID> {
      *
      * @param <C> command sender type
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, UUID> uuidParser() {
         return ParserDescriptor.of(new UUIDParser<>(), UUID.class);
     }
@@ -57,9 +56,8 @@ public final class UUIDParser<C> implements ArgumentParser<C, UUID> {
      *
      * @param <C> the command sender type
      * @return the component builder
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> CommandComponent.@NonNull Builder<C, UUID> uuidComponent() {
         return CommandComponent.<C, UUID>builder().parser(uuidParser());
     }

@@ -39,7 +39,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents a method annotated with {@link cloud.commandframework.annotations.exception.ExceptionHandler}.
  *
  * @param <C> the command sender type
- * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public final class MethodExceptionHandler<C> extends AnnotatedMethodHandler<C> implements ExceptionHandler<C, Throwable> {

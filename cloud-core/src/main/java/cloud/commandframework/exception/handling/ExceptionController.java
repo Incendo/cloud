@@ -41,7 +41,6 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  * The controller handles registrations of exception handlers, as well as the routing of incoming exceptions to the handlers.
  *
  * @param <C> the command sender type
- * @since 2.0.0
  */
 @SuppressWarnings("unused")
 @API(status = API.Status.STABLE, since = "2.0.0")

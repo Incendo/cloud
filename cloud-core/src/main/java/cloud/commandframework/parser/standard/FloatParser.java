@@ -57,9 +57,8 @@ public final class FloatParser<C> extends NumberParser<C, Float, FloatRange> {
      *
      * @param <C> the command sender type
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Float> floatParser() {
         return floatParser(FloatParser.DEFAULT_MINIMUM, FloatParser.DEFAULT_MAXIMUM);
     }
@@ -70,9 +69,8 @@ public final class FloatParser<C> extends NumberParser<C, Float, FloatRange> {
      * @param <C>      the command sender type
      * @param minValue the minimum value accepted by the parser
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Float> floatParser(
             final float minValue
     ) {
@@ -86,9 +84,8 @@ public final class FloatParser<C> extends NumberParser<C, Float, FloatRange> {
      * @param minValue the minimum value accepted by the parser
      * @param maxValue the maximum value accepted by the parser
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Float> floatParser(
             final float minValue,
             final float maxValue
@@ -101,9 +98,8 @@ public final class FloatParser<C> extends NumberParser<C, Float, FloatRange> {
      *
      * @param <C> the command sender type
      * @return the component builder
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> CommandComponent.@NonNull Builder<C, Float> floatComponent() {
         return CommandComponent.<C, Float>builder().parser(floatParser());
     }

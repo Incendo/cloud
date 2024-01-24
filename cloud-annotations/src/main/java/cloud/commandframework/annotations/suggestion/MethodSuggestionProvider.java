@@ -83,7 +83,6 @@ public final class MethodSuggestionProvider<C> extends AnnotatedMethodHandler<C>
      *
      * @param input the input
      * @return the mapped future
-     * @since 2.0.0
      */
     @SuppressWarnings("rawtypes")
     public static @NonNull CompletableFuture<Iterable<@NonNull Suggestion>> mapSuggestions(final @NonNull Object input) {
@@ -98,7 +97,6 @@ public final class MethodSuggestionProvider<C> extends AnnotatedMethodHandler<C>
      *
      * @param future the future
      * @return the mapped future
-     * @since 2.0.0
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static @NonNull CompletableFuture<Iterable<@NonNull Suggestion>> mapFuture(final @NonNull CompletableFuture future) {
@@ -110,7 +108,6 @@ public final class MethodSuggestionProvider<C> extends AnnotatedMethodHandler<C>
      *
      * @param input the input
      * @return the suggestions
-     * @since 2.0.0
      */
     @SuppressWarnings("unchecked")
     public static @NonNull Iterable<@NonNull Suggestion> mapCompleted(final @NonNull Object input) {

@@ -136,9 +136,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * Returns the sender that executed the command.
      *
      * @return the command sender
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull C sender() {
         return this.commandSender;
     }
@@ -251,9 +250,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * Returns a copy of the raw input.
      *
      * @return raw input
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CommandInput rawInput() {
         return this.getOrDefault("__raw_input__", CommandInput.empty()).copy();
     }
@@ -263,9 +261,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      *
      * @param component the component
      * @return the created context
-     * @since 2.0.0
      */
-    @API(status = API.Status.MAINTAINED, since = "2.0.0")
+    @API(status = API.Status.MAINTAINED)
     public @NonNull ParsingContext<C> createParsingContext(final @NonNull CommandComponent<C> component) {
         final ParsingContext<C> parsingContext = new ParsingContext<>(component);
         this.parsingContexts.add(parsingContext);
@@ -278,9 +275,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * @param component the component
      * @return the context
      * @param <T> the type of the component
-     * @since 2.0.0
      */
-    @API(status = API.Status.MAINTAINED, since = "2.0.0")
+    @API(status = API.Status.MAINTAINED)
     public <T> @NonNull ParsingContext<C> parsingContext(final @NonNull CommandComponent<C> component) {
         return this.parsingContexts.stream()
                 .filter(context -> context.component().equals(component))
@@ -293,7 +289,6 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      *
      * @param position the position
      * @return the context
-     * @since 2.0.0
      */
     @API(status = API.Status.MAINTAINED)
     public @NonNull ParsingContext<C> parsingContext(final int position) {
@@ -305,7 +300,6 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      *
      * @param name the name
      * @return the context
-     * @since 2.0.0
      */
     @API(status = API.Status.MAINTAINED)
     public @NonNull ParsingContext<C> parsingContext(final String name) {
@@ -319,9 +313,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * Returns an unmodifiable view of the stored parsing contexts.
      *
      * @return the contexts
-     * @since 2.0.0
      */
-    @API(status = API.Status.MAINTAINED, since = "2.0.0")
+    @API(status = API.Status.MAINTAINED)
     public @NonNull List<@NonNull ParsingContext<@NonNull C>> parsingContexts() {
         return Collections.unmodifiableList(this.parsingContexts);
     }
@@ -341,9 +334,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * suggestions or parse a new command argument.
      *
      * @return the {@link CommandComponent} that is currently being parsed, or {@code null}
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @Nullable CommandComponent<C> currentComponent() {
         return this.currentComponent;
     }
@@ -354,9 +346,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * suggestions or parse a new command argument.
      *
      * @param component the component that is currently being parsed, or {@code null}
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public void currentComponent(final @Nullable CommandComponent<C> component) {
         this.currentComponent = component;
     }
@@ -386,9 +377,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * @param <T>  type to inject
      * @param type type to inject
      * @return optional that may contain the created value
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public <T> @NonNull Optional<T> inject(final @NonNull TypeToken<T> type) {
         if (this.commandManager == null) {
             throw new UnsupportedOperationException(

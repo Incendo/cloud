@@ -33,7 +33,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Assembles {@link CommandComponent command componets} from {@link ArgumentDescriptor argument descriptors}.
  *
  * @param <C> the command sender type
- * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface ArgumentAssembler<C> {

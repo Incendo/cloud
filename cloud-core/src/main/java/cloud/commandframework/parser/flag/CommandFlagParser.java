@@ -87,9 +87,8 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
      * Returns the recognized flags.
      *
      * @return unmodifiable view of flags
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull Collection<@NonNull CommandFlag<?>> flags() {
         return Collections.unmodifiableCollection(this.flags);
     }
@@ -113,7 +112,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
      * @param commandInput   The input arguments
      * @return current flag being typed, or {@code empty()} if none is
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull Optional<String> parseCurrentFlag(
             final @NonNull CommandContext<@NonNull C> commandContext,
             final @NonNull CommandInput commandInput

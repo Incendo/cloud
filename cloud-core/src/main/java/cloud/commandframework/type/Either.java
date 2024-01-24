@@ -37,7 +37,6 @@ import static java.util.Objects.requireNonNull;
  *
  * @param <U> primary value type
  * @param <V> fallback value type
- * @since 2.0.0
  */
 @ImmutableImpl
 @Value.Immutable

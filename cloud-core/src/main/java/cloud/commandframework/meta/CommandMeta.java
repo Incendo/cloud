@@ -50,9 +50,8 @@ public abstract class CommandMeta implements CloudKeyContainer {
      * Creates an empty simple command meta-instance
      *
      * @return the empty instance
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static @NonNull CommandMeta empty() {
         return builder().build();
     }

@@ -40,7 +40,6 @@ import org.immutables.value.Value;
  * {@link #childSuggestions()}} are the commands that share that common path.
  *
  * @param <C> the command sender type
- * @since 2.0.0
  */
 @ImmutableImpl
 @Value.Immutable

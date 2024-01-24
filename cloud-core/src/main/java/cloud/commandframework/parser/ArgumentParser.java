@@ -99,9 +99,8 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      * @param commandContext Command context
      * @param commandInput   Command Input
      * @return future that completes with the result.
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     default @NonNull CompletableFuture<@NonNull ArgumentParseResult<T>> parseFuture(
             @NonNull CommandContext<@NonNull C> commandContext,
             @NonNull CommandInput commandInput
@@ -115,9 +114,8 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      * @param mapper the mapper to apply
      * @param <O>    the result type
      * @return a derived parser.
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     default <O> ArgumentParser.@NonNull FutureArgumentParser<C, O> flatMap(final MappedArgumentParser.Mapper<C, T, O> mapper) {
         return new MappedArgumentParser<>(this, requireNonNull(mapper, "mapper"));
     }
@@ -129,9 +127,8 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      * @param mapper success mapper
      * @param <O>    mapped parser value type
      * @return mapped parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     default <O> ArgumentParser.@NonNull FutureArgumentParser<C, O> flatMapSuccess(
             final @NonNull BiFunction<CommandContext<C>, T, CompletableFuture<ArgumentParseResult<O>>> mapper
     ) {
@@ -151,9 +148,8 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      * @param mapper success mapper
      * @param <O>    mapped parser value type
      * @return mapped parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     default <O> ArgumentParser.@NonNull FutureArgumentParser<C, O> mapSuccess(
             final @NonNull BiFunction<CommandContext<C>, T, CompletableFuture<O>> mapper
     ) {
@@ -203,10 +199,9 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      *
      * @param <C> the command sender type
      * @param <T> the type produced by the parser
-     * @since 2.0.0
      */
     @FunctionalInterface
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     interface FutureArgumentParser<C, T> extends ArgumentParser<C, T> {
 
         @Override

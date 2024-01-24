@@ -62,9 +62,8 @@ public interface CommandRegistrationHandler<C> {
      * Requests that the given {@code rootCommand} should be unregistered.
      *
      * @param rootCommand The command to delete
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     default void unregisterRootCommand(final @NonNull CommandComponent<C> rootCommand) {
     }
 

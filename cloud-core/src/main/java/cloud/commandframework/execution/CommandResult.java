@@ -33,7 +33,6 @@ import org.immutables.value.Value;
  * The result of a command execution.
  *
  * @param <C> command sender type
- * @since 2.0.0
  */
 @ImmutableImpl
 @Value.Immutable

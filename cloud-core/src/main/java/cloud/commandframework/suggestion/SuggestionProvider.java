@@ -35,7 +35,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Provider of suggestions
  *
  * @param <C> command sender type
- * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
 @FunctionalInterface

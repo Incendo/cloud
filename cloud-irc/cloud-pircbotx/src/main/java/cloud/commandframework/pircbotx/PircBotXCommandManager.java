@@ -62,9 +62,8 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
 
     /**
      * Key used to access the generic message event from the command context.
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static final CloudKey<GenericMessageEvent> PIRCBOTX_MESSAGE_EVENT_KEY = CloudKey.of(
             "__internal_generic_message_event__",
             GenericMessageEvent.class

@@ -58,9 +58,8 @@ public final class LongParser<C> extends NumberParser<C, Long, LongRange> implem
      *
      * @param <C> the command sender type
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Long> longParser() {
         return longParser(LongParser.DEFAULT_MINIMUM, LongParser.DEFAULT_MAXIMUM);
     }
@@ -71,9 +70,8 @@ public final class LongParser<C> extends NumberParser<C, Long, LongRange> implem
      * @param <C>      the command sender type
      * @param minValue the minimum value accepted by the parser
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Long> longParser(
             final long minValue
     ) {
@@ -87,9 +85,8 @@ public final class LongParser<C> extends NumberParser<C, Long, LongRange> implem
      * @param minValue the minimum value accepted by the parser
      * @param maxValue the maximum value accepted by the parser
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Long> longParser(
             final long minValue,
             final long maxValue
@@ -102,9 +99,8 @@ public final class LongParser<C> extends NumberParser<C, Long, LongRange> implem
      *
      * @param <C> the command sender type
      * @return the component builder
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> CommandComponent.@NonNull Builder<C, Long> longComponent() {
         return CommandComponent.<C, Long>builder().parser(longParser());
     }

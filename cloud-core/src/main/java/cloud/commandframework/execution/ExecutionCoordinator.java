@@ -42,7 +42,6 @@ import org.checkerframework.dataflow.qual.Pure;
  * for example, disallow concurrent command execution.
  *
  * @param <C> command sender type
- * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface ExecutionCoordinator<C> {
@@ -137,9 +136,8 @@ public interface ExecutionCoordinator<C> {
      * will continue in the current one).</p>
      *
      * @param <C> command sender type
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     interface Builder<C> {
 
         /**

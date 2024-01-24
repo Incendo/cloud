@@ -81,7 +81,7 @@ public class NoPermissionException extends CommandParseException {
      *
      * @return the falsy result that caused this exception
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull PermissionResult permissionResult() {
         return this.result;
     }

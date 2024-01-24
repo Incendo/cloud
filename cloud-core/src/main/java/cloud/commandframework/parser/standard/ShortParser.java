@@ -58,9 +58,8 @@ public final class ShortParser<C> extends NumberParser<C, Short, ShortRange> imp
      *
      * @param <C> the command sender type
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Short> shortParser() {
         return shortParser(ShortParser.DEFAULT_MINIMUM, ShortParser.DEFAULT_MAXIMUM);
     }
@@ -71,9 +70,8 @@ public final class ShortParser<C> extends NumberParser<C, Short, ShortRange> imp
      * @param <C>      the command sender type
      * @param minValue the minimum value accepted by the parser
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Short> shortParser(
             final short minValue
     ) {
@@ -87,9 +85,8 @@ public final class ShortParser<C> extends NumberParser<C, Short, ShortRange> imp
      * @param minValue the minimum value accepted by the parser
      * @param maxValue the maximum value accepted by the parser
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, Short> shortParser(
             final short minValue,
             final short maxValue
@@ -102,9 +99,8 @@ public final class ShortParser<C> extends NumberParser<C, Short, ShortRange> imp
      *
      * @param <C> the command sender type
      * @return the component builder
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> CommandComponent.@NonNull Builder<C, Short> shortComponent() {
         return CommandComponent.<C, Short>builder().parser(shortParser());
     }

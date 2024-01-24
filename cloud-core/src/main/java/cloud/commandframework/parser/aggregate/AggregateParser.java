@@ -56,7 +56,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> the command sender type
  * @param <O> the output type
- * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface AggregateParser<C, O> extends ArgumentParser.FutureArgumentParser<C, O>, ParserDescriptor<C, O> {
@@ -146,7 +145,7 @@ public interface AggregateParser<C, O> extends ArgumentParser.FutureArgumentPars
     }
 
 
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     final class AggregateParseException extends ParserException {
 
         private AggregateParseException(

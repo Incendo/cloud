@@ -29,7 +29,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Something that has an associated {@link Description}.
  *
- * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface Describable {

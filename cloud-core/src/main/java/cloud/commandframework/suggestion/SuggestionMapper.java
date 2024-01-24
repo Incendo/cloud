@@ -30,7 +30,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Maps from {@link Suggestion} to {@link S}.
  *
  * @param <S> the suggestion type
- * @since 2.0.0
  */
 @FunctionalInterface
 @API(status = API.Status.STABLE, since = "2.0.0")

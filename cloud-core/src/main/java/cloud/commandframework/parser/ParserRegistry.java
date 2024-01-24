@@ -63,9 +63,8 @@ public interface ParserRegistry<C> {
      * @param descriptor parser descriptor
      * @param <T>        type produced by the parser
      * @return {@code this}
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     default <T> @This ParserRegistry<C> registerParser(final @NonNull ParserDescriptor<C, T> descriptor) {
         return this.registerParserSupplier(descriptor.valueType(), parameters -> descriptor.parser());
     }
@@ -162,9 +161,8 @@ public interface ParserRegistry<C> {
      * @param name               name of the suggestion provider. The name is case independent.
      * @param suggestionProvider the suggestion provider
      * @see #getSuggestionProvider(String) Get a suggestion provider
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     void registerSuggestionProvider(@NonNull String name, @NonNull SuggestionProvider<C> suggestionProvider);
 
     /**
@@ -174,14 +172,13 @@ public interface ParserRegistry<C> {
      * @return optional that either contains the suggestion provider, or is empty if no
      *         suggestion provider is registered with the given name
      * @see #registerSuggestionProvider(String, SuggestionProvider) Register a suggestion provider
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     @NonNull Optional<SuggestionProvider<C>> getSuggestionProvider(@NonNull String name);
 
 
     @FunctionalInterface
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     interface AnnotationMapper<A extends Annotation> {
 
         /**

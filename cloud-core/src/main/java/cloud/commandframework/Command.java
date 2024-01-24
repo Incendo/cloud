@@ -103,9 +103,8 @@ public class Command<C> {
      * @param permission       command permission
      * @param commandMeta             command meta instance
      * @param commandDescription      description of the command
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public Command(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
@@ -264,9 +263,8 @@ public class Command<C> {
      * Returns a copy of the list of the components that make up this command.
      *
      * @return modifiable copy of the component list
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull List<CommandComponent<C>> components() {
         return new ArrayList<>(this.components);
     }
@@ -275,9 +273,8 @@ public class Command<C> {
      * Returns the first command component.
      *
      * @return the root component
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CommandComponent<C> rootComponent() {
         return this.components.get(0);
     }
@@ -300,9 +297,8 @@ public class Command<C> {
      * Returns the component that contains the flags belonging to the command.
      *
      * @return the flag component, or {@code null} if no flags have been registered
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @Nullable CommandComponent<C> flagComponent() {
         return this.flagComponent;
     }
@@ -311,10 +307,9 @@ public class Command<C> {
      * Returns the flag parser for this command, of {@code null} if the command has no flags.
      *
      * @return flag parser, or {@code null} if no flags have been registered
-     * @since 2.0.0
      */
     @SuppressWarnings("unchecked")
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @Nullable CommandFlagParser<@NonNull C> flagParser() {
         final CommandComponent<C> flagComponent = this.flagComponent();
         if (flagComponent == null) {
@@ -331,9 +326,8 @@ public class Command<C> {
      * the parsed component values.
      *
      * @return the command execution handler
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler() {
         return this.commandExecutionHandler;
     }
@@ -346,9 +340,8 @@ public class Command<C> {
      *
      * @return the special sender type for the command, or {@link Optional#empty()} if the command uses the same sender type
      * as the command manager
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull Optional<Class<? extends C>> senderType() {
         return Optional.ofNullable(this.senderType);
     }
@@ -360,9 +353,8 @@ public class Command<C> {
      * will be thrown when parsing the command.
      *
      * @return the command permission
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull Permission commandPermission() {
         return this.permission;
     }
@@ -373,9 +365,8 @@ public class Command<C> {
      * A common way of using the command meta is by using it to filter out commands in post-processing.
      *
      * @return Command meta
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CommandMeta commandMeta() {
         return this.commandMeta;
     }
@@ -387,9 +378,8 @@ public class Command<C> {
      * The command description used to be configured through the {@link #commandMeta()}.
      *
      * @return the command description
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CommandDescription commandDescription() {
         return this.commandDescription;
     }
@@ -471,9 +461,8 @@ public class Command<C> {
          * Returns the current {@link CommandMeta command meta} value.
          *
          * @return current command meta
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public @NonNull CommandMeta meta() {
             return this.commandMeta;
         }
@@ -546,7 +535,7 @@ public class Command<C> {
          * @param commandDescription the new command description
          * @return new builder instance using the provided command description
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Builder<C> commandDescription(final @NonNull CommandDescription commandDescription) {
             return new Builder<>(
                     this.commandManager,
@@ -633,10 +622,9 @@ public class Command<C> {
          * @param description description of the argument
          * @param <U>         type of the argument
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
         @SuppressWarnings({"unchecked", "rawtypes"})
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <U extends CloudKeyHolder & ParserDescriptor> @NonNull Builder<C> required(
                 final @NonNull U argument,
                 final @NonNull Description description
@@ -662,7 +650,7 @@ public class Command<C> {
          * @return new builder instance with the command argument inserted into the argument list
          */
         @SuppressWarnings({"rawtypes"})
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Builder<C> required(
                 final @NonNull String name,
                 final CommandComponent.@NonNull Builder builder
@@ -678,7 +666,7 @@ public class Command<C> {
          * @return new builder instance with the command argument inserted into the argument list
          */
         @SuppressWarnings({"rawtypes"})
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Builder<C> optional(
                 final @NonNull String name,
                 final CommandComponent.@NonNull Builder builder
@@ -693,7 +681,7 @@ public class Command<C> {
          * @return new builder instance with the command argument inserted into the argument list
          */
         @SuppressWarnings({"rawtypes"})
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Builder<C> required(
                 final CommandComponent.@NonNull Builder builder
         ) {
@@ -707,7 +695,7 @@ public class Command<C> {
          * @return new builder instance with the command argument inserted into the argument list
          */
         @SuppressWarnings({"rawtypes"})
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Builder<C> optional(
                 final CommandComponent.@NonNull Builder builder
         ) {
@@ -721,10 +709,9 @@ public class Command<C> {
          * @param description description of the argument
          * @param <U>         type of the argument
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
         @SuppressWarnings({"unchecked", "rawtypes"})
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <U extends CloudKeyHolder & ParserDescriptor> @NonNull Builder<C> optional(
                 final @NonNull U argument,
                 final @NonNull Description description
@@ -749,10 +736,9 @@ public class Command<C> {
          * @param argument the argument
          * @param <U>      type of the argument
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
         @SuppressWarnings({"unchecked", "rawtypes"})
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <U extends CloudKeyHolder & ParserDescriptor> @NonNull Builder<C> required(
                 final @NonNull U argument
         ) {
@@ -774,10 +760,9 @@ public class Command<C> {
          * @param argument the argument
          * @param <U>      type of the argument
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
         @SuppressWarnings({"unchecked", "rawtypes"})
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <U extends CloudKeyHolder & ParserDescriptor> @NonNull Builder<C> optional(
                 final @NonNull U argument
         ) {
@@ -801,9 +786,8 @@ public class Command<C> {
          * @param parser the parser
          * @param <T>    the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> required(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<? super C, T> parser
@@ -819,9 +803,8 @@ public class Command<C> {
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> required(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -843,9 +826,8 @@ public class Command<C> {
          * @param parser the parser
          * @param <T>    the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> required(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<? super C, T> parser
@@ -861,9 +843,8 @@ public class Command<C> {
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> required(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -886,9 +867,8 @@ public class Command<C> {
          * @param description the description of the argument
          * @param <T>         the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> required(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -906,9 +886,8 @@ public class Command<C> {
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> required(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -933,9 +912,8 @@ public class Command<C> {
          * @param description the description of the argument
          * @param <T>         the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> required(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -953,9 +931,8 @@ public class Command<C> {
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> required(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -980,9 +957,8 @@ public class Command<C> {
          * @param parser the parser
          * @param <T>    the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<? super C, T> parser
@@ -998,9 +974,8 @@ public class Command<C> {
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -1023,9 +998,8 @@ public class Command<C> {
          * @param parser the parser
          * @param <T>    the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<? super C, T> parser
@@ -1041,9 +1015,8 @@ public class Command<C> {
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -1067,9 +1040,8 @@ public class Command<C> {
          * @param description the description of the argument
          * @param <T>         the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -1094,9 +1066,8 @@ public class Command<C> {
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -1122,9 +1093,8 @@ public class Command<C> {
          * @param description the description of the argument
          * @param <T>         the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -1149,9 +1119,8 @@ public class Command<C> {
          * @param suggestions the suggestion provider
          * @param <T>         the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -1177,9 +1146,8 @@ public class Command<C> {
          * @param defaultValue the default value
          * @param <T>          the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -1203,9 +1171,8 @@ public class Command<C> {
          * @param suggestions  the suggestion provider
          * @param <T>          the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -1230,9 +1197,8 @@ public class Command<C> {
          * @param defaultValue the default value
          * @param <T>          the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -1256,9 +1222,8 @@ public class Command<C> {
          * @param suggestions  the suggestion provider
          * @param <T>          the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -1284,9 +1249,8 @@ public class Command<C> {
          * @param description  the description of the argument
          * @param <T>          the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -1313,9 +1277,8 @@ public class Command<C> {
          * @param suggestions  the suggestion provider
          * @param <T>          the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -1343,9 +1306,8 @@ public class Command<C> {
          * @param description  the description of the argument
          * @param <T>          the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -1372,9 +1334,8 @@ public class Command<C> {
          * @param suggestions  the suggestion provider
          * @param <T>          the type produced by the parser
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<? super C, T> parser,
@@ -1401,9 +1362,8 @@ public class Command<C> {
          * @param builderConsumer builder consumer
          * @param <T>             argument type
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> required(
                 final @NonNull Class<T> clazz,
                 final @NonNull String name,
@@ -1422,9 +1382,8 @@ public class Command<C> {
          * @param builderConsumer builder consumer
          * @param <T>             argument type
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <T> @NonNull Builder<C> optional(
                 final @NonNull Class<T> clazz,
                 final @NonNull String name,
@@ -1440,9 +1399,8 @@ public class Command<C> {
          *
          * @param argument argument to add
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Builder<C> argument(
                 final @NonNull CommandComponent<C> argument
         ) {
@@ -1465,10 +1423,9 @@ public class Command<C> {
          *
          * @param builder builder that builds the component to add
          * @return new builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
          */
         @SuppressWarnings({"unchecked", "rawtypes"})
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Builder<C> argument(
                 final CommandComponent.Builder builder
         ) {
@@ -1531,9 +1488,8 @@ public class Command<C> {
          * @param <U>         first type
          * @param <V>         second type
          * @return new builder instance with the argument inserted
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <U, V> @NonNull Builder<C> requiredArgumentPair(
                 final @NonNull CloudKey<Pair<U, V>> name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
@@ -1600,9 +1556,8 @@ public class Command<C> {
          * @param <U>         first type
          * @param <V>         second type
          * @return new builder instance with the argument inserted
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <U, V> @NonNull Builder<C> optionalArgumentPair(
                 final @NonNull CloudKey<Pair<U, V>> name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
@@ -1677,9 +1632,8 @@ public class Command<C> {
          * @param <V>         second type
          * @param <O>         output type
          * @return new builder instance with the argument inserted
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <U, V, O> @NonNull Builder<C> requiredArgumentPair(
                 final @NonNull CloudKey<O> name,
                 final @NonNull TypeToken<O> outputType,
@@ -1756,9 +1710,8 @@ public class Command<C> {
          * @param <V>         second type
          * @param <O>         output type
          * @return new builder instance with the argument inserted
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <U, V, O> @NonNull Builder<C> optionalArgumentPair(
                 final @NonNull CloudKey<O> name,
                 final @NonNull TypeToken<O> outputType,
@@ -1829,9 +1782,8 @@ public class Command<C> {
          * @param <V>           second type
          * @param <W>           third type
          * @return new builder instance with the argument inserted
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <U, V, W> @NonNull Builder<C> requiredArgumentTriplet(
                 final @NonNull CloudKey<Triplet<U, V, W>> name,
                 final @NonNull Triplet<String, String, String> names,
@@ -1900,9 +1852,8 @@ public class Command<C> {
          * @param <V>           second type
          * @param <W>           third type
          * @return new builder instance with the argument inserted
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <U, V, W> @NonNull Builder<C> optionalArgumentTriplet(
                 final @NonNull CloudKey<Triplet<U, V, W>> name,
                 final @NonNull Triplet<String, String, String> names,
@@ -1979,9 +1930,8 @@ public class Command<C> {
          * @param <W>           third type
          * @param <O>           output type
          * @return new builder instance with the argument inserted
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <U, V, W, O> @NonNull Builder<C> requiredArgumentTriplet(
                 final @NonNull CloudKey<O> name,
                 final @NonNull TypeToken<O> outputType,
@@ -2060,9 +2010,8 @@ public class Command<C> {
          * @param <W>           third type
          * @param <O>           output type
          * @return new builder instance with the argument inserted
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public <U, V, W, O> @NonNull Builder<C> optionalArgumentTriplet(
                 final @NonNull CloudKey<O> name,
                 final @NonNull TypeToken<O> outputType,
@@ -2118,9 +2067,8 @@ public class Command<C> {
          *
          * @param handler the handler to invoke before the current handler
          * @return new builder instance
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Builder<C> prependHandler(final @NonNull CommandExecutionHandler<C> handler) {
             return this.handler(CommandExecutionHandler.delegatingExecutionHandler(Arrays.asList(handler, this.handler())));
         }
@@ -2131,9 +2079,8 @@ public class Command<C> {
          *
          * @param handler the handler to invoke after the current handler
          * @return new builder instance
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Builder<C> appendHandler(final @NonNull CommandExecutionHandler<C> handler) {
             return this.handler(CommandExecutionHandler.delegatingExecutionHandler(Arrays.asList(this.handler(), handler)));
         }

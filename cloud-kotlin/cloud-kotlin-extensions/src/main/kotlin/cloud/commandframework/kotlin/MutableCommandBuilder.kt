@@ -268,7 +268,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param commandDescription command description
      * @return this mutable builder
-     * @since 2.0.0
      */
     public fun commandDescription(commandDescription: CommandDescription): MutableCommandBuilder<C> = mutate {
         it.commandDescription(commandDescription)
@@ -356,7 +355,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param component component to add
      * @return this mutable builder
-     * @since 2.0.0
      */
     public fun argument(
         component: CommandComponent<C>
@@ -367,7 +365,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param component component to add
      * @return this mutable builder
-     * @since 2.0.0
      */
     public fun required(
         component: CommandComponent.Builder<C, *>
@@ -378,7 +375,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param component component to add
      * @return this mutable builder
-     * @since 2.0.0
      */
     public fun optional(
         component: CommandComponent.Builder<C, *>
@@ -391,7 +387,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param parser the parser of the component
      * @param mutator mutator of the component
      * @param T the type of the component
-     * @since 2.0.0
      */
     public fun <T> required(
         name: String,
@@ -410,7 +405,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param parser the parser of the component
      * @param mutator mutator of the component
      * @param T the type of the component
-     * @since 2.0.0
      */
     public fun <T> optional(
         name: String,
@@ -429,7 +423,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param parser the parser of the component
      * @param mutator mutator of the component
      * @param T the type of the component
-     * @since 2.0.0
      */
     public fun <T> required(
         name: CloudKey<T>,
@@ -448,7 +441,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param parser the parser of the component
      * @param mutator mutator of the component
      * @param T the type of the component
-     * @since 2.0.0
      */
     public fun <T> optional(
         name: CloudKey<T>,
@@ -465,7 +457,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param componentSupplier supplier of the component
      * @return this mutable builder
-     * @since 2.0.0
      */
     public fun argument(
         componentSupplier: () -> CommandComponent<C>
@@ -476,7 +467,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param componentSupplier supplier of the component
      * @return this mutable builder
-     * @since 2.0.0
      */
     public fun required(
         componentSupplier: () -> CommandComponent.Builder<*, *>
@@ -487,7 +477,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param componentSupplier supplier of the component
      * @return this mutable builder
-     * @since 2.0.0
      */
     public fun optional(
         componentSupplier: () -> CommandComponent.Builder<C, *>
@@ -523,7 +512,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param handler the handler to invoke before the current handler
      * @return this mutable builder
-     * @since 2.0.0
      */
     public fun prependHandler(handler: CommandExecutionHandler<C>): MutableCommandBuilder<C> = mutate {
         it.prependHandler(handler)
@@ -535,7 +523,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param handler the handler to invoke after the current handler
      * @return this mutable builder
-     * @since 2.0.0
      */
     public fun appendHandler(handler: CommandExecutionHandler<C>): MutableCommandBuilder<C> = mutate {
         it.appendHandler(handler)

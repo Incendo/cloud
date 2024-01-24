@@ -29,7 +29,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Exception thrown when a {@link AnnotatedMethodHandler} fails to initiate.
  *
- * @since 2.0.0
  */
 @API(status = API.Status.INTERNAL, since = "2.0.0")
 public final class AnnotatedMethodHandlerInitiationException extends RuntimeException {

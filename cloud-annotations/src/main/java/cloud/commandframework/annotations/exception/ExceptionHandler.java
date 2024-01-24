@@ -45,7 +45,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * See {@link cloud.commandframework.exception.handling.ExceptionHandler#handle(ExceptionContext)} for information about
  * the exception handler behavior.
  *
- * @since 2.0.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

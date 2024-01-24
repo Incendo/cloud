@@ -37,7 +37,6 @@ import org.immutables.value.Value;
  * <p>Custom implementations may be used in order to provide more information.
  * For example, the reason that the permission lookup returned false.</p>
  *
- * @since 2.0.0
  */
 @ImmutableImpl
 @Value.Immutable

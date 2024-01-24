@@ -30,7 +30,6 @@ import org.apiguardian.api.API;
  * Configurable command related settings
  *
  * @see CommandManager#settings() to access the settings
- * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public enum ManagerSetting implements Setting {

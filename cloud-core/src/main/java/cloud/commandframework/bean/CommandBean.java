@@ -47,7 +47,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * where you may configure the command. The command meta may be configured by overriding {@link #meta()}.
  *
  * @param <C> the command sender type
- * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public abstract class CommandBean<C> implements CommandExecutionHandler<C>, CommandFactory<C> {

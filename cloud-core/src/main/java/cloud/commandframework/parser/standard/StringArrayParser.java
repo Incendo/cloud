@@ -50,9 +50,8 @@ public final class StringArrayParser<C> implements ArgumentParser<C, String[]> {
      *
      * @param <C> command sender type
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, String[]> stringArrayParser() {
         return ParserDescriptor.of(new StringArrayParser<>(), String[].class);
     }
@@ -62,9 +61,8 @@ public final class StringArrayParser<C> implements ArgumentParser<C, String[]> {
      *
      * @param <C> command sender type
      * @return the created parser
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull ParserDescriptor<C, String[]> flagYieldingStringArrayParser() {
         return ParserDescriptor.of(new StringArrayParser<>(true /* flagYielding */), String[].class);
     }
@@ -74,9 +72,8 @@ public final class StringArrayParser<C> implements ArgumentParser<C, String[]> {
      *
      * @param <C> the command sender type
      * @return the component builder
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <C> CommandComponent.@NonNull Builder<C, String[]> characterComponent() {
         return CommandComponent.<C, String[]>builder().parser(stringArrayParser());
     }

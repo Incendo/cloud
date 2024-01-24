@@ -54,7 +54,7 @@ public interface ExceptionContext<C, T extends Throwable> {
     @NonNull ExceptionController<C> controller();
 
 
-    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    @API(status = API.Status.INTERNAL)
     final class ExceptionContextImpl<C, T extends Throwable> implements ExceptionContext<C, T> {
 
         private final T exception;

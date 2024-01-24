@@ -33,7 +33,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * This is used in {@link AggregateResultMapper} to map to the output type using the intermediate results.
  *
  * @param <C> the command sender type
- * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface AggregateParsingContext<C> extends MutableCloudKeyContainer {

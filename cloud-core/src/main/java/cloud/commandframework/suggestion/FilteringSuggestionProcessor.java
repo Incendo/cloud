@@ -51,7 +51,7 @@ public final class FilteringSuggestionProcessor<C> implements SuggestionProcesso
      * Create a new {@link FilteringSuggestionProcessor} filtering with {@link Filter#partialTokenMatches(boolean)} that
      * ignores case.
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public FilteringSuggestionProcessor() {
         this(Filter.partialTokenMatches(true));
     }
@@ -165,9 +165,8 @@ public final class FilteringSuggestionProcessor<C> implements SuggestionProcesso
          * @param ignoreCase whether to ignore case
          * @param <C>        command sender type
          * @return new filter
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         static <C> @NonNull Simple<C> partialTokenMatches(final boolean ignoreCase) {
             return Simple.contextFree((suggestion, input) -> {
                 final List<String> suggestionTokens = new CommandInputTokenizer(suggestion).tokenize();

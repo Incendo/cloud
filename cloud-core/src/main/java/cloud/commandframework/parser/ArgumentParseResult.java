@@ -60,9 +60,8 @@ public abstract class ArgumentParseResult<T> {
      * @param failure failure reason
      * @param <T>     parser value type
      * @return completed future with failed result
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <T> @NonNull CompletableFuture<@NonNull ArgumentParseResult<T>> failureFuture(final @NonNull Throwable failure) {
         return new ParseFailure<T>(failure).asFuture();
     }
@@ -84,9 +83,8 @@ public abstract class ArgumentParseResult<T> {
      * @param value parsed value
      * @param <T>   parser value type
      * @return completed future with successful result
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <T> @NonNull CompletableFuture<@NonNull ArgumentParseResult<T>> successFuture(final @NonNull T value) {
         return success(value).asFuture();
     }
@@ -95,27 +93,24 @@ public abstract class ArgumentParseResult<T> {
      * Get the parsed value, if it exists
      *
      * @return Optional containing the parsed value
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public abstract @NonNull Optional<T> parsedValue();
 
     /**
      * Get the failure reason, if it exists
      *
      * @return Optional containing the failure reason
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public abstract @NonNull Optional<Throwable> failure();
 
     /**
      * Maps the result to a completable future.
      *
      * @return the future
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public final @NonNull CompletableFuture<ArgumentParseResult<T>> asFuture() {
         return CompletableFuture.completedFuture(this);
     }

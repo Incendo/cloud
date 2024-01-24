@@ -87,9 +87,8 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      * @param type     type that the injector should inject for
      * @param injector the injector that should inject the value into the command method
      * @return {@code this}
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public synchronized <T> @This @NonNull ParameterInjectorRegistry<C> registerInjector(
             final @NonNull TypeToken<T> type,
             final @NonNull ParameterInjector<C, T> injector
@@ -166,9 +165,8 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      *                           use {@link AnnotationAccessor#empty()}
      * @return the injected value, if an injector was able to provide a value
      * @throws InjectionException if any of the {@link InjectionService injection services} throws an exception
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public <T> @NonNull Optional<T> getInjectable(
             final @NonNull TypeToken<T> type,
             final @NonNull CommandContext<C> context,

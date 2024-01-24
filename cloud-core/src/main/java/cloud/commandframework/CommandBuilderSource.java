@@ -174,6 +174,6 @@ public interface CommandBuilderSource<C> {
      * @param builder builder to decorate
      * @return the decorated builder
      */
-    @API(status = API.Status.INTERNAL, since = "2.0.0")
+    @API(status = API.Status.INTERNAL)
     Command.@NonNull Builder<C> decorateBuilder(Command.@NonNull Builder<C> builder);
 }

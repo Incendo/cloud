@@ -229,9 +229,8 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
          *
          * @param component The component that contained the argument
          * @param parser    Compound argument to append
-         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "2.0.0")
+        @API(status = API.Status.STABLE)
         public void appendAggregate(
                 final @NonNull CommandComponent<?> component,
                 final @NonNull AggregateParser<?, ?> parser

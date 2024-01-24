@@ -34,7 +34,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> the command sender type
  * @param <O> the output type
- * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
 public interface AggregateResultMapper<C, O> {
@@ -52,7 +51,7 @@ public interface AggregateResultMapper<C, O> {
     );
 
 
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     interface DirectAggregateResultMapper<C, O> extends AggregateResultMapper<C, O> {
 
         /**

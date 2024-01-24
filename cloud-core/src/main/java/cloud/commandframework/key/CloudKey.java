@@ -47,9 +47,8 @@ public abstract class CloudKey<T> {
      * @param name the name of the key
      * @param type the type of the value represented by the key
      * @return the created key
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <T> CloudKey<T> of(
             final @NonNull String name,
             final @NonNull TypeToken<T> type
@@ -64,9 +63,8 @@ public abstract class CloudKey<T> {
      * @param name the name of the key
      * @param type the type of the value represented by the key
      * @return the created key
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <T> CloudKey<T> of(
             final @NonNull String name,
             final @NonNull Class<T> type
@@ -79,9 +77,8 @@ public abstract class CloudKey<T> {
      *
      * @param name the name of the key
      * @return the created key
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static @NonNull CloudKey<Void> of(final @NonNull String name) {
         return CloudKeyImpl.of(name, TypeToken.get(Void.TYPE));
     }
@@ -93,9 +90,8 @@ public abstract class CloudKey<T> {
      * @param name the name of the key
      * @param type the type of the value represented by the key
      * @return the created key
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <T> CloudKey<T> cloudKey(
             final @NonNull String name,
             final @NonNull TypeToken<T> type
@@ -110,9 +106,8 @@ public abstract class CloudKey<T> {
      * @param name the name of the key
      * @param type the type of the value represented by the key
      * @return the created key
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static <T> CloudKey<T> cloudKey(
             final @NonNull String name,
             final @NonNull Class<T> type
@@ -125,9 +120,8 @@ public abstract class CloudKey<T> {
      *
      * @param name the name of the key
      * @return the created key
-     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "2.0.0")
+    @API(status = API.Status.STABLE)
     public static @NonNull CloudKey<Void> cloudKey(final @NonNull String name) {
         return CloudKeyImpl.of(name, TypeToken.get(Void.TYPE));
     }

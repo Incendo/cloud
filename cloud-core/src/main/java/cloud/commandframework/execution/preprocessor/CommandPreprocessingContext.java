@@ -34,7 +34,6 @@ import org.immutables.value.Value;
  * Context for {@link CommandPreprocessor command preprocessors}.
  *
  * @param <C> command sender type
- * @since 2.0.0
  */
 @Value.Immutable
 @ImmutableImpl
