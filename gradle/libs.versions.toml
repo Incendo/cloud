@@ -1,5 +1,5 @@
 [plugins]
-versions = { id = "com.github.ben-manes.versions", version = "0.50.0" }
+versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
 cloud-buildLogic-spotless = { id = "org.incendo.cloud-build-logic.spotless", version.ref = "cloud-build-logic" }
 cloud-buildLogic-rootProject-publishing = { id = "org.incendo.cloud-build-logic.publishing.root-project", version.ref = "cloud-build-logic" }
 cloud-buildLogic-rootProject-spotless = { id = "org.incendo.cloud-build-logic.spotless.root-project", version.ref = "cloud-build-logic" }
