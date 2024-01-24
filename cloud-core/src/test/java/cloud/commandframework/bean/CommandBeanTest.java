@@ -21,8 +21,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework;
+package cloud.commandframework.bean;
 
+import cloud.commandframework.Command;
+import cloud.commandframework.CommandManager;
+import cloud.commandframework.TestCommandSender;
+import cloud.commandframework.bean.CommandBean;
+import cloud.commandframework.bean.CommandProperties;
 import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.key.CloudKey;
