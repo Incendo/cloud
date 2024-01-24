@@ -1,4 +1,4 @@
-import cloud.commandframework.annotations.processing.CommandContainer;
+import org.incendo.cloud.annotations.processing.CommandContainer;
 
 @CommandContainer
 public class TestCommandContainer {

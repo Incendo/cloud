@@ -4,7 +4,7 @@
 <h1>cloud command framework</h1>
 
 ![license](https://img.shields.io/github/license/incendo/cloud.svg)
-[![central](https://img.shields.io/maven-central/v/cloud.commandframework/cloud-core)](https://search.maven.org/search?q=cloud.commandframework)
+[![central](https://img.shields.io/maven-central/v/org.incendo.cloud/cloud-core)](https://search.maven.org/search?q=org.incendo.cloud)
 ![build](https://img.shields.io/github/actions/workflow/status/incendo/cloud/build.yml?logo=github)
 [![docs](https://img.shields.io/readthedocs/incendocloud?logo=readthedocs)](https://cloud.incendo.org)
 </div>
@@ -59,7 +59,7 @@ The core module allows you to use Cloud anywhere, simply by implementing the Com
 
 ## links  
 
-- JavaDoc: https://javadoc.io/doc/cloud.commandframework
+- JavaDoc: https://javadoc.io/doc/org.incendo.cloud
 - Docs: https://cloud.incendo.org
 - Incendo Discord: https://discord.gg/aykZu32
 

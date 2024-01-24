@@ -1,5 +1,5 @@
-import cloud.commandframework.annotations.AnnotationParser;
-import cloud.commandframework.annotations.processing.CommandContainer;
+import org.incendo.cloud.annotations.AnnotationParser;
+import org.incendo.cloud.annotations.processing.CommandContainer;
 
 @CommandContainer
 public class TestCommandContainer2 {

@@ -2,6 +2,6 @@
 
 cloud-annotations extensions for Kotlin coroutine integration.
 
-# Package cloud.commandframework.kotlin.coroutines.annotations
+# package org.incendo.cloud.kotlin.coroutines.annotations
 
 cloud-kotlin-coroutines-annotations classes and functions.

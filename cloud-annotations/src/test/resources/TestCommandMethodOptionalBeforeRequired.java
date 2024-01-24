@@ -1,5 +1,5 @@
-import cloud.commandframework.annotations.Argument;
-import cloud.commandframework.annotations.Command;
+import org.incendo.cloud.annotations.Argument;
+import org.incendo.cloud.annotations.Command;
 
 public class TestCommandMethodOptionalBeforeRequired {
 
