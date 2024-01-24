@@ -220,7 +220,7 @@ public class Command<C> {
                 commandMeta,
                 null,
                 commands,
-                new CommandExecutionHandler.NullCommandExecutionHandler<>(),
+                CommandExecutionHandler.noOpCommandExecutionHandler(),
                 Permission.empty(),
                 Collections.emptyList(),
                 CommandDescription.empty()
@@ -256,7 +256,7 @@ public class Command<C> {
                 commandMeta,
                 null,
                 commands,
-                new CommandExecutionHandler.NullCommandExecutionHandler<>(),
+                CommandExecutionHandler.noOpCommandExecutionHandler(),
                 Permission.empty(),
                 Collections.emptyList(),
                 CommandDescription.empty()
