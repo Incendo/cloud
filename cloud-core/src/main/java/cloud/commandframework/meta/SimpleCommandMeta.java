@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.meta;
 
-import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.key.CloudKey;
 import io.leangen.geantyref.GenericTypeReflector;
 import java.util.Collections;
 import java.util.HashMap;

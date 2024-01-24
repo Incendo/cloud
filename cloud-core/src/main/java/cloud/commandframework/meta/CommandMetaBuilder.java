@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.meta;
 
-import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.key.CloudKey;
 import java.util.HashMap;
 import java.util.Map;
 import org.apiguardian.api.API;

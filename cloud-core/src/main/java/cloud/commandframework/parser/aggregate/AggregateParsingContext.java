@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.parser.aggregate;
 
-import cloud.commandframework.keys.MutableCloudKeyContainer;
+import cloud.commandframework.key.MutableCloudKeyContainer;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

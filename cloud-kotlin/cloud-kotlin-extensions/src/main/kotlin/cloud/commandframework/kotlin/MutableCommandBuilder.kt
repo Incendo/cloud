@@ -30,7 +30,7 @@ import cloud.commandframework.component.TypedCommandComponent
 import cloud.commandframework.description.CommandDescription
 import cloud.commandframework.description.Description
 import cloud.commandframework.execution.CommandExecutionHandler
-import cloud.commandframework.keys.CloudKey
+import cloud.commandframework.key.CloudKey
 import cloud.commandframework.kotlin.extension.command
 import cloud.commandframework.kotlin.extension.senderType
 import cloud.commandframework.parser.ParserDescriptor

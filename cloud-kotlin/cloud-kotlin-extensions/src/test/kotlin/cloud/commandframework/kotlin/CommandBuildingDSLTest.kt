@@ -28,7 +28,7 @@ import cloud.commandframework.description.CommandDescription
 import cloud.commandframework.execution.ExecutionCoordinator
 import cloud.commandframework.help.result.CommandEntry
 import cloud.commandframework.internal.CommandRegistrationHandler
-import cloud.commandframework.keys.CloudKey
+import cloud.commandframework.key.CloudKey
 import cloud.commandframework.kotlin.extension.argumentDescription
 import cloud.commandframework.kotlin.extension.buildAndRegister
 import cloud.commandframework.kotlin.extension.cloudKey

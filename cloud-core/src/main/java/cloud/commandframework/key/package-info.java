@@ -3,4 +3,4 @@
  *
  * @since 1.4.0
  */
-package cloud.commandframework.keys;
+package cloud.commandframework.key;

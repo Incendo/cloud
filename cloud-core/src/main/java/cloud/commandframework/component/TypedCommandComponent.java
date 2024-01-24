@@ -25,8 +25,8 @@ package cloud.commandframework.component;
 
 import cloud.commandframework.component.preprocessor.ComponentPreprocessor;
 import cloud.commandframework.description.Description;
-import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.CloudKeyHolder;
+import cloud.commandframework.key.CloudKey;
+import cloud.commandframework.key.CloudKeyHolder;
 import cloud.commandframework.parser.ArgumentParser;
 import cloud.commandframework.parser.ParserDescriptor;
 import cloud.commandframework.suggestion.SuggestionProvider;

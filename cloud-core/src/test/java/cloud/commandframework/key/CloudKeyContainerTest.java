@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.keys;
+package cloud.commandframework.key;
 
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.context.CommandContext;
@@ -29,7 +29,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static cloud.commandframework.keys.CloudKey.cloudKey;
+import static cloud.commandframework.key.CloudKey.cloudKey;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;

@@ -26,7 +26,7 @@ package cloud.commandframework.parser.standard;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.execution.CommandResult;
-import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.key.CloudKey;
 import java.time.Duration;
 import java.util.concurrent.CompletionException;
 import org.junit.jupiter.api.Assertions;

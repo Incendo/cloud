@@ -37,7 +37,7 @@ import cloud.commandframework.exception.handling.ExceptionContext;
 import cloud.commandframework.exception.handling.ExceptionHandler;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.key.CloudKey;
 import cloud.commandframework.pircbotx.arguments.UserParser;
 import java.util.function.BiFunction;
 import java.util.function.Function;

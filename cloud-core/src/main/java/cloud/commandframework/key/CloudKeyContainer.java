@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.keys;
+package cloud.commandframework.key;
 
 import java.util.Map;
 import java.util.Optional;

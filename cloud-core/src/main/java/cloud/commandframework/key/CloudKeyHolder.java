@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.keys;
+package cloud.commandframework.key;
 
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;

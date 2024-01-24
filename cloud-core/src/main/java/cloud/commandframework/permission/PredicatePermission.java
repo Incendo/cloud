@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.permission;
 
-import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.CloudKeyHolder;
+import cloud.commandframework.key.CloudKey;
+import cloud.commandframework.key.CloudKeyHolder;
 import java.util.function.Predicate;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;

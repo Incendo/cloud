@@ -24,7 +24,7 @@
 package cloud.commandframework.meta;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.keys.CloudKeyContainer;
+import cloud.commandframework.key.CloudKeyContainer;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

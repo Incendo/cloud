@@ -31,7 +31,7 @@ import cloud.commandframework.exception.AmbiguousNodeException;
 import cloud.commandframework.exception.NoPermissionException;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.key.CloudKey;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.parser.flag.CommandFlag;
 import cloud.commandframework.parser.standard.StringParser;

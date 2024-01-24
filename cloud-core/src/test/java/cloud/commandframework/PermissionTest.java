@@ -25,7 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.exception.NoPermissionException;
 import cloud.commandframework.execution.ExecutionCoordinator;
-import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.key.CloudKey;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PermissionResult;
 import cloud.commandframework.permission.PredicatePermission;

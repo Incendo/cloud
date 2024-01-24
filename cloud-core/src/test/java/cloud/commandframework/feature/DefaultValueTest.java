@@ -27,7 +27,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.component.DefaultValue;
 import cloud.commandframework.execution.CommandResult;
-import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.key.CloudKey;
 import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
