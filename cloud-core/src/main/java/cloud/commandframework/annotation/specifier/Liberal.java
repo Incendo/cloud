@@ -21,8 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.parser.specifier;
-
+package cloud.commandframework.annotation.specifier;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -31,17 +30,14 @@ import java.lang.annotation.Target;
 import org.apiguardian.api.API;
 
 /**
- * Command completions, separated by "," or ", "
+ * Annotation used to set the parsing mode of a {@link cloud.commandframework.parser.standard.BooleanParser boolean
+ * parser} to liberal.
+ *
+ * @since 1.6.0
  */
-@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-@API(status = API.Status.STABLE)
-public @interface Completions {
+@Retention(RetentionPolicy.RUNTIME)
+@API(status = API.Status.STABLE, since = "1.6.0")
+public @interface Liberal {
 
-    /**
-     * Command completions
-     *
-     * @return Command completions
-     */
-    String value() default "";
 }

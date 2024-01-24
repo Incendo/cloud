@@ -21,7 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.parser.specifier;
+package cloud.commandframework.annotation.specifier;
+
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -30,14 +31,17 @@ import java.lang.annotation.Target;
 import org.apiguardian.api.API;
 
 /**
- * Annotation used to set the parsing mode of a {@link cloud.commandframework.parser.standard.StringParser string
- * parser} to quoted.
- *
- * @since 1.5.0
+ * Command completions, separated by "," or ", "
  */
-@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-@API(status = API.Status.STABLE, since = "1.5.0")
-public @interface Quoted {
+@Target(ElementType.PARAMETER)
+@API(status = API.Status.STABLE)
+public @interface Completions {
 
+    /**
+     * Command completions
+     *
+     * @return Command completions
+     */
+    String value() default "";
 }

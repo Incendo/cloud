@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.annotations.assembler;
 
+import cloud.commandframework.annotation.specifier.Completions;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.ArgumentMode;
 import cloud.commandframework.annotations.PreprocessorMapper;
@@ -34,7 +35,6 @@ import cloud.commandframework.component.preprocessor.ComponentPreprocessor;
 import cloud.commandframework.parser.ArgumentParser;
 import cloud.commandframework.parser.ParserDescriptor;
 import cloud.commandframework.parser.ParserParameters;
-import cloud.commandframework.parser.specifier.Completions;
 import cloud.commandframework.parser.standard.EitherParser;
 import cloud.commandframework.suggestion.Suggestion;
 import cloud.commandframework.suggestion.SuggestionProvider;

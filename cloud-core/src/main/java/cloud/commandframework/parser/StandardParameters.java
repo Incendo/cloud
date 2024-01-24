@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.parser;
 
-import cloud.commandframework.parser.specifier.FlagYielding;
+import cloud.commandframework.annotation.specifier.FlagYielding;
 import io.leangen.geantyref.TypeToken;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;

@@ -23,11 +23,11 @@
 //
 package cloud.commandframework.parser;
 
-import cloud.commandframework.parser.specifier.FlagYielding;
-import cloud.commandframework.parser.specifier.Greedy;
-import cloud.commandframework.parser.specifier.Liberal;
-import cloud.commandframework.parser.specifier.Quoted;
-import cloud.commandframework.parser.specifier.Range;
+import cloud.commandframework.annotation.specifier.FlagYielding;
+import cloud.commandframework.annotation.specifier.Greedy;
+import cloud.commandframework.annotation.specifier.Liberal;
+import cloud.commandframework.annotation.specifier.Quoted;
+import cloud.commandframework.annotation.specifier.Range;
 import cloud.commandframework.parser.standard.BooleanParser;
 import cloud.commandframework.parser.standard.ByteParser;
 import cloud.commandframework.parser.standard.CharacterParser;

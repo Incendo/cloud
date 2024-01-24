@@ -24,15 +24,15 @@
 package cloud.commandframework.annotations;
 
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.annotation.specifier.Greedy;
+import cloud.commandframework.annotation.specifier.Quoted;
+import cloud.commandframework.annotation.specifier.Range;
 import cloud.commandframework.annotations.parser.Parser;
 import cloud.commandframework.annotations.suggestion.Suggestions;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.parser.ArgumentParser;
 import cloud.commandframework.parser.ParserParameters;
-import cloud.commandframework.parser.specifier.Greedy;
-import cloud.commandframework.parser.specifier.Quoted;
-import cloud.commandframework.parser.specifier.Range;
 import cloud.commandframework.parser.standard.IntegerParser;
 import cloud.commandframework.parser.standard.StringParser;
 import cloud.commandframework.suggestion.Suggestion;

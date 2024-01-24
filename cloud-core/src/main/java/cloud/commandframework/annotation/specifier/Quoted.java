@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.parser.specifier;
+package cloud.commandframework.annotation.specifier;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -30,16 +30,14 @@ import java.lang.annotation.Target;
 import org.apiguardian.api.API;
 
 /**
- * Indicates that the argument should stop parsing when encountering what
- * could potentially be a flag.
- * <p>
- * This only has an effect on greedy arguments that consume all remaining input.
+ * Annotation used to set the parsing mode of a {@link cloud.commandframework.parser.standard.StringParser string
+ * parser} to quoted.
  *
- * @since 1.7.0
+ * @since 1.5.0
  */
-@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-@API(status = API.Status.STABLE, since = "1.7.0")
-public @interface FlagYielding {
+@Retention(RetentionPolicy.RUNTIME)
+@API(status = API.Status.STABLE, since = "1.5.0")
+public @interface Quoted {
 
 }
