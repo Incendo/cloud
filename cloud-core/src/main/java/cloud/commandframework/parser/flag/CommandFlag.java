@@ -77,9 +77,8 @@ public final class CommandFlag<T> {
      *
      * @param name flag name
      * @return new {@link Builder}
-     * @since 1.8.0
      */
-    @API(status = API.Status.STABLE, since = "1.8.0")
+    @API(status = API.Status.STABLE)
     public static @NonNull Builder<Void> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
@@ -107,7 +106,7 @@ public final class CommandFlag<T> {
      *
      * @return the flag mode
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public @NonNull FlagMode mode() {
         return this.mode;
     }
@@ -116,9 +115,8 @@ public final class CommandFlag<T> {
      * Returns the flag description.
      *
      * @return flag description
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     public @NonNull Description description() {
         return this.description;
     }
@@ -138,9 +136,8 @@ public final class CommandFlag<T> {
      * Returns the permission required to use this flag, if it exists.
      *
      * @return Command permission, or {@code null}
-     * @since 1.6.0
      */
-    @API(status = API.Status.STABLE, since = "1.6.0")
+    @API(status = API.Status.STABLE)
     public Permission permission() {
         return this.permission;
     }
@@ -249,9 +246,8 @@ public final class CommandFlag<T> {
          *
          * @param description Flag description
          * @return New builder instance
-         * @since 1.4.0
          */
-        @API(status = API.Status.STABLE, since = "1.4.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Builder<T> withDescription(final @NonNull Description description) {
             return new Builder<>(this.name, this.aliases, description, this.permission, this.commandComponent, this.mode);
         }
@@ -303,9 +299,8 @@ public final class CommandFlag<T> {
          *
          * @param permission Flag permission
          * @return New builder instance
-         * @since 1.6.0
          */
-        @API(status = API.Status.STABLE, since = "1.6.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Builder<T> withPermission(final @NonNull Permission permission) {
             return new Builder<>(this.name, this.aliases, this.description, permission, this.commandComponent, this.mode);
         }
@@ -314,9 +309,8 @@ public final class CommandFlag<T> {
          * Marks the flag as {@link FlagMode#REPEATABLE}.
          *
          * @return new builder instance
-         * @since 1.7.0
          */
-        @API(status = API.Status.STABLE, since = "1.7.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Builder<T> asRepeatable() {
             return new Builder<>(
                     this.name,
@@ -346,7 +340,7 @@ public final class CommandFlag<T> {
     }
 
 
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public enum FlagMode {
         /**
          * Only a single value can be provided for the flag, and should be extracted

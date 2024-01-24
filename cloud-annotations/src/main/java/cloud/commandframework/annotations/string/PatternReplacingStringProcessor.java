@@ -33,7 +33,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * {@link StringProcessor} that replaces matches of a given {@link Pattern}.
  *
- * @since 1.7.0
  */
 public class PatternReplacingStringProcessor implements StringProcessor {
 

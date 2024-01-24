@@ -70,9 +70,8 @@ public class NoPermissionException extends CommandParseException {
      * Returns the missing {@link Permission}
      *
      * @return the missing permission
-     * @since 1.9.0
      */
-    @API(status = API.Status.STABLE, since = "1.9.0")
+    @API(status = API.Status.STABLE)
     public @NonNull Permission missingPermission() {
         return this.result.permission();
     }

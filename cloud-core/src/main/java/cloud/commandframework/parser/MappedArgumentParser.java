@@ -39,7 +39,6 @@ import static java.util.Objects.requireNonNull;
  * @param <C> command sender type
  * @param <I> base output type
  * @param <O> mapped output type
- * @since 1.5.0
  */
 @API(status = API.Status.STABLE, since = "1.5.0")
 public final class MappedArgumentParser<C, I, O> implements ArgumentParser.FutureArgumentParser<C, O> {

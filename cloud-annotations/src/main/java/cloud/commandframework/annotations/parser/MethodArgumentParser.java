@@ -42,7 +42,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> command sender type
  * @param <T> Argument type
- * @since 1.3.0
  */
 public final class MethodArgumentParser<C, T> extends AnnotatedMethodHandler<C> implements ArgumentParser<C, T> {
 

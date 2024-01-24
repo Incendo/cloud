@@ -41,17 +41,15 @@ public final class ShortParser<C> extends NumberParser<C, Short, ShortRange> imp
     /**
      * Constant for the default/unset minimum value.
      *
-     * @since 1.5.0
      */
-    @API(status = API.Status.STABLE, since = "1.5.0")
+    @API(status = API.Status.STABLE)
     public static final short DEFAULT_MINIMUM = Short.MIN_VALUE;
 
     /**
      * Constant for the default/unset maximum value.
      *
-     * @since 1.5.0
      */
-    @API(status = API.Status.STABLE, since = "1.5.0")
+    @API(status = API.Status.STABLE)
     public static final short DEFAULT_MAXIMUM = Short.MAX_VALUE;
 
     /**
@@ -164,9 +162,8 @@ public final class ShortParser<C> extends NumberParser<C, Short, ShortRange> imp
          * @param input          input string
          * @param parser         short parser
          * @param commandContext command context
-         * @since 1.5.0
          */
-        @API(status = API.Status.STABLE, since = "1.5.0")
+        @API(status = API.Status.STABLE)
         public ShortParseException(
                 final @NonNull String input,
                 final @NonNull ShortParser<?> parser,

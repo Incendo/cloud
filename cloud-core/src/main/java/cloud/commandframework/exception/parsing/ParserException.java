@@ -87,9 +87,8 @@ public class ParserException extends IllegalArgumentException {
      * Get the error caption for this parser exception
      *
      * @return The caption
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     public @NonNull Caption errorCaption() {
         return this.errorCaption;
     }
@@ -99,9 +98,8 @@ public class ParserException extends IllegalArgumentException {
      * The returned array may be empty if no variables are present.
      *
      * @return The caption variables
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CaptionVariable @NonNull [] captionVariables() {
         return Arrays.copyOf(this.captionVariables, this.captionVariables.length);
     }

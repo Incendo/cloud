@@ -49,7 +49,6 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  * The order injectors are tested is the same order they were registered in.
  *
  * @param <C> command sender type
- * @since 1.2.0
  */
 @SuppressWarnings("ALL")
 @API(status = API.Status.STABLE, since = "1.2.0")
@@ -111,9 +110,8 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      * @param predicate a predicate that matches if the injector should be used for a type
      * @param injector  the injector that should inject the value into the command method
      * @return {@code this}
-     * @since 1.8.0
      */
-    @API(status = API.Status.STABLE, since = "1.8.0")
+    @API(status = API.Status.STABLE)
     public synchronized <T> @This @NonNull ParameterInjectorRegistry<C> registerInjector(
             final @NonNull Predicate<TypeToken<?>> predicate,
             final @NonNull ParameterInjector<C, T> injector
@@ -145,9 +143,8 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      * @param annotationAccessor annotation accessor for the injection. If the object is requested without access to annotations,
      *                           use {@link AnnotationAccessor#empty()}
      * @return the injected value, if an injector was able to provide a value
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     public <T> @NonNull Optional<T> getInjectable(
             final @NonNull Class<T> clazz,
             final @NonNull CommandContext<C> context,
@@ -211,9 +208,8 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      *
      * @param service Service implementation
      * @return {@code this}
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     public @This @NonNull ParameterInjectorRegistry<C> registerInjectionService(final InjectionService<C> service) {
         this.servicePipeline.registerServiceImplementation(new TypeToken<InjectionService<C>>() {
         }, service, Collections.emptyList());

@@ -260,7 +260,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * @since 2.0.0
      * @see #captionFormatter()
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public void captionFormatter(final @NonNull CaptionFormatter<C, String> captionFormatter) {
         this.captionVariableReplacementHandler = captionFormatter;
     }
@@ -269,10 +269,9 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * Returns the command syntax formatter.
      *
      * @return the syntax formatter
-     * @since 1.7.0
      * @see #commandSyntaxFormatter(CommandSyntaxFormatter)
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CommandSyntaxFormatter<C> commandSyntaxFormatter() {
         return this.commandSyntaxFormatter;
     }
@@ -283,10 +282,9 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * The command syntax formatter is used to format the command syntax hints that are used in help and error messages.
      *
      * @param commandSyntaxFormatter new formatter
-     * @since 1.7.0
      * @see #commandSyntaxFormatter()
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public void commandSyntaxFormatter(final @NonNull CommandSyntaxFormatter<C> commandSyntaxFormatter) {
         this.commandSyntaxFormatter = commandSyntaxFormatter;
     }
@@ -301,13 +299,12 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * {@link CommandRegistrationHandler#nullCommandRegistrationHandler()}.
      *
      * @return the command registration handler
-     * @since 1.7.0
      */
     public @NonNull CommandRegistrationHandler<C> commandRegistrationHandler() {
         return this.commandRegistrationHandler;
     }
 
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     protected final void commandRegistrationHandler(final @NonNull CommandRegistrationHandler<C> commandRegistrationHandler) {
         this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.commandRegistrationHandler = commandRegistrationHandler;
@@ -317,11 +314,10 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * Registers the given {@code capability}.
      *
      * @param capability the capability
-     * @since 1.7.0
      * @see #hasCapability(CloudCapability)
      * @see #capabilities()
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     protected final void registerCapability(final @NonNull CloudCapability capability) {
         this.capabilities.add(capability);
     }
@@ -331,10 +327,9 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      *
      * @param capability the capability
      * @return {@code true} if the implementation has the {@code capability}, {@code false} if not
-     * @since 1.7.0
      * @see #capabilities()
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public boolean hasCapability(final @NonNull CloudCapability capability) {
         return this.capabilities.contains(capability);
     }
@@ -343,10 +338,9 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * Returns an unmodifiable snapshot of the currently registered {@link CloudCapability capabilities}.
      *
      * @return the currently registered capabilities
-     * @since 1.7.0
      * @see #hasCapability(CloudCapability)
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public @NonNull Collection<@NonNull CloudCapability> capabilities() {
         return Collections.unmodifiableSet(new HashSet<>(this.capabilities));
     }
@@ -391,10 +385,9 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * Returns the caption registry.
      *
      * @return the caption registry
-     * @since 1.7.0
      * @see #captionRegistry(CaptionRegistry)
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public final @NonNull CaptionRegistry<C> captionRegistry() {
         return this.captionRegistry;
     }
@@ -407,9 +400,8 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      *
      * @param captionRegistry new caption registry.
      * @see #captionRegistry()
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public final void captionRegistry(final @NonNull CaptionRegistry<C> captionRegistry) {
         this.captionRegistry = captionRegistry;
     }
@@ -431,9 +423,8 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      *
      * @param rootCommand The root command to delete
      * @throws CloudCapability.CloudCapabilityMissingException If {@link CloudCapability.StandardCapabilities#ROOT_COMMAND_DELETION} is missing
-     * @since 1.7.0
      */
-    @API(status = API.Status.EXPERIMENTAL, since = "1.7.0")
+    @API(status = API.Status.EXPERIMENTAL)
     public void deleteRootCommand(final @NonNull String rootCommand) throws CloudCapability.CloudCapabilityMissingException {
         if (!this.hasCapability(CloudCapability.StandardCapabilities.ROOT_COMMAND_DELETION)) {
             throw new CloudCapability.CloudCapabilityMissingException(CloudCapability.StandardCapabilities.ROOT_COMMAND_DELETION);
@@ -460,9 +451,8 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * Returns all root command names.
      *
      * @return Root command names.
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public @NonNull Collection<@NonNull String> rootCommands() {
         return this.commandTree.rootNodes()
                 .stream()
@@ -522,9 +512,8 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * absolutely know what you're doing.
      *
      * @return the command tree
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public @NonNull CommandTree<C> commandTree() {
         return this.commandTree;
     }
@@ -649,9 +638,8 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * constructor of the platform {@link CommandManager}.
      *
      * @return the parser registry instance
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public @NonNull ParserRegistry<C> parserRegistry() {
         return this.parserRegistry;
     }
@@ -660,7 +648,6 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * Get the parameter injector registry instance
      *
      * @return Parameter injector registry
-     * @since 1.3.0
      */
     public final @NonNull ParameterInjectorRegistry<C> parameterInjectorRegistry() {
         return this.parameterInjectorRegistry;
@@ -683,9 +670,8 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * Returns an unmodifiable view of all registered commands.
      *
      * @return unmodifiable view of all registered commands
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public final @NonNull Collection<@NonNull Command<C>> commands() {
         return Collections.unmodifiableCollection(this.commands);
     }
@@ -774,9 +760,8 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * {@link RegistrationState#REGISTERING} to {@link RegistrationState#AFTER_REGISTRATION}.
      *
      * @throws IllegalStateException if the manager is not in the expected state
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     protected final void lockRegistration() {
         if (this.state() == RegistrationState.BEFORE_REGISTRATION) {
             this.transitionOrThrow(RegistrationState.BEFORE_REGISTRATION, RegistrationState.AFTER_REGISTRATION);
@@ -792,9 +777,8 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * {@link ManagerSetting#ALLOW_UNSAFE_REGISTRATION} setting.
      *
      * @return {@code true} if the registration is allowed, else {@code false}
-     * @since 1.2.0
      */
-    @API(status = API.Status.STABLE, since = "1.2.0")
+    @API(status = API.Status.STABLE)
     public boolean isCommandRegistrationAllowed() {
         return this.settings().get(ManagerSetting.ALLOW_UNSAFE_REGISTRATION)
                 || this.state.get() != RegistrationState.AFTER_REGISTRATION;

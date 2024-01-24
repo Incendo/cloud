@@ -41,17 +41,15 @@ public final class LongParser<C> extends NumberParser<C, Long, LongRange> implem
     /**
      * Constant for the default/unset minimum value.
      *
-     * @since 1.5.0
      */
-    @API(status = API.Status.STABLE, since = "1.5.0")
+    @API(status = API.Status.STABLE)
     public static final long DEFAULT_MINIMUM = Long.MIN_VALUE;
 
     /**
      * Constant for the default/unset maximum value.
      *
-     * @since 1.5.0
      */
-    @API(status = API.Status.STABLE, since = "1.5.0")
+    @API(status = API.Status.STABLE)
     public static final long DEFAULT_MAXIMUM = Long.MAX_VALUE;
 
     /**
@@ -164,9 +162,8 @@ public final class LongParser<C> extends NumberParser<C, Long, LongRange> implem
          * @param input          input string
          * @param parser         long parser
          * @param commandContext command context
-         * @since 1.5.0
          */
-        @API(status = API.Status.STABLE, since = "1.5.0")
+        @API(status = API.Status.STABLE)
         public LongParseException(
                 final @NonNull String input,
                 final @NonNull LongParser<?> parser,

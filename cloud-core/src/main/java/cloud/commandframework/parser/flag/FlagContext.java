@@ -96,9 +96,8 @@ public final class FlagContext {
      * @param flag the flag
      * @param <T>  the flag value type
      * @return the number of values associated with the flag
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public <T> int count(final @NonNull CommandFlag<T> flag) {
         return this.getAll(flag).size();
     }
@@ -108,9 +107,8 @@ public final class FlagContext {
      *
      * @param flag the flag
      * @return the number of values associated with the flag
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public int count(final @NonNull String flag) {
         return this.getAll(flag).size();
     }
@@ -135,9 +133,8 @@ public final class FlagContext {
      * @param flag A presence flag instance
      * @return {@code true} if the flag is a presence flag and is present,
      *         else {@code false}
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     public boolean isPresent(final @NonNull CommandFlag<Void> flag) {
         return this.isPresent(flag.name());
     }
@@ -153,9 +150,8 @@ public final class FlagContext {
      * @param name Flag name
      * @param <T>  Value type
      * @return Optional containing stored value if present
-     * @since 1.2.0
      */
-    @API(status = API.Status.STABLE, since = "1.2.0")
+    @API(status = API.Status.STABLE)
     public <T> @NonNull Optional<T> getValue(
             final @NonNull String name
     ) {
@@ -177,9 +173,8 @@ public final class FlagContext {
      * @param flag Flag type
      * @param <T>  Value type
      * @return Optional containing stored value if present
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     public <T> @NonNull Optional<T> getValue(
             final @NonNull CommandFlag<T> flag
     ) {
@@ -218,9 +213,8 @@ public final class FlagContext {
      * @param defaultValue Default value
      * @param <T>          Value type
      * @return Stored value, or the supplied default value
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     public <T> @Nullable T getValue(
             final @NonNull CommandFlag<T> name,
             final @Nullable T defaultValue
@@ -235,9 +229,8 @@ public final class FlagContext {
      *
      * @param name Flag name
      * @return whether the flag is present
-     * @since 1.2.0
      */
-    @API(status = API.Status.STABLE, since = "1.2.0")
+    @API(status = API.Status.STABLE)
     public boolean hasFlag(
             final @NonNull String name
     ) {
@@ -251,9 +244,8 @@ public final class FlagContext {
      *
      * @param flag The flag instance
      * @return whether the flag is present
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     public boolean hasFlag(
             final @NonNull CommandFlag<?> flag
     ) {
@@ -267,9 +259,8 @@ public final class FlagContext {
      *
      * @param name Flag name
      * @return whether the flag is present
-     * @since 1.3.0
      */
-    @API(status = API.Status.STABLE, since = "1.3.0")
+    @API(status = API.Status.STABLE)
     public boolean contains(final @NonNull String name) {
         return this.hasFlag(name);
     }
@@ -281,9 +272,8 @@ public final class FlagContext {
      *
      * @param flag Flag instance
      * @return whether the flag is present
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     public boolean contains(final @NonNull CommandFlag<?> flag) {
         return this.hasFlag(flag);
     }
@@ -299,10 +289,9 @@ public final class FlagContext {
      * @param name Flag name
      * @param <T>  Value type
      * @return Stored value if present, else {@code null}
-     * @since 1.3.0
      */
     @SuppressWarnings("TypeParameterUnusedInFormals")
-    @API(status = API.Status.STABLE, since = "1.3.0")
+    @API(status = API.Status.STABLE)
     public <T> @Nullable T get(
             final @NonNull String name
     ) {
@@ -320,9 +309,8 @@ public final class FlagContext {
      * @param flag Flag name
      * @param <T>  Value type
      * @return Stored value if present, else {@code null}
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     public <T> @Nullable T get(
             final @NonNull CommandFlag<T> flag
     ) {
@@ -335,9 +323,8 @@ public final class FlagContext {
      * @param flag the flag
      * @param <T>  the flag value type
      * @return unmodifiable view of all stored flag values, or {@link Collections#emptyList()}.
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public <T> @NonNull Collection<T> getAll(
             final @NonNull CommandFlag<T> flag
     ) {
@@ -354,9 +341,8 @@ public final class FlagContext {
      * @param flag the flag
      * @param <T>  the flag value type
      * @return unmodifiable view of all stored flag values, or {@link Collections#emptyList()}.
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public <T> @NonNull Collection<T> getAll(
             final @NonNull String flag
     ) {

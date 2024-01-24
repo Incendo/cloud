@@ -35,7 +35,6 @@ import org.apiguardian.api.API;
  * <p>
  * This only has an effect on greedy arguments that consume all remaining input.
  *
- * @since 1.7.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)

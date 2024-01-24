@@ -333,9 +333,8 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
          * Returns the reason why the flag parsing failed.
          *
          * @return the failure reason
-         * @since 1.8.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE)
         public CommandFlagParser.@NonNull FailureReason failureReason() {
             return this.failureReason;
         }

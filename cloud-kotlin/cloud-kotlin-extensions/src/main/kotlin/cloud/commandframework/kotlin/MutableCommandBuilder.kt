@@ -44,7 +44,6 @@ import kotlin.reflect.KClass
  * @property commandBuilder the command builder the mutate
  * @property commandManager the command manager which will own this command
  * @constructor Create a new [MutableCommandBuilder]
- * @since 1.3.0
  */
 public class MutableCommandBuilder<C : Any>(
     commandBuilder: Command.Builder<C>,
@@ -65,7 +64,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param description description for the root command node
      * @param aliases aliases for the root command node
      * @param commandManager the command manager which will own this command
-     * @since 1.4.0
      */
     public constructor(
         name: String,
@@ -82,7 +80,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param aliases aliases for the root command node
      * @param commandManager the command manager which will own this command
      * @param lambda receiver lambda which will be invoked on the new builder
-     * @since 1.4.0
      */
     public constructor(
         name: String,
@@ -98,7 +95,6 @@ public class MutableCommandBuilder<C : Any>(
      * Build a [Command] from the current state of this builder
      *
      * @return built command
-     * @since 1.3.0
      */
     public fun build(): Command<C> = this.commandBuilder.build()
 
@@ -108,7 +104,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param lambda receiver lambda which will be invoked on builder before building
      * @return built command
-     * @since 1.3.0
      */
     public fun build(lambda: MutableCommandBuilder<C>.() -> Unit): Command<C> {
         lambda(this)
@@ -120,7 +115,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param mutator mutator function
      * @return this mutable builder
-     * @since 1.3.0
      */
     public fun mutate(
         mutator: (Command.Builder<C>) -> Command.Builder<C>
@@ -137,7 +131,6 @@ public class MutableCommandBuilder<C : Any>(
      * Make a new copy of this [MutableCommandBuilder]
      *
      * @return a copy of this mutable builder
-     * @since 1.3.0
      */
     public fun copy(): MutableCommandBuilder<C> =
         MutableCommandBuilder(this.commandBuilder, this.commandManager)
@@ -147,7 +140,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param lambda receiver lambda which will be invoked on the new builder
      * @return a copy of this mutable builder
-     * @since 1.3.0
      */
     public fun copy(lambda: MutableCommandBuilder<C>.() -> Unit): MutableCommandBuilder<C> =
         copy().apply { lambda(this) }
@@ -160,7 +152,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param description description for the literal
      * @param lambda receiver lambda which will be invoked on the new builder
      * @return a copy of this mutable builder
-     * @since 1.4.0
      */
     public fun copy(
         literal: String,
@@ -179,7 +170,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param literal name for the literal
      * @param lambda receiver lambda which will be invoked on the new builder
      * @return a copy of this mutable builder
-     * @since 1.3.0
      */
     public fun copy(
         literal: String,
@@ -195,7 +185,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @return this mutable builder
      * @see [CommandManager.command]
-     * @since 1.3.0
      */
     public fun register(): MutableCommandBuilder<C> = apply { this.commandManager.command(this) }
 
@@ -206,7 +195,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param lambda receiver lambda which will be invoked on the new builder
      * @return the new mutable builder
      * @see [CommandManager.command]
-     * @since 1.3.0
      */
     public fun registerCopy(lambda: MutableCommandBuilder<C>.() -> Unit): MutableCommandBuilder<C> =
         copy(lambda).register()
@@ -219,7 +207,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param lambda receiver lambda which will be invoked on the new builder
      * @return the new mutable builder
      * @see [CommandManager.command]
-     * @since 1.3.0
      */
     public fun registerCopy(
         literal: String,
@@ -235,7 +222,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param lambda receiver lambda which will be invoked on the new builder
      * @return the new mutable builder
      * @see [CommandManager.command]
-     * @since 1.4.0
      */
     public fun registerCopy(
         literal: String,
@@ -250,7 +236,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param key the key to set a value for
      * @param value new value
      * @return this mutable builder
-     * @since 1.3.0
      */
     public fun <T : Any> meta(key: CloudKey<T>, value: T): MutableCommandBuilder<C> =
         mutate {
@@ -263,7 +248,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param T value type
      * @param value new value
      * @return this mutable builder
-     * @since 1.3.0
      */
     public infix fun <T : Any> CloudKey<T>.to(value: T): MutableCommandBuilder<C> =
         meta(this, value)
@@ -295,7 +279,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param T sender type
      * @return this mutable builder
-     * @since 1.3.0
      */
     public inline fun <reified T : C> senderType(): MutableCommandBuilder<C> = mutate {
         it.senderType(T::class)
@@ -306,7 +289,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param type sender type
      * @return this mutable builder
-     * @since 1.3.0
      */
     public fun senderType(type: KClass<out C>): MutableCommandBuilder<C> = mutate {
         it.senderType(type)
@@ -315,7 +297,6 @@ public class MutableCommandBuilder<C : Any>(
     /**
      * Field to get and set the required sender type for this command builder
      *
-     * @since 1.3.0
      */
     public var senderType: KClass<out C>?
         get() = this.commandBuilder.senderType()?.kotlin
@@ -329,7 +310,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param type sender type
      * @return this mutable builder
-     * @since 1.3.0
      */
     public fun senderType(type: Class<out C>): MutableCommandBuilder<C> = mutate {
         it.senderType(type)
@@ -340,7 +320,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param permission permission string
      * @return this mutable builder
-     * @since 1.3.0
      */
     public fun permission(permission: String): MutableCommandBuilder<C> = mutate {
         it.permission(permission)
@@ -351,7 +330,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param permission command permission
      * @return this mutable builder
-     * @since 1.3.0
      */
     public fun permission(permission: Permission): MutableCommandBuilder<C> = mutate {
         it.permission(permission)
@@ -360,7 +338,6 @@ public class MutableCommandBuilder<C : Any>(
     /**
      * Field to get and set the required permission for this command builder
      *
-     * @since 1.3.0
      */
     public var permission: String
         get() = this.commandBuilder.commandPermission().toString()
@@ -369,7 +346,6 @@ public class MutableCommandBuilder<C : Any>(
     /**
      * Field to get and set the required permission for this command builder
      *
-     * @since 1.3.0
      */
     public var commandPermission: Permission
         get() = this.commandBuilder.commandPermission()
@@ -524,7 +500,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param description literal description
      * @param aliases argument aliases
      * @return this mutable builder
-     * @since 1.4.0
      */
     public fun literal(
         name: String,
@@ -537,7 +512,6 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @param handler command execution handler
      * @return this mutable builder
-     * @since 1.3.0
      */
     public fun handler(handler: CommandExecutionHandler<C>): MutableCommandBuilder<C> = mutate {
         it.handler(handler)
@@ -576,7 +550,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param componentSupplier component supplier for the flag
      * @param <T> the component value type
      * @return this mutable builder
-     * @since 1.4.0
      */
     public fun <T> flag(
         name: String,
@@ -603,7 +576,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param component component for the flag
      * @param <T> the component value type
      * @return this mutable builder
-     * @since 1.4.0
      */
     public fun <T> flag(
         name: String,
@@ -630,7 +602,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param componentBuilder command component builder for the flag
      * @param <T> the component value type
      * @return this mutable builder
-     * @since 1.4.0
      */
     public fun <T> flag(
         name: String,
@@ -655,7 +626,6 @@ public class MutableCommandBuilder<C : Any>(
      * @param aliases flag aliases
      * @param description description of the flag
      * @return this mutable builder
-     * @since 1.4.0
      */
     public fun flag(
         name: String,

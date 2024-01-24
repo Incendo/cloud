@@ -34,7 +34,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Managed access for {@link java.lang.annotation.Annotation} instances
  *
- * @since 1.2.0
  */
 @API(status = API.Status.STABLE, since = "1.2.0")
 public interface AnnotationAccessor {
@@ -43,9 +42,8 @@ public interface AnnotationAccessor {
      * Get a {@link AnnotationAccessor} that cannot access any annotations
      *
      * @return Empty annotation accessor
-     * @since 1.3.0
      */
-    @API(status = API.Status.STABLE, since = "1.3.0")
+    @API(status = API.Status.STABLE)
     static @NonNull AnnotationAccessor empty() {
         return new NullAnnotationAccessor();
     }
@@ -68,9 +66,8 @@ public interface AnnotationAccessor {
      *
      * @param accessors The accessor to delegate to
      * @return Annotation accessor that delegates to the given accessors (using their natural ordering)
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     static @NonNull AnnotationAccessor of(final @NonNull AnnotationAccessor @NonNull... accessors) {
         return new MultiDelegateAnnotationAccessor(accessors);
     }
@@ -97,7 +94,6 @@ public interface AnnotationAccessor {
     /**
      * Annotation accessor that cannot access any annotations
      *
-     * @since 1.3.0
      */
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "1.3.0")
     final class NullAnnotationAccessor implements AnnotationAccessor {

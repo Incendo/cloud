@@ -40,7 +40,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Ignore the warning says 'Binding annotation @YourAnnotation without {@literal @Inject} declared'.</p>
  *
  * @param <C> command sender type
- * @since 1.4.0
  */
 @API(status = API.Status.STABLE, since = "1.4.0")
 public final class GuiceInjectionService<C> implements InjectionService<C> {

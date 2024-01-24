@@ -33,7 +33,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * A functional {@link Permission} implementation
  *
  * @param <C> command sender type
- * @since 1.4.0
  */
 @FunctionalInterface
 @API(status = API.Status.STABLE, since = "1.4.0")

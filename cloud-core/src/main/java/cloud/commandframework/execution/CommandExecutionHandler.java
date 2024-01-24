@@ -46,10 +46,9 @@ public interface CommandExecutionHandler<C> {
      *
      * @param <C> command sender type
      * @return command execution handler that does nothing
-     * @since 1.7.0
      */
     @SuppressWarnings("unchecked")
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     static <C> @NonNull CommandExecutionHandler<C> noOpCommandExecutionHandler() {
         return (CommandExecutionHandler<C>) NullCommandExecutionHandler.INSTANCE;
     }
@@ -64,9 +63,8 @@ public interface CommandExecutionHandler<C> {
      * @param handlers The handlers to delegate to
      * @param <C>      Command sender type
      * @return multicast-delegate command execution handler
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     static <C> @NonNull CommandExecutionHandler<C> delegatingExecutionHandler(
             final List<CommandExecutionHandler<C>> handlers
     ) {
@@ -85,9 +83,8 @@ public interface CommandExecutionHandler<C> {
      *
      * @param commandContext Command context
      * @return future that completes when the command has finished execution
-     * @since 1.6.0
      */
-    @API(status = API.Status.STABLE, since = "1.6.0")
+    @API(status = API.Status.STABLE)
     default CompletableFuture<@Nullable Void> executeFuture(@NonNull CommandContext<C> commandContext) {
         final CompletableFuture<Void> future = new CompletableFuture<>();
         try {
@@ -105,10 +102,9 @@ public interface CommandExecutionHandler<C> {
      * by a command sender
      *
      * @param <C> command sender type
-     * @since 1.6.0
      */
     @FunctionalInterface
-    @API(status = API.Status.STABLE, since = "1.6.0")
+    @API(status = API.Status.STABLE)
     interface FutureCommandExecutionHandler<C> extends CommandExecutionHandler<C> {
 
         @Override

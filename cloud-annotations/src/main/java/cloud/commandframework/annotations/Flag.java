@@ -79,7 +79,6 @@ public @interface Flag {
      *
      * @return The name of the suggestion provider, or {@code ""} if the default suggestion provider for the argument parser
      *         should be used instead
-     * @since 1.2.0
      */
     @NonNull String suggestions() default "";
 
@@ -94,7 +93,6 @@ public @interface Flag {
      * The flag permission
      *
      * @return Flag permission
-     * @since 1.6.0
      */
     @NonNull String permission() default "";
 
@@ -102,8 +100,7 @@ public @interface Flag {
      * Whether the flag can be repeated.
      *
      * @return whether the flag can be repeated
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     boolean repeatable() default false;
 }

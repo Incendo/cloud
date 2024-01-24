@@ -60,9 +60,8 @@ public final class FilteringSuggestionProcessor<C> implements SuggestionProcesso
      * Create a new {@link FilteringSuggestionProcessor}.
      *
      * @param filter mode
-     * @since 1.8.0
      */
-    @API(status = API.Status.STABLE, since = "1.8.0")
+    @API(status = API.Status.STABLE)
     public FilteringSuggestionProcessor(final @NonNull Filter<C> filter) {
         this.filter = filter;
     }
@@ -91,9 +90,8 @@ public final class FilteringSuggestionProcessor<C> implements SuggestionProcesso
      * Filter function that tests (and potentially changes) each suggestion against the input and context.
      *
      * @param <C> command sender type
-     * @since 1.8.0
      */
-    @API(status = API.Status.STABLE, since = "1.8.0")
+    @API(status = API.Status.STABLE)
     @FunctionalInterface
     public interface Filter<C> {
 
@@ -104,9 +102,8 @@ public final class FilteringSuggestionProcessor<C> implements SuggestionProcesso
          * @param suggestion potential suggestion
          * @param input      remaining unconsumed input
          * @return possibly modified suggestion or null to deny
-         * @since 1.8.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE)
         @Nullable String filter(
                 @NonNull CommandPreprocessingContext<C> context,
                 @NonNull String suggestion,
@@ -119,9 +116,8 @@ public final class FilteringSuggestionProcessor<C> implements SuggestionProcesso
          *
          * @param and next filter
          * @return combined filter
-         * @since 1.8.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE)
         default @NonNull Filter<C> and(final @NonNull Filter<C> and) {
             return (ctx, suggestion, input) -> {
                 final @Nullable String filtered = this.filter(ctx, suggestion, input);
@@ -138,9 +134,8 @@ public final class FilteringSuggestionProcessor<C> implements SuggestionProcesso
          * @param ignoreCase whether to ignore case
          * @param <C>        sender type
          * @return new filter
-         * @since 1.8.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE)
         static <C> @NonNull Simple<C> startsWith(final boolean ignoreCase) {
             final BiPredicate<String, String> test = ignoreCase
                     ? (suggestion, input) -> suggestion.toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT))
@@ -154,9 +149,8 @@ public final class FilteringSuggestionProcessor<C> implements SuggestionProcesso
          * @param ignoreCase whether to ignore case
          * @param <C>        sender type
          * @return new filter
-         * @since 1.8.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE)
         static <C> @NonNull Simple<C> contains(final boolean ignoreCase) {
             final BiPredicate<String, String> test = ignoreCase
                     ? (suggestion, input) -> suggestion.toLowerCase(Locale.ROOT).contains(input.toLowerCase(Locale.ROOT))
@@ -215,9 +209,8 @@ public final class FilteringSuggestionProcessor<C> implements SuggestionProcesso
          * @param function function
          * @param <C>      sender type
          * @return filter
-         * @since 1.8.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE)
         static <C> @NonNull Filter<C> contextFree(final @NonNull BiFunction<String, String, @Nullable String> function) {
             return (ctx, suggestion, input) -> function.apply(suggestion, input);
         }
@@ -230,9 +223,8 @@ public final class FilteringSuggestionProcessor<C> implements SuggestionProcesso
          * @param filter filter lambda
          * @param <C>    sender type
          * @return new simple filter
-         * @since 1.8.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE)
         static <C> @NonNull Simple<C> simple(final Simple<C> filter) {
             return filter;
         }
@@ -243,9 +235,8 @@ public final class FilteringSuggestionProcessor<C> implements SuggestionProcesso
          * <p>Returns boolean instead of nullable String.</p>
          *
          * @param <C> command sender type
-         * @since 1.8.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE)
         @FunctionalInterface
         interface Simple<C> extends Filter<C> {
 
@@ -256,9 +247,8 @@ public final class FilteringSuggestionProcessor<C> implements SuggestionProcesso
              * @param suggestion potential suggestion
              * @param input      remaining unconsumed input
              * @return whether to accept the suggestion
-             * @since 1.8.0
              */
-            @API(status = API.Status.STABLE, since = "1.8.0")
+            @API(status = API.Status.STABLE)
             boolean test(
                     @NonNull CommandPreprocessingContext<C> context,
                     @NonNull String suggestion,
@@ -284,9 +274,8 @@ public final class FilteringSuggestionProcessor<C> implements SuggestionProcesso
              * @param test predicate
              * @param <C>  sender type
              * @return simple filter
-             * @since 1.8.0
              */
-            @API(status = API.Status.STABLE, since = "1.8.0")
+            @API(status = API.Status.STABLE)
             static <C> @NonNull Simple<C> contextFree(final @NonNull BiPredicate<String, String> test) {
                 return (ctx, suggestion, input) -> test.test(suggestion, input);
             }

@@ -40,17 +40,15 @@ public final class FloatParser<C> extends NumberParser<C, Float, FloatRange> {
     /**
      * Constant for the default/unset minimum value.
      *
-     * @since 1.5.0
      */
-    @API(status = API.Status.STABLE, since = "1.5.0")
+    @API(status = API.Status.STABLE)
     public static final float DEFAULT_MINIMUM = Float.NEGATIVE_INFINITY;
 
     /**
      * Constant for the default/unset maximum value.
      *
-     * @since 1.5.0
      */
-    @API(status = API.Status.STABLE, since = "1.5.0")
+    @API(status = API.Status.STABLE)
     public static final float DEFAULT_MAXIMUM = Float.POSITIVE_INFINITY;
 
     /**
@@ -155,9 +153,8 @@ public final class FloatParser<C> extends NumberParser<C, Float, FloatRange> {
          * @param input          input string
          * @param parser         float parser
          * @param commandContext command context
-         * @since 1.5.0
          */
-        @API(status = API.Status.STABLE, since = "1.5.0")
+        @API(status = API.Status.STABLE)
         public FloatParseException(
                 final @NonNull String input,
                 final @NonNull FloatParser<?> parser,

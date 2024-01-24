@@ -30,7 +30,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Represents the fragment of the syntax making up a command.
  *
- * @since 1.7.0
  */
 @API(status = API.Status.STABLE, since = "1.7.0")
 public final class SyntaxFragment {

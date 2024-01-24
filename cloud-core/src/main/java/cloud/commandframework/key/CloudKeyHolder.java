@@ -30,7 +30,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents any object that holds a {@link CloudKey}
  *
  * @param <T> The type of the key value.
- * @since 1.4.0
  */
 @FunctionalInterface
 @API(status = API.Status.STABLE, since = "1.4.0")

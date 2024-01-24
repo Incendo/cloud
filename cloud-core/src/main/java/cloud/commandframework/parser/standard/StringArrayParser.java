@@ -94,9 +94,8 @@ public final class StringArrayParser<C> implements ArgumentParser<C, String[]> {
      * Construct a new string array parser.
      *
      * @param flagYielding Whether the parser should stop parsing when encountering a potential flag
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public StringArrayParser(final boolean flagYielding) {
         this.flagYielding = flagYielding;
     }

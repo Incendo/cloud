@@ -71,9 +71,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      *
      * @param commandSender  the sender of the command
      * @param commandManager command manager
-     * @since 1.3.0
      */
-    @API(status = API.Status.STABLE, since = "1.3.0")
+    @API(status = API.Status.STABLE)
     public CommandContext(final @NonNull C commandSender, final @NonNull CommandManager<C> commandManager) {
         this(false, commandSender, commandManager);
     }
@@ -84,9 +83,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * @param suggestions    whether the context is created for command suggestions
      * @param commandSender  the sender of the command
      * @param commandManager command manager
-     * @since 1.3.0
      */
-    @API(status = API.Status.STABLE, since = "1.3.0")
+    @API(status = API.Status.STABLE)
     public CommandContext(
             final boolean suggestions,
             final @NonNull C commandSender,
@@ -150,9 +148,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      *
      * @param permission the permission
      * @return {@code true} if the {@link #sender()} has the permission, else {@code false}
-     * @since 1.6.0
      */
-    @API(status = API.Status.STABLE, since = "1.6.0")
+    @API(status = API.Status.STABLE)
     public boolean hasPermission(final @NonNull Permission permission) {
         return this.commandManager.testPermission(this.commandSender, permission).allowed();
     }
@@ -162,9 +159,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      *
      * @param permission the permission
      * @return {@code true} if the {@link #sender()} has the permission, else {@code false}
-     * @since 1.6.0
      */
-    @API(status = API.Status.STABLE, since = "1.6.0")
+    @API(status = API.Status.STABLE)
     public boolean hasPermission(final @NonNull String permission) {
         return this.commandManager.hasPermission(this.commandSender, permission);
     }
@@ -299,7 +295,7 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * @return the context
      * @since 2.0.0
      */
-    @API(status = API.Status.MAINTAINED, since = "1.9.0")
+    @API(status = API.Status.MAINTAINED)
     public @NonNull ParsingContext<C> parsingContext(final int position) {
         return this.parsingContexts.get(position);
     }
@@ -311,7 +307,7 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * @return the context
      * @since 2.0.0
      */
-    @API(status = API.Status.MAINTAINED, since = "1.9.0")
+    @API(status = API.Status.MAINTAINED)
     public @NonNull ParsingContext<C> parsingContext(final String name) {
         return this.parsingContexts.stream()
                 .filter(context -> context.component().name().equals(name))
@@ -372,9 +368,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * @param <T>   type to inject
      * @param clazz class of type to inject
      * @return optional that may contain the created value
-     * @since 1.3.0
      */
-    @API(status = API.Status.STABLE, since = "1.3.0")
+    @API(status = API.Status.STABLE)
     public <T> @NonNull Optional<T> inject(final @NonNull Class<T> clazz) {
         if (this.commandManager == null) {
             throw new UnsupportedOperationException(

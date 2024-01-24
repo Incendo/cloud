@@ -34,7 +34,6 @@ import org.immutables.value.Value;
  * A typed, named key.
  *
  * @param <T> The type of the key
- * @since 1.4.0
  */
 @ImmutableImpl
 @Value.Immutable

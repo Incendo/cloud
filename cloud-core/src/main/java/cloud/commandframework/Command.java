@@ -155,9 +155,8 @@ public class Command<C> {
      * @param commandExecutionHandler execution handler
      * @param senderType              required sender type. May be {@code null}
      * @param commandMeta             command meta instance
-     * @since 1.3.0
      */
-    @API(status = API.Status.STABLE, since = "1.3.0")
+    @API(status = API.Status.STABLE)
     public Command(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
@@ -174,9 +173,8 @@ public class Command<C> {
      * @param commandExecutionHandler execution handler
      * @param permission       command permission
      * @param commandMeta             command meta instance
-     * @since 1.3.0
      */
-    @API(status = API.Status.STABLE, since = "1.3.0")
+    @API(status = API.Status.STABLE)
     public Command(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
@@ -197,9 +195,8 @@ public class Command<C> {
      * @param aliases     command aliases
      * @param <C>         command sender type
      * @return command builder
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     public static <C> @NonNull Builder<C> newBuilder(
             final @NonNull String commandName,
             final @NonNull CommandMeta commandMeta,
@@ -289,9 +286,8 @@ public class Command<C> {
      * Returns a mutable copy of the command components, ignoring flag arguments.
      *
      * @return argument list
-     * @since 1.8.0
      */
-    @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
+    @API(status = API.Status.EXPERIMENTAL)
     public @NonNull List<CommandComponent<C>> nonFlagArguments() {
         final List<CommandComponent<C>> components = new ArrayList<>(this.components);
         if (this.flagComponent() != null) {
@@ -453,9 +449,8 @@ public class Command<C> {
          * Returns {@code null} when there is not a specific required sender type.
          *
          * @return required sender type
-         * @since 1.3.0
          */
-        @API(status = API.Status.STABLE, since = "1.3.0")
+        @API(status = API.Status.STABLE)
         public @Nullable Class<? extends C> senderType() {
             return this.senderType;
         }
@@ -466,9 +461,8 @@ public class Command<C> {
          * Will return {@link Permission#empty()} if there is no required permission.
          *
          * @return required permission
-         * @since 1.3.0
          */
-        @API(status = API.Status.STABLE, since = "1.3.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Permission commandPermission() {
             return this.permission;
         }
@@ -489,9 +483,8 @@ public class Command<C> {
          *
          * @param applicable operation
          * @return operation result
-         * @since 1.8.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Builder<@NonNull C> apply(
                 final @NonNull Applicable<@NonNull C> applicable
         ) {
@@ -505,9 +498,8 @@ public class Command<C> {
          * @param key   meta key
          * @param value meta value
          * @return new builder instance using the inserted meta key-value pair
-         * @since 1.3.0
          */
-        @API(status = API.Status.STABLE, since = "1.3.0")
+        @API(status = API.Status.STABLE)
         public <V> @NonNull Builder<C> meta(final @NonNull CloudKey<V> key, final @NonNull V value) {
             final CommandMeta commandMeta = CommandMeta.builder().with(this.commandMeta).with(key, value).build();
             return new Builder<>(
@@ -624,9 +616,8 @@ public class Command<C> {
          * @param description literal description
          * @param aliases     argument aliases
          * @return new builder instance with the modified command chain
-         * @since 1.4.0
          */
-        @API(status = API.Status.STABLE, since = "1.4.0")
+        @API(status = API.Status.STABLE)
         public @NonNull Builder<C> literal(
                 final @NonNull String main,
                 final @NonNull Description description,
@@ -1506,9 +1497,8 @@ public class Command<C> {
          * @param <U>         first type
          * @param <V>         second type
          * @return new builder instance with the argument inserted
-         * @since 1.4.0
          */
-        @API(status = API.Status.STABLE, since = "1.4.0")
+        @API(status = API.Status.STABLE)
         public <U, V> @NonNull Builder<C> requiredArgumentPair(
                 final @NonNull String name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
@@ -1576,9 +1566,8 @@ public class Command<C> {
          * @param <U>         first type
          * @param <V>         second type
          * @return new builder instance with the argument inserted
-         * @since 1.4.0
          */
-        @API(status = API.Status.STABLE, since = "1.4.0")
+        @API(status = API.Status.STABLE)
         public <U, V> @NonNull Builder<C> optionalArgumentPair(
                 final @NonNull String name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
@@ -1649,9 +1638,8 @@ public class Command<C> {
          * @param <V>         second type
          * @param <O>         output type
          * @return new builder instance with the argument inserted
-         * @since 1.4.0
          */
-        @API(status = API.Status.STABLE, since = "1.4.0")
+        @API(status = API.Status.STABLE)
         public <U, V, O> @NonNull Builder<C> requiredArgumentPair(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
@@ -1729,9 +1717,8 @@ public class Command<C> {
          * @param <V>         second type
          * @param <O>         output type
          * @return new builder instance with the argument inserted
-         * @since 1.4.0
          */
-        @API(status = API.Status.STABLE, since = "1.4.0")
+        @API(status = API.Status.STABLE)
         public <U, V, O> @NonNull Builder<C> optionalArgumentPair(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
@@ -1807,9 +1794,8 @@ public class Command<C> {
          * @param <V>           second type
          * @param <W>           third type
          * @return new builder instance with the argument inserted
-         * @since 1.4.0
          */
-        @API(status = API.Status.STABLE, since = "1.4.0")
+        @API(status = API.Status.STABLE)
         public <U, V, W> @NonNull Builder<C> requiredArgumentTriplet(
                 final @NonNull String name,
                 final @NonNull Triplet<String, String, String> names,
@@ -1879,9 +1865,8 @@ public class Command<C> {
          * @param <V>           second type
          * @param <W>           third type
          * @return new builder instance with the argument inserted
-         * @since 1.4.0
          */
-        @API(status = API.Status.STABLE, since = "1.4.0")
+        @API(status = API.Status.STABLE)
         public <U, V, W> @NonNull Builder<C> optionalArgumentTriplet(
                 final @NonNull String name,
                 final @NonNull Triplet<String, String, String> names,
@@ -1954,9 +1939,8 @@ public class Command<C> {
          * @param <W>           third type
          * @param <O>           output type
          * @return new builder instance with the argument inserted
-         * @since 1.4.0
          */
-        @API(status = API.Status.STABLE, since = "1.4.0")
+        @API(status = API.Status.STABLE)
         public <U, V, W, O> @NonNull Builder<C> requiredArgumentTriplet(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
@@ -2036,9 +2020,8 @@ public class Command<C> {
          * @param <W>           third type
          * @param <O>           output type
          * @return new builder instance with the argument inserted
-         * @since 1.4.0
          */
-        @API(status = API.Status.STABLE, since = "1.4.0")
+        @API(status = API.Status.STABLE)
         public <U, V, W, O> @NonNull Builder<C> optionalArgumentTriplet(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
@@ -2123,9 +2106,8 @@ public class Command<C> {
          * Returns the current command execution handler.
          *
          * @return the current handler
-         * @since 1.7.0
          */
-        @API(status = API.Status.STABLE, since = "1.7.0")
+        @API(status = API.Status.STABLE)
         public @NonNull CommandExecutionHandler<C> handler() {
             return this.commandExecutionHandler;
         }
@@ -2334,9 +2316,8 @@ public class Command<C> {
          * but as a separate interface to avoid conflicts.
          *
          * @param <C> command sender type
-         * @since 1.8.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE)
         @FunctionalInterface
         public interface Applicable<C> {
 
@@ -2345,9 +2326,8 @@ public class Command<C> {
              *
              * @param builder builder
              * @return possibly modified builder
-             * @since 1.8.0
              */
-            @API(status = API.Status.STABLE, since = "1.8.0")
+            @API(status = API.Status.STABLE)
             @NonNull Builder<C> applyToCommandBuilder(@NonNull Builder<C> builder);
         }
     }

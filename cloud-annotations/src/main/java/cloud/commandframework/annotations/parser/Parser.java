@@ -46,7 +46,6 @@ import java.lang.annotation.Target;
  * <p>The method can throw exceptions, and the thrown exceptions will automatically be
  * wrapped by a {@link ArgumentParseResult#failure(Throwable)}.</p>
  *
- * @since 1.3.0
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

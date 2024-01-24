@@ -261,9 +261,8 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
         /**
          * Greedy string that will consume the input until a flag is present.
          *
-         * @since 1.7.0
          */
-        @API(status = API.Status.STABLE, since = "1.7.0")
+        @API(status = API.Status.STABLE)
         GREEDY_FLAG_YIELDING
     }
 

@@ -63,7 +63,6 @@ public final class InvalidCommandSenderException extends CommandParseException {
      * @param requiredSender The sender type that is required
      * @param currentChain   Chain leading up to the exception
      * @param command        Command
-     * @since 1.4.0
      */
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "1.4.0")
     public InvalidCommandSenderException(
@@ -99,9 +98,8 @@ public final class InvalidCommandSenderException extends CommandParseException {
      * Returns the Command which the sender is invalid for.
      *
      * @return command
-     * @since 1.4.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.STABLE)
     public @Nullable Command<?> command() {
         return this.command;
     }

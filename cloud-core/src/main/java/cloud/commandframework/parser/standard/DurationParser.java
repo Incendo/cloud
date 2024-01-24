@@ -47,7 +47,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Parser for {@link Duration}.
  *
  * @param <C> command sender type
- * @since 1.7.0
  */
 @API(status = API.Status.STABLE, since = "1.7.0")
 public final class DurationParser<C> implements ArgumentParser<C, Duration>, BlockingSuggestionProvider.Strings<C> {
@@ -150,9 +149,8 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
     /**
      * Failure exception for {@link DurationParser}.
      *
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public static final class DurationParseException extends ParserException {
 
         private final String input;
@@ -162,7 +160,6 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
          *
          * @param input   input string
          * @param context command context
-         * @since 1.7.0
          */
         public DurationParseException(
                 final @NonNull String input,
@@ -181,7 +178,6 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
          * Returns the supplied input string.
          *
          * @return input string
-         * @since 1.7.0
          */
         public @NonNull String input() {
             return this.input;

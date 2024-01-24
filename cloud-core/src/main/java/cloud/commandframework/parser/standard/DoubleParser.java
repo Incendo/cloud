@@ -40,17 +40,15 @@ public final class DoubleParser<C> extends NumberParser<C, Double, DoubleRange> 
     /**
      * Constant for the default/unset minimum value.
      *
-     * @since 1.5.0
      */
-    @API(status = API.Status.STABLE, since = "1.5.0")
+    @API(status = API.Status.STABLE)
     public static final double DEFAULT_MINIMUM = Double.NEGATIVE_INFINITY;
 
     /**
      * Constant for the default/unset maximum value.
      *
-     * @since 1.5.0
      */
-    @API(status = API.Status.STABLE, since = "1.5.0")
+    @API(status = API.Status.STABLE)
     public static final double DEFAULT_MAXIMUM = Double.POSITIVE_INFINITY;
 
     /**
@@ -155,9 +153,8 @@ public final class DoubleParser<C> extends NumberParser<C, Double, DoubleRange> 
          * @param input          input string
          * @param parser         double parser
          * @param commandContext command context
-         * @since 1.5.0
          */
-        @API(status = API.Status.STABLE, since = "1.5.0")
+        @API(status = API.Status.STABLE)
         public DoubleParseException(
                 final @NonNull String input,
                 final @NonNull DoubleParser<?> parser,

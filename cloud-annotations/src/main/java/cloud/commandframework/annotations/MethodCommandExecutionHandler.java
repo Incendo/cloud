@@ -61,7 +61,6 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
      * Constructs a new method command execution handler
      *
      * @param context The context
-     * @since 1.6.0
      */
     public MethodCommandExecutionHandler(final @NonNull CommandMethodContext<C> context) {
         super(context.method, context.instance, context.annotationParser.manager().parameterInjectorRegistry());
@@ -74,7 +73,6 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
      * Returns the command method context
      *
      * @return The context
-     * @since 1.6.0
      */
     public @NonNull CommandMethodContext<C> context() {
         return this.context;
@@ -162,7 +160,6 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
      * Context for command methods
      *
      * @param <C> command sender type
-     * @since 1.6.0
      */
     public static class CommandMethodContext<C> {
 
@@ -196,7 +193,6 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
          * The instance that owns the command method
          *
          * @return The instance
-         * @since 1.6.0
          */
         public @NonNull Object instance() {
             return this.instance;
@@ -206,7 +202,6 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
          * The command method
          *
          * @return The method
-         * @since 1.6.0
          */
         public final @NonNull Method method() {
             return this.method;
@@ -226,7 +221,6 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
          * The injector registry
          *
          * @return Injector registry
-         * @since 1.6.0
          */
         public final @NonNull ParameterInjectorRegistry<C> injectorRegistry() {
             return this.injectorRegistry;
@@ -236,7 +230,6 @@ public class MethodCommandExecutionHandler<C> extends AnnotatedMethodHandler<C> 
          * The annotation parser
          *
          * @return Annotation parser
-         * @since 1.7.0
          */
         public @NonNull AnnotationParser<C> annotationParser() {
             return this.annotationParser;

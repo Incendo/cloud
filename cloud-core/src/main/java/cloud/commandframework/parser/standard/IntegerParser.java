@@ -46,17 +46,15 @@ public final class IntegerParser<C> extends NumberParser<C, Integer, IntRange> i
     /**
      * Constant for the default/unset minimum value.
      *
-     * @since 1.5.0
      */
-    @API(status = API.Status.STABLE, since = "1.5.0")
+    @API(status = API.Status.STABLE)
     public static final int DEFAULT_MINIMUM = Integer.MIN_VALUE;
 
     /**
      * Constant for the default/unset maximum value.
      *
-     * @since 1.5.0
      */
-    @API(status = API.Status.STABLE, since = "1.5.0")
+    @API(status = API.Status.STABLE)
     public static final int DEFAULT_MAXIMUM = Integer.MAX_VALUE;
 
     private static final int MAX_SUGGESTIONS_INCREMENT = 10;
@@ -217,9 +215,8 @@ public final class IntegerParser<C> extends NumberParser<C, Integer, IntRange> i
          * @param input          input string
          * @param parser         integer parser
          * @param commandContext command context
-         * @since 1.5.0
          */
-        @API(status = API.Status.STABLE, since = "1.5.0")
+        @API(status = API.Status.STABLE)
         public IntegerParseException(
                 final @NonNull String input,
                 final @NonNull IntegerParser<?> parser,

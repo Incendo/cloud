@@ -60,7 +60,6 @@ import kotlin.reflect.jvm.kotlinFunction
  * @param context coroutine context
  * @param onlyForSuspending whether the Kotlin execution handler should only be used for suspending functions
  * @return annotation parser
- * @since 1.6.0
  */
 public fun <C> AnnotationParser<C>.installCoroutineSupport(
     scope: CoroutineScope = GlobalScope,

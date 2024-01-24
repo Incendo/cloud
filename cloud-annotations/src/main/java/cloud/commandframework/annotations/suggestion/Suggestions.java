@@ -57,7 +57,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * ﹫Suggestions("name")
  * public Stream<Suggestion> methodName(CommandContext<YourSender> sender, String input)}</pre>
  *
- * @since 1.3.0
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

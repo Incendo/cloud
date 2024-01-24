@@ -50,9 +50,8 @@ public final class StandardParameters {
      * Indicates that an argument should stop parsing when encountering a potential flag.
      *
      * @see FlagYielding
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public static final ParserParameter<Boolean> FLAG_YIELDING = create(
             "flag_yielding",
             TypeToken.get(Boolean.class)
@@ -60,16 +59,14 @@ public final class StandardParameters {
     /**
      * Indicates that a string argument should be quoted.
      *
-     * @since 1.5.0
      */
-    @API(status = API.Status.STABLE, since = "1.5.0")
+    @API(status = API.Status.STABLE)
     public static final ParserParameter<Boolean> QUOTED = create("quoted", TypeToken.get(Boolean.class));
     /**
      * Indicates that a boolean argument should be liberal.
      *
-     * @since 1.6.0
      */
-    @API(status = API.Status.STABLE, since = "1.6.0")
+    @API(status = API.Status.STABLE)
     public static final ParserParameter<Boolean> LIBERAL = create("liberal", TypeToken.get(Boolean.class));
 
     private StandardParameters() {

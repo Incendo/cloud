@@ -36,7 +36,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @param <C> command sender type
  * @param <T> Type of the value that is injected by this injector
- * @since 1.2.0
  */
 @FunctionalInterface
 @API(status = API.Status.STABLE, since = "1.2.0")

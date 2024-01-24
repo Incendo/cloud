@@ -74,7 +74,6 @@ public @interface Argument {
      *
      * @return The name of the suggestion provider, or {@code ""} if the default suggestion provider for the argument parser
      *         should be used instead
-     * @since 1.1.0
      */
     @NonNull String suggestions() default "";
 

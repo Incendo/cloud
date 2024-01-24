@@ -188,9 +188,8 @@ public final class AnnotationParser<C> {
      *                          command methods. These annotations will be mapped to
      *                          {@link ParserParameter}. Mappers for the
      *                          parser parameters can be registered using {@link #registerAnnotationMapper(Class, AnnotationMapper)}
-     * @since 1.7.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.STABLE)
     public AnnotationParser(
             final @NonNull CommandManager<C> manager,
             final @NonNull TypeToken<C> commandSenderType,
@@ -289,7 +288,6 @@ public final class AnnotationParser<C> {
      * Returns the command manager that was used to create this parser
      *
      * @return Command manager
-     * @since 1.6.0
      */
     public @NonNull CommandManager<C> manager() {
         return this.manager;
@@ -389,7 +387,6 @@ public final class AnnotationParser<C> {
      * Returns the string processor used by this parser.
      *
      * @return the string processor
-     * @since 1.7.0
      */
     public @NonNull StringProcessor stringProcessor() {
         return this.stringProcessor;
@@ -399,7 +396,6 @@ public final class AnnotationParser<C> {
      * Replaces the string processor of this parser.
      *
      * @param stringProcessor the new string processor
-     * @since 1.7.0
      */
     public void stringProcessor(final @NonNull StringProcessor stringProcessor) {
         this.stringProcessor = stringProcessor;
@@ -410,7 +406,6 @@ public final class AnnotationParser<C> {
      *
      * @param input the input string
      * @return the processed string
-     * @since 1.7.0
      */
     public @NonNull String processString(final @NonNull String input) {
         return this.stringProcessor().processString(input);
@@ -421,7 +416,6 @@ public final class AnnotationParser<C> {
      *
      * @param strings the input strings
      * @return the processed strings
-     * @since 1.7.0
      */
     public @NonNull String[] processStrings(final @NonNull String[] strings) {
         return Arrays.stream(strings).map(this::processString).toArray(String[]::new);
@@ -645,7 +639,6 @@ public final class AnnotationParser<C> {
      * @return Collection of parsed commands
      * @throws Exception re-throws all encountered exceptions.
      * @see cloud.commandframework.annotations.processing.CommandContainer CommandContainer for more information.
-     * @since 1.7.0
      */
     public @NonNull Collection<cloud.commandframework.@NonNull Command<C>> parseContainers() throws Exception {
         return this.parseContainers(this.getClass().getClassLoader());

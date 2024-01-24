@@ -41,17 +41,15 @@ public final class ByteParser<C> extends NumberParser<C, Byte, ByteRange> implem
     /**
      * Constant for the default/unset minimum value.
      *
-     * @since 1.5.0
      */
-    @API(status = API.Status.STABLE, since = "1.5.0")
+    @API(status = API.Status.STABLE)
     public static final byte DEFAULT_MINIMUM = Byte.MIN_VALUE;
 
     /**
      * Constant for the default/unset maximum value.
      *
-     * @since 1.5.0
      */
-    @API(status = API.Status.STABLE, since = "1.5.0")
+    @API(status = API.Status.STABLE)
     public static final byte DEFAULT_MAXIMUM = Byte.MAX_VALUE;
 
     /**
@@ -164,9 +162,8 @@ public final class ByteParser<C> extends NumberParser<C, Byte, ByteRange> implem
          * @param input          input string
          * @param parser         byte parser
          * @param commandContext command context
-         * @since 1.5.0
          */
-        @API(status = API.Status.STABLE, since = "1.5.0")
+        @API(status = API.Status.STABLE)
         public ByteParseException(
                 final @NonNull String input,
                 final @NonNull ByteParser<?> parser,
