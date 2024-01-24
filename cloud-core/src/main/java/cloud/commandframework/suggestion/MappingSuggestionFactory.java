@@ -26,7 +26,6 @@ package cloud.commandframework.suggestion;
 import cloud.commandframework.context.CommandContext;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 final class MappingSuggestionFactory<C, S extends Suggestion> implements SuggestionFactory<C, S> {
