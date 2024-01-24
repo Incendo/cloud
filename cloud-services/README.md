@@ -19,7 +19,7 @@ Rörledning is available on Maven Central:
 
 ```xml
 <dependency>
-    <groupId>org.incendo.cloud</groupId>
+    <groupId>org.incendo</groupId>
     <artifactId>cloud-services</artifactId>
     <version>1.4.0</version>
 </dependency>
