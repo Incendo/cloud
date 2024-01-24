@@ -24,14 +24,14 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.ParserException;
+import cloud.commandframework.parser.ArgumentParseResult;
+import cloud.commandframework.parser.ArgumentParser;
+import cloud.commandframework.parser.ParserDescriptor;
 import cloud.commandframework.util.StringUtils;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;

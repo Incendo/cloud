@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.arguments.compound;
 
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.parser.ArgumentParser;
+import cloud.commandframework.parser.ParserDescriptor;
 import cloud.commandframework.types.tuples.Tuple;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.BiFunction;

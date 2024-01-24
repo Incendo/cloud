@@ -71,11 +71,11 @@ public interface ArgumentDescriptor extends Descriptor {
     /**
      * Returns the name of the suggestion provider to use. If the string is {@code null}, the default
      * provider for the argument parser will be used. Otherwise,
-     * the {@link cloud.commandframework.arguments.parser.ParserRegistry} instance in the
+     * the {@link cloud.commandframework.parser.ParserRegistry} instance in the
      * {@link cloud.commandframework.CommandManager} will be queried for a matching suggestion provider.
      * <p>
      * For this to work, the suggestion needs to be registered in the parser registry. To do this, use
-     * {@link cloud.commandframework.arguments.parser.ParserRegistry#registerSuggestionProvider(String, SuggestionProvider)}.
+     * {@link cloud.commandframework.parser.ParserRegistry#registerSuggestionProvider(String, SuggestionProvider)}.
      * The registry instance can be retrieved using {@link cloud.commandframework.CommandManager#parserRegistry()}.
      *
      * @return the name of the suggestion provider, or {@code null}

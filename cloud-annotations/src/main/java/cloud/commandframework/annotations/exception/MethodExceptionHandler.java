@@ -23,11 +23,11 @@
 //
 package cloud.commandframework.annotations.exception;
 
-import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.method.AnnotatedMethodHandler;
 import cloud.commandframework.annotations.method.ParameterValue;
 import cloud.commandframework.exceptions.handling.ExceptionContext;
 import cloud.commandframework.exceptions.handling.ExceptionHandler;
+import cloud.commandframework.injection.ParameterInjectorRegistry;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;

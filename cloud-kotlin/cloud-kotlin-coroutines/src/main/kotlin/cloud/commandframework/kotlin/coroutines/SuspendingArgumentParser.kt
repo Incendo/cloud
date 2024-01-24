@@ -24,13 +24,13 @@
 package cloud.commandframework.kotlin.coroutines
 
 import cloud.commandframework.CommandManager
-import cloud.commandframework.arguments.parser.ArgumentParseResult
-import cloud.commandframework.arguments.parser.ArgumentParser
-import cloud.commandframework.arguments.parser.ParserDescriptor
 import cloud.commandframework.arguments.suggestion.SuggestionFactory
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.context.CommandInput
 import cloud.commandframework.execution.ExecutionCoordinator
+import cloud.commandframework.parser.ArgumentParseResult
+import cloud.commandframework.parser.ArgumentParser
+import cloud.commandframework.parser.ParserDescriptor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.future

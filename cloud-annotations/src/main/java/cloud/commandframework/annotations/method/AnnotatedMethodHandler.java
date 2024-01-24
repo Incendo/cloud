@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.annotations.method;
 
-import cloud.commandframework.annotations.AnnotationAccessor;
-import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.injection.ParameterInjectorRegistry;
+import cloud.commandframework.util.annotation.AnnotationAccessor;
 import io.leangen.geantyref.TypeToken;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;

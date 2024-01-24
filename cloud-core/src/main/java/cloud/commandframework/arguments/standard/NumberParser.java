@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.arguments.standard;
 
-import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.parser.ArgumentParser;
 import cloud.commandframework.types.range.Range;
 import java.util.Objects;
 import org.apiguardian.api.API;

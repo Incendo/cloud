@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.arguments.aggregate;
 
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.parser.ArgumentParseResult;
 import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;

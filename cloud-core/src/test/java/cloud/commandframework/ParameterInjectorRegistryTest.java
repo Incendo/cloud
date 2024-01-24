@@ -23,12 +23,12 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.annotations.AnnotationAccessor;
-import cloud.commandframework.annotations.injection.GuiceInjectionService;
-import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.StandardCommandContextFactory;
+import cloud.commandframework.injection.GuiceInjectionService;
+import cloud.commandframework.injection.ParameterInjectorRegistry;
+import cloud.commandframework.util.annotation.AnnotationAccessor;
 import com.google.inject.AbstractModule;
 import com.google.inject.BindingAnnotation;
 import com.google.inject.Guice;

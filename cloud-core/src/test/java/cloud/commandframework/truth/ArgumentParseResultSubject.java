@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.truth;
 
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.parser.ArgumentParseResult;
 import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.OptionalSubject;

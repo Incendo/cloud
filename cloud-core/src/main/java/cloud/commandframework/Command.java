@@ -30,12 +30,13 @@ import cloud.commandframework.arguments.compound.ArgumentPair;
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.flags.CommandFlagParser;
-import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
 import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.parser.ParserDescriptor;
+import cloud.commandframework.parser.ParserRegistry;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PredicatePermission;
 import cloud.commandframework.types.tuples.Pair;
@@ -62,7 +63,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * {@link CommandManager#commandBuilder(String, String...)}.
  * Getting a builder from the command manager means that the builder is linked to the manager.
  * When the command builder is linked to the manager, it is able to retrieve parsers from the associated
- * {@link cloud.commandframework.arguments.parser.ParserRegistry} in the case that only a parsed type is given to the builder,
+ * {@link ParserRegistry} in the case that only a parsed type is given to the builder,
  * and not a complete parser.
  * You may link any command builder to a command manager by using {@link Command.Builder#manager(CommandManager)}.
  * <p>
@@ -1496,7 +1497,7 @@ public class Command<C> {
          * @param name        name of the argument
          * @param names       pair containing the names of the sub-arguments
          * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+         *                    in the {@link ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
          * @param description description of the argument
          * @param <U>         first type
@@ -1531,7 +1532,7 @@ public class Command<C> {
          * @param name        name of the argument
          * @param names       pair containing the names of the sub-arguments
          * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+         *                    in the {@link ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
          * @param description description of the argument
          * @param <U>         first type
@@ -1566,7 +1567,7 @@ public class Command<C> {
          * @param name        name of the argument
          * @param names       pair containing the names of the sub-arguments
          * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+         *                    in the {@link ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
          * @param description description of the argument
          * @param <U>         first type
@@ -1601,7 +1602,7 @@ public class Command<C> {
          * @param name        name of the argument
          * @param names       pair containing the names of the sub-arguments
          * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+         *                    in the {@link ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
          * @param description description of the argument
          * @param <U>         first type
@@ -1637,7 +1638,7 @@ public class Command<C> {
          * @param outputType  the output type
          * @param names       pair containing the names of the sub-arguments
          * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+         *                    in the {@link ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
          * @param mapper      mapper that maps from {@link Pair} to the custom type
          * @param description description of the argument
@@ -1677,7 +1678,7 @@ public class Command<C> {
          * @param outputType  the output type
          * @param names       pair containing the names of the sub-arguments
          * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+         *                    in the {@link ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
          * @param mapper      mapper that maps from {@link Pair} to the custom type
          * @param description description of the argument
@@ -1717,7 +1718,7 @@ public class Command<C> {
          * @param outputType  the output type
          * @param names       pair containing the names of the sub-arguments
          * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+         *                    in the {@link ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
          * @param mapper      mapper that maps from {@link Pair} to the custom type
          * @param description description of the argument
@@ -1757,7 +1758,7 @@ public class Command<C> {
          * @param outputType  the output type
          * @param names       pair containing the names of the sub-arguments
          * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+         *                    in the {@link ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
          * @param mapper      mapper that maps from {@link Pair} to the custom type
          * @param description description of the argument
@@ -1796,7 +1797,7 @@ public class Command<C> {
          * @param name          name of the argument
          * @param names         triplet containing the names of the sub-arguments
          * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry}
+         *                      registered in the {@link ParserRegistry}
          *                      used by the {@link CommandManager} attached to this command
          * @param description   description of the argument
          * @param <U>           first type
@@ -1832,7 +1833,7 @@ public class Command<C> {
          * @param name          name of the argument
          * @param names         triplet containing the names of the sub-arguments
          * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry}
+         *                      registered in the {@link ParserRegistry}
          *                      used by the {@link CommandManager} attached to this command
          * @param description   description of the argument
          * @param <U>           first type
@@ -1868,7 +1869,7 @@ public class Command<C> {
          * @param name          name of the argument
          * @param names         triplet containing the names of the sub-arguments
          * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry}
+         *                      registered in the {@link ParserRegistry}
          *                      used by the {@link CommandManager} attached to this command
          * @param description   description of the argument
          * @param <U>           first type
@@ -1904,7 +1905,7 @@ public class Command<C> {
          * @param name          name of the argument
          * @param names         triplet containing the names of the sub-arguments
          * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry}
+         *                      registered in the {@link ParserRegistry}
          *                      used by the {@link CommandManager} attached to this command
          * @param description   description of the argument
          * @param <U>           first type
@@ -1941,7 +1942,7 @@ public class Command<C> {
          * @param outputType    the output type
          * @param names         triplet containing the names of the sub-arguments
          * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by
+         *                      registered in the {@link ParserRegistry} used by
          *                      the {@link CommandManager} attached to this command
          * @param mapper        mapper that maps from {@link Triplet} to the custom type
          * @param description   description of the argument
@@ -1982,7 +1983,7 @@ public class Command<C> {
          * @param outputType    the output type
          * @param names         triplet containing the names of the sub-arguments
          * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by
+         *                      registered in the {@link ParserRegistry} used by
          *                      the {@link CommandManager} attached to this command
          * @param mapper        Mapper that maps from {@link Triplet} to the custom type
          * @param description   description of the argument
@@ -2023,7 +2024,7 @@ public class Command<C> {
          * @param outputType    the output type
          * @param names         triplet containing the names of the sub-arguments
          * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by
+         *                      registered in the {@link ParserRegistry} used by
          *                      the {@link CommandManager} attached to this command
          * @param mapper        mapper that maps from {@link Triplet} to the custom type
          * @param description   description of the argument
@@ -2064,7 +2065,7 @@ public class Command<C> {
          * @param outputType    the output type
          * @param names         triplet containing the names of the sub-arguments
          * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by
+         *                      registered in the {@link ParserRegistry} used by
          *                      the {@link CommandManager} attached to this command
          * @param mapper        mapper that maps from {@link Triplet} to the custom type
          * @param description   description of the argument

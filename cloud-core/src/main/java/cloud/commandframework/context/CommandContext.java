@@ -25,15 +25,16 @@ package cloud.commandframework.context;
 
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.annotations.AnnotationAccessor;
 import cloud.commandframework.arguments.flags.FlagContext;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionFormatter;
 import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.injection.ParameterInjectorRegistry;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.MutableCloudKeyContainer;
 import cloud.commandframework.permission.Permission;
+import cloud.commandframework.util.annotation.AnnotationAccessor;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collections;
 import java.util.HashMap;
@@ -366,7 +367,7 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
 
     /**
      * Attempts to retrieve a value that has been registered to the associated command manager's
-     * {@link cloud.commandframework.annotations.injection.ParameterInjectorRegistry}.
+     * {@link ParameterInjectorRegistry}.
      *
      * @param <T>   type to inject
      * @param clazz class of type to inject
@@ -385,7 +386,7 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
 
     /**
      * Attempts to retrieve a value that has been registered to the associated command manager's
-     * {@link cloud.commandframework.annotations.injection.ParameterInjectorRegistry}.
+     * {@link ParameterInjectorRegistry}.
      *
      * @param <T>  type to inject
      * @param type type to inject

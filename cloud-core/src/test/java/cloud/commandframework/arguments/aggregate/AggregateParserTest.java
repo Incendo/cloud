@@ -25,7 +25,6 @@ package cloud.commandframework.arguments.aggregate;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
@@ -34,6 +33,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.StandardCommandContextFactory;
 import cloud.commandframework.exceptions.parsing.ParserException;
+import cloud.commandframework.parser.ArgumentParseResult;
 import java.util.Arrays;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;

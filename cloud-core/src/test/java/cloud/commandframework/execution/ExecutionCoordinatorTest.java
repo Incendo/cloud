@@ -25,12 +25,12 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import cloud.commandframework.parser.ArgumentParseResult;
+import cloud.commandframework.parser.ArgumentParser;
+import cloud.commandframework.parser.ParserDescriptor;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;

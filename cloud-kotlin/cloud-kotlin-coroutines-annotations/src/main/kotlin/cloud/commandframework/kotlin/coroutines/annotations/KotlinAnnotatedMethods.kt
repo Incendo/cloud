@@ -25,7 +25,6 @@ package cloud.commandframework.kotlin.coroutines.annotations
 
 import cloud.commandframework.annotations.AnnotationParser
 import cloud.commandframework.annotations.MethodCommandExecutionHandler
-import cloud.commandframework.annotations.injection.ParameterInjectorRegistry
 import cloud.commandframework.annotations.method.ParameterValue
 import cloud.commandframework.annotations.suggestions.MethodSuggestionProvider
 import cloud.commandframework.annotations.suggestions.SuggestionProviderFactory
@@ -33,6 +32,7 @@ import cloud.commandframework.arguments.suggestion.Suggestion
 import cloud.commandframework.arguments.suggestion.SuggestionProvider
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.context.CommandInput
+import cloud.commandframework.injection.ParameterInjectorRegistry
 import io.leangen.geantyref.GenericTypeReflector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope

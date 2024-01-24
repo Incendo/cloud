@@ -23,10 +23,11 @@
 //
 package cloud.commandframework.exceptions;
 
+import cloud.commandframework.injection.InjectionService;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Exception thrown when an {@link cloud.commandframework.annotations.injection.InjectionService} fails exceptionally.
+ * Exception thrown when an {@link InjectionService} fails exceptionally.
  */
 public class InjectionException extends RuntimeException {
 

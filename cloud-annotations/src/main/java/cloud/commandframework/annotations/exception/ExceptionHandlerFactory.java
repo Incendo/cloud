@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.annotations.exception;
 
-import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.exceptions.handling.ExceptionHandler;
+import cloud.commandframework.injection.ParameterInjectorRegistry;
 import java.lang.reflect.Method;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;

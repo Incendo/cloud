@@ -23,11 +23,11 @@
 //
 package cloud.commandframework.kotlin.extension
 
-import cloud.commandframework.arguments.parser.ArgumentParseResult
-import cloud.commandframework.arguments.parser.ArgumentParser
-import cloud.commandframework.arguments.parser.MappedArgumentParser.Mapper
-import cloud.commandframework.arguments.parser.ParserDescriptor
 import cloud.commandframework.context.CommandContext
+import cloud.commandframework.parser.ArgumentParseResult
+import cloud.commandframework.parser.ArgumentParser
+import cloud.commandframework.parser.MappedArgumentParser.Mapper
+import cloud.commandframework.parser.ParserDescriptor
 import java.util.concurrent.CompletableFuture
 
 /**

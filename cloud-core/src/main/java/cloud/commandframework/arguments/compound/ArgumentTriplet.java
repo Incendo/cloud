@@ -24,9 +24,9 @@
 package cloud.commandframework.arguments.compound;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.arguments.parser.ParserRegistry;
+import cloud.commandframework.parser.ArgumentParser;
+import cloud.commandframework.parser.ParserParameters;
+import cloud.commandframework.parser.ParserRegistry;
 import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.BiFunction;
@@ -73,7 +73,7 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
      * @param manager Command manager
      * @param names   Sub-argument names
      * @param types   Triplet containing the types of the sub-arguments. There must be parsers for these types registered
-     *                in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+     *                in the {@link ParserRegistry} used by the
      *                {@link CommandManager}
      * @param <C>     Command sender type
      * @param <U>     First parsed type

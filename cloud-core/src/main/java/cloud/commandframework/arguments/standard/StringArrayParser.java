@@ -24,11 +24,11 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.parser.ArgumentParseResult;
+import cloud.commandframework.parser.ArgumentParser;
+import cloud.commandframework.parser.ParserDescriptor;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;

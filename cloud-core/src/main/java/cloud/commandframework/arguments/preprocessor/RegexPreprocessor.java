@@ -24,12 +24,12 @@
 package cloud.commandframework.arguments.preprocessor;
 
 import cloud.commandframework.arguments.ComponentPreprocessor;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.parser.ArgumentParseResult;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import org.apiguardian.api.API;

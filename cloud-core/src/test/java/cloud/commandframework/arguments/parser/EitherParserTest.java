@@ -29,6 +29,8 @@ import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.parser.ArgumentParseResult;
+import cloud.commandframework.parser.EitherParser;
 import cloud.commandframework.types.Either;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

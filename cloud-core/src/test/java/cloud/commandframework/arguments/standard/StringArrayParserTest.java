@@ -24,9 +24,9 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.parser.ArgumentParseResult;
 import java.util.LinkedList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;

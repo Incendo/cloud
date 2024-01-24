@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.arguments.parser.ParserParameters;
+import cloud.commandframework.parser.ParserParameters;
 import java.lang.annotation.Annotation;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;

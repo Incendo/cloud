@@ -23,14 +23,9 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.arguments.CommandSyntaxFormatter;
 import cloud.commandframework.arguments.StandardCommandSyntaxFormatter;
 import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.parser.ParserParameter;
-import cloud.commandframework.arguments.parser.ParserRegistry;
-import cloud.commandframework.arguments.parser.StandardParserRegistry;
 import cloud.commandframework.arguments.suggestion.DelegatingSuggestionFactory;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionFactory;
@@ -54,9 +49,14 @@ import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import cloud.commandframework.help.CommandPredicate;
 import cloud.commandframework.help.HelpHandler;
 import cloud.commandframework.help.HelpHandlerFactory;
+import cloud.commandframework.injection.ParameterInjectorRegistry;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.parser.ArgumentParser;
+import cloud.commandframework.parser.ParserParameter;
+import cloud.commandframework.parser.ParserRegistry;
+import cloud.commandframework.parser.StandardParserRegistry;
 import cloud.commandframework.permission.AndPermission;
 import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.permission.Permission;

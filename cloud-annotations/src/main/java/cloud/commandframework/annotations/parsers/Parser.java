@@ -26,6 +26,8 @@ package cloud.commandframework.annotations.parsers;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.parser.ArgumentParseResult;
+import cloud.commandframework.parser.ParserRegistry;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -42,7 +44,7 @@ import java.lang.annotation.Target;
  * </ul>
  *
  * <p>The method can throw exceptions, and the thrown exceptions will automatically be
- * wrapped by a {@link cloud.commandframework.arguments.parser.ArgumentParseResult#failure(Throwable)}.</p>
+ * wrapped by a {@link ArgumentParseResult#failure(Throwable)}.</p>
  *
  * @since 1.3.0
  */
@@ -65,11 +67,11 @@ public @interface Parser {
      *
      * <p>If the string is left empty, the default
      * provider for the {@link cloud.commandframework.annotations.Argument} will be used. Otherwise,
-     * the {@link cloud.commandframework.arguments.parser.ParserRegistry} instance in the
+     * the {@link ParserRegistry} instance in the
      * {@link cloud.commandframework.CommandManager} will be queried for a matching suggestion provider.</p>
      *
      * <p>For this to work, the suggestion needs to be registered in the parser registry. To do this, use
-     * {@link cloud.commandframework.arguments.parser.ParserRegistry#registerSuggestionProvider(String, SuggestionProvider)}.
+     * {@link ParserRegistry#registerSuggestionProvider(String, SuggestionProvider)}.
      * The registry instance can be retrieved using {@link cloud.commandframework.CommandManager#parserRegistry()}.</p>
      *
      * @return The name of the suggestion provider, or {@code ""}

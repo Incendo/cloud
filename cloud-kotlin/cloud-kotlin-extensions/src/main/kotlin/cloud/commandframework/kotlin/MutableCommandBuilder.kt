@@ -29,11 +29,11 @@ import cloud.commandframework.CommandDescription
 import cloud.commandframework.CommandManager
 import cloud.commandframework.Description
 import cloud.commandframework.TypedCommandComponent
-import cloud.commandframework.arguments.parser.ParserDescriptor
 import cloud.commandframework.execution.CommandExecutionHandler
 import cloud.commandframework.keys.CloudKey
 import cloud.commandframework.kotlin.extension.command
 import cloud.commandframework.kotlin.extension.senderType
+import cloud.commandframework.parser.ParserDescriptor
 import cloud.commandframework.permission.Permission
 import kotlin.reflect.KClass
 
