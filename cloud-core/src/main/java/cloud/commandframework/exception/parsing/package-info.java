@@ -21,23 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.exceptions;
-
-import cloud.commandframework.injection.InjectionService;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 /**
- * Exception thrown when an {@link InjectionService} fails exceptionally.
+ * Parsing related exceptions
  */
-public class InjectionException extends RuntimeException {
-
-    /**
-     * Creates a new injection exception.
-     *
-     * @param message message describing the exception
-     * @param cause   cause of the exception
-     */
-    public InjectionException(final @NonNull String message, final @NonNull Throwable cause) {
-        super(message, cause);
-    }
-}
+package cloud.commandframework.exception.parsing;

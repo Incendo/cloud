@@ -28,7 +28,7 @@ import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.ParserException;
+import cloud.commandframework.exception.parsing.ParserException;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.parser.ArgumentParseResult;
 import cloud.commandframework.parser.ArgumentParser;

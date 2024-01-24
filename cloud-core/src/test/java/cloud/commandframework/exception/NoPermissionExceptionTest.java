@@ -21,38 +21,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.exceptions.handling;
+package cloud.commandframework.exception;
 
-import cloud.commandframework.context.CommandContext;
-import org.apiguardian.api.API;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import cloud.commandframework.permission.Permission;
+import cloud.commandframework.permission.PermissionResult;
+import java.util.Collections;
+import org.junit.jupiter.api.Test;
 
-@API(status = API.Status.INTERNAL, since = "2.0.0")
-public final class ExceptionContextFactory<C> {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    private final ExceptionController<C> controller;
+@SuppressWarnings("ThrowableNotThrown")
+class NoPermissionExceptionTest {
 
-    /**
-     * Creates a new factory.
-     *
-     * @param controller the controller
-     */
-    public ExceptionContextFactory(final @NonNull ExceptionController<C> controller) {
-        this.controller = controller;
+    @Test
+    void testSucceededResult() {
+        PermissionResult result = PermissionResult.allowed(Permission.of("konicai"));
+        assertThrows(IllegalArgumentException.class, () -> new NoPermissionException(result, new Object(), Collections.emptyList()));
     }
 
-    /**
-     * Creates a new exception context.
-     *
-     * @param <T>       the exception type
-     * @param context   the command context
-     * @param exception the exception
-     * @return the created context
-     */
-    public <T extends Throwable> @NonNull ExceptionContext<C, T> createContext(
-            final @NonNull CommandContext<C> context,
-            final @NonNull T exception
-    ) {
-        return new ExceptionContext.ExceptionContextImpl<>(exception, context, this.controller);
+    @Test
+    void testCommandPermission() {
+        Permission permission = Permission.of("konicai");
+        PermissionResult result = PermissionResult.denied(permission);
+        NoPermissionException exception = new NoPermissionException(result, new Object(), Collections.emptyList());
+
+        assertEquals(permission, exception.missingPermission());
+        assertEquals(permission, exception.permissionResult().permission());
     }
 }

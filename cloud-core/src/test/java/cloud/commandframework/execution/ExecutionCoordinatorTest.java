@@ -25,8 +25,8 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.exceptions.ArgumentParseException;
-import cloud.commandframework.exceptions.CommandExecutionException;
+import cloud.commandframework.exception.ArgumentParseException;
+import cloud.commandframework.exception.CommandExecutionException;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.parser.ArgumentParseResult;
 import cloud.commandframework.parser.ArgumentParser;

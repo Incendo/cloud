@@ -21,69 +21,42 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.exceptions;
+package cloud.commandframework.exception;
 
 import cloud.commandframework.component.CommandComponent;
 import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Exception thrown when a command sender tries to execute
- * a command that doesn't exist
- */
-@SuppressWarnings("unused")
 @API(status = API.Status.STABLE)
-public final class NoSuchCommandException extends CommandParseException {
+public class ArgumentParseException extends CommandParseException {
 
-    private final String suppliedCommand;
+    private final Throwable cause;
 
     /**
-     * Construct a no such command exception
+     * Create a new command parse exception
      *
-     * @param commandSender Sender who executed the command
+     * @param throwable     Exception that caused the parsing error
+     * @param commandSender Command sender
      * @param currentChain  Chain leading up to the exception
-     * @param command       Entered command (following the command chain)
      */
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-    public NoSuchCommandException(
+    public ArgumentParseException(
+            final @NonNull Throwable throwable,
             final @NonNull Object commandSender,
-            final @NonNull List<CommandComponent<?>> currentChain,
-            final @NonNull String command
+            final @NonNull List<@NonNull CommandComponent<?>> currentChain
     ) {
         super(commandSender, currentChain);
-        this.suppliedCommand = command;
-    }
-
-
-    @Override
-    public String getMessage() {
-        final StringBuilder builder = new StringBuilder();
-        for (final CommandComponent<?> commandComponent : this.currentChain()) {
-            if (commandComponent == null) {
-                continue;
-            }
-            builder.append(" ").append(commandComponent.name());
-        }
-        return String.format("Unrecognized command input '%s' following chain%s", this.suppliedCommand, builder.toString());
+        this.cause = throwable;
     }
 
     /**
-     * Returns the supplied command.
+     * Get the cause of the exception
      *
-     * @return supplied command
+     * @return Cause
      */
-    public @NonNull String suppliedCommand() {
-        return this.suppliedCommand;
-    }
-
     @Override
-    public synchronized Throwable fillInStackTrace() {
-        return this;
-    }
-
-    @Override
-    public synchronized Throwable initCause(final Throwable cause) {
-        return this;
+    public synchronized @NonNull Throwable getCause() {
+        return this.cause;
     }
 }

@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.exceptions.handling;
+package cloud.commandframework.exception.handling;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;

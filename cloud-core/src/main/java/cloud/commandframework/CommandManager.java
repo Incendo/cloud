@@ -31,7 +31,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.StandardCommandContextFactory;
-import cloud.commandframework.exceptions.handling.ExceptionController;
+import cloud.commandframework.exception.handling.ExceptionController;
 import cloud.commandframework.execution.CommandSuggestionProcessor;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;

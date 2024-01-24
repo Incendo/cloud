@@ -21,42 +21,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.exceptions;
+package cloud.commandframework.exception.handling;
 
-import cloud.commandframework.component.CommandComponent;
-import java.util.List;
+import cloud.commandframework.context.CommandContext;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.STABLE)
-public class ArgumentParseException extends CommandParseException {
+@API(status = API.Status.INTERNAL, since = "2.0.0")
+public final class ExceptionContextFactory<C> {
 
-    private final Throwable cause;
+    private final ExceptionController<C> controller;
 
     /**
-     * Create a new command parse exception
+     * Creates a new factory.
      *
-     * @param throwable     Exception that caused the parsing error
-     * @param commandSender Command sender
-     * @param currentChain  Chain leading up to the exception
+     * @param controller the controller
      */
-    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-    public ArgumentParseException(
-            final @NonNull Throwable throwable,
-            final @NonNull Object commandSender,
-            final @NonNull List<@NonNull CommandComponent<?>> currentChain
-    ) {
-        super(commandSender, currentChain);
-        this.cause = throwable;
+    public ExceptionContextFactory(final @NonNull ExceptionController<C> controller) {
+        this.controller = controller;
     }
 
     /**
-     * Get the cause of the exception
+     * Creates a new exception context.
      *
-     * @return Cause
+     * @param <T>       the exception type
+     * @param context   the command context
+     * @param exception the exception
+     * @return the created context
      */
-    @Override
-    public synchronized @NonNull Throwable getCause() {
-        return this.cause;
+    public <T extends Throwable> @NonNull ExceptionContext<C, T> createContext(
+            final @NonNull CommandContext<C> context,
+            final @NonNull T exception
+    ) {
+        return new ExceptionContext.ExceptionContextImpl<>(exception, context, this.controller);
     }
 }

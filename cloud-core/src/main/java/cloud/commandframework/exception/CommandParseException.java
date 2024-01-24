@@ -21,50 +21,54 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.exceptions;
+package cloud.commandframework.exception;
 
 import cloud.commandframework.component.CommandComponent;
+import java.util.Collections;
 import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Exception sent when a command sender inputs invalid command syntax
+ * Exception thrown when parsing user input into a command
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "serial"})
 @API(status = API.Status.STABLE)
-public class InvalidSyntaxException extends CommandParseException {
+public class CommandParseException extends IllegalArgumentException {
 
-    private final String correctSyntax;
+    private final Object commandSender;
+    private final List<CommandComponent<?>> currentChain;
 
     /**
-     * Create a new invalid syntax exception instance
+     * Construct a new command parse exception
      *
-     * @param correctSyntax Expected syntax
-     * @param commandSender Sender that sent the command
-     * @param currentChain  Chain leading up to issue
+     * @param commandSender Sender who executed the command
+     * @param currentChain  Chain leading up to the exception
      */
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-    public InvalidSyntaxException(
-            final @NonNull String correctSyntax,
+    protected CommandParseException(
             final @NonNull Object commandSender,
-            final @NonNull List<@NonNull CommandComponent<?>> currentChain
+            final @NonNull List<CommandComponent<?>> currentChain
     ) {
-        super(commandSender, currentChain);
-        this.correctSyntax = correctSyntax;
+        this.commandSender = commandSender;
+        this.currentChain = currentChain;
     }
 
     /**
-     * Returns the correct syntax of the command.
+     * Returns the command sender.
      *
-     * @return correct command syntax
+     * @return command sender
      */
-    public @NonNull String correctSyntax() {
-        return this.correctSyntax;
+    public @NonNull Object commandSender() {
+        return this.commandSender;
     }
 
-    @Override
-    public final String getMessage() {
-        return String.format("Invalid command syntax. Correct syntax is: %s", this.correctSyntax);
+    /**
+     * Returns the command chain leading up to the exception.
+     *
+     * @return unmodifiable list of command arguments
+     */
+    public @NonNull List<@NonNull CommandComponent<?>> currentChain() {
+        return Collections.unmodifiableList(this.currentChain);
     }
 }

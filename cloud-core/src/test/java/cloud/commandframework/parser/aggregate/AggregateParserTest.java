@@ -29,7 +29,7 @@ import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.StandardCommandContextFactory;
-import cloud.commandframework.exceptions.parsing.ParserException;
+import cloud.commandframework.exception.parsing.ParserException;
 import cloud.commandframework.parser.ArgumentParseResult;
 import cloud.commandframework.parser.standard.IntegerParser;
 import cloud.commandframework.suggestion.Suggestion;

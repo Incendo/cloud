@@ -21,54 +21,69 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.exceptions;
+package cloud.commandframework.exception;
 
 import cloud.commandframework.component.CommandComponent;
-import java.util.Collections;
 import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Exception thrown when parsing user input into a command
+ * Exception thrown when a command sender tries to execute
+ * a command that doesn't exist
  */
-@SuppressWarnings({"unused", "serial"})
+@SuppressWarnings("unused")
 @API(status = API.Status.STABLE)
-public class CommandParseException extends IllegalArgumentException {
+public final class NoSuchCommandException extends CommandParseException {
 
-    private final Object commandSender;
-    private final List<CommandComponent<?>> currentChain;
+    private final String suppliedCommand;
 
     /**
-     * Construct a new command parse exception
+     * Construct a no such command exception
      *
      * @param commandSender Sender who executed the command
      * @param currentChain  Chain leading up to the exception
+     * @param command       Entered command (following the command chain)
      */
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-    protected CommandParseException(
+    public NoSuchCommandException(
             final @NonNull Object commandSender,
-            final @NonNull List<CommandComponent<?>> currentChain
+            final @NonNull List<CommandComponent<?>> currentChain,
+            final @NonNull String command
     ) {
-        this.commandSender = commandSender;
-        this.currentChain = currentChain;
+        super(commandSender, currentChain);
+        this.suppliedCommand = command;
+    }
+
+
+    @Override
+    public String getMessage() {
+        final StringBuilder builder = new StringBuilder();
+        for (final CommandComponent<?> commandComponent : this.currentChain()) {
+            if (commandComponent == null) {
+                continue;
+            }
+            builder.append(" ").append(commandComponent.name());
+        }
+        return String.format("Unrecognized command input '%s' following chain%s", this.suppliedCommand, builder.toString());
     }
 
     /**
-     * Returns the command sender.
+     * Returns the supplied command.
      *
-     * @return command sender
+     * @return supplied command
      */
-    public @NonNull Object commandSender() {
-        return this.commandSender;
+    public @NonNull String suppliedCommand() {
+        return this.suppliedCommand;
     }
 
-    /**
-     * Returns the command chain leading up to the exception.
-     *
-     * @return unmodifiable list of command arguments
-     */
-    public @NonNull List<@NonNull CommandComponent<?>> currentChain() {
-        return Collections.unmodifiableList(this.currentChain);
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this;
+    }
+
+    @Override
+    public synchronized Throwable initCause(final Throwable cause) {
+        return this;
     }
 }

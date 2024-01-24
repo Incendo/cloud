@@ -21,32 +21,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.exceptions;
+package cloud.commandframework.exception;
 
-import cloud.commandframework.permission.Permission;
-import cloud.commandframework.permission.PermissionResult;
-import java.util.Collections;
-import org.junit.jupiter.api.Test;
+import cloud.commandframework.injection.InjectionService;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+/**
+ * Exception thrown when an {@link InjectionService} fails exceptionally.
+ */
+public class InjectionException extends RuntimeException {
 
-@SuppressWarnings("ThrowableNotThrown")
-class NoPermissionExceptionTest {
-
-    @Test
-    void testSucceededResult() {
-        PermissionResult result = PermissionResult.allowed(Permission.of("konicai"));
-        assertThrows(IllegalArgumentException.class, () -> new NoPermissionException(result, new Object(), Collections.emptyList()));
-    }
-
-    @Test
-    void testCommandPermission() {
-        Permission permission = Permission.of("konicai");
-        PermissionResult result = PermissionResult.denied(permission);
-        NoPermissionException exception = new NoPermissionException(result, new Object(), Collections.emptyList());
-
-        assertEquals(permission, exception.missingPermission());
-        assertEquals(permission, exception.permissionResult().permission());
+    /**
+     * Creates a new injection exception.
+     *
+     * @param message message describing the exception
+     * @param cause   cause of the exception
+     */
+    public InjectionException(final @NonNull String message, final @NonNull Throwable cause) {
+        super(message, cause);
     }
 }

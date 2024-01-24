@@ -25,7 +25,7 @@ package cloud.commandframework.feature;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exception.ArgumentParseException;
 import cloud.commandframework.execution.CommandResult;
 import cloud.commandframework.parser.flag.CommandFlagParser;
 import cloud.commandframework.setting.ManagerSetting;

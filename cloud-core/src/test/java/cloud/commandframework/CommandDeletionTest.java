@@ -23,7 +23,7 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.exception.NoSuchCommandException;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;

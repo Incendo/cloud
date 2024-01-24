@@ -21,11 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.exceptions.handling;
+package cloud.commandframework.exception.handling;
 
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.CommandExecutionException;
-import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.exception.CommandExecutionException;
+import cloud.commandframework.exception.NoSuchCommandException;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;

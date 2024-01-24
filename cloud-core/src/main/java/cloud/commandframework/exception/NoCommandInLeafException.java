@@ -21,39 +21,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations.exception;
+package cloud.commandframework.exception;
 
-import cloud.commandframework.exception.handling.ExceptionHandler;
-import cloud.commandframework.injection.ParameterInjectorRegistry;
-import java.lang.reflect.Method;
+import cloud.commandframework.Command;
+import cloud.commandframework.component.CommandComponent;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@FunctionalInterface
-@API(status = API.Status.STABLE, since = "2.0.0")
-public interface ExceptionHandlerFactory<C> {
+/**
+ * Thrown when a {@link CommandComponent}
+ * that is registered as a leaf node, does not contain an owning {@link Command}
+ */
+@SuppressWarnings({"unused", "serial"})
+@API(status = API.Status.STABLE)
+public final class NoCommandInLeafException extends IllegalStateException {
+
+    private final CommandComponent<?> commandComponent;
 
     /**
-     * Returns a factory that produces {@link MethodExceptionHandler} instances.
+     * Create a new no command in leaf exception instance
      *
-     * @param <C> the command sender type
-     * @return the created factory
+     * @param commandComponent Command argument that caused the exception
      */
-    static <C> @NonNull ExceptionHandlerFactory<C> defaultFactory() {
-        return MethodExceptionHandler::new;
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
+    public NoCommandInLeafException(final @NonNull CommandComponent<?> commandComponent) {
+        super(String.format("Leaf node '%s' does not have associated owning command", commandComponent.name()));
+        this.commandComponent = commandComponent;
     }
 
     /**
-     * Creates an exception handler using the given {@code method}.
+     * Returns the command component.
      *
-     * @param instance         parsed instance
-     * @param method           exception handler method
-     * @param injectorRegistry injector registry
-     * @return the method handler
+     * @return command component
      */
-    @NonNull ExceptionHandler<C, Throwable> createExceptionHandler(
-            @NonNull Object instance,
-            @NonNull Method method,
-            @NonNull ParameterInjectorRegistry<C> injectorRegistry
-    );
+    public @NonNull CommandComponent<?> commandComponent() {
+        return this.commandComponent;
+    }
 }

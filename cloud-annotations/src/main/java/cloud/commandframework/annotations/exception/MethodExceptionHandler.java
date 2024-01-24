@@ -25,8 +25,8 @@ package cloud.commandframework.annotations.exception;
 
 import cloud.commandframework.annotations.method.AnnotatedMethodHandler;
 import cloud.commandframework.annotations.method.ParameterValue;
-import cloud.commandframework.exceptions.handling.ExceptionContext;
-import cloud.commandframework.exceptions.handling.ExceptionHandler;
+import cloud.commandframework.exception.handling.ExceptionContext;
+import cloud.commandframework.exception.handling.ExceptionHandler;
 import cloud.commandframework.injection.ParameterInjectorRegistry;
 import java.lang.reflect.Method;
 import java.util.Arrays;

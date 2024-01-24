@@ -31,7 +31,7 @@ import cloud.commandframework.annotations.suggestions.Suggestions
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.context.CommandInput
 import cloud.commandframework.context.StandardCommandContextFactory
-import cloud.commandframework.exceptions.CommandExecutionException
+import cloud.commandframework.exception.CommandExecutionException
 import cloud.commandframework.execution.ExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
 import cloud.commandframework.suggestion.Suggestion

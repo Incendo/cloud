@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.kotlin.extension
 
-import cloud.commandframework.exceptions.handling.ExceptionController
-import cloud.commandframework.exceptions.handling.ExceptionHandler
-import cloud.commandframework.exceptions.handling.ExceptionHandlerRegistration
+import cloud.commandframework.exception.handling.ExceptionController
+import cloud.commandframework.exception.handling.ExceptionHandler
+import cloud.commandframework.exception.handling.ExceptionHandlerRegistration
 import org.checkerframework.checker.units.qual.C
 import org.checkerframework.common.returnsreceiver.qual.This
 

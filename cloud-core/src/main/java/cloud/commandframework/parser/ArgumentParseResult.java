@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.parser;
 
-import cloud.commandframework.exceptions.handling.ExceptionController;
+import cloud.commandframework.exception.handling.ExceptionController;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;

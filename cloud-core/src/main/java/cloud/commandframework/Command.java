@@ -358,7 +358,7 @@ public class Command<C> {
     /**
      * Returns the permission required to execute the command.
      * <p>
-     * If the sender does not have the required permission a {@link cloud.commandframework.exceptions.NoPermissionException}
+     * If the sender does not have the required permission a {@link cloud.commandframework.exception.NoPermissionException}
      * will be thrown when parsing the command.
      *
      * @return the command permission

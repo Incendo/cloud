@@ -26,7 +26,7 @@ package cloud.commandframework.parser.standard;
 import cloud.commandframework.component.CommandComponent;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
-import cloud.commandframework.exceptions.parsing.NumberParseException;
+import cloud.commandframework.exception.parsing.NumberParseException;
 import cloud.commandframework.parser.ArgumentParseResult;
 import cloud.commandframework.parser.ParserDescriptor;
 import cloud.commandframework.types.range.DoubleRange;

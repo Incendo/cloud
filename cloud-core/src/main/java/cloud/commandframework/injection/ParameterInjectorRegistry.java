@@ -24,7 +24,7 @@
 package cloud.commandframework.injection;
 
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.InjectionException;
+import cloud.commandframework.exception.InjectionException;
 import cloud.commandframework.services.ServicePipeline;
 import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.util.annotation.AnnotationAccessor;

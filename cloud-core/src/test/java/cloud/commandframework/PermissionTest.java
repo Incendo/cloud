@@ -23,7 +23,7 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.exceptions.NoPermissionException;
+import cloud.commandframework.exception.NoPermissionException;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.permission.Permission;

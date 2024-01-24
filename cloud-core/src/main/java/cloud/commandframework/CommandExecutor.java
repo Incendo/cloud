@@ -48,7 +48,7 @@ public interface CommandExecutor<C> {
      *
      * <p>The future may also complete exceptionally.
      * These exceptions will be handled using exception handlers registered in the
-     * {@link cloud.commandframework.exceptions.handling.ExceptionController}.
+     * {@link cloud.commandframework.exception.handling.ExceptionController}.
      * The exceptions will be forwarded to the future, if the exception was transformed during the exception handling, then the
      * new exception will be present in the completed future.</p>
      *
@@ -76,7 +76,7 @@ public interface CommandExecutor<C> {
      *
      * <p>The future may also complete exceptionally.
      * These exceptions will be handled using exception handlers registered in the
-     * {@link cloud.commandframework.exceptions.handling.ExceptionController}.
+     * {@link cloud.commandframework.exception.handling.ExceptionController}.
      * The exceptions will be forwarded to the future, if the exception was transformed during the exception handling, then the
      * new exception will be present in the completed future.</p>
      *

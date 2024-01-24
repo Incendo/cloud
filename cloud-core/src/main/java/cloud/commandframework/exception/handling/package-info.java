@@ -3,4 +3,4 @@
  *
  * @since 2.0.0
  */
-package cloud.commandframework.exceptions.handling;
+package cloud.commandframework.exception.handling;

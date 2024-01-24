@@ -21,40 +21,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.exceptions;
+package cloud.commandframework.exception;
 
-import cloud.commandframework.Command;
 import cloud.commandframework.component.CommandComponent;
+import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Thrown when a {@link CommandComponent}
- * that is registered as a leaf node, does not contain an owning {@link Command}
+ * Exception sent when a command sender inputs invalid command syntax
  */
-@SuppressWarnings({"unused", "serial"})
+@SuppressWarnings("unused")
 @API(status = API.Status.STABLE)
-public final class NoCommandInLeafException extends IllegalStateException {
+public class InvalidSyntaxException extends CommandParseException {
 
-    private final CommandComponent<?> commandComponent;
+    private final String correctSyntax;
 
     /**
-     * Create a new no command in leaf exception instance
+     * Create a new invalid syntax exception instance
      *
-     * @param commandComponent Command argument that caused the exception
+     * @param correctSyntax Expected syntax
+     * @param commandSender Sender that sent the command
+     * @param currentChain  Chain leading up to issue
      */
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-    public NoCommandInLeafException(final @NonNull CommandComponent<?> commandComponent) {
-        super(String.format("Leaf node '%s' does not have associated owning command", commandComponent.name()));
-        this.commandComponent = commandComponent;
+    public InvalidSyntaxException(
+            final @NonNull String correctSyntax,
+            final @NonNull Object commandSender,
+            final @NonNull List<@NonNull CommandComponent<?>> currentChain
+    ) {
+        super(commandSender, currentChain);
+        this.correctSyntax = correctSyntax;
     }
 
     /**
-     * Returns the command component.
+     * Returns the correct syntax of the command.
      *
-     * @return command component
+     * @return correct command syntax
      */
-    public @NonNull CommandComponent<?> commandComponent() {
-        return this.commandComponent;
+    public @NonNull String correctSyntax() {
+        return this.correctSyntax;
+    }
+
+    @Override
+    public final String getMessage() {
+        return String.format("Invalid command syntax. Correct syntax is: %s", this.correctSyntax);
     }
 }

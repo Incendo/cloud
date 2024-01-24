@@ -25,7 +25,7 @@ package cloud.commandframework.issue;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import cloud.commandframework.exceptions.CommandExecutionException;
+import cloud.commandframework.exception.CommandExecutionException;
 import cloud.commandframework.execution.ExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import java.util.concurrent.CompletionException;
