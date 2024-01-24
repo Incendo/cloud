@@ -30,7 +30,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Command execution handler that does nothing
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.INTERNAL)
 final class NullCommandExecutionHandler<C> implements CommandExecutionHandler<C> {

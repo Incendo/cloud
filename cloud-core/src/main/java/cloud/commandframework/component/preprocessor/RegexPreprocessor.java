@@ -37,7 +37,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Command preprocessor that filters based on regular expressions
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @SuppressWarnings("unused")
 @API(status = API.Status.STABLE)

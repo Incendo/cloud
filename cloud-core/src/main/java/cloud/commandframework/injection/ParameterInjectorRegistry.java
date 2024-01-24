@@ -48,7 +48,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  *
  * The order injectors are tested is the same order they were registered in.
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  * @since 1.2.0
  */
 @SuppressWarnings("ALL")

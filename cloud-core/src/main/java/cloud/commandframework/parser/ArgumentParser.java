@@ -40,7 +40,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Parser that parses strings into values of a specific type
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  * @param <T> Value type
  */
 @FunctionalInterface

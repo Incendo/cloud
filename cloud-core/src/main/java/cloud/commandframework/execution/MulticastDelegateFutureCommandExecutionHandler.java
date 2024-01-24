@@ -36,7 +36,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Delegates to other handlers.
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  * @see #delegatingExecutionHandler(List)
  */
 @API(status = API.Status.INTERNAL)

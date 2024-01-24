@@ -39,7 +39,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * <p>You should not put {@link com.google.inject.Inject} annotation on your methods.
  * Ignore the warning says 'Binding annotation @YourAnnotation without {@literal @Inject} declared'.</p>
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  * @since 1.4.0
  */
 @API(status = API.Status.STABLE, since = "1.4.0")

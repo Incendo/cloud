@@ -40,7 +40,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Represents a method annotated with {@link Parser}
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  * @param <T> Argument type
  * @since 1.3.0
  */

@@ -50,7 +50,7 @@ import org.pircbotx.hooks.types.GenericMessageEvent;
 /**
  * Command manager implementation for PircBotX 2.0
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  * @since 1.1.0
  */
 public class PircBotXCommandManager<C> extends CommandManager<C> {

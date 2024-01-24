@@ -51,7 +51,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Command context used to assist in the parsing of commands
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.STABLE)
 public class CommandContext<C> implements MutableCloudKeyContainer {

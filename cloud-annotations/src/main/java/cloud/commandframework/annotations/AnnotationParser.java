@@ -97,7 +97,7 @@ import static cloud.commandframework.description.CommandDescription.commandDescr
 /**
  * Parser that parses class instances {@link cloud.commandframework.Command commands}
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @SuppressWarnings("unused")
 public final class AnnotationParser<C> {

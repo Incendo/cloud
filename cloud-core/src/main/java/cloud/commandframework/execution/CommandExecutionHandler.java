@@ -35,7 +35,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Handler that is invoked whenever a {@link Command} is executed
  * by a command sender
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @FunctionalInterface
 @API(status = API.Status.STABLE)
@@ -44,7 +44,7 @@ public interface CommandExecutionHandler<C> {
     /**
      * Returns a {@link CommandExecutionHandler} that does nothing (no-op).
      *
-     * @param <C> Command sender type
+     * @param <C> command sender type
      * @return command execution handler that does nothing
      * @since 1.7.0
      */
@@ -104,7 +104,7 @@ public interface CommandExecutionHandler<C> {
      * Handler that is invoked whenever a {@link Command} is executed
      * by a command sender
      *
-     * @param <C> Command sender type
+     * @param <C> command sender type
      * @since 1.6.0
      */
     @FunctionalInterface

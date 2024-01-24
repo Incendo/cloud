@@ -36,7 +36,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * A compound argument consisting of three inner arguments
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  * @param <U> First argument type
  * @param <V> Second argument type
  * @param <W> Third argument type

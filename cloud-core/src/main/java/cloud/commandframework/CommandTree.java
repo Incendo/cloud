@@ -90,7 +90,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * or a {@link InvalidSyntaxException} otherwise. Only the fourth scenario would result in a complete
  * command being parsed.
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class CommandTree<C> {

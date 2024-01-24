@@ -60,7 +60,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
 /**
  * Standard implementation of {@link ParserRegistry}
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @SuppressWarnings({"unused", "unchecked", "rawtypes"})
 @API(status = API.Status.STABLE)

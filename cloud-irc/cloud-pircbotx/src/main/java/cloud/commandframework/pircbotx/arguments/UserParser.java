@@ -41,7 +41,7 @@ import org.pircbotx.exception.DaoException;
 /**
  * {@link ArgumentParser Argument parser} that parses PircBotX {@link User users}
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  * @since 2.0.0
  */
 public final class UserParser<C> implements ArgumentParser<C, User> {

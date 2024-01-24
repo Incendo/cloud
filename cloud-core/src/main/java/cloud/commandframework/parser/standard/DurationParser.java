@@ -46,7 +46,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Parser for {@link Duration}.
  *
- * @param <C> sender type
+ * @param <C> command sender type
  * @since 1.7.0
  */
 @API(status = API.Status.STABLE, since = "1.7.0")

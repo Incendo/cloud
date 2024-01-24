@@ -36,7 +36,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Compound argument
  *
  * @param <T> Tuple type
- * @param <C> Command sender type
+ * @param <C> command sender type
  * @param <O> Output type
  */
 @API(status = API.Status.INTERNAL, since = "2.0.0")

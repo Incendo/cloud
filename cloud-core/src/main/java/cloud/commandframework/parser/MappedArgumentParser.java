@@ -36,7 +36,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * An argument parser which wraps another argument parser, converting the output type.
  *
- * @param <C> sender type
+ * @param <C> command sender type
  * @param <I> base output type
  * @param <O> mapped output type
  * @since 1.5.0

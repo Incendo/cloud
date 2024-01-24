@@ -33,7 +33,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Utility that formats chains of {@link CommandComponent command components} into syntax strings
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @FunctionalInterface
 @API(status = API.Status.STABLE)

@@ -242,7 +242,7 @@ public final class FilteringSuggestionProcessor<C> implements SuggestionProcesso
          *
          * <p>Returns boolean instead of nullable String.</p>
          *
-         * @param <C> sender type
+         * @param <C> command sender type
          * @since 1.8.0
          */
         @API(status = API.Status.STABLE, since = "1.8.0")

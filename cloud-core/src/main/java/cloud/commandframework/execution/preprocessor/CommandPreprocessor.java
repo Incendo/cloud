@@ -33,7 +33,7 @@ import org.apiguardian.api.API;
  * Command preprocessors may filter out invalid commands by using
  * {@link ConsumerService#interrupt()}
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.STABLE)
 public interface CommandPreprocessor<C> extends ConsumerService<CommandPreprocessingContext<C>> {

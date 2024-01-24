@@ -34,7 +34,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Injector that injects parameters into Command annotated
  * methods
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  * @param <T> Type of the value that is injected by this injector
  * @since 1.2.0
  */

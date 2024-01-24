@@ -44,7 +44,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Represents a method annotated with {@link Suggestions}
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  * @since 1.3.0
  */
 public final class MethodSuggestionProvider<C> extends AnnotatedMethodHandler<C> implements SuggestionProvider<C> {

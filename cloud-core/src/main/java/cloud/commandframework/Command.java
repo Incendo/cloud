@@ -80,7 +80,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * A command may have a {@link #senderType()} that is different from the sender type of the command manager.
  * The command tree will enforce this type when parsing the command.
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @SuppressWarnings("unused")
 @API(status = API.Status.STABLE)
@@ -413,7 +413,7 @@ public class Command<C> {
      * Builder for {@link Command} instances. The builder is immutable, and each
      * setter method will return a new builder instance.
      *
-     * @param <C> Command sender type
+     * @param <C> command sender type
      */
     @API(status = API.Status.STABLE)
     public static final class Builder<C> {
@@ -2333,7 +2333,7 @@ public class Command<C> {
          * Essentially a {@link java.util.function.UnaryOperator} for {@link Builder},
          * but as a separate interface to avoid conflicts.
          *
-         * @param <C> sender type
+         * @param <C> command sender type
          * @since 1.8.0
          */
         @API(status = API.Status.STABLE, since = "1.8.0")

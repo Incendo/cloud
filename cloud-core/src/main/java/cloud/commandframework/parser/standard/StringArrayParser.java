@@ -38,7 +38,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Parser that parses input into a string array
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
  */
 @API(status = API.Status.STABLE)
 public final class StringArrayParser<C> implements ArgumentParser<C, String[]> {
