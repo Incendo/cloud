@@ -23,17 +23,14 @@
 //
 package org.incendo.cloud.exception;
 
-import io.leangen.geantyref.GenericTypeReflector;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.component.CommandComponent;
+import org.incendo.cloud.util.TypeUtils;
 
 /**
  * Exception thrown when an invalid command sender tries to execute a command
@@ -95,19 +92,8 @@ public final class InvalidCommandSenderException extends CommandParseException {
         return String.format(
                 "%s is not allowed to execute that command. Must be of type %s",
                 commandSender().getClass().getSimpleName(),
-                simpleName(this.requiredSender)
+                TypeUtils.simpleName(this.requiredSender)
         );
-    }
-
-    private static String simpleName(final @NonNull Type type) {
-        final String simpleName = GenericTypeReflector.erase(type).getSimpleName();
-        if (type instanceof ParameterizedType) {
-            final String paramTypes = Arrays.stream(((ParameterizedType) type).getActualTypeArguments())
-                    .map(InvalidCommandSenderException::simpleName)
-                    .collect(Collectors.joining(", "));
-            return simpleName + '<' + paramTypes + '>';
-        }
-        return simpleName;
     }
 
     /**
