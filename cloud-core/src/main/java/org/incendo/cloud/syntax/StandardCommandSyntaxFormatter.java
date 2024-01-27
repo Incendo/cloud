@@ -23,6 +23,8 @@
 //
 package org.incendo.cloud.syntax;
 
+import io.leangen.geantyref.GenericTypeReflector;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -83,15 +85,15 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                     CommandNode.META_KEY_PERMISSION,
                     Permission.empty()
             );
-            final Set<Class<?>> senderTypes = (Set<Class<?>>) n.nodeMeta().getOrDefault(
+            final Set<Type> senderTypes = (Set<Type>) n.nodeMeta().getOrDefault(
                     CommandNode.META_KEY_SENDER_TYPES,
                     Collections.emptySet()
             );
             if (senderTypes.isEmpty()) {
                 return this.manager.testPermission(sender, permission).allowed();
             }
-            for (final Class<?> senderType : senderTypes) {
-                if (senderType.isInstance(sender)) {
+            for (final Type senderType : senderTypes) {
+                if (GenericTypeReflector.isSuperType(senderType, sender.getClass())) {
                     return this.manager.testPermission(sender, permission).allowed();
                 }
             }

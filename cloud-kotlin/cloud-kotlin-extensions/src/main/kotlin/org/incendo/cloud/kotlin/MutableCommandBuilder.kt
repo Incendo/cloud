@@ -23,6 +23,7 @@
 //
 package org.incendo.cloud.kotlin
 
+import io.leangen.geantyref.TypeToken
 import org.incendo.cloud.Command
 import org.incendo.cloud.CommandManager
 import org.incendo.cloud.component.CommandComponent
@@ -297,8 +298,8 @@ public class MutableCommandBuilder<C : Any>(
      * Field to get and set the required sender type for this command builder
      *
      */
-    public var senderType: KClass<out C>?
-        get() = this.commandBuilder.senderType()?.kotlin
+    public var senderType: TypeToken<out C>?
+        get() = this.commandBuilder.senderType()
         set(type) {
             if (type == null) throw UnsupportedOperationException("Cannot set a null sender type")
             onlyMutate { it.senderType(type) }

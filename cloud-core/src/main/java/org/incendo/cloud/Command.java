@@ -24,6 +24,7 @@
 package org.incendo.cloud;
 
 import io.leangen.geantyref.TypeToken;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -89,7 +90,7 @@ public class Command<C> {
     private final List<@NonNull CommandComponent<C>> components;
     private final @Nullable CommandComponent<C> flagComponent;
     private final CommandExecutionHandler<C> commandExecutionHandler;
-    private final Class<? extends C> senderType;
+    private final Type senderType;
     private final Permission permission;
     private final CommandMeta commandMeta;
     private final CommandDescription commandDescription;
@@ -104,11 +105,11 @@ public class Command<C> {
      * @param commandMeta             command meta instance
      * @param commandDescription      description of the command
      */
-    @API(status = API.Status.STABLE)
+    @API(status = API.Status.INTERNAL)
     public Command(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
-            final @Nullable Class<? extends C> senderType,
+            final @Nullable Type senderType,
             final @NonNull Permission permission,
             final @NonNull CommandMeta commandMeta,
             final @NonNull CommandDescription commandDescription
@@ -145,42 +146,6 @@ public class Command<C> {
         this.permission = permission;
         this.commandMeta = commandMeta;
         this.commandDescription = commandDescription;
-    }
-
-    /**
-     * Constructs a new command.
-     *
-     * @param commandComponents       command components
-     * @param commandExecutionHandler execution handler
-     * @param senderType              required sender type. May be {@code null}
-     * @param commandMeta             command meta instance
-     */
-    @API(status = API.Status.STABLE)
-    public Command(
-            final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
-            final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
-            final @Nullable Class<? extends C> senderType,
-            final @NonNull CommandMeta commandMeta
-    ) {
-        this(commandComponents, commandExecutionHandler, senderType, Permission.empty(), commandMeta, CommandDescription.empty());
-    }
-
-    /**
-     * Constructs a new command.
-     *
-     * @param commandComponents       command components
-     * @param commandExecutionHandler execution handler
-     * @param permission       command permission
-     * @param commandMeta             command meta instance
-     */
-    @API(status = API.Status.STABLE)
-    public Command(
-            final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
-            final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
-            final @NonNull Permission permission,
-            final @NonNull CommandMeta commandMeta
-    ) {
-        this(commandComponents, commandExecutionHandler, null, permission, commandMeta, CommandDescription.empty());
     }
 
     /**
@@ -342,8 +307,12 @@ public class Command<C> {
      * as the command manager
      */
     @API(status = API.Status.STABLE)
-    public @NonNull Optional<Class<? extends C>> senderType() {
-        return Optional.ofNullable(this.senderType);
+    @SuppressWarnings("unchecked")
+    public @NonNull Optional<TypeToken<? extends C>> senderType() {
+        if (this.senderType == null) {
+            return Optional.empty();
+        }
+        return Optional.of((TypeToken<? extends C>) TypeToken.get(this.senderType));
     }
 
     /**
@@ -407,7 +376,7 @@ public class Command<C> {
         private final CommandMeta commandMeta;
         private final List<CommandComponent<C>> commandComponents;
         private final CommandExecutionHandler<C> commandExecutionHandler;
-        private final Class<? extends C> senderType;
+        private final Type senderType;
         private final Permission permission;
         private final CommandManager<C> commandManager;
         private final Collection<CommandFlag<?>> flags;
@@ -416,7 +385,7 @@ public class Command<C> {
         private Builder(
                 final @Nullable CommandManager<C> commandManager,
                 final @NonNull CommandMeta commandMeta,
-                final @Nullable Class<? extends C> senderType,
+                final @Nullable Type senderType,
                 final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
                 final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
                 final @NonNull Permission permission,
@@ -441,8 +410,12 @@ public class Command<C> {
          * @return required sender type
          */
         @API(status = API.Status.STABLE)
-        public @Nullable Class<? extends C> senderType() {
-            return this.senderType;
+        @SuppressWarnings("unchecked")
+        public @Nullable TypeToken<? extends C> senderType() {
+            if (this.senderType == null) {
+                return null;
+            }
+            return (TypeToken<? extends C>) TypeToken.get(this.senderType);
         }
 
         /**
@@ -2092,12 +2065,23 @@ public class Command<C> {
          * @param senderType required sender type
          * @return new builder instance using the required sender type
          */
-        @SuppressWarnings("unchecked")
         public <N extends C> @NonNull Builder<N> senderType(final @NonNull Class<? extends N> senderType) {
+            return this.senderType(TypeToken.get(senderType));
+        }
+
+        /**
+         * Specifies a required sender type.
+         *
+         * @param <N>        the new sender type or a superclass thereof
+         * @param senderType required sender type
+         * @return new builder instance using the required sender type
+         */
+        @SuppressWarnings("unchecked")
+        public <N extends C> @NonNull Builder<N> senderType(final @NonNull TypeToken<? extends N> senderType) {
             return (Builder<N>) new Builder<>(
                     this.commandManager,
                     this.commandMeta,
-                    senderType,
+                    senderType.getType(),
                     this.commandComponents,
                     this.commandExecutionHandler,
                     this.permission,
@@ -2179,8 +2163,8 @@ public class Command<C> {
         @SuppressWarnings("unchecked")
         public <N extends C> @NonNull Builder<N> proxies(final @NonNull Command<N> command) {
             Builder<N> builder;
-            if (command.senderType != null) {
-                builder = this.senderType(command.senderType);
+            if (command.senderType().isPresent()) {
+                builder = this.senderType(command.senderType().get());
             } else {
                 builder = (Builder<N>) this;
             }
