@@ -70,7 +70,7 @@ class DefaultValueTest {
         // Arrange
         final CloudKey<Integer> key = CloudKey.of("int", Integer.class);
         final DefaultValue<TestCommandSender, Integer> defaultValue =
-                ctx -> ArgumentParseResult.success(ThreadLocalRandom.current().nextInt());
+                DefaultValue.dynamic(ctx -> ThreadLocalRandom.current().nextInt());
         this.commandManager.command(
                 this.commandManager.commandBuilder("test").optional(key, integerParser(), defaultValue)
         );

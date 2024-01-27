@@ -29,6 +29,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.parser.ArgumentParseResult;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Default value used when an optional argument is omitted by the command sender.
  *
@@ -60,8 +62,22 @@ public interface DefaultValue<C, T> {
      * @param <C> the command sender type
      * @param <T> the argument type
      */
-    static <C, T> @NonNull DefaultValue<C, T> dynamic(final @NonNull DefaultValue<C, T> expression) {
-        return new DynamicDefaultValue<>(expression);
+    static <C, T> @NonNull DefaultValue<C, T> dynamic(final @NonNull DefaultValueProvider<C, T> expression) {
+        requireNonNull(expression, "expression");
+        return failableDynamic(ctx -> ArgumentParseResult.success(expression.evaluateDefault(ctx)));
+    }
+
+    /**
+     * Returns a default value that will be evaluated when the command is evaluated. The argument parser will be
+     * bypassed when using a dynamic default value.
+     *
+     * @param expression the expression producing the default value
+     * @return the default value instance
+     * @param <C> the command sender type
+     * @param <T> the argument type
+     */
+    static <C, T> @NonNull DefaultValue<C, T> failableDynamic(final @NonNull DefaultValue<C, T> expression) {
+        return new DynamicDefaultValue<>(requireNonNull(expression, "expression"));
     }
 
     /**
@@ -84,6 +100,17 @@ public interface DefaultValue<C, T> {
      */
     @NonNull ArgumentParseResult<T> evaluateDefault(@NonNull CommandContext<C> context);
 
+
+    interface DefaultValueProvider<C, T> {
+
+        /**
+         * Evaluates the default value for the given {@code context}.
+         *
+         * @param context the context
+         * @return the default value
+         */
+        @NonNull T evaluateDefault(@NonNull CommandContext<C> context);
+    }
 
     final class ConstantDefaultValue<C, T> implements DefaultValue<C, T> {
 
