@@ -11,7 +11,7 @@
 
 > [!NOTE]
 > Cloud 2 is a major update with many significant changes. Cloud 2 is _not_ compatible with version 1.
-> You can find the changelog [here](https://cloud.incendo.org/en/latest/cloud-v2/).
+> You can find the changelog [here](https://cloud.incendo.org/cloud-v2/).
 
 Cloud is a general-purpose Java command dispatcher &amp; framework. It allows programmers to define command chains that are then parsed and invoked from user-supplied string inputs, to execute pre-defined actions.
 
