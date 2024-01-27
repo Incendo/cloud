@@ -23,6 +23,9 @@
 //
 package org.incendo.cloud;
 
+import io.leangen.geantyref.GenericTypeReflector;
+import io.leangen.geantyref.TypeToken;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -198,11 +201,11 @@ public final class CommandTree<C> {
         ).thenCompose(command -> {
             if (command != null
                     && command.senderType().isPresent()
-                    && !command.senderType().get().isInstance(commandContext.sender())) {
+                    && !GenericTypeReflector.isSuperType(command.senderType().get().getType(), commandContext.sender().getClass())) {
                 return CompletableFutures.failedFuture(
                         new InvalidCommandSenderException(
                                 commandContext.sender(),
-                                command.senderType().get(),
+                                command.senderType().get().getType(),
                                 new ArrayList<>(command.components()),
                                 command
                         )
@@ -995,12 +998,12 @@ public final class CommandTree<C> {
      */
     @SuppressWarnings("unchecked")
     private boolean canAccess(final @NonNull C sender, final @NonNull CommandNode<C> node) {
-        final Set<Class<?>> types = (Set<Class<?>>) node.nodeMeta().get(CommandNode.META_KEY_SENDER_TYPES);
+        final Set<Type> types = (Set<Type>) node.nodeMeta().get(CommandNode.META_KEY_SENDER_TYPES);
         if (types == null) {
             throw new IllegalStateException("Expected sender type requirements to be propagated");
         }
-        for (final Class<?> type : types) {
-            if (type.isInstance(sender)) {
+        for (final Type type : types) {
+            if (GenericTypeReflector.isSuperType(type, sender.getClass())) {
                 return this.determinePermissionResult(sender, node).allowed();
             }
         }
@@ -1052,7 +1055,7 @@ public final class CommandTree<C> {
     @SuppressWarnings("unchecked")
     private void propagateRequirements(final @NonNull CommandNode<C> leafNode) {
         final Permission commandPermission = leafNode.command().commandPermission();
-        Class<?> senderType = leafNode.command().senderType().orElse(null);
+        Type senderType = leafNode.command().senderType().map(TypeToken::getType).orElse(null);
         if (senderType == null) {
             senderType = Object.class;
         }
@@ -1086,7 +1089,7 @@ public final class CommandTree<C> {
 
             commandArgumentNode.nodeMeta().put(CommandNode.META_KEY_PERMISSION, permission);
 
-            final Set<Class<?>> senderTypes = (Set<Class<?>>) commandArgumentNode.nodeMeta()
+            final Set<Type> senderTypes = (Set<Type>) commandArgumentNode.nodeMeta()
                     .computeIfAbsent(CommandNode.META_KEY_SENDER_TYPES, $ -> new HashSet<>());
             senderTypes.add(senderType);
         }

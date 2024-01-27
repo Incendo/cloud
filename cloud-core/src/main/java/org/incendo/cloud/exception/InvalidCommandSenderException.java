@@ -23,7 +23,12 @@
 //
 package org.incendo.cloud.exception;
 
+import io.leangen.geantyref.GenericTypeReflector;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -37,7 +42,7 @@ import org.incendo.cloud.component.CommandComponent;
 @API(status = API.Status.STABLE)
 public final class InvalidCommandSenderException extends CommandParseException {
 
-    private final Class<?> requiredSender;
+    private final Type requiredSender;
     private final Command<?> command;
 
     /**
@@ -67,7 +72,7 @@ public final class InvalidCommandSenderException extends CommandParseException {
     @API(status = API.Status.INTERNAL, consumers = "org.incendo.cloud.*")
     public InvalidCommandSenderException(
             final @NonNull Object commandSender,
-            final @NonNull Class<?> requiredSender,
+            final @NonNull Type requiredSender,
             final @NonNull List<@NonNull CommandComponent<?>> currentChain,
             final @Nullable Command<?> command
     ) {
@@ -81,7 +86,7 @@ public final class InvalidCommandSenderException extends CommandParseException {
      *
      * @return required sender type
      */
-    public @NonNull Class<?> requiredSender() {
+    public @NonNull Type requiredSender() {
         return this.requiredSender;
     }
 
@@ -90,8 +95,19 @@ public final class InvalidCommandSenderException extends CommandParseException {
         return String.format(
                 "%s is not allowed to execute that command. Must be of type %s",
                 commandSender().getClass().getSimpleName(),
-                this.requiredSender.getSimpleName()
+                simpleName(this.requiredSender)
         );
+    }
+
+    private static String simpleName(final @NonNull Type type) {
+        final String simpleName = GenericTypeReflector.erase(type).getSimpleName();
+        if (type instanceof ParameterizedType) {
+            final String paramTypes = Arrays.stream(((ParameterizedType) type).getActualTypeArguments())
+                    .map(InvalidCommandSenderException::simpleName)
+                    .collect(Collectors.joining(", "));
+            return simpleName + '<' + paramTypes + '>';
+        }
+        return simpleName;
     }
 
     /**
