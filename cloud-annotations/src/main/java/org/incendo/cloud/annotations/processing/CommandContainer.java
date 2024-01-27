@@ -37,7 +37,7 @@ import org.incendo.cloud.annotations.Command;
  * If using <i>cloud-annotations</i> as an annotation processor, then the class will
  * be listed in a special file under META-INF. These containers can be collectively
  * parsed using {@link AnnotationParser#parseContainers()}, which will create instances
- * of the containers and then call {@link AnnotationParser#parse(Object[])} with the created instance.
+ * of the containers and then call {@link AnnotationParser#parse(Object)} with the created instance.
  * <p>
  * Every class annotated with {@link CommandContainer} needs to be {@code public}, and it
  * also needs to have one of the following:
