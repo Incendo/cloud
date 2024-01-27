@@ -50,7 +50,7 @@ public interface DefaultValue<C, T> {
      * @param <T> the argument type
      */
     static <C, T> @NonNull DefaultValue<C, T> constant(final @NonNull T value) {
-        return new ConstantDefaultValue<>(value);
+        return new ConstantDefaultValue<>(requireNonNull(value, "value"));
     }
 
     /**
