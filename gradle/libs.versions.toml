@@ -1,5 +1,5 @@
 [plugins]
-versions = { id = "com.github.ben-manes.versions", version = "0.50.0" }
+versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
 cloud-buildLogic-spotless = { id = "org.incendo.cloud-build-logic.spotless", version.ref = "cloud-build-logic" }
 cloud-buildLogic-rootProject-publishing = { id = "org.incendo.cloud-build-logic.publishing.root-project", version.ref = "cloud-build-logic" }
 cloud-buildLogic-rootProject-spotless = { id = "org.incendo.cloud-build-logic.spotless.root-project", version.ref = "cloud-build-logic" }
@@ -10,7 +10,7 @@ checkstyle = "10.12.5"
 stylecheck = "0.2.1"
 checkerQual = "3.42.0"
 errorprone = "2.24.1"
-geantyref = "1.3.14"
+geantyref = "1.3.15"
 jmh = "1.37"
 apiguardian = "1.1.2"
 immutables = "2.10.0"
