@@ -100,7 +100,8 @@ public interface DefaultValue<C, T> {
      */
     @NonNull ArgumentParseResult<T> evaluateDefault(@NonNull CommandContext<C> context);
 
-
+    @API(status = API.Status.STABLE)
+    @FunctionalInterface
     interface DefaultValueProvider<C, T> {
 
         /**
