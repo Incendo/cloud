@@ -33,7 +33,7 @@ truth = "1.3.0"
 compileTesting = "0.21.0"
 
 # build-logic
-cloud-build-logic = "0.0.4"
+cloud-build-logic = "0.0.7"
 revapi = "1.7.0"
 
 [libraries]
