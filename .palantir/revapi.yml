@@ -21,6 +21,10 @@ acceptedBreaks:
         \ org.incendo.cloud.permission.Permission, org.incendo.cloud.meta.CommandMeta,\
         \ org.incendo.cloud.description.CommandDescription)"
       justification: "beta release"
+    - code: "java.method.addedToInterface"
+      new: "method T org.incendo.cloud.caption.CaptionFormatter<C, T>::formatCaption(org.incendo.cloud.caption.Caption,\
+        \ C, java.lang.String, java.util.Collection<org.incendo.cloud.caption.CaptionVariable>)"
+      justification: "beta release"
     - code: "java.method.numberOfParametersChanged"
       old: "method void org.incendo.cloud.Command<C>::<init>(java.util.List<org.incendo.cloud.component.CommandComponent<C>>,\
         \ org.incendo.cloud.execution.CommandExecutionHandler<C>, org.incendo.cloud.permission.Permission,\
