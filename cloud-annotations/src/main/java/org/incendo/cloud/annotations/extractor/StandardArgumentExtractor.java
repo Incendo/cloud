@@ -37,9 +37,11 @@ import org.incendo.cloud.annotations.AnnotationParser;
 import org.incendo.cloud.annotations.Argument;
 import org.incendo.cloud.annotations.ArgumentMode;
 import org.incendo.cloud.annotations.Default;
+import org.incendo.cloud.annotations.DefaultValueFactory;
 import org.incendo.cloud.annotations.DescriptionMapper;
 import org.incendo.cloud.annotations.SyntaxFragment;
 import org.incendo.cloud.annotations.descriptor.ArgumentDescriptor;
+import org.incendo.cloud.component.DefaultValue;
 import org.incendo.cloud.internal.ImmutableBuilder;
 
 /**
@@ -132,10 +134,35 @@ public abstract class StandardArgumentExtractor implements ArgumentExtractor {
         final Collection<ArgumentDescriptor> arguments = new ArrayList<>();
         for (final Parameter parameter : method.getParameters()) {
             final String parameterName = this.parameterNameExtractor().extract(parameter);
+
+            DefaultValue<?, ?> defaultValue = null;
+            if (parameter.isAnnotationPresent(Default.class)) {
+                final Default defaultAnnotation = parameter.getAnnotation(Default.class);
+                if (defaultAnnotation.name().isEmpty()) {
+                    defaultValue = DefaultValue.parsed(this.annotationParser()
+                            .processString(parameter.getAnnotation(Default.class).value()));
+                } else {
+                    final DefaultValueFactory<?, ?> factory = this.annotationParser()
+                            .defaultValueRegistry()
+                            .named(this.annotationParser().processString(defaultAnnotation.name()))
+                            .orElseThrow(() -> new IllegalArgumentException(String.format(
+                                    "No default value factory named '%s' has been registered",
+                                    defaultAnnotation.name()))
+                            );
+                    defaultValue = factory.create(parameter);
+                }
+            }
+
             if (!parameter.isAnnotationPresent(Argument.class)) {
                 final SyntaxFragment fragment = variableFragments.get(parameterName);
                 if (fragment != null) {
-                    arguments.add(ArgumentDescriptor.builder().parameter(parameter).name(parameterName).build());
+                    arguments.add(
+                            ArgumentDescriptor.builder()
+                                    .parameter(parameter)
+                                    .defaultValue(defaultValue)
+                                    .name(parameterName)
+                                    .build()
+                    );
                 }
                 continue;
             }
@@ -147,11 +174,6 @@ public abstract class StandardArgumentExtractor implements ArgumentExtractor {
                 name = parameterName;
             } else {
                 name = this.annotationParser().processString(argument.value());
-            }
-
-            String defaultValue = null;
-            if (parameter.isAnnotationPresent(Default.class)) {
-                defaultValue = this.annotationParser().processString(parameter.getAnnotation(Default.class).value());
             }
 
             final ArgumentDescriptor argumentDescriptor = ArgumentDescriptor.builder()
