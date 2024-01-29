@@ -7,7 +7,7 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.cloudCore)
+    api(projects.cloudCore)
 
     testImplementation(libs.compileTesting)
 }
