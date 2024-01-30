@@ -11,6 +11,39 @@ acceptedBreaks:
       new: "class cloud.commandframework.services.types.ConsumerService.PipeBurst"
       justification: "no practical effect, the constructor was private already"
   "2.0.0-beta.1":
+    org.incendo:cloud-annotations:
+    - code: "java.method.parameterTypeChanged"
+      old: "parameter org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor\
+        \ org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor::of(java.lang.reflect.Parameter,\
+        \ java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===,\
+        \ org.incendo.cloud.description.Description)"
+      new: "parameter org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor\
+        \ org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor::of(java.lang.reflect.Parameter,\
+        \ java.lang.String, java.lang.String, java.lang.String, ===org.incendo.cloud.component.DefaultValue<?,\
+        \ ?>===, org.incendo.cloud.description.Description)"
+      justification: "Change of internal annotation API between beta releases"
+    - code: "java.method.parameterTypeChanged"
+      old: "parameter org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor\
+        \ org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor::withDefaultValue(===java.lang.String===)"
+      new: "parameter org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor\
+        \ org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor::withDefaultValue(===org.incendo.cloud.component.DefaultValue<?,\
+        \ ?>===)"
+      justification: "Change of internal annotation API between beta releases"
+    - code: "java.method.parameterTypeChanged"
+      old: "parameter org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor.Builder\
+        \ org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor.Builder::defaultValue(===java.lang.String===)"
+      new: "parameter org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor.Builder\
+        \ org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor.Builder::defaultValue(===org.incendo.cloud.component.DefaultValue<?,\
+        \ ?>===)"
+      justification: "Change of internal annotation API between beta releases"
+    - code: "java.method.returnTypeChanged"
+      old: "method java.lang.String org.incendo.cloud.annotations.descriptor.ArgumentDescriptor::defaultValue()"
+      new: "method org.incendo.cloud.component.DefaultValue<?, ?> org.incendo.cloud.annotations.descriptor.ArgumentDescriptor::defaultValue()"
+      justification: "Change of internal annotation API between beta releases"
+    - code: "java.method.returnTypeChanged"
+      old: "method java.lang.String org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor::defaultValue()"
+      new: "method org.incendo.cloud.component.DefaultValue<?, ?> org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor::defaultValue()"
+      justification: "Change of internal annotation API between beta releases"
     org.incendo:cloud-core:
     - code: "java.annotation.attributeValueChanged"
       old: "method void org.incendo.cloud.Command<C>::<init>(java.util.List<org.incendo.cloud.component.CommandComponent<C>>,\
