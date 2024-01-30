@@ -27,6 +27,9 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -37,9 +40,42 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public @interface Permission {
 
     /**
-     * Get the command permission
+     * Returns the command permissions.
      *
-     * @return Command permission
+     * @return command permissions
      */
-    @NonNull String value() default "";
+    @NonNull String[] value() default {};
+
+    /**
+     * Returns the permission mode. This is only used in {@link #value()} contains more than one permission.
+     *
+     * @return the permission mode
+     */
+    @NonNull Mode mode() default Mode.ANY_OF;
+
+
+    enum Mode {
+        /**
+         * At least one of the permissions defined in {@link #value()} is required.
+         *
+         * @see org.incendo.cloud.permission.Permission#anyOf(org.incendo.cloud.permission.Permission...)
+         */
+        ANY_OF,
+        /**
+         * All permissions defined in {@link #value()} are required.
+         *
+         * @see org.incendo.cloud.permission.Permission#allOf(org.incendo.cloud.permission.Permission...)
+         */
+        ALL_OF;
+
+        org.incendo.cloud.permission.@NonNull Permission combine(
+                final @NonNull Stream<org.incendo.cloud.permission.Permission> permissions
+        ) {
+            final List<org.incendo.cloud.permission.Permission> permissionList = permissions.collect(Collectors.toList());
+            if (this == ANY_OF) {
+                return org.incendo.cloud.permission.Permission.anyOf(permissionList);
+            }
+            return org.incendo.cloud.permission.Permission.allOf(permissionList);
+        }
+    }
 }

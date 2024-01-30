@@ -11,6 +11,15 @@ acceptedBreaks:
       new: "class cloud.commandframework.services.types.ConsumerService.PipeBurst"
       justification: "no practical effect, the constructor was private already"
   "2.0.0-beta.1":
+    org.incendo:cloud-annotations:
+    - code: "java.method.defaultValueChanged"
+      old: "method java.lang.String org.incendo.cloud.annotations.Permission::value()"
+      new: "method java.lang.String[] org.incendo.cloud.annotations.Permission::value()"
+      justification: "beta; just requires re-compilation"
+    - code: "java.method.returnTypeChanged"
+      old: "method java.lang.String org.incendo.cloud.annotations.Permission::value()"
+      new: "method java.lang.String[] org.incendo.cloud.annotations.Permission::value()"
+      justification: "beta; just requires re-compilation"
     org.incendo:cloud-core:
     - code: "java.annotation.attributeValueChanged"
       old: "method void org.incendo.cloud.Command<C>::<init>(java.util.List<org.incendo.cloud.component.CommandComponent<C>>,\

@@ -135,7 +135,7 @@ class AnnotationParserTest {
                 Permission.class
         );
         Assertions.assertNotNull(permission);
-        Assertions.assertEquals("some.permission", permission.value());
+        Assertions.assertEquals("some.permission", permission.value()[0]);
 
         System.out.println("Looking for @Command");
         final Command command = AnnotationParser.getMethodOrClassAnnotation(
