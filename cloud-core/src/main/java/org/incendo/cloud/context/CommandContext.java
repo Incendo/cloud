@@ -24,6 +24,7 @@
 package org.incendo.cloud.context;
 
 import io.leangen.geantyref.TypeToken;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -111,6 +112,20 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
     }
 
     /**
+     * Formats a {@code caption} using the {@link CommandManager#captionFormatter()}.
+     *
+     * @param caption   the caption key
+     * @param variables the variables to use during formatting
+     * @return the formatted caption
+     */
+    public @NonNull String formatCaption(
+            final @NonNull Caption caption,
+            final @NonNull Collection<@NonNull CaptionVariable> variables
+    ) {
+        return this.formatCaption(this.commandManager.captionFormatter(), caption, variables);
+    }
+
+    /**
      * Formats a {@code caption} using the given {@code formatter}.
      *
      * @param <T>       the message type produced by the formatter
@@ -123,6 +138,28 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
             final @NonNull CaptionFormatter<C, T> formatter,
             final @NonNull Caption caption,
             final @NonNull CaptionVariable @NonNull... variables
+    ) {
+        return formatter.formatCaption(
+                caption,
+                this.commandSender,
+                this.captionRegistry.caption(caption, this.commandSender),
+                variables
+        );
+    }
+
+    /**
+     * Formats a {@code caption} using the given {@code formatter}.
+     *
+     * @param <T>       the message type produced by the formatter
+     * @param formatter the formatter
+     * @param caption   the caption key
+     * @param variables the variables to use during formatting
+     * @return the formatted caption
+     */
+    public <T> @NonNull T formatCaption(
+            final @NonNull CaptionFormatter<C, T> formatter,
+            final @NonNull Caption caption,
+            final @NonNull Collection<@NonNull CaptionVariable> variables
     ) {
         return formatter.formatCaption(
                 caption,
