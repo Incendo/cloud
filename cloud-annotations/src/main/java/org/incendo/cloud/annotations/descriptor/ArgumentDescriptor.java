@@ -28,6 +28,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.immutables.value.Value;
+import org.incendo.cloud.component.DefaultValue;
 import org.incendo.cloud.description.Description;
 import org.incendo.cloud.internal.ImmutableBuilder;
 import org.incendo.cloud.suggestion.SuggestionProvider;
@@ -87,7 +88,7 @@ public interface ArgumentDescriptor extends Descriptor {
      *
      * @return the default value, or {@code null}
      */
-    @Nullable String defaultValue();
+    @Nullable DefaultValue<?, ?> defaultValue();
 
     /**
      * Returns the description of the argument.

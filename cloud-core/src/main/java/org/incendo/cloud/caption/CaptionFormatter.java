@@ -23,6 +23,8 @@
 //
 package org.incendo.cloud.caption;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -68,11 +70,29 @@ public interface CaptionFormatter<C, T> {
      * @param variables  the caption variables
      * @return the transformed message
      */
-    @NonNull T formatCaption(
+    default @NonNull T formatCaption(
             @NonNull Caption captionKey,
             @NonNull C recipient,
             @NonNull String caption,
             @NonNull CaptionVariable @NonNull... variables
+    ) {
+        return this.formatCaption(captionKey, recipient, caption, Arrays.asList(variables));
+    }
+
+    /**
+     * Formats the {@code caption}.
+     *
+     * @param captionKey the caption key
+     * @param recipient  the recipient of the message
+     * @param caption    the value of the caption
+     * @param variables  the caption variables
+     * @return the transformed message
+     */
+    @NonNull T formatCaption(
+            @NonNull Caption captionKey,
+            @NonNull C recipient,
+            @NonNull String caption,
+            @NonNull Collection<@NonNull CaptionVariable> variables
     );
 
 
@@ -89,7 +109,7 @@ public interface CaptionFormatter<C, T> {
                 final @NonNull Caption captionKey,
                 final @NonNull C recipient,
                 final @NonNull String caption,
-                final @NonNull CaptionVariable @NonNull... variables
+                final @NonNull Collection<@NonNull CaptionVariable> variables
         ) {
             final Map<String, String> replacements = new HashMap<>();
             for (final CaptionVariable variable : variables) {

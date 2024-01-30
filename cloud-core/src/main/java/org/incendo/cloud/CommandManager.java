@@ -28,15 +28,19 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.returnsreceiver.qual.This;
+import org.incendo.cloud.caption.Caption;
 import org.incendo.cloud.caption.CaptionFormatter;
 import org.incendo.cloud.caption.CaptionRegistry;
+import org.incendo.cloud.caption.CaptionVariable;
 import org.incendo.cloud.caption.StandardCaptionsProvider;
 import org.incendo.cloud.component.CommandComponent;
 import org.incendo.cloud.context.CommandContext;
@@ -82,6 +86,8 @@ import org.incendo.cloud.suggestion.SuggestionFactory;
 import org.incendo.cloud.suggestion.SuggestionProcessor;
 import org.incendo.cloud.syntax.CommandSyntaxFormatter;
 import org.incendo.cloud.syntax.StandardCommandSyntaxFormatter;
+import org.incendo.cloud.type.tuple.Pair;
+import org.incendo.cloud.type.tuple.Triplet;
 
 /**
  * The manager is responsible for command registration, parsing delegation, etc.
@@ -768,5 +774,23 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
     public boolean isCommandRegistrationAllowed() {
         return this.settings().get(ManagerSetting.ALLOW_UNSAFE_REGISTRATION)
                 || this.state.get() != RegistrationState.AFTER_REGISTRATION;
+    }
+
+    /**
+     * Registers the default exception handlers.
+     *
+     * @param messageSender consumer that gets invoked when a message should be sent to the command sender
+     * @param logger        consumer that gets invoked when a message should be logged
+     */
+    protected void registerDefaultExceptionHandlers(
+            final @NonNull Consumer<Triplet<CommandContext<C>, Caption, List<@NonNull CaptionVariable>>> messageSender,
+            final @NonNull Consumer<Pair<String, Throwable>> logger
+    ) {
+        final DefaultExceptionHandlers<C> defaultExceptionHandlers = new DefaultExceptionHandlers<>(
+                messageSender,
+                logger,
+                this.exceptionController
+        );
+        defaultExceptionHandlers.register();
     }
 }

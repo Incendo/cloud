@@ -103,6 +103,32 @@ public final class StandardCaptionsProvider<C> extends DelegatingCaptionProvider
      */
     public static final String ARGUMENT_PARSE_FAILURE_EITHER = "Could not resolve <primary> or <fallback> from '<input>'";
 
+    /**
+     * Default caption for {@link StandardCaptionKeys#EXCEPTION_UNEXPECTED}
+     */
+    public static final String EXCEPTION_UNEXPECTED = "An internal error occurred while attempting to perform this command.";
+    /**
+     * Default caption for {@link StandardCaptionKeys#EXCEPTION_INVALID_ARGUMENT}
+     */
+    public static final String EXCEPTION_INVALID_ARGUMENT = "Invalid Command Argument: <cause>.";
+    /**
+     * Default caption for {@link StandardCaptionKeys#EXCEPTION_NO_SUCH_COMMAND}
+     */
+    public static final String EXCEPTION_NO_SUCH_COMMAND = "Unknown Command.";
+    /**
+     * Default caption for {@link StandardCaptionKeys#EXCEPTION_NO_PERMISSION}
+     */
+    public static final String EXCEPTION_NO_PERMISSION = "I'm sorry, but you do not have permission to perform this command.";
+    /**
+     * Default caption for {@link StandardCaptionKeys#EXCEPTION_INVALID_SENDER}
+     */
+    public static final String EXCEPTION_INVALID_SENDER =
+            "<actual> is not allowed to execute that command. Must be of type <expected>";
+    /**
+     * Default caption for {@link StandardCaptionKeys#EXCEPTION_INVALID_SYNTAX}
+     */
+    public static final String EXCEPTION_INVALID_SYNTAX = "Invalid Command Syntax. Correct command syntax is: <syntax>.";
+
     private static final CaptionProvider<?> PROVIDER = CaptionProvider.constantProvider()
             .putCaption(
                     StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_BOOLEAN,
@@ -155,8 +181,25 @@ public final class StandardCaptionsProvider<C> extends DelegatingCaptionProvider
             ).putCaption(
                     StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_EITHER,
                     ARGUMENT_PARSE_FAILURE_EITHER
-            )
-            .build();
+            ).putCaption(
+                    StandardCaptionKeys.EXCEPTION_UNEXPECTED,
+                    EXCEPTION_UNEXPECTED
+            ).putCaption(
+                    StandardCaptionKeys.EXCEPTION_INVALID_ARGUMENT,
+                    EXCEPTION_INVALID_ARGUMENT
+            ).putCaption(
+                    StandardCaptionKeys.EXCEPTION_NO_SUCH_COMMAND,
+                    EXCEPTION_NO_SUCH_COMMAND
+            ).putCaption(
+                    StandardCaptionKeys.EXCEPTION_NO_PERMISSION,
+                    EXCEPTION_NO_PERMISSION
+            ).putCaption(
+                    StandardCaptionKeys.EXCEPTION_INVALID_SENDER,
+                    EXCEPTION_INVALID_SENDER
+            ).putCaption(
+                    StandardCaptionKeys.EXCEPTION_INVALID_SYNTAX,
+                    EXCEPTION_INVALID_SYNTAX
+            ).build();
 
     @SuppressWarnings("unchecked")
     @Override

@@ -107,6 +107,28 @@ public final class StandardCaptionKeys {
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_EITHER = of("argument.parse.failure.either");
 
+    public static final Caption EXCEPTION_UNEXPECTED = of("exception.unexpected");
+    /**
+     * Variables: {@code <cause>}
+     */
+    public static final Caption EXCEPTION_INVALID_ARGUMENT = of("exception.invalid_argument");
+    /**
+     * Variables: {@code <command>}
+     */
+    public static final Caption EXCEPTION_NO_SUCH_COMMAND = of("exception.no_such_command");
+    /**
+     * Variables: {@code <permission>}
+     */
+    public static final Caption EXCEPTION_NO_PERMISSION = of("exception.no_permission");
+    /**
+     * Variables: {@code <actual>}, {@code <expected>}
+     */
+    public static final Caption EXCEPTION_INVALID_SENDER = of("exception.invalid_sender");
+    /**
+     * Variables: {@code <syntax>}
+     */
+    public static final Caption EXCEPTION_INVALID_SYNTAX = of("exception.invalid_syntax");
+
     private StandardCaptionKeys() {
     }
 
