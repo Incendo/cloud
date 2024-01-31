@@ -939,7 +939,18 @@ public final class AnnotationParser<C> {
 
         final Permission permission = getMethodOrClassAnnotation(method, Permission.class);
         if (permission != null) {
-            builder = builder.permission(this.processString(permission.value()));
+            final String[] permissions = permission.value();
+            if (permissions.length == 1) {
+                builder = builder.permission(this.processString(permissions[0]));
+            } else if (permissions.length > 1) {
+                builder = builder.permission(
+                        permission.mode().combine(
+                                Arrays.stream(permissions)
+                                        .map(this::processString)
+                                        .map(org.incendo.cloud.permission.Permission::permission)
+                        )
+                );
+            }
         }
 
         if (commandDescriptor.requiredSender() != Object.class) {

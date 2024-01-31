@@ -12,6 +12,14 @@ acceptedBreaks:
       justification: "no practical effect, the constructor was private already"
   "2.0.0-beta.1":
     org.incendo:cloud-annotations:
+    - code: "java.method.defaultValueChanged"
+      old: "method java.lang.String org.incendo.cloud.annotations.Permission::value()"
+      new: "method java.lang.String[] org.incendo.cloud.annotations.Permission::value()"
+      justification: "beta; just requires re-compilation"
+    - code: "java.method.returnTypeChanged"
+      old: "method java.lang.String org.incendo.cloud.annotations.Permission::value()"
+      new: "method java.lang.String[] org.incendo.cloud.annotations.Permission::value()"
+      justification: "beta; just requires re-compilation"
     - code: "java.method.parameterTypeChanged"
       old: "parameter org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor\
         \ org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor::of(java.lang.reflect.Parameter,\
