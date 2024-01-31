@@ -41,7 +41,6 @@ import org.incendo.cloud.annotations.PreprocessorMapper;
 import org.incendo.cloud.annotations.SyntaxFragment;
 import org.incendo.cloud.annotations.descriptor.ArgumentDescriptor;
 import org.incendo.cloud.component.CommandComponent;
-import org.incendo.cloud.component.DefaultValue;
 import org.incendo.cloud.component.preprocessor.ComponentPreprocessor;
 import org.incendo.cloud.parser.ArgumentParser;
 import org.incendo.cloud.parser.ParserDescriptor;
@@ -174,7 +173,7 @@ public final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
         }
 
         if (syntaxFragment.argumentMode() == ArgumentMode.OPTIONAL && descriptor.defaultValue() != null) {
-            componentBuilder.defaultValue(DefaultValue.parsed(this.annotationParser.processString(descriptor.defaultValue())));
+            componentBuilder.defaultValue(descriptor.defaultValue());
         }
 
         for (final Annotation annotation : annotations) {

@@ -20,6 +20,38 @@ acceptedBreaks:
       old: "method java.lang.String org.incendo.cloud.annotations.Permission::value()"
       new: "method java.lang.String[] org.incendo.cloud.annotations.Permission::value()"
       justification: "beta; just requires re-compilation"
+    - code: "java.method.parameterTypeChanged"
+      old: "parameter org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor\
+        \ org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor::of(java.lang.reflect.Parameter,\
+        \ java.lang.String, java.lang.String, java.lang.String, ===java.lang.String===,\
+        \ org.incendo.cloud.description.Description)"
+      new: "parameter org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor\
+        \ org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor::of(java.lang.reflect.Parameter,\
+        \ java.lang.String, java.lang.String, java.lang.String, ===org.incendo.cloud.component.DefaultValue<?,\
+        \ ?>===, org.incendo.cloud.description.Description)"
+      justification: "Change of internal annotation API between beta releases"
+    - code: "java.method.parameterTypeChanged"
+      old: "parameter org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor\
+        \ org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor::withDefaultValue(===java.lang.String===)"
+      new: "parameter org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor\
+        \ org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor::withDefaultValue(===org.incendo.cloud.component.DefaultValue<?,\
+        \ ?>===)"
+      justification: "Change of internal annotation API between beta releases"
+    - code: "java.method.parameterTypeChanged"
+      old: "parameter org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor.Builder\
+        \ org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor.Builder::defaultValue(===java.lang.String===)"
+      new: "parameter org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor.Builder\
+        \ org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor.Builder::defaultValue(===org.incendo.cloud.component.DefaultValue<?,\
+        \ ?>===)"
+      justification: "Change of internal annotation API between beta releases"
+    - code: "java.method.returnTypeChanged"
+      old: "method java.lang.String org.incendo.cloud.annotations.descriptor.ArgumentDescriptor::defaultValue()"
+      new: "method org.incendo.cloud.component.DefaultValue<?, ?> org.incendo.cloud.annotations.descriptor.ArgumentDescriptor::defaultValue()"
+      justification: "Change of internal annotation API between beta releases"
+    - code: "java.method.returnTypeChanged"
+      old: "method java.lang.String org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor::defaultValue()"
+      new: "method org.incendo.cloud.component.DefaultValue<?, ?> org.incendo.cloud.annotations.descriptor.ImmutableArgumentDescriptor::defaultValue()"
+      justification: "Change of internal annotation API between beta releases"
     org.incendo:cloud-core:
     - code: "java.annotation.attributeValueChanged"
       old: "method void org.incendo.cloud.Command<C>::<init>(java.util.List<org.incendo.cloud.component.CommandComponent<C>>,\
@@ -29,6 +61,10 @@ acceptedBreaks:
         \ org.incendo.cloud.execution.CommandExecutionHandler<C>, java.lang.reflect.Type,\
         \ org.incendo.cloud.permission.Permission, org.incendo.cloud.meta.CommandMeta,\
         \ org.incendo.cloud.description.CommandDescription)"
+      justification: "beta release"
+    - code: "java.method.addedToInterface"
+      new: "method T org.incendo.cloud.caption.CaptionFormatter<C, T>::formatCaption(org.incendo.cloud.caption.Caption,\
+        \ C, java.lang.String, java.util.Collection<org.incendo.cloud.caption.CaptionVariable>)"
       justification: "beta release"
     - code: "java.method.numberOfParametersChanged"
       old: "method void org.incendo.cloud.Command<C>::<init>(java.util.List<org.incendo.cloud.component.CommandComponent<C>>,\

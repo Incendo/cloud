@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -134,6 +135,7 @@ public final class AnnotationParser<C> {
     private SuggestionProviderFactory<C> suggestionProviderFactory;
     private ExceptionHandlerFactory<C> exceptionHandlerFactory;
     private DescriptionMapper descriptionMapper;
+    private DefaultValueRegistry<C> defaultValueRegistry;
 
     /**
      * Construct a new annotation parser
@@ -212,6 +214,7 @@ public final class AnnotationParser<C> {
         this.suggestionProviderFactory = SuggestionProviderFactory.defaultFactory();
         this.exceptionHandlerFactory = ExceptionHandlerFactory.defaultFactory();
         this.builderDecorators = new ArrayList<>();
+        this.defaultValueRegistry = new DefaultValueRegistryImpl<>();
         this.registerBuilderModifier(
                 CommandDescription.class,
                 (description, builder) -> builder.commandDescription(commandDescription(this.mapDescription(description.value())))
@@ -608,6 +611,24 @@ public final class AnnotationParser<C> {
     }
 
     /**
+     * Returns the default value registry.
+     *
+     * @return the default value registry
+     */
+    public @NonNull DefaultValueRegistry<C> defaultValueRegistry() {
+        return this.defaultValueRegistry;
+    }
+
+    /**
+     * Sets the default value registry.
+     *
+     * @param defaultValueRegistry default value registry
+     */
+    public void defaultValueRegistry(final @NonNull DefaultValueRegistry<C> defaultValueRegistry) {
+        this.defaultValueRegistry = Objects.requireNonNull(defaultValueRegistry, "defaultValueRegistry");
+    }
+
+    /**
      * Parses all known {@link org.incendo.cloud.annotations.processing.CommandContainer command containers}.
      *
      * <p>This will use the {@link ClassLoader class loader} of the current class to retrieve the stored information about the
@@ -689,6 +710,7 @@ public final class AnnotationParser<C> {
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> @NonNull Collection<org.incendo.cloud.@NonNull Command<C>> parse(final @NonNull T instance) {
+        this.parseDefaultValues(instance);
         this.parseSuggestions(instance);
         this.parseParsers(instance);
         this.parseExceptionHandlers(instance);
@@ -775,6 +797,24 @@ public final class AnnotationParser<C> {
             } catch (final Exception e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    private <T> void parseDefaultValues(final @NonNull T instance) {
+        for (final Method method : instance.getClass().getMethods()) {
+            final Default defaultValue = method.getAnnotation(Default.class);
+            if (defaultValue == null) {
+                continue;
+            }
+
+            final String name;
+            if (defaultValue.name().isEmpty()) {
+                name = method.getName();
+            } else {
+                name = defaultValue.name();
+            }
+
+            this.defaultValueRegistry().register(name, new MethodDefaultValueFactory<>(method, instance));
         }
     }
 

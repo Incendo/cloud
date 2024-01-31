@@ -31,21 +31,43 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Used to give an optional command component a
- * {@link org.incendo.cloud.component.DefaultValue#parsed(String) parsed default value}.
+ * <b>When used on a method parameter:</b><br/>
+ * Used to give an optional {@link Argument} a {@link org.incendo.cloud.component.DefaultValue}.
  *
+ * <p>If {@link #value()} is used then a parsed default value will be created. If {@link #name()} is used then a dynamic
+ * default value registered to the {@link DefaultValueRegistry} will be used.</p>
+ *
+ * <hr/>
+ * <b>When used on a method:</b><br>
+ * Used to indicate that a method is a {@link DefaultValueFactory}. The method must return a
+ * {@link org.incendo.cloud.component.DefaultValue} instance. The <i>only</i> accepted method parameter is a
+ * {@link java.lang.reflect.Parameter} which represents the parameter that the default value is being created for.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
+@Target({ElementType.PARAMETER, ElementType.METHOD})
 @API(status = API.Status.STABLE)
 public @interface Default {
 
     /**
-     * Returns the default value.
-     * <p>
-     * This value will be parsed when the command is being parsed in the case that the optional parameter has been omitted.
+     * Returns the default value. {@link #name()} will take priority when non-empty and used on a parameter.
+     *
+     * <p>This value will be parsed when the command is being parsed in the case that the optional parameter has been omitted.</p>
      *
      * @return the default value
      */
-    @NonNull String value();
+    @NonNull String value() default "";
+
+    /**
+     * If used on a parameter this returns the name of the {@link DefaultValueFactory} used to create the default value.
+     *
+     * <p>If used on a method, this indicates the name of the {@link DefaultValueFactory} represented by the method. If this
+     * is empty, the method name will be used.</p>
+     *
+     * <p>The factories must be registered to the {@link DefaultValueRegistry} retrieved
+     * through {@link AnnotationParser#defaultValueRegistry()}. Using {@link AnnotationParser#parse(Object)} will scan &amp;
+     * register all {@code @Default}-annotated methods.</p>
+     *
+     * @return name of the default value registry to use
+     */
+    @NonNull String name() default "";
 }
