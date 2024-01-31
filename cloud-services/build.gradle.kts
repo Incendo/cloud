@@ -1,7 +1,7 @@
 plugins {
     id("cloud.base-conventions")
     id("cloud.publishing-conventions")
-    alias(libs.plugins.revapi)
+    id("org.incendo.cloud-build-logic.revapi")
 }
 
 dependencies {

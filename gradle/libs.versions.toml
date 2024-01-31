@@ -3,7 +3,6 @@ versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
 cloud-buildLogic-spotless = { id = "org.incendo.cloud-build-logic.spotless", version.ref = "cloud-build-logic" }
 cloud-buildLogic-rootProject-publishing = { id = "org.incendo.cloud-build-logic.publishing.root-project", version.ref = "cloud-build-logic" }
 cloud-buildLogic-rootProject-spotless = { id = "org.incendo.cloud-build-logic.spotless.root-project", version.ref = "cloud-build-logic" }
-revapi = { id = "com.palantir.revapi", version.ref = "revapi" }
 
 [versions]
 checkstyle = "10.12.5"
@@ -33,8 +32,7 @@ truth = "1.3.0"
 compileTesting = "0.21.0"
 
 # build-logic
-cloud-build-logic = "0.0.8"
-revapi = "1.7.0"
+cloud-build-logic = "0.0.9"
 
 [libraries]
 checkerQual = { group = "org.checkerframework", name = "checker-qual", version.ref = "checkerQual" }
@@ -68,7 +66,6 @@ gradleKotlinJvm = { group = "org.jetbrains.kotlin.jvm", name = "org.jetbrains.ko
 gradleDokka = { group = "org.jetbrains.dokka", name = "dokka-gradle-plugin", version.ref = "dokka" }
 stylecheck = { module = "ca.stellardrift:stylecheck", version.ref = "stylecheck" }
 cloud-build-logic = { module = "org.incendo:cloud-build-logic", version.ref = "cloud-build-logic" }
-revapi = { group = "com.palantir.gradle.revapi", name = "gradle-revapi", version.ref = "revapi" }
 
 [bundles]
 coroutines = ["coroutinesCore", "coroutinesJdk8"]
