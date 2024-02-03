@@ -2025,6 +2025,18 @@ public class Command<C> {
         }
 
         /**
+         * Specifies the command execution handler.
+         *
+         * @param commandExecutionHandler New execution handler
+         * @return new builder instance using the command execution handler
+         */
+        public @NonNull Builder<C> futureHandler(
+                final CommandExecutionHandler.@NonNull FutureCommandExecutionHandler<C> commandExecutionHandler
+        ) {
+            return this.handler(commandExecutionHandler);
+        }
+
+        /**
          * Returns the current command execution handler.
          *
          * @return the current handler
