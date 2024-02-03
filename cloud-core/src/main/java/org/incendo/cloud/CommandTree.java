@@ -394,7 +394,7 @@ public final class CommandTree<C> {
         }
 
         // This stores the argument value for this argument.
-        Object argumentValue = null;
+        ArgumentParseResult<?> argumentValue = null;
 
         // Flag arguments need to be skipped over, so that further defaults are handled
         if (commandInput.isEmpty() && !(child.component().type() == CommandComponent.ComponentType.FLAG)) {
@@ -489,7 +489,11 @@ public final class CommandTree<C> {
 
         final CompletableFuture<?> parseResult;
         if (argumentValue != null) {
-            parseResult = CompletableFuture.completedFuture(argumentValue);
+            if (argumentValue.parsedValue().isPresent()) {
+                parseResult = CompletableFuture.completedFuture(argumentValue.parsedValue().get());
+            } else {
+                parseResult = CompletableFutures.failedFuture(this.argumentParseException(commandContext, child, argumentValue));
+            }
         } else {
             parseResult =
                     this.parseArgument(commandContext, child, commandInput, executor)
@@ -567,17 +571,25 @@ public final class CommandTree<C> {
                     if (result.failure().isPresent()) {
                         commandInput.cursor(currentInput.cursor());
                         resultFuture.completeExceptionally(
-                                new ArgumentParseException(
-                                        result.failure().get(),
-                                        commandContext.sender(),
-                                        this.getComponentChain(node)
-                                )
+                                this.argumentParseException(commandContext, node, result)
                         );
                     } else {
                         resultFuture.complete(result);
                     }
                     return resultFuture;
                 }, executor);
+    }
+
+    private @NonNull ArgumentParseException argumentParseException(
+            final CommandContext<C> commandContext,
+            final CommandNode<C> node,
+            final ArgumentParseResult<?> result
+    ) {
+        return new ArgumentParseException(
+                result.failure().get(),
+                commandContext.sender(),
+                this.getComponentChain(node)
+        );
     }
 
     /**
