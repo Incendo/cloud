@@ -13,13 +13,13 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v4
-      - uses: gradle/wrapper-validation-action@v1
+      - uses: gradle/wrapper-validation-action@v2
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 17
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/actions/setup-gradle@v3
         with:
           # allow master and *-dev branches to write caches (default is only master/main)
           cache-read-only: ${{ github.ref != 'refs/heads/master' && !(endsWith(github.ref, '-dev') && startsWith(github.ref, 'refs/heads/')) }}
