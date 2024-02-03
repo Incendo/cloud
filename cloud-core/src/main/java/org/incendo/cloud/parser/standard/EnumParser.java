@@ -23,6 +23,8 @@
 //
 package org.incendo.cloud.parser.standard;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Objects;
@@ -73,7 +75,7 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
     }
 
     private final Class<E> enumClass;
-    private final EnumSet<E> allowedValues;
+    private final EnumSet<E> acceptedValues;
 
     /**
      * Construct a new enum parser
@@ -82,7 +84,25 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
      */
     public EnumParser(final @NonNull Class<E> enumClass) {
         this.enumClass = enumClass;
-        this.allowedValues = EnumSet.allOf(enumClass);
+        this.acceptedValues = EnumSet.allOf(enumClass);
+    }
+
+    /**
+     * Returns the enum class that was used to create this parser.
+     *
+     * @return the enum class
+     */
+    public @NonNull Class<E> enumClass() {
+        return this.enumClass;
+    }
+
+    /**
+     * Returns a collection containing all accepted values.
+     *
+     * @return the accepted values
+     */
+    public @NonNull Collection<@NonNull E> acceptedValues() {
+        return Collections.unmodifiableSet(this.acceptedValues);
     }
 
     @Override
@@ -92,7 +112,7 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
     ) {
         final String input = commandInput.readString();
 
-        for (final E value : this.allowedValues) {
+        for (final E value : this.acceptedValues) {
             if (value.name().equalsIgnoreCase(input)) {
                 return ArgumentParseResult.success(value);
             }
