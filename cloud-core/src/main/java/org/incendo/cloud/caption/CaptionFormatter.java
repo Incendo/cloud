@@ -58,7 +58,17 @@ public interface CaptionFormatter<C, T> {
      * @return the formatter
      */
     static <C> @NonNull CaptionFormatter<C, String> placeholderReplacing() {
-        return new PatternReplacingCaptionFormatter<>(Pattern.compile("<(\\S+)>"));
+        return new PatternReplacingCaptionFormatter<>(placeholderPattern());
+    }
+
+    /**
+     * Returns the pattern for {@link #placeholderReplacing()}.
+     * Replaces variables in the {@code <name>} format.
+     *
+     * @return the pattern for {@link #placeholderReplacing()}
+     */
+    static Pattern placeholderPattern() {
+        return Pattern.compile("<(\\S+)>");
     }
 
     /**
