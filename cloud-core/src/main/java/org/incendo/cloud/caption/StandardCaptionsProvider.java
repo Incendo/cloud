@@ -110,11 +110,11 @@ public final class StandardCaptionsProvider<C> extends DelegatingCaptionProvider
     /**
      * Default caption for {@link StandardCaptionKeys#EXCEPTION_INVALID_ARGUMENT}
      */
-    public static final String EXCEPTION_INVALID_ARGUMENT = "Invalid Command Argument: <cause>.";
+    public static final String EXCEPTION_INVALID_ARGUMENT = "Invalid command argument: <cause>.";
     /**
      * Default caption for {@link StandardCaptionKeys#EXCEPTION_NO_SUCH_COMMAND}
      */
-    public static final String EXCEPTION_NO_SUCH_COMMAND = "Unknown Command.";
+    public static final String EXCEPTION_NO_SUCH_COMMAND = "Unknown command.";
     /**
      * Default caption for {@link StandardCaptionKeys#EXCEPTION_NO_PERMISSION}
      */
@@ -127,7 +127,7 @@ public final class StandardCaptionsProvider<C> extends DelegatingCaptionProvider
     /**
      * Default caption for {@link StandardCaptionKeys#EXCEPTION_INVALID_SYNTAX}
      */
-    public static final String EXCEPTION_INVALID_SYNTAX = "Invalid Command Syntax. Correct command syntax is: <syntax>.";
+    public static final String EXCEPTION_INVALID_SYNTAX = "Invalid command syntax. Correct command syntax is: <syntax>.";
 
     private static final CaptionProvider<?> PROVIDER = CaptionProvider.constantProvider()
             .putCaption(
