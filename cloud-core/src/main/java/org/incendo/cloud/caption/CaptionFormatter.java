@@ -24,8 +24,8 @@
 package org.incendo.cloud.caption;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -102,7 +102,7 @@ public interface CaptionFormatter<C, T> {
             @NonNull Caption captionKey,
             @NonNull C recipient,
             @NonNull String caption,
-            @NonNull Collection<@NonNull CaptionVariable> variables
+            @NonNull List<@NonNull CaptionVariable> variables
     );
 
 
@@ -119,7 +119,7 @@ public interface CaptionFormatter<C, T> {
                 final @NonNull Caption captionKey,
                 final @NonNull C recipient,
                 final @NonNull String caption,
-                final @NonNull Collection<@NonNull CaptionVariable> variables
+                final @NonNull List<@NonNull CaptionVariable> variables
         ) {
             final Map<String, String> replacements = new HashMap<>();
             for (final CaptionVariable variable : variables) {
