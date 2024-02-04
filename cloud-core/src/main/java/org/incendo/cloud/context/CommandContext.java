@@ -24,7 +24,6 @@
 package org.incendo.cloud.context;
 
 import io.leangen.geantyref.TypeToken;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -120,7 +119,7 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      */
     public @NonNull String formatCaption(
             final @NonNull Caption caption,
-            final @NonNull Collection<@NonNull CaptionVariable> variables
+            final @NonNull List<@NonNull CaptionVariable> variables
     ) {
         return this.formatCaption(this.commandManager.captionFormatter(), caption, variables);
     }
@@ -159,7 +158,7 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
     public <T> @NonNull T formatCaption(
             final @NonNull CaptionFormatter<C, T> formatter,
             final @NonNull Caption caption,
-            final @NonNull Collection<@NonNull CaptionVariable> variables
+            final @NonNull List<@NonNull CaptionVariable> variables
     ) {
         return formatter.formatCaption(
                 caption,
