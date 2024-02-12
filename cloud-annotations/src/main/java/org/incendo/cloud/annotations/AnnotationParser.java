@@ -669,7 +669,7 @@ public final class AnnotationParser<C> {
 
         final List<Class<?>> classes = new ArrayList<>();
         for (final String className : classNames) {
-            classes.add(Class.forName(className));
+            classes.add(Class.forName(className, true, classLoader));
         }
         classes.sort(COMMAND_CONTAINER_COMPARATOR);
 
