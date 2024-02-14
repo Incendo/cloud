@@ -735,7 +735,7 @@ public final class AnnotationParser<C> {
             this.parseExceptionHandlers(instance);
         }
 
-        ArrayList<org.incendo.cloud.Command<C>> result = new ArrayList<>();
+        final List<org.incendo.cloud.Command<C>> result = new ArrayList<>();
         for (final T instance : instances) {
             final Collection<CommandDescriptor> commandDescriptors = this.commandExtractor.extractCommands(instance);
             final Collection<org.incendo.cloud.Command<C>> commands = this.construct(instance, commandDescriptors);
