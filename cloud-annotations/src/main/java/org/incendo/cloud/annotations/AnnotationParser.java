@@ -103,6 +103,14 @@ import static org.incendo.cloud.description.CommandDescription.commandDescriptio
 @SuppressWarnings("unused")
 public final class AnnotationParser<C> {
 
+    private static final Comparator<Class<?>> COMMAND_CONTAINER_COMPARATOR = Comparator.<Class<?>>comparingInt(clazz -> {
+        final CommandContainer commandContainer = clazz.getAnnotation(CommandContainer.class);
+        if (commandContainer == null) {
+            return 1;
+        }
+        return commandContainer.priority();
+    }).reversed();
+
     /**
      * The value of {@link Argument} that should be used to infer argument names from parameter names.
      */
@@ -659,20 +667,22 @@ public final class AnnotationParser<C> {
             }
         }
 
-        final Map<Integer, List<Object>> priorityMap = new HashMap<>();
+        final List<Class<?>> classes = new ArrayList<>();
         for (final String className : classNames) {
-            final Class<?> clazz = Class.forName(className);
-            final CommandContainer commandContainer = clazz.getAnnotation(CommandContainer.class);
-            final int priority = commandContainer == null ? 1 : commandContainer.priority();
+            classes.add(Class.forName(className, true, classLoader));
+        }
+        classes.sort(COMMAND_CONTAINER_COMPARATOR);
+
+        for (final Class<?> commandContainer : classes) {
             // We now have the class, and we now just need to decide what constructor to invoke.
             // We first try to find a constructor which takes in the parser.
             @MonotonicNonNull Object instance;
             try {
-                instance = clazz.getConstructor(AnnotationParser.class).newInstance(this);
+                instance = commandContainer.getConstructor(AnnotationParser.class).newInstance(this);
             } catch (final NoSuchMethodException ignored) {
                 try {
                     // Then we try to find a no-arg constructor.
-                    instance = clazz.getConstructor().newInstance();
+                    instance = commandContainer.getConstructor().newInstance();
                 } catch (final NoSuchMethodException e) {
                     // If neither are found, we panic!
                     throw new IllegalStateException(
@@ -684,13 +694,7 @@ public final class AnnotationParser<C> {
                     );
                 }
             }
-            priorityMap.computeIfAbsent(priority, k -> new ArrayList<>()).add(instance);
-        }
-
-        final List<Integer> keys = new ArrayList<>(priorityMap.keySet());
-        keys.sort(Comparator.reverseOrder());
-        for (final Integer priority : keys) {
-            commands.addAll(this.parse(priorityMap.get(priority).toArray()));
+            commands.addAll(this.parse(instance));
         }
 
         return Collections.unmodifiableList(commands);
