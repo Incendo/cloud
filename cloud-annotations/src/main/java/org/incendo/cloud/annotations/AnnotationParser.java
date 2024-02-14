@@ -654,8 +654,6 @@ public final class AnnotationParser<C> {
     public @NonNull Collection<org.incendo.cloud.@NonNull Command<C>> parseContainers(
             final @NonNull ClassLoader classLoader
     ) throws Exception {
-        final List<org.incendo.cloud.Command<C>> commands = new LinkedList<>();
-
         final List<String> classNames;
         try (InputStream stream = classLoader.getResourceAsStream(CommandContainerProcessor.PATH)) {
             if (stream == null) {
@@ -673,7 +671,9 @@ public final class AnnotationParser<C> {
         }
         classes.sort(COMMAND_CONTAINER_COMPARATOR);
 
-        for (final Class<?> commandContainer : classes) {
+        final Object[] instances = new Object[classes.size()];
+        for (int i = 0; i < classes.size(); i++) {
+            final Class<?> commandContainer = classes.get(i);
             // We now have the class, and we now just need to decide what constructor to invoke.
             // We first try to find a constructor which takes in the parser.
             @MonotonicNonNull Object instance;
@@ -694,8 +694,9 @@ public final class AnnotationParser<C> {
                     );
                 }
             }
-            commands.addAll(this.parse(instance));
+            instances[i] = instance;
         }
+        final List<org.incendo.cloud.Command<C>> commands = new LinkedList<>(this.parse(instances));
 
         return Collections.unmodifiableList(commands);
     }
