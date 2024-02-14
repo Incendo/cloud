@@ -721,19 +721,22 @@ public final class AnnotationParser<C> {
      * @return Collection of parsed commands
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public <T> @NonNull Collection<org.incendo.cloud.@NonNull Command<C>> parse(final @NonNull T... instances) {
-        for (T instance: instances) {
+    public <T> @NonNull Collection<org.incendo.cloud.@NonNull Command<C>> parse(final @NonNull T @NonNull... instances) {
+        for (final T instance : instances) {
+            this.parseDefaultValues(instance);
+        }
+        for (final T instance : instances) {
             this.parseSuggestions(instance);
         }
-        for (T instance: instances) {
+        for (final T instance : instances) {
             this.parseParsers(instance);
         }
-        for (T instance: instances) {
+        for (final T instance : instances) {
             this.parseExceptionHandlers(instance);
         }
 
         ArrayList<org.incendo.cloud.Command<C>> result = new ArrayList<>();
-        for (T instance: instances) {
+        for (final T instance : instances) {
             final Collection<CommandDescriptor> commandDescriptors = this.commandExtractor.extractCommands(instance);
             final Collection<org.incendo.cloud.Command<C>> commands = this.construct(instance, commandDescriptors);
             for (final org.incendo.cloud.Command<C> command : commands) {
