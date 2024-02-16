@@ -654,8 +654,6 @@ public final class AnnotationParser<C> {
     public @NonNull Collection<org.incendo.cloud.@NonNull Command<C>> parseContainers(
             final @NonNull ClassLoader classLoader
     ) throws Exception {
-        final List<org.incendo.cloud.Command<C>> commands = new LinkedList<>();
-
         final List<String> classNames;
         try (InputStream stream = classLoader.getResourceAsStream(CommandContainerProcessor.PATH)) {
             if (stream == null) {
@@ -673,6 +671,7 @@ public final class AnnotationParser<C> {
         }
         classes.sort(COMMAND_CONTAINER_COMPARATOR);
 
+        final List<Object> instances = new LinkedList<>();
         for (final Class<?> commandContainer : classes) {
             // We now have the class, and we now just need to decide what constructor to invoke.
             // We first try to find a constructor which takes in the parser.
@@ -694,33 +693,55 @@ public final class AnnotationParser<C> {
                     );
                 }
             }
-            commands.addAll(this.parse(instance));
+            instances.add(instance);
         }
 
-        return Collections.unmodifiableList(commands);
+        return this.parse(instances);
     }
 
     /**
-     * Scan a class instance of {@link Command} annotations and attempt to
+     * Scan some instances of {@link Command}-annotated types and attempt to
      * compile them into {@link org.incendo.cloud.Command} instances.
      *
-     * @param instance Instance to scan
-     * @param <T>      Type of the instance
-     * @return Collection of parsed commands
+     * @param instances instances to scan
+     * @return collection of parsed commands
+     */
+    public @NonNull Collection<org.incendo.cloud.@NonNull Command<C>> parse(final @NonNull Object @NonNull... instances) {
+        return this.parse(Arrays.asList(instances));
+    }
+
+    /**
+     * Scan some instances of {@link Command}-annotated types and attempt to
+     * compile them into {@link org.incendo.cloud.Command} instances.
+     *
+     * @param instances instances to scan
+     * @return collection of parsed commands
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public <T> @NonNull Collection<org.incendo.cloud.@NonNull Command<C>> parse(final @NonNull T instance) {
-        this.parseDefaultValues(instance);
-        this.parseSuggestions(instance);
-        this.parseParsers(instance);
-        this.parseExceptionHandlers(instance);
-
-        final Collection<CommandDescriptor> commandDescriptors = this.commandExtractor.extractCommands(instance);
-        final Collection<org.incendo.cloud.Command<C>> commands = this.construct(instance, commandDescriptors);
-        for (final org.incendo.cloud.Command<C> command : commands) {
-            ((CommandManager) this.manager).command(command);
+    public @NonNull Collection<org.incendo.cloud.@NonNull Command<C>> parse(final @NonNull Collection<@NonNull Object> instances) {
+        for (final Object instance : instances) {
+            this.parseDefaultValues(instance);
         }
-        return commands;
+        for (final Object instance : instances) {
+            this.parseSuggestions(instance);
+        }
+        for (final Object instance : instances) {
+            this.parseParsers(instance);
+        }
+        for (final Object instance : instances) {
+            this.parseExceptionHandlers(instance);
+        }
+
+        final List<org.incendo.cloud.Command<C>> result = new ArrayList<>();
+        for (final Object instance : instances) {
+            final Collection<CommandDescriptor> commandDescriptors = this.commandExtractor.extractCommands(instance);
+            final Collection<org.incendo.cloud.Command<C>> commands = this.construct(instance, commandDescriptors);
+            for (final org.incendo.cloud.Command<C> command : commands) {
+                ((CommandManager) this.manager).command(command);
+            }
+            result.addAll(commands);
+        }
+        return Collections.unmodifiableList(result);
     }
 
     /**

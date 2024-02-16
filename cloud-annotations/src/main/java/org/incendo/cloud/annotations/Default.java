@@ -64,7 +64,7 @@ public @interface Default {
      * is empty, the method name will be used.</p>
      *
      * <p>The factories must be registered to the {@link DefaultValueRegistry} retrieved
-     * through {@link AnnotationParser#defaultValueRegistry()}. Using {@link AnnotationParser#parse(Object)} will scan &amp;
+     * through {@link AnnotationParser#defaultValueRegistry()}. Using {@link AnnotationParser#parse(Object[])} will scan &amp;
      * register all {@code @Default}-annotated methods.</p>
      *
      * @return name of the default value registry to use
