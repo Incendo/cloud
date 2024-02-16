@@ -672,8 +672,7 @@ public final class AnnotationParser<C> {
         classes.sort(COMMAND_CONTAINER_COMPARATOR);
 
         final List<Object> instances = new LinkedList<>();
-        for (int i = 0; i < classes.size(); i++) {
-            final Class<?> commandContainer = classes.get(i);
+        for (final Class<?> commandContainer : classes) {
             // We now have the class, and we now just need to decide what constructor to invoke.
             // We first try to find a constructor which takes in the parser.
             @MonotonicNonNull Object instance;
