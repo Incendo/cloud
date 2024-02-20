@@ -143,7 +143,7 @@ class AggregateParserTest {
                 .build();
 
         // Act
-        final Iterable<Suggestion> suggestions = parser.suggestionProvider()
+        final Iterable<? extends Suggestion> suggestions = parser.suggestionProvider()
                 .suggestionsFuture(this.commandContext, CommandInput.empty()).join();
 
         // Assert
@@ -172,7 +172,7 @@ class AggregateParserTest {
                 .build();
 
         // Act
-        final Iterable<Suggestion> suggestions = parser.suggestionProvider()
+        final Iterable<? extends Suggestion> suggestions = parser.suggestionProvider()
                 .suggestionsFuture(this.commandContext, CommandInput.of("123 ")).join();
 
         // Assert

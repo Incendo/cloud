@@ -77,7 +77,7 @@ class MethodSuggestionProviderTest {
         );
 
         // Act
-        final Iterable<Suggestion> suggestions =
+        final Iterable<? extends Suggestion> suggestions =
                 this.commandManager.parserRegistry()
                         .getSuggestionProvider("suggestions")
                         .orElseThrow(NullPointerException::new)

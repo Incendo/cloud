@@ -55,7 +55,7 @@ public interface SuggestionProvider<C> {
      * @param input   the current input
      * @return the suggestions
      */
-    @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
+    @NonNull CompletableFuture<? extends @NonNull Iterable<? extends @NonNull Suggestion>> suggestionsFuture(
             @NonNull CommandContext<C> context,
             @NonNull CommandInput input
     );
@@ -132,7 +132,7 @@ public interface SuggestionProvider<C> {
      * @return suggestion provider
      */
     static <C> @NonNull SuggestionProvider<C> suggesting(
-            final @NonNull Iterable<@NonNull Suggestion> suggestions
+            final @NonNull Iterable<? extends @NonNull Suggestion> suggestions
     ) {
         return blocking((ctx, input) -> suggestions);
     }
