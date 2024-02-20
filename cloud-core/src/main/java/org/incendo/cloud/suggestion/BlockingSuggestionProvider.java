@@ -57,10 +57,10 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
      * @param input   the current input
      * @return the suggestions
      */
-    @NonNull Iterable<@NonNull Suggestion> suggestions(@NonNull CommandContext<C> context, @NonNull CommandInput input);
+    @NonNull Iterable<? extends @NonNull Suggestion> suggestions(@NonNull CommandContext<C> context, @NonNull CommandInput input);
 
     @Override
-    default @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestionsFuture(
+    default @NonNull CompletableFuture<? extends @NonNull Iterable<? extends @NonNull Suggestion>> suggestionsFuture(
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput input
     ) {

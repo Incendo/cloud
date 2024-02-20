@@ -93,7 +93,7 @@ class EitherParserTest {
     @Test
     void testSuggestions() {
         // Act
-        final Iterable<Suggestion> suggestions = this.parser.suggestionsFuture(this.context, CommandInput.empty()).join();
+        final Iterable<? extends Suggestion> suggestions = this.parser.suggestionsFuture(this.context, CommandInput.empty()).join();
 
         // Assert
         assertThat(suggestions).containsExactly(
