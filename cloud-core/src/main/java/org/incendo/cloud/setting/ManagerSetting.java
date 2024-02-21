@@ -69,5 +69,8 @@ public enum ManagerSetting implements Setting {
      * {@link org.incendo.cloud.exception.NoPermissionException}.
      */
     @API(status = API.Status.EXPERIMENTAL)
-    HIDE_COMMAND_EXISTENCE
+    HIDE_COMMAND_EXISTENCE,
+
+    @API(status = API.Status.EXPERIMENTAL)
+    REDUCE_REDUNDANT_PERMISSION_CHECKS
 }

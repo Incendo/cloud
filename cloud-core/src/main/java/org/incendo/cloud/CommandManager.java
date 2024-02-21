@@ -29,10 +29,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -378,6 +381,21 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
         return Collections.unmodifiableSet(new HashSet<>(this.capabilities));
     }
 
+    private final ThreadLocal<Map<Pair<C, Permission>, PermissionResult>> threadLocalPermissionCache =
+            ThreadLocal.withInitial(ConcurrentHashMap::new);
+
+    @SuppressWarnings("rawtypes")
+    private @NonNull <T> PermissionResult testPermissionCaching(
+            final @NonNull C sender,
+            final @NonNull T permission,
+            final @NonNull Function<Pair<C, T>, @NonNull PermissionResult> tester
+    ) {
+        if (!this.settings.get(ManagerSetting.REDUCE_REDUNDANT_PERMISSION_CHECKS)) {
+            return tester.apply(Pair.of(sender, permission));
+        }
+        return this.threadLocalPermissionCache.get().computeIfAbsent((Pair) Pair.of(sender, permission), (Function) tester);
+    }
+
     /**
      * Checks if the command sender has the required permission and returns the result.
      *
@@ -386,31 +404,44 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * @return a {@link PermissionResult} representing whether the sender has the permission
      */
     @API(status = API.Status.STABLE)
-    @SuppressWarnings("unchecked")
     public @NonNull PermissionResult testPermission(
             final @NonNull C sender,
             final @NonNull Permission permission
     ) {
+        try {
+            return this.testPermission_(sender, permission);
+        } finally {
+            this.threadLocalPermissionCache.get().clear();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private @NonNull PermissionResult testPermission_(final @NonNull C sender, final @NonNull Permission permission) {
         if (permission instanceof PredicatePermission) {
-            return ((PredicatePermission<C>) permission).testPermission(sender);
+            return this.testPermissionCaching(sender, (PredicatePermission<C>) permission, pair -> {
+                return pair.second().testPermission(pair.first());
+            });
         } else if (permission instanceof OrPermission) {
             for (final Permission innerPermission : permission.permissions()) {
                 final PermissionResult result = this.testPermission(sender, innerPermission);
                 if (result.allowed()) {
-                    return result; // short circuit the first true result
+                    return result;
                 }
             }
-            return PermissionResult.denied(permission); // none returned true
+            return PermissionResult.denied(permission);
         } else if (permission instanceof AndPermission) {
             for (final Permission innerPermission : permission.permissions()) {
                 final PermissionResult result = this.testPermission(sender, innerPermission);
                 if (!result.allowed()) {
-                    return result; // short circuit the first false result
+                    return result;
                 }
             }
-            return PermissionResult.allowed(permission); // all returned true
+            return PermissionResult.allowed(permission);
         }
-        return PermissionResult.of(permission.isEmpty() || this.hasPermission(sender, permission.permissionString()), permission);
+        return this.testPermissionCaching(sender, permission, pair -> {
+            return PermissionResult.of(
+                    pair.second().isEmpty() || this.hasPermission(pair.first(), pair.second().permissionString()), pair.second());
+        });
     }
 
     /**
