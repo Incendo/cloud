@@ -24,10 +24,8 @@
 package org.incendo.cloud;
 
 import io.leangen.geantyref.TypeToken;
-import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -35,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -384,8 +382,8 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
         return Collections.unmodifiableSet(new HashSet<>(this.capabilities));
     }
 
-    private final ThreadLocal<Deque<Map<Pair<C, Permission>, PermissionResult>>> threadLocalPermissionCache =
-            ThreadLocal.withInitial(ArrayDeque::new);
+    private final ThreadLocal<Pair<Map<Pair<C, Permission>, PermissionResult>, AtomicInteger>> threadLocalPermissionCache =
+            ThreadLocal.withInitial(() -> Pair.of(new HashMap<>(), new AtomicInteger(0)));
 
     @SuppressWarnings("rawtypes")
     private @NonNull <T> PermissionResult testPermissionCaching(
@@ -396,7 +394,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
         if (!this.settings.get(ManagerSetting.REDUCE_REDUNDANT_PERMISSION_CHECKS)) {
             return tester.apply(Pair.of(sender, permission));
         }
-        return Objects.requireNonNull(this.threadLocalPermissionCache.get().peek())
+        return this.threadLocalPermissionCache.get().first()
                 .computeIfAbsent((Pair) Pair.of(sender, permission), (Function) tester);
     }
 
@@ -413,10 +411,13 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
             final @NonNull Permission permission
     ) {
         try {
-            this.threadLocalPermissionCache.get().push(new HashMap<>());
+            this.threadLocalPermissionCache.get().second().incrementAndGet();
             return this.testPermission_(sender, permission);
         } finally {
-            this.threadLocalPermissionCache.get().pop();
+            final Pair<Map<Pair<C, Permission>, PermissionResult>, AtomicInteger> pair = this.threadLocalPermissionCache.get();
+            if (pair.second().getAndDecrement() == 1) {
+                pair.first().clear();
+            }
         }
     }
 
