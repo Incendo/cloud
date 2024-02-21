@@ -61,5 +61,8 @@ public enum ManagerSetting implements Setting {
      * and code inspecting the command tree may need to be adjusted.
      */
     @API(status = API.Status.EXPERIMENTAL)
-    LIBERAL_FLAG_PARSING
+    LIBERAL_FLAG_PARSING,
+
+    @API(status = API.Status.EXPERIMENTAL)
+    CONVERT_NO_PERMISSION_TO_SYNTAX_EXCEPTION
 }
