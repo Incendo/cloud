@@ -24,8 +24,11 @@
 package org.incendo.cloud;
 
 import io.leangen.geantyref.TypeToken;
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -381,8 +384,8 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
         return Collections.unmodifiableSet(new HashSet<>(this.capabilities));
     }
 
-    private final ThreadLocal<Map<Pair<C, Permission>, PermissionResult>> threadLocalPermissionCache =
-            ThreadLocal.withInitial(ConcurrentHashMap::new);
+    private final ThreadLocal<Deque<Map<Pair<C, Permission>, PermissionResult>>> threadLocalPermissionCache =
+            ThreadLocal.withInitial(ArrayDeque::new);
 
     @SuppressWarnings("rawtypes")
     private @NonNull <T> PermissionResult testPermissionCaching(
@@ -393,7 +396,8 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
         if (!this.settings.get(ManagerSetting.REDUCE_REDUNDANT_PERMISSION_CHECKS)) {
             return tester.apply(Pair.of(sender, permission));
         }
-        return this.threadLocalPermissionCache.get().computeIfAbsent((Pair) Pair.of(sender, permission), (Function) tester);
+        return Objects.requireNonNull(this.threadLocalPermissionCache.get().peek())
+                .computeIfAbsent((Pair) Pair.of(sender, permission), (Function) tester);
     }
 
     /**
@@ -409,9 +413,10 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
             final @NonNull Permission permission
     ) {
         try {
+            this.threadLocalPermissionCache.get().push(new HashMap<>());
             return this.testPermission_(sender, permission);
         } finally {
-            this.threadLocalPermissionCache.get().clear();
+            this.threadLocalPermissionCache.get().pop();
         }
     }
 
