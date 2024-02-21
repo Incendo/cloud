@@ -423,7 +423,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
             });
         } else if (permission instanceof OrPermission) {
             for (final Permission innerPermission : permission.permissions()) {
-                final PermissionResult result = this.testPermission(sender, innerPermission);
+                final PermissionResult result = this.testPermission_(sender, innerPermission);
                 if (result.allowed()) {
                     return result;
                 }
@@ -431,7 +431,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
             return PermissionResult.denied(permission);
         } else if (permission instanceof AndPermission) {
             for (final Permission innerPermission : permission.permissions()) {
-                final PermissionResult result = this.testPermission(sender, innerPermission);
+                final PermissionResult result = this.testPermission_(sender, innerPermission);
                 if (!result.allowed()) {
                     return result;
                 }
