@@ -413,7 +413,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
         final boolean cache = this.settings.get(ManagerSetting.REDUCE_REDUNDANT_PERMISSION_CHECKS);
         try {
             if (cache) {
-                final int prev = this.threadLocalPermissionCache.get().second().incrementAndGet();
+                final int prev = this.threadLocalPermissionCache.get().second().getAndIncrement();
                 if (prev == 0) {
                     // Cleanup from case where cache was enabled mid-permission check
                     this.threadLocalPermissionCache.get().first().clear();
