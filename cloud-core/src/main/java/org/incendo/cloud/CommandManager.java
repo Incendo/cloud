@@ -184,7 +184,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * @return the suggestion factory
      */
     @API(status = API.Status.STABLE)
-    public final @NonNull SuggestionFactory<C, ? extends Suggestion> suggestionFactory() {
+    public @NonNull SuggestionFactory<C, ? extends Suggestion> suggestionFactory() {
         return this.suggestionFactory;
     }
 
