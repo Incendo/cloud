@@ -83,11 +83,14 @@ import org.incendo.cloud.suggestion.DelegatingSuggestionFactory;
 import org.incendo.cloud.suggestion.FilteringSuggestionProcessor;
 import org.incendo.cloud.suggestion.Suggestion;
 import org.incendo.cloud.suggestion.SuggestionFactory;
+import org.incendo.cloud.suggestion.SuggestionMapper;
 import org.incendo.cloud.suggestion.SuggestionProcessor;
 import org.incendo.cloud.syntax.CommandSyntaxFormatter;
 import org.incendo.cloud.syntax.StandardCommandSyntaxFormatter;
 import org.incendo.cloud.type.tuple.Pair;
 import org.incendo.cloud.type.tuple.Triplet;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * The manager is responsible for command registration, parsing delegation, etc.
@@ -116,6 +119,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
     private CommandRegistrationHandler<C> commandRegistrationHandler;
     private CaptionRegistry<C> captionRegistry;
     private HelpHandlerFactory<C> helpHandlerFactory = HelpHandlerFactory.standard(this);
+    private SuggestionMapper<? extends Suggestion> mapper = SuggestionMapper.identity();
     private final AtomicReference<RegistrationState> state = new AtomicReference<>(RegistrationState.BEFORE_REGISTRATION);
 
     /**
@@ -139,7 +143,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
                 this.commandTree,
                 commandContextFactory,
                 executionCoordinator
-        );
+        ).mapped(suggestion -> this.mapper.map(suggestion));
         this.commandExecutor = new StandardCommandExecutor<>(
                 this,
                 executionCoordinator,
@@ -174,20 +178,48 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
 
     /**
      * Returns the suggestion factory.
-     * <p>
-     * Platform implementations of command manager may override this method to make it easier to work with platform
-     * suggestion types, for example:
-     * <pre>{@code
-     * @Override
-     * public @NonNull SuggestionFactory<C, YourType> suggestionFactory() {
-     *    return super.suggestionFactory().mapped(suggestion -> yourType);
-     * }
-     * }</pre>
+     *
+     * <p>Will map results using {@link #suggestionMapper()}.</p>
+     *
      * @return the suggestion factory
      */
     @API(status = API.Status.STABLE)
-    public @NonNull SuggestionFactory<C, ? extends Suggestion> suggestionFactory() {
+    public final @NonNull SuggestionFactory<C, ? extends Suggestion> suggestionFactory() {
         return this.suggestionFactory;
+    }
+
+    /**
+     * Returns the suggestion mapper for {@link #suggestionFactory()}.
+     *
+     * <p>Platform command managers may replace the default mapper to better support
+     * platform suggestion types. Therefore it's encouraged to chain any additional mappers using
+     * {@link SuggestionMapper#then(SuggestionMapper)} or {@link #appendSuggestionMapper(SuggestionMapper)},
+     * rather than replacing the mapper directly.</p>
+     *
+     * @return the suggestion mapper
+     */
+    public @NonNull SuggestionMapper<? extends Suggestion> suggestionMapper() {
+        return this.mapper;
+    }
+
+    /**
+     * Sets the suggestion mapper for {@link #suggestionFactory()} to the result of appending the provided mapper to the
+     * current mapper using {@link SuggestionMapper#then(SuggestionMapper)}.
+     *
+     * @param mapper suggestion mapper
+     */
+    public void appendSuggestionMapper(final @NonNull SuggestionMapper<? extends  Suggestion> mapper) {
+        this.suggestionMapper(this.suggestionMapper().then(mapper));
+    }
+
+    /**
+     * Sets the suggestion mapper for {@link #suggestionFactory()}.
+     *
+     * @param mapper suggestion mapper
+     * @see #suggestionMapper()
+     */
+    public void suggestionMapper(final @NonNull SuggestionMapper<? extends  Suggestion> mapper) {
+        this.mapper = requireNonNull(mapper, "mapper");
     }
 
     /**
