@@ -34,6 +34,7 @@ import org.incendo.cloud.CommandTree;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
 import org.incendo.cloud.suggestion.Suggestion;
+import org.incendo.cloud.suggestion.SuggestionMapper;
 import org.incendo.cloud.suggestion.Suggestions;
 
 /**
@@ -107,15 +108,18 @@ public interface ExecutionCoordinator<C> {
     /**
      * Coordinates the execution of a suggestions query.
      *
+     * @param <S>          suggestion type
      * @param commandTree  command tree to suggest from
      * @param context      command context
      * @param commandInput command input
+     * @param mapper       suggestion mapper
      * @return future that completes with the result
      */
-    @NonNull CompletableFuture<@NonNull Suggestions<C, Suggestion>> coordinateSuggestions(
+    <S extends Suggestion> @NonNull CompletableFuture<@NonNull Suggestions<C, S>> coordinateSuggestions(
             @NonNull CommandTree<C> commandTree,
             @NonNull CommandContext<C> context,
-            @NonNull CommandInput commandInput
+            @NonNull CommandInput commandInput,
+            @NonNull SuggestionMapper<S> mapper
     );
 
     /**

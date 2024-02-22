@@ -65,6 +65,7 @@ import org.incendo.cloud.permission.Permission;
 import org.incendo.cloud.permission.PermissionResult;
 import org.incendo.cloud.setting.ManagerSetting;
 import org.incendo.cloud.suggestion.Suggestion;
+import org.incendo.cloud.suggestion.SuggestionMapper;
 import org.incendo.cloud.suggestion.Suggestions;
 import org.incendo.cloud.util.CompletableFutures;
 
@@ -595,37 +596,42 @@ public final class CommandTree<C> {
     /**
      * Returns suggestions from the input queue
      *
+     * @param <S>          suggestion type
      * @param context      Context instance
      * @param commandInput Input
+     * @param mapper       suggestion mapper
      * @param executor     executor to schedule suggestion logic on
      * @return String suggestions. These should be filtered based on {@link String#startsWith(String)}
      */
     @API(status = API.Status.STABLE)
-    public @NonNull CompletableFuture<@NonNull Suggestions<C, Suggestion>> getSuggestions(
+    public <S extends Suggestion> @NonNull CompletableFuture<@NonNull Suggestions<C, S>> getSuggestions(
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput,
+            final @NonNull SuggestionMapper<S> mapper,
             final @NonNull Executor executor
     ) {
-        return CompletableFutures.scheduleOn(executor, () -> this.getSuggestionsDirect(context, commandInput, executor));
+        return CompletableFutures.scheduleOn(executor, () -> this.getSuggestionsDirect(context, commandInput, mapper, executor));
     }
 
-    private @NonNull CompletableFuture<@NonNull Suggestions<C, Suggestion>> getSuggestionsDirect(
+    private <S extends Suggestion> @NonNull CompletableFuture<@NonNull Suggestions<C, S>> getSuggestionsDirect(
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput,
+            final @NonNull SuggestionMapper<S> mapper,
             final @NonNull Executor executor
     ) {
-        final SuggestionContext<C> suggestionContext = new SuggestionContext<>(
+        final SuggestionContext<C, S> suggestionCtx = new SuggestionContext<>(
                 this.commandManager.suggestionProcessor(),
                 context,
-                commandInput
+                commandInput,
+                mapper
         );
-        return this.getSuggestions(suggestionContext, commandInput, this.internalTree, executor)
-                .thenApply(s -> Suggestions.create(s.commandContext(), s.suggestions(), commandInput));
+        return this.getSuggestions(suggestionCtx, commandInput, this.internalTree, executor)
+                .thenApply($ -> suggestionCtx.makeSuggestions());
     }
 
     @SuppressWarnings("MixedMutabilityReturnType")
-    private @NonNull CompletableFuture<SuggestionContext<C>> getSuggestions(
-            final @NonNull SuggestionContext<C> context,
+    private @NonNull CompletableFuture<SuggestionContext<C, ?>> getSuggestions(
+            final @NonNull SuggestionContext<C, ?> context,
             final @NonNull CommandInput commandInput,
             final @NonNull CommandNode<C> root,
             final @NonNull Executor executor
@@ -682,7 +688,7 @@ public final class CommandTree<C> {
         }
 
         // Calculate suggestions for the literal arguments
-        CompletableFuture<SuggestionContext<C>> suggestionFuture = CompletableFuture.completedFuture(context);
+        CompletableFuture<SuggestionContext<C, ?>> suggestionFuture = CompletableFuture.completedFuture(context);
         if (commandInput.remainingTokens() <= 1) {
             for (final CommandNode<C> node : staticArguments) {
                 suggestionFuture = suggestionFuture
@@ -710,8 +716,8 @@ public final class CommandTree<C> {
      * @param input   the current input
      * @return future that completes with the context
      */
-    private CompletableFuture<SuggestionContext<C>> addSuggestionsForLiteralArgument(
-            final @NonNull SuggestionContext<C> context,
+    private CompletableFuture<SuggestionContext<C, ?>> addSuggestionsForLiteralArgument(
+            final @NonNull SuggestionContext<C, ?> context,
             final @NonNull CommandNode<C> node,
             final @NonNull CommandInput input
     ) {
@@ -735,8 +741,8 @@ public final class CommandTree<C> {
     }
 
     @SuppressWarnings("unchecked")
-    private @NonNull CompletableFuture<SuggestionContext<C>> addSuggestionsForDynamicArgument(
-            final @NonNull SuggestionContext<C> context,
+    private @NonNull CompletableFuture<SuggestionContext<C, ?>> addSuggestionsForDynamicArgument(
+            final @NonNull SuggestionContext<C, ?> context,
             final @NonNull CommandInput commandInput,
             final @NonNull CommandNode<C> child,
             final @NonNull Executor executor
@@ -776,7 +782,7 @@ public final class CommandTree<C> {
                 && preParseResult.parsedValue().orElse(false);
         // END: Preprocessing
 
-        final CompletableFuture<SuggestionContext<C>> parsingFuture;
+        final CompletableFuture<SuggestionContext<C, ?>> parsingFuture;
         if (!preParseSuccess) {
             parsingFuture = CompletableFuture.completedFuture(null);
         } else {
@@ -858,8 +864,8 @@ public final class CommandTree<C> {
      * @param executor executor to schedule further suggestion logic to
      * @return the context
      */
-    private @NonNull CompletableFuture<SuggestionContext<C>> addArgumentSuggestions(
-            final @NonNull SuggestionContext<C> context,
+    private @NonNull CompletableFuture<SuggestionContext<C, ?>> addArgumentSuggestions(
+            final @NonNull SuggestionContext<C, ?> context,
             final @NonNull CommandNode<C> node,
             final @NonNull CommandInput input,
             final @NonNull Executor executor
@@ -895,8 +901,8 @@ public final class CommandTree<C> {
      * @param executor  executor to schedule further suggestion logic to
      * @return future that completes with the context
      */
-    private CompletableFuture<SuggestionContext<C>> addArgumentSuggestions(
-            final @NonNull SuggestionContext<C> context,
+    private CompletableFuture<SuggestionContext<C, ?>> addArgumentSuggestions(
+            final @NonNull SuggestionContext<C, ?> context,
             final @NonNull CommandComponent<C> component,
             final @NonNull CommandInput input,
             final @NonNull Executor executor

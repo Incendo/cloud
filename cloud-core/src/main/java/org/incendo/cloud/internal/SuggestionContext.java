@@ -35,13 +35,16 @@ import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
 import org.incendo.cloud.execution.preprocessor.CommandPreprocessingContext;
 import org.incendo.cloud.suggestion.Suggestion;
+import org.incendo.cloud.suggestion.SuggestionMapper;
 import org.incendo.cloud.suggestion.SuggestionProcessor;
+import org.incendo.cloud.suggestion.Suggestions;
 
 @API(status = API.Status.INTERNAL, consumers = "org.incendo.cloud.*")
-public final class SuggestionContext<C> {
+public final class SuggestionContext<C, S extends Suggestion> {
 
-    private final List<Suggestion> suggestions = new ArrayList<>();
+    private final List<S> suggestions = new ArrayList<>();
     private final CommandPreprocessingContext<C> preprocessingContext;
+    private final SuggestionMapper<S> mapper;
     private final SuggestionProcessor<C> processor;
     private final CommandContext<C> commandContext;
 
@@ -51,34 +54,42 @@ public final class SuggestionContext<C> {
      * @param processor      the suggestion processor
      * @param commandContext the command context
      * @param commandInput   the command input
+     * @param mapper         the suggestion mapper
      */
     public SuggestionContext(
-            final SuggestionProcessor<C> processor,
+            final @NonNull SuggestionProcessor<C> processor,
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull CommandInput commandInput
+            final @NonNull CommandInput commandInput,
+            final @NonNull SuggestionMapper<S> mapper
     ) {
         this.processor = processor;
         this.commandContext = commandContext;
         this.preprocessingContext = CommandPreprocessingContext.of(this.commandContext, commandInput);
+        this.mapper = mapper;
     }
 
     /**
-     * Returns an unmodifiable view of the suggestions
+     * Create {@link Suggestions} from the current context.
      *
-     * @return list of suggestions
+     * @return suggestions
      */
-    public @NonNull List<@NonNull Suggestion> suggestions() {
-        final Stream<Suggestion> stream = this.suggestions.stream();
-        final Stream<Suggestion> processedStream = this.processor.process(this.preprocessingContext, stream);
+    @SuppressWarnings("unchecked")
+    public @NonNull Suggestions<C, S> makeSuggestions() {
+        final Stream<S> stream = this.suggestions.stream();
+        final Stream<Suggestion> processedStream = this.processor.process(this.preprocessingContext, (Stream<Suggestion>) stream);
+        final List<S> list;
         if (stream == processedStream) {
             // don't re-collect with a pass-through processor
-            return Collections.unmodifiableList(this.suggestions);
+            list = Collections.unmodifiableList(this.suggestions);
+        } else {
+            list = Collections.unmodifiableList(
+                    processedStream
+                            .peek(obj -> Objects.requireNonNull(obj, "suggestion"))
+                            .map(this.mapper::map)
+                            .collect(Collectors.toList())
+            );
         }
-        return Collections.unmodifiableList(
-                processedStream
-                        .peek(obj -> Objects.requireNonNull(obj, "suggestion"))
-                        .collect(Collectors.toList())
-        );
+        return Suggestions.create(this.commandContext, list, this.preprocessingContext.commandInput());
     }
 
     /**
@@ -106,6 +117,6 @@ public final class SuggestionContext<C> {
      */
     public void addSuggestion(final @NonNull Suggestion suggestion) {
         Objects.requireNonNull(suggestion, "suggestion");
-        this.suggestions.add(suggestion);
+        this.suggestions.add(this.mapper.map(suggestion));
     }
 }

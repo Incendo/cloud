@@ -142,8 +142,9 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
                 this,
                 this.commandTree,
                 commandContextFactory,
-                executionCoordinator
-        ).mapped(suggestion -> this.mapper.map(suggestion));
+                executionCoordinator,
+                suggestion -> this.mapper.map(suggestion)
+        );
         this.commandExecutor = new StandardCommandExecutor<>(
                 this,
                 executionCoordinator,

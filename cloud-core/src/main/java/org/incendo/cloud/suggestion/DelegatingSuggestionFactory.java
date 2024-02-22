@@ -41,17 +41,17 @@ import org.incendo.cloud.setting.ManagerSetting;
  * Command suggestion engine that delegates to a {@link org.incendo.cloud.CommandTree}
  *
  * @param <C> command sender type
+ * @param <S> suggestion type
  */
 @API(status = API.Status.INTERNAL, consumers = "org.incendo.cloud.*")
-public final class DelegatingSuggestionFactory<C> implements SuggestionFactory<C, Suggestion> {
+public final class DelegatingSuggestionFactory<C, S extends Suggestion> implements SuggestionFactory<C, S> {
 
-    private static final List<Suggestion> SINGLE_EMPTY_SUGGESTION =
-            Collections.singletonList(Suggestion.simple(""));
-
+    private final List<S> singleEmptySuggestion;
     private final CommandManager<C> commandManager;
     private final CommandTree<C> commandTree;
     private final CommandContextFactory<C> contextFactory;
     private final ExecutionCoordinator<C> executionCoordinator;
+    private final SuggestionMapper<S> mapper;
 
     /**
      * Creates a new {@link DelegatingSuggestionFactory}.
@@ -60,21 +60,25 @@ public final class DelegatingSuggestionFactory<C> implements SuggestionFactory<C
      * @param commandTree          the command tree
      * @param contextFactory       the context factory
      * @param executionCoordinator the execution coordinator
+     * @param mapper               the suggestion mapper
      */
     public DelegatingSuggestionFactory(
             final @NonNull CommandManager<C> commandManager,
             final @NonNull CommandTree<C> commandTree,
             final @NonNull CommandContextFactory<C> contextFactory,
-            final @NonNull ExecutionCoordinator<C> executionCoordinator
+            final @NonNull ExecutionCoordinator<C> executionCoordinator,
+            final @NonNull SuggestionMapper<S> mapper
     ) {
         this.commandManager = commandManager;
         this.commandTree = commandTree;
         this.contextFactory = contextFactory;
         this.executionCoordinator = executionCoordinator;
+        this.mapper = mapper;
+        this.singleEmptySuggestion = Collections.singletonList(mapper.map(Suggestion.simple("")));
     }
 
     @Override
-    public @NonNull CompletableFuture<@NonNull Suggestions<C, Suggestion>> suggest(
+    public @NonNull CompletableFuture<@NonNull Suggestions<C, S>> suggest(
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {
@@ -82,14 +86,25 @@ public final class DelegatingSuggestionFactory<C> implements SuggestionFactory<C
     }
 
     @Override
-    public @NonNull CompletableFuture<@NonNull Suggestions<C, Suggestion>> suggest(
+    public @NonNull CompletableFuture<@NonNull Suggestions<C, S>> suggest(
             final @NonNull C sender,
             final @NonNull String input
     ) {
         return this.suggest(this.contextFactory.create(true /* suggestions */, sender), input);
     }
 
-    private @NonNull CompletableFuture<@NonNull Suggestions<C, Suggestion>> suggestFromTree(
+    @Override
+    public <S2 extends Suggestion> @NonNull SuggestionFactory<C, S2> mapped(final @NonNull SuggestionMapper<S2> mapper) {
+        return new DelegatingSuggestionFactory<>(
+                this.commandManager,
+                this.commandTree,
+                this.contextFactory,
+                this.executionCoordinator,
+                this.mapper.then(mapper)
+        );
+    }
+
+    private @NonNull CompletableFuture<@NonNull Suggestions<C, S>> suggestFromTree(
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {
@@ -99,16 +114,17 @@ public final class DelegatingSuggestionFactory<C> implements SuggestionFactory<C
 
         if (this.commandManager.preprocessContext(context, commandInput) != State.ACCEPTED) {
             if (this.commandManager.settings().get(ManagerSetting.FORCE_SUGGESTION)) {
-                return CompletableFuture.completedFuture(Suggestions.create(context, SINGLE_EMPTY_SUGGESTION, commandInput));
+                return CompletableFuture.completedFuture(Suggestions.create(context, this.singleEmptySuggestion, commandInput));
             }
             return CompletableFuture.completedFuture(Suggestions.create(context, Collections.emptyList(), commandInput));
         }
 
-        return this.executionCoordinator.coordinateSuggestions(this.commandTree, context, commandInput).thenApply(suggestions -> {
-            if (this.commandManager.settings().get(ManagerSetting.FORCE_SUGGESTION) && suggestions.list().isEmpty()) {
-                return Suggestions.create(suggestions.commandContext(), SINGLE_EMPTY_SUGGESTION, commandInput);
-            }
-            return suggestions;
-        });
+        return this.executionCoordinator.coordinateSuggestions(this.commandTree, context, commandInput, this.mapper)
+                .thenApply(suggestions -> {
+                    if (this.commandManager.settings().get(ManagerSetting.FORCE_SUGGESTION) && suggestions.list().isEmpty()) {
+                        return Suggestions.create(suggestions.commandContext(), this.singleEmptySuggestion, commandInput);
+                    }
+                    return suggestions;
+                });
     }
 }

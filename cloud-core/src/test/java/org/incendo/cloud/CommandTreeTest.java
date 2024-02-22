@@ -44,6 +44,7 @@ import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.parser.flag.CommandFlag;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.suggestion.Suggestion;
+import org.incendo.cloud.suggestion.SuggestionMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -165,6 +166,7 @@ class CommandTreeTest {
         final List<? extends Suggestion> results = this.commandManager.commandTree().getSuggestions(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 CommandInput.of("test "),
+                SuggestionMapper.identity(),
                 ExecutionCoordinator.nonSchedulingExecutor()
         ).join().list();
 
