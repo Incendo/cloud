@@ -26,17 +26,13 @@ package org.incendo.cloud;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -66,6 +62,7 @@ import org.incendo.cloud.help.HelpHandlerFactory;
 import org.incendo.cloud.injection.ParameterInjectorRegistry;
 import org.incendo.cloud.internal.CommandNode;
 import org.incendo.cloud.internal.CommandRegistrationHandler;
+import org.incendo.cloud.internal.ThreadLocalPermissionCache;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.parser.ArgumentParser;
 import org.incendo.cloud.parser.ParserParameter;
@@ -115,6 +112,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
     private final Set<CloudCapability> capabilities = new HashSet<>();
     private final ExceptionController<C> exceptionController = new ExceptionController<>();
     private final CommandExecutor<C> commandExecutor;
+    final ThreadLocalPermissionCache<C> threadLocalPermissionCache = new ThreadLocalPermissionCache<>(this.settings);
 
     private CaptionFormatter<C, String> captionVariableReplacementHandler = CaptionFormatter.placeholderReplacing();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>(this);
@@ -382,22 +380,6 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
         return Collections.unmodifiableSet(new HashSet<>(this.capabilities));
     }
 
-    private final ThreadLocal<Pair<Map<Pair<C, Permission>, PermissionResult>, AtomicInteger>> threadLocalPermissionCache =
-            ThreadLocal.withInitial(() -> Pair.of(new HashMap<>(), new AtomicInteger(0)));
-
-    @SuppressWarnings("rawtypes")
-    private @NonNull <T> PermissionResult testPermissionCaching(
-            final @NonNull C sender,
-            final @NonNull T permission,
-            final @NonNull Function<Pair<C, T>, @NonNull PermissionResult> tester
-    ) {
-        if (!this.settings.get(ManagerSetting.REDUCE_REDUNDANT_PERMISSION_CHECKS)) {
-            return tester.apply(Pair.of(sender, permission));
-        }
-        return this.threadLocalPermissionCache.get().first()
-                .computeIfAbsent((Pair) Pair.of(sender, permission), (Function) tester);
-    }
-
     /**
      * Checks if the command sender has the required permission and returns the result.
      *
@@ -410,30 +392,13 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
             final @NonNull C sender,
             final @NonNull Permission permission
     ) {
-        final boolean cache = this.settings.get(ManagerSetting.REDUCE_REDUNDANT_PERMISSION_CHECKS);
-        try {
-            if (cache) {
-                final int prev = this.threadLocalPermissionCache.get().second().getAndIncrement();
-                if (prev == 0) {
-                    // Cleanup from case where cache was enabled mid-permission check
-                    this.threadLocalPermissionCache.get().first().clear();
-                }
-            }
-            return this.testPermission_(sender, permission);
-        } finally {
-            if (cache) {
-                final Pair<Map<Pair<C, Permission>, PermissionResult>, AtomicInteger> pair = this.threadLocalPermissionCache.get();
-                if (pair.second().getAndDecrement() == 1) {
-                    pair.first().clear();
-                }
-            }
-        }
+        return this.threadLocalPermissionCache.withPermissionCache(() -> this.testPermission_(sender, permission));
     }
 
     @SuppressWarnings("unchecked")
     private @NonNull PermissionResult testPermission_(final @NonNull C sender, final @NonNull Permission permission) {
         if (permission instanceof PredicatePermission) {
-            return this.testPermissionCaching(sender, (PredicatePermission<C>) permission, pair -> {
+            return this.threadLocalPermissionCache.testPermissionCaching(sender, (PredicatePermission<C>) permission, pair -> {
                 return pair.second().testPermission(pair.first());
             });
         } else if (permission instanceof OrPermission) {
@@ -453,7 +418,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
             }
             return PermissionResult.allowed(permission);
         }
-        return this.testPermissionCaching(sender, permission, pair -> {
+        return this.threadLocalPermissionCache.testPermissionCaching(sender, permission, pair -> {
             return PermissionResult.of(
                     pair.second().isEmpty() || this.hasPermission(pair.first(), pair.second().permissionString()), pair.second());
         });

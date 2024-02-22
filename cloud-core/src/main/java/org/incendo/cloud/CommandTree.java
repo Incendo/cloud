@@ -357,31 +357,33 @@ public final class CommandTree<C> {
             );
         }
 
-        if (this.childPermitted(root, sender)) {
-            return new InvalidSyntaxException(
-                    this.commandManager.commandSyntaxFormatter().apply(sender, (List) this.getComponentChain(root), root),
-                    sender, this.getComponentChain(root)
-            );
-        }
+        return this.commandManager.threadLocalPermissionCache.withPermissionCache(() -> {
+            if (this.childPermitted(root, sender)) {
+                return new InvalidSyntaxException(
+                        this.commandManager.commandSyntaxFormatter().apply(sender, (List) this.getComponentChain(root), root),
+                        sender, this.getComponentChain(root)
+                );
+            }
 
-        final @Nullable List<CommandNode<C>> parentChain = this.permittedParentChain(root, sender);
-        if (parentChain != null) {
-            return new InvalidSyntaxException(
-                    this.commandManager.commandSyntaxFormatter().apply(
-                            sender,
-                            parentChain.stream().map(CommandNode::component)
-                                    .filter(Objects::nonNull).collect(Collectors.toList()),
-                            root
-                    ),
-                    sender, this.getComponentChain(root)
-            );
-        }
+            final @Nullable List<CommandNode<C>> parentChain = this.permittedParentChain(root, sender);
+            if (parentChain != null) {
+                return new InvalidSyntaxException(
+                        this.commandManager.commandSyntaxFormatter().apply(
+                                sender,
+                                parentChain.stream().map(CommandNode::component)
+                                        .filter(Objects::nonNull).collect(Collectors.toList()),
+                                root
+                        ),
+                        sender, this.getComponentChain(root)
+                );
+            }
 
-        return new NoPermissionException(
-                permissionResult,
-                sender,
-                this.getComponentChain(root)
-        );
+            return new NoPermissionException(
+                    permissionResult,
+                    sender,
+                    this.getComponentChain(root)
+            );
+        });
     }
 
     private boolean childPermitted(final CommandNode<C> node, final C sender) {
