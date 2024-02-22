@@ -411,12 +411,16 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
             final @NonNull Permission permission
     ) {
         try {
-            this.threadLocalPermissionCache.get().second().incrementAndGet();
+            if (this.settings.get(ManagerSetting.REDUCE_REDUNDANT_PERMISSION_CHECKS)) {
+                this.threadLocalPermissionCache.get().second().incrementAndGet();
+            }
             return this.testPermission_(sender, permission);
         } finally {
-            final Pair<Map<Pair<C, Permission>, PermissionResult>, AtomicInteger> pair = this.threadLocalPermissionCache.get();
-            if (pair.second().getAndDecrement() == 1) {
-                pair.first().clear();
+            if (this.settings.get(ManagerSetting.REDUCE_REDUNDANT_PERMISSION_CHECKS)) {
+                final Pair<Map<Pair<C, Permission>, PermissionResult>, AtomicInteger> pair = this.threadLocalPermissionCache.get();
+                if (pair.second().getAndDecrement() == 1) {
+                    pair.first().clear();
+                }
             }
         }
     }
