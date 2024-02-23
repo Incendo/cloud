@@ -42,6 +42,6 @@ public final class ArgumentTestHelper {
     public static @NonNull List<@NonNull Suggestion> suggestionList(
             final @NonNull String... strings
     ) {
-        return Arrays.stream(strings).map(Suggestion::simple).collect(Collectors.toList());
+        return Arrays.stream(strings).map(Suggestion::suggestion).collect(Collectors.toList());
     }
 }

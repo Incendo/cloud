@@ -97,11 +97,11 @@ class EitherParserTest {
 
         // Assert
         assertThat(suggestions).containsExactly(
-                Suggestion.simple("1"),
-                Suggestion.simple("2"),
-                Suggestion.simple("3"),
-                Suggestion.simple("true"),
-                Suggestion.simple("false")
+                Suggestion.suggestion("1"),
+                Suggestion.suggestion("2"),
+                Suggestion.suggestion("3"),
+                Suggestion.suggestion("true"),
+                Suggestion.suggestion("false")
         );
     }
 }

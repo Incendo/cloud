@@ -165,11 +165,11 @@ class KotlinAnnotatedMethodsTest {
         @Suggestions("suspending-suggestions")
         suspend fun suspendingSuggestions(ctx: CommandContext<TestCommandSender>, input: String): Sequence<Suggestion> =
             withContext(Dispatchers.Default) {
-                (1..10).asSequence().map(Int::toString).map(Suggestion::simple)
+                (1..10).asSequence().map(Int::toString).map(Suggestion::suggestion)
             }
 
         @Suggestions("non-suspending-suggestions")
         fun suggestions(ctx: CommandContext<TestCommandSender>, input: String): Sequence<Suggestion> =
-            (1..10).asSequence().map(Int::toString).map(Suggestion::simple)
+            (1..10).asSequence().map(Int::toString).map(Suggestion::suggestion)
     }
 }

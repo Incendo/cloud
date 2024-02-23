@@ -74,7 +74,7 @@ public final class DelegatingSuggestionFactory<C, S extends Suggestion> implemen
         this.contextFactory = contextFactory;
         this.executionCoordinator = executionCoordinator;
         this.mapper = mapper;
-        this.singleEmptySuggestion = Collections.singletonList(mapper.map(Suggestion.simple("")));
+        this.singleEmptySuggestion = Collections.singletonList(mapper.map(Suggestion.suggestion("")));
     }
 
     @Override

@@ -131,9 +131,9 @@ class AggregateParserTest {
         // Arrange
         final AggregateParser<TestCommandSender, OutputType> parser = AggregateParser.<TestCommandSender>builder()
                 .withComponent("number", integerParser(), SuggestionProvider.blocking((ctx, in) -> Arrays.asList(
-                        Suggestion.simple("1"),
-                        Suggestion.simple("2"),
-                        Suggestion.simple("3")
+                        Suggestion.suggestion("1"),
+                        Suggestion.suggestion("2"),
+                        Suggestion.suggestion("3")
                 ))).withComponent("string", stringParser())
                 .withMapper(
                         OutputType.class,
@@ -148,9 +148,9 @@ class AggregateParserTest {
 
         // Assert
         assertThat(suggestions).containsExactly(
-                Suggestion.simple("1"),
-                Suggestion.simple("2"),
-                Suggestion.simple("3")
+                Suggestion.suggestion("1"),
+                Suggestion.suggestion("2"),
+                Suggestion.suggestion("3")
         );
     }
 
@@ -160,9 +160,9 @@ class AggregateParserTest {
         final AggregateParser<TestCommandSender, OutputType> parser = AggregateParser.<TestCommandSender>builder()
                 .withComponent("number", integerParser())
                 .withComponent("string", stringParser(), SuggestionProvider.blocking((ctx, in) -> Arrays.asList(
-                        Suggestion.simple("a"),
-                        Suggestion.simple("b"),
-                        Suggestion.simple("c")
+                        Suggestion.suggestion("a"),
+                        Suggestion.suggestion("b"),
+                        Suggestion.suggestion("c")
                 )))
                 .withMapper(
                         OutputType.class,
@@ -177,9 +177,9 @@ class AggregateParserTest {
 
         // Assert
         assertThat(suggestions).containsExactly(
-                Suggestion.simple("123 a"),
-                Suggestion.simple("123 b"),
-                Suggestion.simple("123 c")
+                Suggestion.suggestion("123 a"),
+                Suggestion.suggestion("123 b"),
+                Suggestion.suggestion("123 c")
         );
     }
 

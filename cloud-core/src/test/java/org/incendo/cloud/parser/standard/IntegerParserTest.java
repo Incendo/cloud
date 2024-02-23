@@ -143,7 +143,7 @@ class IntegerParserTest {
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();
         for (int i = 0; i <= 9; i++) {
-            expectedSuggestions.add(Suggestion.simple(Integer.toString(i)));
+            expectedSuggestions.add(Suggestion.suggestion(Integer.toString(i)));
         }
 
         // Act
@@ -166,7 +166,7 @@ class IntegerParserTest {
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();
         for (int i = 0; i <= 9; i++) {
-            expectedSuggestions.add(Suggestion.simple(Integer.toString(-i)));
+            expectedSuggestions.add(Suggestion.suggestion(Integer.toString(-i)));
         }
 
         // Act

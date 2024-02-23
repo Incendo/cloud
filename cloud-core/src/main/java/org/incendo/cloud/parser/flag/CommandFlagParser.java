@@ -196,7 +196,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                     continue;
                 }
 
-                suggestions.add(Suggestion.simple(String.format("--%s", flag.name())));
+                suggestions.add(Suggestion.suggestion(String.format("--%s", flag.name())));
             }
             /* Recommend aliases */
             final boolean suggestCombined = nextToken.length() > 1 && nextToken.startsWith("-") && !nextToken.startsWith("--");
@@ -213,15 +213,15 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                         continue;
                     }
                     if (suggestCombined && flag.commandComponent() == null) {
-                        suggestions.add(Suggestion.simple(String.format("%s%s", input.peekString(), alias)));
+                        suggestions.add(Suggestion.suggestion(String.format("%s%s", input.peekString(), alias)));
                     } else {
-                        suggestions.add(Suggestion.simple(String.format("-%s", alias)));
+                        suggestions.add(Suggestion.suggestion(String.format("-%s", alias)));
                     }
                 }
             }
             /* If we are suggesting the combined flag, then also suggest the current input */
             if (suggestCombined) {
-                suggestions.add(Suggestion.simple(input.peekString()));
+                suggestions.add(Suggestion.suggestion(input.peekString()));
             }
             return CompletableFuture.completedFuture(suggestions);
         } else {

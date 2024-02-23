@@ -85,7 +85,7 @@ class MethodSuggestionProviderTest {
                         .join();
 
         // Assert
-        assertThat(suggestions).containsExactly(Suggestion.simple("foo"));
+        assertThat(suggestions).containsExactly(Suggestion.suggestion("foo"));
     }
 
     static @NonNull Stream<@NonNull Object> testSuggestionsSource() {
@@ -108,7 +108,7 @@ class MethodSuggestionProviderTest {
                 final @NonNull CommandContext<TestCommandSender> context,
                 final @NonNull String input
         ) {
-            return Collections.singletonList(Suggestion.simple("foo"));
+            return Collections.singletonList(Suggestion.suggestion("foo"));
         }
     }
 
@@ -119,7 +119,7 @@ class MethodSuggestionProviderTest {
                 final @NonNull CommandContext<TestCommandSender> context,
                 final @NonNull String input
         ) {
-            return Collections.singleton(Suggestion.simple("foo"));
+            return Collections.singleton(Suggestion.suggestion("foo"));
         }
     }
 
@@ -130,7 +130,7 @@ class MethodSuggestionProviderTest {
                 final @NonNull CommandContext<TestCommandSender> context,
                 final @NonNull String input
         ) {
-            return Stream.of(Suggestion.simple("foo"));
+            return Stream.of(Suggestion.suggestion("foo"));
         }
     }
 
@@ -141,7 +141,7 @@ class MethodSuggestionProviderTest {
                 final @NonNull CommandContext<TestCommandSender> context,
                 final @NonNull String input
         ) {
-            return Collections.singleton(Suggestion.simple("foo"));
+            return Collections.singleton(Suggestion.suggestion("foo"));
         }
     }
 

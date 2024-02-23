@@ -76,7 +76,7 @@ class DurationParserSuggestionsTest {
                 input4
         ).list();
         Assertions.assertTrue(suggestions4.containsAll(suggestionList("1d2h", "1d2m", "1d2s")));
-        Assertions.assertFalse(suggestions4.contains(Suggestion.simple("1d2d")));
+        Assertions.assertFalse(suggestions4.contains(Suggestion.suggestion("1d2d")));
 
         final String input9 = "duration 1d22";
         final List<? extends Suggestion> suggestions9 = manager.suggestionFactory().suggestImmediately(
@@ -84,7 +84,7 @@ class DurationParserSuggestionsTest {
                 input9
         ).list();
         Assertions.assertTrue(suggestions9.containsAll(suggestionList("1d22h", "1d22m", "1d22s")));
-        Assertions.assertFalse(suggestions9.contains(Suggestion.simple("1d22d")));
+        Assertions.assertFalse(suggestions9.contains(Suggestion.suggestion("1d22d")));
 
         final String input5 = "duration d";
         final List<? extends Suggestion> suggestions5 = manager.suggestionFactory().suggestImmediately(
