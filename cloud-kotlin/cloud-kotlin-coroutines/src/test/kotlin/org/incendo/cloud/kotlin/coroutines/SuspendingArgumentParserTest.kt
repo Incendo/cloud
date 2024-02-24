@@ -51,7 +51,7 @@ class SuspendingArgumentParserTest {
         }
         val suspendingSuggestionProvider = suspendingSuggestionProvider<TestCommandSender> { _, _ ->
             delay(1L)
-            (1..3).asSequence().map(Number::toString).map(Suggestion::simple).asIterable()
+            (1..3).asSequence().map(Number::toString).map(Suggestion::suggestion).asIterable()
         }
 
         val manager = TestCommandManager()
@@ -64,9 +64,9 @@ class SuspendingArgumentParserTest {
 
         manager.commandExecutor().executeCommand(TestCommandSender(), "test 123").await()
         assertThat(manager.suggestionFactory().suggest(TestCommandSender(), "test ").await().list()).containsExactly(
-            Suggestion.simple("1"),
-            Suggestion.simple("2"),
-            Suggestion.simple("3")
+            Suggestion.suggestion("1"),
+            Suggestion.suggestion("2"),
+            Suggestion.suggestion("3")
         )
     }
 

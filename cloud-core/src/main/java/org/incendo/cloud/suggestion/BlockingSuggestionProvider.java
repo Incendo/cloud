@@ -72,7 +72,7 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
      * instead of {@link Suggestion} results.
      *
      * <p>The provided default implementation of {@link #suggestions(CommandContext, CommandInput)}
-     * maps the {@link String} results to {@link Suggestion suggestions} using {@link Suggestion#simple(String)}.</p>
+     * maps the {@link String} results to {@link Suggestion suggestions} using {@link Suggestion#suggestion(String)}.</p>
      *
      * @param <C> command sender type
      */
@@ -104,7 +104,7 @@ interface BlockingSuggestionProvider<C> extends SuggestionProvider<C> {
                 final @NonNull CommandInput input
         ) {
             return StreamSupport.stream(this.stringSuggestions(context, input).spliterator(), false)
-                    .map(Suggestion::simple)
+                    .map(Suggestion::suggestion)
                     .collect(Collectors.toList());
         }
     }

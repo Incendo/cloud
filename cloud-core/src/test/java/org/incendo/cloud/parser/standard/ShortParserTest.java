@@ -143,7 +143,7 @@ class ShortParserTest {
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();
         for (int i = 0; i <= 9; i++) {
-            expectedSuggestions.add(Suggestion.simple(Short.toString((short) i)));
+            expectedSuggestions.add(Suggestion.suggestion(Short.toString((short) i)));
         }
 
         // Act
@@ -166,7 +166,7 @@ class ShortParserTest {
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();
         for (int i = 0; i <= 9; i++) {
-            expectedSuggestions.add(Suggestion.simple(Short.toString((short) -i)));
+            expectedSuggestions.add(Suggestion.suggestion(Short.toString((short) -i)));
         }
 
         // Act

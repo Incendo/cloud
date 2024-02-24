@@ -171,7 +171,7 @@ class CommandTreeTest {
         ).join().list();
 
         // Assert
-        assertThat(results).containsExactly(Suggestion.simple("a"), Suggestion.simple("b"));
+        assertThat(results).containsExactly(Suggestion.suggestion("a"), Suggestion.suggestion("b"));
     }
 
     @Test

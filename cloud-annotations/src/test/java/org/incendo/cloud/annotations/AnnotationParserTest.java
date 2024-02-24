@@ -61,7 +61,7 @@ class AnnotationParserTest {
 
     private static final List<Suggestion> NAMED_SUGGESTIONS = Arrays.asList("Dancing-Queen", "Gimme!-Gimme!-Gimme!",
             "Waterloo"
-    ).stream().map(Suggestion::simple).collect(Collectors.toList());
+    ).stream().map(Suggestion::suggestion).collect(Collectors.toList());
 
     private CommandManager<TestCommandSender> manager;
     private AnnotationParser<TestCommandSender> annotationParser;
@@ -161,7 +161,7 @@ class AnnotationParserTest {
 
         assertThat(suggestionProvider).isNotNull();
         assertThat(suggestionProvider.suggestionsFuture(new CommandContext<>(new TestCommandSender(), manager),
-                CommandInput.empty()).join()).contains(Suggestion.simple("Stella"));
+                CommandInput.empty()).join()).contains(Suggestion.suggestion("Stella"));
     }
 
     @Test
@@ -177,7 +177,7 @@ class AnnotationParserTest {
         assertThat(parser.parse(context, CommandInput.empty()).parsedValue().orElse(new CustomType("")).toString())
                 .isEqualTo("yay");
         assertThat(parser.suggestionProvider().suggestionsFuture(context, CommandInput.empty()).join())
-                .contains(Suggestion.simple("Stella"));
+                .contains(Suggestion.suggestion("Stella"));
     }
 
     @Test

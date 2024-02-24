@@ -100,9 +100,9 @@ class MultiTokenParserTest {
 
         // Assert
         assertThat(result).containsExactly(
-                Suggestion.simple("Goofy"),
-                Suggestion.simple("Bubbles"),
-                Suggestion.simple("Chuckles")
+                Suggestion.suggestion("Goofy"),
+                Suggestion.suggestion("Bubbles"),
+                Suggestion.suggestion("Chuckles")
         );
     }
 
@@ -123,9 +123,9 @@ class MultiTokenParserTest {
 
         // Assert
         assertThat(result).containsExactly(
-                Suggestion.simple("Goofy banana"),
-                Suggestion.simple("Goofy apple"),
-                Suggestion.simple("Goofy mango")
+                Suggestion.suggestion("Goofy banana"),
+                Suggestion.suggestion("Goofy apple"),
+                Suggestion.suggestion("Goofy mango")
         );
     }
 
@@ -146,9 +146,9 @@ class MultiTokenParserTest {
 
         // Assert
         assertThat(result).containsExactly(
-                Suggestion.simple("Goofy banana 1"),
-                Suggestion.simple("Goofy banana 2"),
-                Suggestion.simple("Goofy banana 3")
+                Suggestion.suggestion("Goofy banana 1"),
+                Suggestion.suggestion("Goofy banana 2"),
+                Suggestion.suggestion("Goofy banana 3")
         );
     }
 
@@ -169,8 +169,8 @@ class MultiTokenParserTest {
 
         // Assert
         assertThat(result).containsExactly(
-                Suggestion.simple("true"),
-                Suggestion.simple("false")
+                Suggestion.suggestion("true"),
+                Suggestion.suggestion("false")
         );
     }
 
@@ -208,7 +208,7 @@ class MultiTokenParserTest {
                 name = input.readString();
             } else {
                 return CompletableFuture.completedFuture(
-                        MONKEY_NAMES.stream().map(Suggestion::simple).collect(Collectors.toList())
+                        MONKEY_NAMES.stream().map(Suggestion::suggestion).collect(Collectors.toList())
                 );
             }
 
@@ -221,7 +221,7 @@ class MultiTokenParserTest {
                                 .map(Fruit::name)
                                 .map(fruit -> fruit.toLowerCase(Locale.ROOT))
                                 .map(fruit -> String.format("%s %s", name, fruit))
-                                .map(Suggestion::simple)
+                                .map(Suggestion::suggestion)
                                 .collect(Collectors.toList())
                 );
             }
@@ -233,14 +233,14 @@ class MultiTokenParserTest {
                 return CompletableFuture.completedFuture(
                         IntStream.range(1, 4)
                                 .mapToObj(number -> String.format("%s %s %d", name, favoriteFruit, number))
-                                .map(Suggestion::simple)
+                                .map(Suggestion::suggestion)
                                 .collect(Collectors.toList())
                 );
             }
 
             return CompletableFuture.completedFuture(
                     Collections.singletonList(
-                            Suggestion.simple(String.format("%s %s %d", name, favoriteFruit, age))
+                            Suggestion.suggestion(String.format("%s %s %d", name, favoriteFruit, age))
                     )
             );
         }

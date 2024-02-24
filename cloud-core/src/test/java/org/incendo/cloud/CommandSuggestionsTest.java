@@ -161,7 +161,7 @@ class CommandSuggestionsTest {
         final List<? extends Suggestion> suggestions = this.manager.suggestionFactory().suggestImmediately(new TestCommandSender(), input).list();
 
         // Assert
-        assertThat(suggestions).containsExactly(Suggestion.simple("one"));
+        assertThat(suggestions).containsExactly(Suggestion.suggestion("one"));
     }
 
     @Test

@@ -138,7 +138,7 @@ public final class MethodSuggestionProvider<C> extends AnnotatedMethodHandler<C>
         if (suggestion instanceof Suggestion) {
             return (List<Suggestion>) suggestions;
         } else if (suggestion instanceof String) {
-            return suggestions.stream().map(Object::toString).map(Suggestion::simple).collect(Collectors.toList());
+            return suggestions.stream().map(Object::toString).map(Suggestion::suggestion).collect(Collectors.toList());
         } else {
             throw new IllegalArgumentException(
                     String.format("Cannot handle suggestions of type: %s",
