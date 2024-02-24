@@ -24,7 +24,6 @@
 package org.incendo.cloud.suggestion;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -66,8 +65,8 @@ public interface SuggestionProvider<C> {
      * @param <C> command sender type
      * @return suggestion provider
      */
-    static <C> SuggestionProvider<C> noSuggestions() {
-        return (ctx, in) -> CompletableFuture.completedFuture(Collections.emptyList());
+    static <C> @NonNull SuggestionProvider<C> noSuggestions() {
+        return NoSuggestions.instance();
     }
 
     /**
