@@ -69,7 +69,7 @@ public interface SuggestionProcessor<C> {
      * @param nextProcessor next suggestion processor
      * @return chained processor
      */
-    default @NonNull SuggestionProcessor<C> and(final @NonNull SuggestionProcessor<C> nextProcessor) {
+    default @NonNull SuggestionProcessor<C> then(final @NonNull SuggestionProcessor<C> nextProcessor) {
         Objects.requireNonNull(nextProcessor, "nextProcessor");
         return new ChainedSuggestionProcessor<>(Arrays.asList(this, nextProcessor));
     }
