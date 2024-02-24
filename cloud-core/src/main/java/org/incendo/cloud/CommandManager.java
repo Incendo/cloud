@@ -101,8 +101,7 @@ import static java.util.Objects.requireNonNull;
 @API(status = API.Status.STABLE)
 public abstract class CommandManager<C> implements Stateful<RegistrationState>, CommandBuilderSource<C> {
 
-    private final Configurable<ManagerSetting> settings = Configurable.enumConfigurable(ManagerSetting.class)
-            .set(ManagerSetting.ENFORCE_INTERMEDIARY_PERMISSIONS, true);
+    private final Configurable<ManagerSetting> settings = Configurable.enumConfigurable(ManagerSetting.class);
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private final ParserRegistry<C> parserRegistry = new StandardParserRegistry<>();
     private final Collection<Command<C>> commands = new LinkedList<>();

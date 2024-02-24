@@ -25,11 +25,13 @@ package org.incendo.cloud;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.exception.NoPermissionException;
+import org.incendo.cloud.execution.CommandResult;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.key.CloudKey;
 import org.incendo.cloud.permission.Permission;
@@ -44,6 +46,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.incendo.cloud.parser.standard.IntegerParser.integerParser;
+import static org.incendo.cloud.truth.CompletableFutureSubject.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -112,6 +115,29 @@ class PermissionTest {
 
         // Assert
         assertThat(exception).hasCauseThat().isInstanceOf(NoPermissionException.class);
+    }
+
+    @Test
+    void testPermittedNodeFollowingNotPermittedNode() {
+        // Arrange
+        this.manager.command(this.manager.commandBuilder("root")
+                .literal("no")
+                .permission("0"));
+        this.manager.command(this.manager.commandBuilder("root")
+                .literal("no")
+                .literal("yes")
+                .permission("1"));
+        final TestCommandSender sender = new TestCommandSender("1");
+
+        // Act
+        final CompletableFuture<CommandResult<TestCommandSender>> noPermission = this.manager.commandExecutor()
+                .executeCommand(sender, "root no");
+        final CompletableFuture<CommandResult<TestCommandSender>> permitted = this.manager.commandExecutor()
+                .executeCommand(sender, "root no yes");
+
+        // Assert
+        assertThat(noPermission).hasFailureThat().isInstanceOf(NoPermissionException.class);
+        assertThat(permitted).hasResult();
     }
 
     @Test
@@ -260,7 +286,7 @@ class PermissionTest {
                 final @NonNull TestCommandSender sender,
                 final @NonNull String permission
         ) {
-            return this.permissionFunction.apply(permission);
+            return this.permissionFunction.apply(permission) || sender.hasPermisison(permission);
         }
     }
 }

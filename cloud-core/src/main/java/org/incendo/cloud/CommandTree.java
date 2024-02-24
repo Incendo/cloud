@@ -1051,7 +1051,7 @@ public final class CommandTree<C> {
             }
         });
 
-        this.getLeavesRaw(this.internalTree).forEach(this::propagateRequirements);
+        this.getExecutorNodes(this.internalTree).forEach(this::propagateRequirements);
     }
 
     /**
@@ -1077,32 +1077,17 @@ public final class CommandTree<C> {
         if (senderType == null) {
             senderType = Object.class;
         }
-        /* All leaves must necessarily have an owning command */
-        leafNode.nodeMeta().put(CommandNode.META_KEY_PERMISSION, commandPermission);
-        leafNode.nodeMeta().put(CommandNode.META_KEY_SENDER_TYPES, new HashSet<>(Collections.singletonList(senderType)));
-        // Get chain and order it tail->head then skip the tail (leaf node)
+        // Get chain and order it tail->head
         List<CommandNode<C>> chain = this.getChain(leafNode);
         Collections.reverse(chain);
-        chain = chain.subList(1, chain.size());
-        // Go through all nodes from the tail upwards until a collision occurs
         for (final CommandNode<C> commandArgumentNode : chain) {
             final Permission existingPermission = (Permission) commandArgumentNode.nodeMeta().get(CommandNode.META_KEY_PERMISSION);
 
-            Permission permission;
+            final Permission permission;
             if (existingPermission != null) {
                 permission = Permission.anyOf(commandPermission, existingPermission);
             } else {
                 permission = commandPermission;
-            }
-
-            /* Now also check if there's a command handler attached to an upper level node */
-            if (commandArgumentNode.component() != null && commandArgumentNode.command() != null) {
-                final Command<C> command = commandArgumentNode.command();
-                if (this.commandManager().settings().get(ManagerSetting.ENFORCE_INTERMEDIARY_PERMISSIONS)) {
-                    permission = command.commandPermission();
-                } else {
-                    permission = Permission.anyOf(permission, command.commandPermission());
-                }
             }
 
             commandArgumentNode.nodeMeta().put(CommandNode.META_KEY_PERMISSION, permission);
@@ -1192,6 +1177,19 @@ public final class CommandTree<C> {
             }
         } else {
             node.children().forEach(child -> leaves.addAll(this.getLeavesRaw(child)));
+        }
+        return leaves;
+    }
+
+    private @NonNull List<@NonNull CommandNode<C>> getExecutorNodes(
+            final @NonNull CommandNode<C> node
+    ) {
+        final List<CommandNode<C>> leaves = new LinkedList<>();
+        if (node.command() != null) {
+            leaves.add(node);
+        }
+        for (final CommandNode<C> child : node.children()) {
+            leaves.addAll(this.getExecutorNodes(child));
         }
         return leaves;
     }
