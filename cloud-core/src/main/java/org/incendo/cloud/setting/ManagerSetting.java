@@ -34,13 +34,6 @@ import org.incendo.cloud.CommandManager;
 @API(status = API.Status.STABLE)
 public enum ManagerSetting implements Setting {
     /**
-     * Do not create a compound permission and do not look greedily
-     * for child permission values, if a preceding command in the tree path
-     * has a command handler attached
-     */
-    ENFORCE_INTERMEDIARY_PERMISSIONS,
-
-    /**
      * Force sending of an empty suggestion (i.e. a singleton list containing an empty string)
      * when no suggestions are present
      */
@@ -52,14 +45,12 @@ public enum ManagerSetting implements Setting {
      * For example, if a platform serializes the command tree and sends it to clients,
      * this will allow modifying the command tree after it has been sent, as long as these modifications are not blocked by
      * the underlying platform
-     *
      */
     @API(status = API.Status.STABLE)
     ALLOW_UNSAFE_REGISTRATION,
 
     /**
      * Enables overriding of existing commands on supported platforms.
-     *
      */
     @API(status = API.Status.STABLE)
     OVERRIDE_EXISTING_COMMANDS,
@@ -68,7 +59,6 @@ public enum ManagerSetting implements Setting {
      * Allows parsing flags at any position after the last literal by appending flag argument nodes between each command node.
      * It can have some conflicts when integrating with other command systems like Brigadier,
      * and code inspecting the command tree may need to be adjusted.
-     *
      */
     @API(status = API.Status.EXPERIMENTAL)
     LIBERAL_FLAG_PARSING
