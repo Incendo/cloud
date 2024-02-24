@@ -65,7 +65,7 @@ class SuggestionProcessorTest {
         ).list();
 
         // Assert
-        assertThat(suggestions).containsExactly(Suggestion.simple("test-suggestion"));
+        assertThat(suggestions).containsExactly(Suggestion.suggestion("test-suggestion"));
     }
 
     @Test

@@ -107,6 +107,6 @@ class RepeatableFlagTest {
         ).list();
 
         // Assert
-        assertThat(suggestions).containsExactly(Suggestion.simple("--flag"));
+        assertThat(suggestions).containsExactly(Suggestion.suggestion("--flag"));
     }
 }

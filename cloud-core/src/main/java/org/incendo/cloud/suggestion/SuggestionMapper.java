@@ -26,6 +26,8 @@ package org.incendo.cloud.suggestion;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Maps from {@link Suggestion} to {@link S}.
  *
@@ -51,4 +53,16 @@ public interface SuggestionMapper<S extends Suggestion> {
      * @return the output suggestion
      */
     @NonNull S map(@NonNull Suggestion suggestion);
+
+    /**
+     * Returns a suggestion mapper that invokes this mapper first and then the provided one.
+     *
+     * @param mapper suggestion mapper
+     * @param <S1> mapped suggestion type
+     * @return new mapper
+     */
+    default <S1 extends Suggestion> @NonNull SuggestionMapper<S1> then(final @NonNull SuggestionMapper<S1> mapper) {
+        requireNonNull(mapper, "mapper");
+        return suggestion -> mapper.map(this.map(suggestion));
+    }
 }

@@ -37,6 +37,7 @@ import org.incendo.cloud.exception.CommandExecutionException;
 import org.incendo.cloud.exception.CommandParseException;
 import org.incendo.cloud.services.State;
 import org.incendo.cloud.suggestion.Suggestion;
+import org.incendo.cloud.suggestion.SuggestionMapper;
 import org.incendo.cloud.suggestion.Suggestions;
 import org.incendo.cloud.type.tuple.Pair;
 
@@ -150,11 +151,12 @@ final class ExecutionCoordinatorImpl<C> implements ExecutionCoordinator<C> {
     }
 
     @Override
-    public @NonNull CompletableFuture<@NonNull Suggestions<C, Suggestion>> coordinateSuggestions(
+    public <S extends Suggestion> @NonNull CompletableFuture<@NonNull Suggestions<C, S>> coordinateSuggestions(
             final @NonNull CommandTree<C> commandTree,
             final @NonNull CommandContext<C> context,
-            final @NonNull CommandInput commandInput
+            final @NonNull CommandInput commandInput,
+            final @NonNull SuggestionMapper<S> mapper
     ) {
-        return commandTree.getSuggestions(context, commandInput, this.suggestionsExecutor);
+        return commandTree.getSuggestions(context, commandInput, mapper, this.suggestionsExecutor);
     }
 }

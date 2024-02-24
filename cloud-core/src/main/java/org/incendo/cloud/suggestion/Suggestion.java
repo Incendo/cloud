@@ -35,7 +35,7 @@ public interface Suggestion {
      * @param suggestion the suggestion string
      * @return the created suggestion
      */
-    static @NonNull Suggestion simple(final @NonNull String suggestion) {
+    static @NonNull Suggestion suggestion(final @NonNull String suggestion) {
         return new SimpleSuggestion(suggestion);
     }
 
