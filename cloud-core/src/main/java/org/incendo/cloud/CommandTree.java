@@ -357,7 +357,7 @@ public final class CommandTree<C> {
             );
         }
 
-        return this.commandManager.threadLocalPermissionCache.withPermissionCache(() -> {
+        return this.commandManager.threadLocalPermissionCache().withPermissionCache(() -> {
             if (this.childPermitted(root, sender)) {
                 return new InvalidSyntaxException(
                         this.commandManager.commandSyntaxFormatter().apply(sender, (List) this.getComponentChain(root), root),

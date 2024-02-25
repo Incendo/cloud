@@ -112,7 +112,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
     private final Set<CloudCapability> capabilities = new HashSet<>();
     private final ExceptionController<C> exceptionController = new ExceptionController<>();
     private final CommandExecutor<C> commandExecutor;
-    final ThreadLocalPermissionCache<C> threadLocalPermissionCache = new ThreadLocalPermissionCache<>(this.settings);
+    private final ThreadLocalPermissionCache<C> threadLocalPermissionCache = new ThreadLocalPermissionCache<>(this.settings);
 
     private CaptionFormatter<C, String> captionVariableReplacementHandler = CaptionFormatter.placeholderReplacing();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>(this);
@@ -176,6 +176,10 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
     @API(status = API.Status.STABLE)
     public @NonNull CommandExecutor<C> commandExecutor() {
         return this.commandExecutor;
+    }
+
+    final @NonNull ThreadLocalPermissionCache<C> threadLocalPermissionCache() {
+        return this.threadLocalPermissionCache;
     }
 
     /**
@@ -392,18 +396,18 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
             final @NonNull C sender,
             final @NonNull Permission permission
     ) {
-        return this.threadLocalPermissionCache.withPermissionCache(() -> this.testPermission_(sender, permission));
+        return this.threadLocalPermissionCache.withPermissionCache(() -> this.testPermissionRaw(sender, permission));
     }
 
     @SuppressWarnings("unchecked")
-    private @NonNull PermissionResult testPermission_(final @NonNull C sender, final @NonNull Permission permission) {
+    private @NonNull PermissionResult testPermissionRaw(final @NonNull C sender, final @NonNull Permission permission) {
         if (permission instanceof PredicatePermission) {
             return this.threadLocalPermissionCache.testPermissionCaching(sender, (PredicatePermission<C>) permission, pair -> {
                 return pair.second().testPermission(pair.first());
             });
         } else if (permission instanceof OrPermission) {
             for (final Permission innerPermission : permission.permissions()) {
-                final PermissionResult result = this.testPermission_(sender, innerPermission);
+                final PermissionResult result = this.testPermissionRaw(sender, innerPermission);
                 if (result.allowed()) {
                     return result;
                 }
@@ -411,7 +415,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
             return PermissionResult.denied(permission);
         } else if (permission instanceof AndPermission) {
             for (final Permission innerPermission : permission.permissions()) {
-                final PermissionResult result = this.testPermission_(sender, innerPermission);
+                final PermissionResult result = this.testPermissionRaw(sender, innerPermission);
                 if (!result.allowed()) {
                     return result;
                 }

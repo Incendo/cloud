@@ -38,14 +38,27 @@ import org.incendo.cloud.type.tuple.Pair;
 
 @API(status = API.Status.INTERNAL)
 public final class ThreadLocalPermissionCache<C> {
+
     private final ThreadLocal<Pair<Map<Pair<C, Permission>, PermissionResult>, AtomicInteger>> threadLocalPermissionCache =
             ThreadLocal.withInitial(() -> Pair.of(new HashMap<>(), new AtomicInteger(0)));
     private final Configurable<ManagerSetting> settings;
 
+    /**
+     * Create a new cache.
+     *
+     * @param settings settings
+     */
     public ThreadLocalPermissionCache(final Configurable<ManagerSetting> settings) {
         this.settings = settings;
     }
 
+    /**
+     * Perform an action in a cached scope.
+     *
+     * @param action action
+     * @param <T>    result type
+     * @return result
+     */
     public <T> T withPermissionCache(final Supplier<T> action) {
         final boolean cache = this.settings.get(ManagerSetting.REDUCE_REDUNDANT_PERMISSION_CHECKS);
         try {
@@ -67,6 +80,15 @@ public final class ThreadLocalPermissionCache<C> {
         }
     }
 
+    /**
+     * Test permission caching.
+     *
+     * @param sender     sender
+     * @param permission permission
+     * @param tester     tester
+     * @param <T>        permission type
+     * @return permission result
+     */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public @NonNull <T> PermissionResult testPermissionCaching(
             final @NonNull C sender,
