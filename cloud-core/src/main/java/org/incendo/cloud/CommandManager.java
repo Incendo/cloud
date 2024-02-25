@@ -62,6 +62,7 @@ import org.incendo.cloud.help.HelpHandlerFactory;
 import org.incendo.cloud.injection.ParameterInjectorRegistry;
 import org.incendo.cloud.internal.CommandNode;
 import org.incendo.cloud.internal.CommandRegistrationHandler;
+import org.incendo.cloud.internal.ThreadLocalPermissionCache;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.parser.ArgumentParser;
 import org.incendo.cloud.parser.ParserParameter;
@@ -111,6 +112,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
     private final Set<CloudCapability> capabilities = new HashSet<>();
     private final ExceptionController<C> exceptionController = new ExceptionController<>();
     private final CommandExecutor<C> commandExecutor;
+    private final ThreadLocalPermissionCache<C> threadLocalPermissionCache = new ThreadLocalPermissionCache<>(this.settings);
 
     private CaptionFormatter<C, String> captionVariableReplacementHandler = CaptionFormatter.placeholderReplacing();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>(this);
@@ -174,6 +176,10 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
     @API(status = API.Status.STABLE)
     public @NonNull CommandExecutor<C> commandExecutor() {
         return this.commandExecutor;
+    }
+
+    final @NonNull ThreadLocalPermissionCache<C> threadLocalPermissionCache() {
+        return this.threadLocalPermissionCache;
     }
 
     /**
@@ -386,31 +392,40 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * @return a {@link PermissionResult} representing whether the sender has the permission
      */
     @API(status = API.Status.STABLE)
-    @SuppressWarnings("unchecked")
     public @NonNull PermissionResult testPermission(
             final @NonNull C sender,
             final @NonNull Permission permission
     ) {
+        return this.threadLocalPermissionCache.withPermissionCache(() -> this.testPermissionRaw(sender, permission));
+    }
+
+    @SuppressWarnings("unchecked")
+    private @NonNull PermissionResult testPermissionRaw(final @NonNull C sender, final @NonNull Permission permission) {
         if (permission instanceof PredicatePermission) {
-            return ((PredicatePermission<C>) permission).testPermission(sender);
+            return this.threadLocalPermissionCache.testPermissionCaching(sender, (PredicatePermission<C>) permission, pair -> {
+                return pair.second().testPermission(pair.first());
+            });
         } else if (permission instanceof OrPermission) {
             for (final Permission innerPermission : permission.permissions()) {
-                final PermissionResult result = this.testPermission(sender, innerPermission);
+                final PermissionResult result = this.testPermissionRaw(sender, innerPermission);
                 if (result.allowed()) {
-                    return result; // short circuit the first true result
+                    return result;
                 }
             }
-            return PermissionResult.denied(permission); // none returned true
+            return PermissionResult.denied(permission);
         } else if (permission instanceof AndPermission) {
             for (final Permission innerPermission : permission.permissions()) {
-                final PermissionResult result = this.testPermission(sender, innerPermission);
+                final PermissionResult result = this.testPermissionRaw(sender, innerPermission);
                 if (!result.allowed()) {
-                    return result; // short circuit the first false result
+                    return result;
                 }
             }
-            return PermissionResult.allowed(permission); // all returned true
+            return PermissionResult.allowed(permission);
         }
-        return PermissionResult.of(permission.isEmpty() || this.hasPermission(sender, permission.permissionString()), permission);
+        return this.threadLocalPermissionCache.testPermissionCaching(sender, permission, pair -> {
+            return PermissionResult.of(
+                    pair.second().isEmpty() || this.hasPermission(pair.first(), pair.second().permissionString()), pair.second());
+        });
     }
 
     /**
