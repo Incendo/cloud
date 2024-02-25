@@ -348,7 +348,7 @@ public final class CommandTree<C> {
             final C sender,
             final CommandNode<C> root
     ) {
-        final boolean convert = this.commandManager.settings().get(ManagerSetting.CONVERT_NO_PERMISSION_TO_SYNTAX_EXCEPTION);
+        final boolean convert = this.commandManager.settings().get(ManagerSetting.HIDE_COMMAND_EXISTENCE);
         if (!convert) {
             return new NoPermissionException(
                     permissionResult,
@@ -369,8 +369,8 @@ public final class CommandTree<C> {
             return new InvalidSyntaxException(
                     this.commandManager.commandSyntaxFormatter().apply(
                             sender,
-							parentChain.stream().map(CommandNode::component)
-									.filter(Objects::nonNull).collect(Collectors.toList()),
+                            parentChain.stream().map(CommandNode::component)
+                                    .filter(Objects::nonNull).collect(Collectors.toList()),
                             root
                     ),
                     sender, this.getComponentChain(root)
@@ -384,7 +384,7 @@ public final class CommandTree<C> {
         );
     }
 
-    private boolean childPermitted(CommandNode<C> node, C sender) {
+    private boolean childPermitted(final CommandNode<C> node, final C sender) {
         if (this.determinePermissionResult(sender, node).allowed()) {
             return true;
         }
@@ -396,7 +396,7 @@ public final class CommandTree<C> {
         return false;
     }
 
-    private @Nullable List<CommandNode<C>> permittedParentChain(CommandNode<C> node, C sender) {
+    private @Nullable List<CommandNode<C>> permittedParentChain(final CommandNode<C> node, final C sender) {
         final @Nullable CommandNode<C> parent = node.parent();
         if (parent != null) {
             if (this.determinePermissionResult(sender, parent).allowed()) {
