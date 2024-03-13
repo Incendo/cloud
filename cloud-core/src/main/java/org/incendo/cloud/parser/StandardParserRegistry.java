@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -175,6 +176,9 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         });
         this.registerParser(UUIDParser.uuidParser());
         this.registerParser(DurationParser.durationParser());
+
+        final ServiceLoader<ParserContributor> loader = ServiceLoader.load(ParserContributor.class);
+        loader.iterator().forEachRemaining(contributor -> contributor.contribute(this));
     }
 
     private static boolean isPrimitive(final @NonNull TypeToken<?> type) {
