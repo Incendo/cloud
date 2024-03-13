@@ -142,6 +142,7 @@ public final class ServiceRepository<Context, Response> {
             );
         }
 
+        @SuppressWarnings("EnumOrdinal")
         @Override
         public int compareTo(final @NonNull ServiceWrapper<T> other) {
             return Comparator.<ServiceWrapper<T>>comparingInt(
