@@ -177,7 +177,10 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         this.registerParser(UUIDParser.uuidParser());
         this.registerParser(DurationParser.durationParser());
 
-        final ServiceLoader<ParserContributor> loader = ServiceLoader.load(ParserContributor.class);
+        final ServiceLoader<ParserContributor> loader = ServiceLoader.load(
+                ParserContributor.class,
+                ParserContributor.class.getClassLoader()
+        );
         loader.iterator().forEachRemaining(contributor -> contributor.contribute(this));
     }
 
