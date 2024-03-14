@@ -346,7 +346,7 @@ public final class CommandFlag<T> {
          */
         SINGLE,
         /**
-         * Multiple values can be provided for the flag, and sdhould be extracted
+         * Multiple values can be provided for the flag, and should be extracted
          * using {@link FlagContext#getAll(CommandFlag)}.
          */
         REPEATABLE

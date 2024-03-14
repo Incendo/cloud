@@ -632,7 +632,7 @@ public class Command<C> {
         }
 
         /**
-         * Marks the {@code builder} as required and adds it to the command.
+         * Marks the {@code builder} as optional and adds it to the command.
          *
          * @param name    the name that will be inserted into the builder
          * @param builder the component builder
@@ -662,7 +662,7 @@ public class Command<C> {
         }
 
         /**
-         * Marks the {@code builder} as required and adds it to the command.
+         * Marks the {@code builder} as optional and adds it to the command.
          *
          * @param builder the component builder
          * @return new builder instance with the command argument inserted into the argument list

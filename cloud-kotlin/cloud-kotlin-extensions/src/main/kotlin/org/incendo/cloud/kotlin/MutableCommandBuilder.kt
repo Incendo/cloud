@@ -394,7 +394,7 @@ public class MutableCommandBuilder<C : Any>(
         parser: ParserDescriptor<C, T>,
         mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
     ): MutableCommandBuilder<C> = mutate {
-        it.required(
+        it.argument(
             CommandComponent.builder<C, T>().name(name).parser(parser).also(mutator)
         )
     }
@@ -412,7 +412,7 @@ public class MutableCommandBuilder<C : Any>(
         parser: ParserDescriptor<C, T>,
         mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
     ): MutableCommandBuilder<C> = mutate {
-        it.required(
+        it.argument(
             CommandComponent.builder<C, T>().name(name).parser(parser).optional().also(mutator)
         )
     }
@@ -430,7 +430,7 @@ public class MutableCommandBuilder<C : Any>(
         parser: ParserDescriptor<C, T>,
         mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
     ): MutableCommandBuilder<C> = mutate {
-        it.required(
+        it.argument(
             CommandComponent.builder<C, T>().key(name).parser(parser).also(mutator)
         )
     }
@@ -448,7 +448,7 @@ public class MutableCommandBuilder<C : Any>(
         parser: ParserDescriptor<C, T>,
         mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
     ): MutableCommandBuilder<C> = mutate {
-        it.required(
+        it.argument(
             CommandComponent.builder<C, T>().key(name).parser(parser).optional().also(mutator)
         )
     }
