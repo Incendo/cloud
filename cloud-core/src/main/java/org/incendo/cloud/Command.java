@@ -168,9 +168,7 @@ public class Command<C> {
         final List<CommandComponent<C>> commands = new ArrayList<>();
         final ParserDescriptor<C, String> staticParser = LiteralParser.literal(commandName, aliases);
         commands.add(
-                CommandComponent.<C, String>builder()
-                        .name(commandName)
-                        .parser(staticParser)
+                CommandComponent.builder(commandName, staticParser)
                         .description(description)
                         .build()
         );
@@ -659,7 +657,7 @@ public class Command<C> {
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<? super C, T> parser
         ) {
-            return this.argument(CommandComponent.<C, T>builder().name(name).parser(parser).build());
+            return this.argument(CommandComponent.<C, T>builder(name, parser).build());
         }
 
         /**
@@ -678,9 +676,7 @@ public class Command<C> {
                 final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .name(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .suggestionProvider(suggestions)
                             .build()
             );
@@ -699,7 +695,7 @@ public class Command<C> {
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<? super C, T> parser
         ) {
-            return this.argument(CommandComponent.<C, T>builder().key(name).parser(parser).build());
+            return this.argument(CommandComponent.<C, T>builder(name, parser).build());
         }
 
         /**
@@ -718,9 +714,7 @@ public class Command<C> {
                 final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .key(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .suggestionProvider(suggestions)
                             .build()
             );
@@ -741,7 +735,7 @@ public class Command<C> {
                 final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description
         ) {
-            return this.argument(CommandComponent.<C, T>builder().key(name).parser(parser).description(description).build());
+            return this.argument(CommandComponent.<C, T>builder(name, parser).description(description).build());
         }
 
         /**
@@ -762,9 +756,7 @@ public class Command<C> {
                 final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .key(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .description(description)
                             .suggestionProvider(suggestions)
                             .build()
@@ -786,7 +778,7 @@ public class Command<C> {
                 final @NonNull ParserDescriptor<? super C, T> parser,
                 final @NonNull Description description
         ) {
-            return this.argument(CommandComponent.<C, T>builder().name(name).parser(parser).description(description).build());
+            return this.argument(CommandComponent.<C, T>builder(name, parser).description(description).build());
         }
 
         /**
@@ -807,9 +799,7 @@ public class Command<C> {
                 final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .name(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .description(description)
                             .suggestionProvider(suggestions)
                             .build()
@@ -830,7 +820,7 @@ public class Command<C> {
                 final @NonNull String name,
                 final @NonNull ParserDescriptor<? super C, T> parser
         ) {
-            return this.argument(CommandComponent.<C, T>builder().name(name).parser(parser).optional().build());
+            return this.argument(CommandComponent.<C, T>builder(name, parser).optional().build());
         }
 
         /**
@@ -849,9 +839,7 @@ public class Command<C> {
                 final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .name(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .optional()
                             .suggestionProvider(suggestions)
                             .build()
@@ -871,7 +859,7 @@ public class Command<C> {
                 final @NonNull CloudKey<T> name,
                 final @NonNull ParserDescriptor<? super C, T> parser
         ) {
-            return this.argument(CommandComponent.<C, T>builder().key(name).parser(parser).optional().build());
+            return this.argument(CommandComponent.<C, T>builder(name, parser).optional().build());
         }
 
         /**
@@ -890,9 +878,7 @@ public class Command<C> {
                 final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .key(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .optional()
                             .suggestionProvider(suggestions)
                             .build()
@@ -915,9 +901,7 @@ public class Command<C> {
                 final @NonNull Description description
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .name(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .description(description)
                             .optional()
                             .build()
@@ -942,9 +926,7 @@ public class Command<C> {
                 final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .name(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .description(description)
                             .optional()
                             .suggestionProvider(suggestions)
@@ -968,9 +950,7 @@ public class Command<C> {
                 final @NonNull Description description
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .key(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .description(description)
                             .optional()
                             .build()
@@ -995,9 +975,7 @@ public class Command<C> {
                 final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .key(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .description(description)
                             .optional()
                             .suggestionProvider(suggestions)
@@ -1021,9 +999,7 @@ public class Command<C> {
                 final @NonNull DefaultValue<? super C, T> defaultValue
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .name(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .optional(defaultValue)
                             .build()
             );
@@ -1047,9 +1023,7 @@ public class Command<C> {
                 final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .name(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .optional(defaultValue)
                             .suggestionProvider(suggestions)
                             .build()
@@ -1072,9 +1046,7 @@ public class Command<C> {
                 final @NonNull DefaultValue<? super C, T> defaultValue
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .key(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .optional(defaultValue)
                             .build()
             );
@@ -1098,9 +1070,7 @@ public class Command<C> {
                 final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .key(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .optional(defaultValue)
                             .suggestionProvider(suggestions)
                             .build()
@@ -1125,9 +1095,7 @@ public class Command<C> {
                 final @NonNull Description description
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .name(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .optional(defaultValue)
                             .description(description)
                             .build()
@@ -1154,9 +1122,7 @@ public class Command<C> {
                 final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .name(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .optional(defaultValue)
                             .description(description)
                             .suggestionProvider(suggestions)
@@ -1182,9 +1148,7 @@ public class Command<C> {
                 final @NonNull Description description
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .key(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .optional(defaultValue)
                             .description(description)
                             .build()
@@ -1211,9 +1175,7 @@ public class Command<C> {
                 final @NonNull SuggestionProvider<? super C> suggestions
         ) {
             return this.argument(
-                    CommandComponent.<C, T>builder()
-                            .key(name)
-                            .parser(parser)
+                    CommandComponent.<C, T>builder(name, parser)
                             .optional(defaultValue)
                             .description(description)
                             .suggestionProvider(suggestions)
