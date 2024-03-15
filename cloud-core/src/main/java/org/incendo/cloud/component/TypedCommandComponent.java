@@ -33,12 +33,11 @@ import org.incendo.cloud.description.Description;
 import org.incendo.cloud.key.CloudKey;
 import org.incendo.cloud.key.CloudKeyHolder;
 import org.incendo.cloud.parser.ArgumentParser;
-import org.incendo.cloud.parser.ParserDescriptor;
 import org.incendo.cloud.suggestion.SuggestionProvider;
 
 @SuppressWarnings("unchecked")
 @API(status = API.Status.STABLE)
-public final class TypedCommandComponent<C, T> extends CommandComponent<C> implements CloudKeyHolder<T>, ParserDescriptor<C, T> {
+public final class TypedCommandComponent<C, T> extends CommandComponent<C> implements CloudKeyHolder<T> {
 
     TypedCommandComponent(
             final @NonNull String name,

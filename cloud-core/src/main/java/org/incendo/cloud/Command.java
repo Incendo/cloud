@@ -39,12 +39,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.incendo.cloud.component.CommandComponent;
 import org.incendo.cloud.component.DefaultValue;
-import org.incendo.cloud.component.preprocessor.PreprocessorHolder;
 import org.incendo.cloud.description.CommandDescription;
 import org.incendo.cloud.description.Description;
 import org.incendo.cloud.execution.CommandExecutionHandler;
 import org.incendo.cloud.key.CloudKey;
-import org.incendo.cloud.key.CloudKeyHolder;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.parser.ParserDescriptor;
 import org.incendo.cloud.parser.ParserRegistry;
@@ -589,33 +587,6 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given required {@code argument} to the command
-         *
-         * @param argument    argument to add
-         * @param description description of the argument
-         * @param <U>         type of the argument
-         * @return new builder instance with the command argument inserted into the argument list
-         */
-        @SuppressWarnings({"unchecked", "rawtypes"})
-        @API(status = API.Status.STABLE)
-        public <U extends CloudKeyHolder & ParserDescriptor> @NonNull Builder<C> required(
-                final @NonNull U argument,
-                final @NonNull Description description
-        ) {
-            final CommandComponent.Builder builder = CommandComponent.builder()
-                    .key(argument.key())
-                    .parser(argument)
-                    .description(description);
-            if (argument instanceof SuggestionProvider) {
-                builder.suggestionProvider((SuggestionProvider<? super C>) argument);
-            }
-            if (argument instanceof PreprocessorHolder) {
-                builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
-            }
-            return this.argument(builder);
-        }
-
-        /**
          * Marks the {@code builder} as required and adds it to the command.
          *
          * @param name    the name that will be inserted into the builder
@@ -673,83 +644,6 @@ public class Command<C> {
                 final CommandComponent.@NonNull Builder builder
         ) {
             return this.argument(builder.optional());
-        }
-
-        /**
-         * Adds the given optional {@code argument} to the command with no default value.
-         *
-         * @param argument    argument to add
-         * @param description description of the argument
-         * @param <U>         type of the argument
-         * @return new builder instance with the command argument inserted into the argument list
-         */
-        @SuppressWarnings({"unchecked", "rawtypes"})
-        @API(status = API.Status.STABLE)
-        public <U extends CloudKeyHolder & ParserDescriptor> @NonNull Builder<C> optional(
-                final @NonNull U argument,
-                final @NonNull Description description
-        ) {
-            final CommandComponent.Builder builder = CommandComponent.builder()
-                    .key(argument.key())
-                    .parser(argument)
-                    .optional()
-                    .description(description);
-            if (argument instanceof SuggestionProvider) {
-                builder.suggestionProvider((SuggestionProvider<? super C>) argument);
-            }
-            if (argument instanceof PreprocessorHolder) {
-                builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
-            }
-            return this.argument(builder);
-        }
-
-        /**
-         * Adds the given required argument to the command.
-         *
-         * @param argument the argument
-         * @param <U>      type of the argument
-         * @return new builder instance with the command argument inserted into the argument list
-         */
-        @SuppressWarnings({"unchecked", "rawtypes"})
-        @API(status = API.Status.STABLE)
-        public <U extends CloudKeyHolder & ParserDescriptor> @NonNull Builder<C> required(
-                final @NonNull U argument
-        ) {
-            final CommandComponent.Builder builder = CommandComponent.builder()
-                    .key(argument.key())
-                    .parser(argument);
-            if (argument instanceof SuggestionProvider) {
-                builder.suggestionProvider((SuggestionProvider<? super C>) argument);
-            }
-            if (argument instanceof PreprocessorHolder) {
-                builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
-            }
-            return this.argument(builder);
-        }
-
-        /**
-         * Adds the given optional argument to the command.
-         *
-         * @param argument the argument
-         * @param <U>      type of the argument
-         * @return new builder instance with the command argument inserted into the argument list
-         */
-        @SuppressWarnings({"unchecked", "rawtypes"})
-        @API(status = API.Status.STABLE)
-        public <U extends CloudKeyHolder & ParserDescriptor> @NonNull Builder<C> optional(
-                final @NonNull U argument
-        ) {
-            final CommandComponent.Builder builder = CommandComponent.builder()
-                    .key(argument.key())
-                    .parser(argument)
-                    .optional();
-            if (argument instanceof SuggestionProvider) {
-                builder.suggestionProvider((SuggestionProvider<? super C>) argument);
-            }
-            if (argument instanceof PreprocessorHolder) {
-                builder.preprocessors(((PreprocessorHolder) argument).preprocessors());
-            }
-            return this.argument(builder);
         }
 
         /**
