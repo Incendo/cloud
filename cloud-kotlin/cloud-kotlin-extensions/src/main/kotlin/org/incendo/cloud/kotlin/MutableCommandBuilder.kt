@@ -35,6 +35,7 @@ import org.incendo.cloud.key.CloudKey
 import org.incendo.cloud.kotlin.extension.command
 import org.incendo.cloud.kotlin.extension.senderType
 import org.incendo.cloud.parser.ParserDescriptor
+import org.incendo.cloud.parser.flag.CommandFlag
 import org.incendo.cloud.permission.Permission
 import kotlin.reflect.KClass
 
@@ -42,7 +43,7 @@ import kotlin.reflect.KClass
  * A mutable [Command.Builder] wrapper, providing functions to assist in creating commands using the
  * Kotlin builder DSL style
  *
- * @property commandBuilder the command builder the mutate
+ * @property commandBuilder the command builder to mutate
  * @property commandManager the command manager which will own this command
  * @constructor Create a new [MutableCommandBuilder]
  */
@@ -367,6 +368,16 @@ public class MutableCommandBuilder<C : Any>(
      * @param component component to add
      * @return this mutable builder
      */
+    public fun <T> argument(
+        component: CommandComponent.Builder<C, T>
+    ): MutableCommandBuilder<C> = mutate { it.argument(component) }
+
+    /**
+     * Adds a new component to this command
+     *
+     * @param component component to add
+     * @return this mutable builder
+     */
     public fun required(
         component: CommandComponent.Builder<C, *>
     ): MutableCommandBuilder<C> = mutate { it.required(component) }
@@ -393,11 +404,7 @@ public class MutableCommandBuilder<C : Any>(
         name: String,
         parser: ParserDescriptor<C, T>,
         mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
-    ): MutableCommandBuilder<C> = mutate {
-        it.argument(
-            CommandComponent.builder(name, parser).also(mutator)
-        )
-    }
+    ): MutableCommandBuilder<C> = argument(CommandComponent.builder(name, parser).also(mutator))
 
     /**
      * Adds a new component to this command
@@ -411,11 +418,7 @@ public class MutableCommandBuilder<C : Any>(
         name: String,
         parser: ParserDescriptor<C, T>,
         mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
-    ): MutableCommandBuilder<C> = mutate {
-        it.argument(
-            CommandComponent.builder(name, parser).optional().also(mutator)
-        )
-    }
+    ): MutableCommandBuilder<C> = argument(CommandComponent.builder(name, parser).optional().also(mutator))
 
     /**
      * Adds a new component to this command
@@ -429,11 +432,7 @@ public class MutableCommandBuilder<C : Any>(
         name: CloudKey<T>,
         parser: ParserDescriptor<C, T>,
         mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
-    ): MutableCommandBuilder<C> = mutate {
-        it.argument(
-            CommandComponent.builder(name, parser).also(mutator)
-        )
-    }
+    ): MutableCommandBuilder<C> = argument(CommandComponent.builder(name, parser).also(mutator))
 
     /**
      * Adds a new component to this command
@@ -447,11 +446,7 @@ public class MutableCommandBuilder<C : Any>(
         name: CloudKey<T>,
         parser: ParserDescriptor<C, T>,
         mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
-    ): MutableCommandBuilder<C> = mutate {
-        it.argument(
-            CommandComponent.builder(name, parser).optional().also(mutator)
-        )
-    }
+    ): MutableCommandBuilder<C> = argument(CommandComponent.builder(name, parser).optional().also(mutator))
 
     /**
      * Add a new argument to this command
@@ -461,7 +456,7 @@ public class MutableCommandBuilder<C : Any>(
      */
     public fun argument(
         componentSupplier: () -> CommandComponent<C>
-    ): MutableCommandBuilder<C> = mutate { it.argument(componentSupplier()) }
+    ): MutableCommandBuilder<C> = argument(componentSupplier())
 
     /**
      * Add a new argument to this command
@@ -481,7 +476,7 @@ public class MutableCommandBuilder<C : Any>(
      */
     public fun optional(
         componentSupplier: () -> CommandComponent.Builder<C, *>
-    ): MutableCommandBuilder<C> = mutate { it.optional(componentSupplier()) }
+    ): MutableCommandBuilder<C> = optional(componentSupplier())
 
     /**
      * Add a new literal argument to this command
@@ -506,6 +501,15 @@ public class MutableCommandBuilder<C : Any>(
     public fun handler(handler: CommandExecutionHandler<C>): MutableCommandBuilder<C> = mutate {
         it.handler(handler)
     }
+
+    /**
+     * Set the [CommandExecutionHandler] for this builder
+     *
+     * @param handler command execution handler
+     * @return this mutable builder
+     */
+    public fun futureHandler(handler: CommandExecutionHandler.FutureCommandExecutionHandler<C>): MutableCommandBuilder<C> =
+        mutate { it.futureHandler(handler) }
 
     /**
      * Sets a new command execution handler that invokes the given {@code handler} before the current
@@ -535,7 +539,7 @@ public class MutableCommandBuilder<C : Any>(
      * @param name name of the flag
      * @param aliases flag aliases
      * @param description description of the flag
-     * @param componentSupplier component supplier for the flag
+     * @param parser parser for the flag
      * @param <T> the component value type
      * @return this mutable builder
      */
@@ -543,14 +547,40 @@ public class MutableCommandBuilder<C : Any>(
         name: String,
         aliases: Array<String> = emptyArray(),
         description: Description = Description.empty(),
-        componentSupplier: () -> TypedCommandComponent<C, T>
+        parser: ParserDescriptor<C, T>
     ): MutableCommandBuilder<C> = mutate {
         it.flag(
             this.commandManager
                 .flagBuilder(name)
                 .withAliases(*aliases)
                 .withDescription(description)
-                .withComponent(componentSupplier())
+                .withComponent(parser)
+                .build()
+        )
+    }
+
+    /**
+     * Add a new flag component to this command
+     *
+     * @param name name of the flag
+     * @param aliases flag aliases
+     * @param description description of the flag
+     * @param builderModifier flag builder modifier
+     * @param T the component value type
+     * @return this mutable builder
+     */
+    public fun <T> flag(
+        name: String,
+        aliases: Array<String> = emptyArray(),
+        description: Description = Description.empty(),
+        builderModifier: CommandFlag.Builder<C, Void>.() -> CommandFlag.Builder<C, T>
+    ): MutableCommandBuilder<C> = mutate {
+        it.flag(
+            this.commandManager
+                .flagBuilder(name)
+                .withAliases(*aliases)
+                .withDescription(description)
+                .builderModifier()
                 .build()
         )
     }

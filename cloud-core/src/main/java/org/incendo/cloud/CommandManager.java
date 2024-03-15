@@ -532,7 +532,7 @@ public abstract class CommandManager<C> implements Stateful<RegistrationState>, 
      * @param name Flag name
      * @return Flag builder
      */
-    public CommandFlag.@NonNull Builder<Void> flagBuilder(final @NonNull String name) {
+    public CommandFlag.@NonNull Builder<C, Void> flagBuilder(final @NonNull String name) {
         return CommandFlag.builder(name);
     }
 
