@@ -395,7 +395,7 @@ public class MutableCommandBuilder<C : Any>(
         mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
     ): MutableCommandBuilder<C> = mutate {
         it.argument(
-            CommandComponent.builder<C, T>().name(name).parser(parser).also(mutator)
+            CommandComponent.builder(name, parser).also(mutator)
         )
     }
 
@@ -413,7 +413,7 @@ public class MutableCommandBuilder<C : Any>(
         mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
     ): MutableCommandBuilder<C> = mutate {
         it.argument(
-            CommandComponent.builder<C, T>().name(name).parser(parser).optional().also(mutator)
+            CommandComponent.builder(name, parser).optional().also(mutator)
         )
     }
 
@@ -431,7 +431,7 @@ public class MutableCommandBuilder<C : Any>(
         mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
     ): MutableCommandBuilder<C> = mutate {
         it.argument(
-            CommandComponent.builder<C, T>().key(name).parser(parser).also(mutator)
+            CommandComponent.builder(name, parser).also(mutator)
         )
     }
 
@@ -449,7 +449,7 @@ public class MutableCommandBuilder<C : Any>(
         mutator: CommandComponent.Builder<C, T>.() -> Unit = {}
     ): MutableCommandBuilder<C> = mutate {
         it.argument(
-            CommandComponent.builder<C, T>().key(name).parser(parser).optional().also(mutator)
+            CommandComponent.builder(name, parser).optional().also(mutator)
         )
     }
 

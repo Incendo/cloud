@@ -89,6 +89,44 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
      * <p>The builder returns a {@link TypedCommandComponent} which can be used to retrieve parsed values from the
      * {@link CommandContext}.</p>
      *
+     * @param name             component name
+     * @param parserDescriptor parser descriptor
+     * @param <C>              command sender type
+     * @param <T>              component value type
+     * @return the builder
+     */
+    public static <C, T> @NonNull Builder<C, T> builder(
+            final @NonNull String name,
+            final @NonNull ParserDescriptor<? super C, T> parserDescriptor
+    ) {
+        return CommandComponent.<C, T>builder().name(name).parser(parserDescriptor);
+    }
+
+    /**
+     * Creates a new mutable builder.
+     *
+     * <p>The builder returns a {@link TypedCommandComponent} which can be used to retrieve parsed values from the
+     * {@link CommandContext}.</p>
+     *
+     * @param name             component name
+     * @param parserDescriptor parser descriptor
+     * @param <C>              command sender type
+     * @param <T>              component value type
+     * @return the builder
+     */
+    public static <C, T> @NonNull Builder<C, T> builder(
+            final @NonNull CloudKey<T> name,
+            final @NonNull ParserDescriptor<? super C, T> parserDescriptor
+    ) {
+        return CommandComponent.<C, T>builder().key(name).parser(parserDescriptor);
+    }
+
+    /**
+     * Creates a new mutable builder.
+     *
+     * <p>The builder returns a {@link TypedCommandComponent} which can be used to retrieve parsed values from the
+     * {@link CommandContext}.</p>
+     *
      * @param <C>   command sender type
      * @param <T>   component value type
      * @param clazz type of the component
@@ -351,6 +389,9 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>>, Pre
         private TypeToken<T> valueType;
         private SuggestionProvider<C> suggestionProvider;
         private final Collection<@NonNull ComponentPreprocessor<C>> componentPreprocessors = new ArrayList<>();
+
+        protected Builder() {
+        }
 
         /**
          * Sets the command manager, which will be used to create a parser if none is provided.
