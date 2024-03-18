@@ -75,11 +75,12 @@ public final class CommandFlag<T> {
     /**
      * Create a new {@link Builder}.
      *
+     * @param <C> command sender type
      * @param name flag name
      * @return new {@link Builder}
      */
     @API(status = API.Status.STABLE)
-    public static @NonNull Builder<Void> builder(final @NonNull String name) {
+    public static <C> @NonNull Builder<C, Void> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
@@ -165,13 +166,13 @@ public final class CommandFlag<T> {
 
 
     @API(status = API.Status.STABLE)
-    public static final class Builder<T> {
+    public static final class Builder<C, T> {
 
         private final String name;
         private final String[] aliases;
         private final Description description;
         private final Permission permission;
-        private final TypedCommandComponent<?, T> commandComponent;
+        private final TypedCommandComponent<C, T> commandComponent;
         private final FlagMode mode;
 
         private Builder(
@@ -179,7 +180,7 @@ public final class CommandFlag<T> {
                 final @NonNull String[] aliases,
                 final @NonNull Description description,
                 final @NonNull Permission permission,
-                final @Nullable TypedCommandComponent<?, T> commandComponent,
+                final @Nullable TypedCommandComponent<C, T> commandComponent,
                 final @NonNull FlagMode mode
         ) {
             this.name = name;
@@ -201,7 +202,7 @@ public final class CommandFlag<T> {
          * @param aliases Flag aliases
          * @return New builder instance
          */
-        public @NonNull Builder<T> withAliases(final @NonNull String... aliases) {
+        public @NonNull Builder<C, T> withAliases(final @NonNull String... aliases) {
             return this.withAliases(Arrays.asList(aliases));
         }
 
@@ -213,7 +214,7 @@ public final class CommandFlag<T> {
          * @return New builder instance
          */
         @API(status = API.Status.STABLE)
-        public @NonNull Builder<T> withAliases(final @NonNull Collection<@NonNull String> aliases) {
+        public @NonNull Builder<C, T> withAliases(final @NonNull Collection<@NonNull String> aliases) {
             final Set<String> filteredAliases = new HashSet<>();
             for (final String alias : aliases) {
                 if (alias.isEmpty()) {
@@ -246,7 +247,7 @@ public final class CommandFlag<T> {
          * @return New builder instance
          */
         @API(status = API.Status.STABLE)
-        public @NonNull Builder<T> withDescription(final @NonNull Description description) {
+        public @NonNull Builder<C, T> withDescription(final @NonNull Description description) {
             return new Builder<>(this.name, this.aliases, description, this.permission, this.commandComponent, this.mode);
         }
 
@@ -257,7 +258,7 @@ public final class CommandFlag<T> {
          * @param <N>     New component type
          * @return New builder instance
          */
-        public <N> @NonNull Builder<N> withComponent(final @NonNull TypedCommandComponent<?, N> component) {
+        public <N> @NonNull Builder<C, N> withComponent(final @NonNull TypedCommandComponent<C, N> component) {
             return new Builder<>(this.name, this.aliases, this.description, this.permission, component, this.mode);
         }
 
@@ -268,17 +269,8 @@ public final class CommandFlag<T> {
          * @param <N>              new component type
          * @return New builder instance
          */
-        @SuppressWarnings({"rawtypes", "unchecked"})
-        public <N> @NonNull Builder<N> withComponent(final @NonNull ParserDescriptor<?, N> parserDescriptor) {
-            final CommandComponent.Builder builder = CommandComponent.builder();
-            return new Builder<>(
-                    this.name,
-                    this.aliases,
-                    this.description,
-                    this.permission,
-                    builder.name(this.name).parser(parserDescriptor).build(),
-                    this.mode
-            );
+        public <N> @NonNull Builder<C, N> withComponent(final @NonNull ParserDescriptor<? super C, N> parserDescriptor) {
+            return this.withComponent(CommandComponent.builder(this.name, parserDescriptor));
         }
 
         /**
@@ -288,7 +280,7 @@ public final class CommandFlag<T> {
          * @param <N>     New component type
          * @return New builder instance
          */
-        public <N> @NonNull Builder<N> withComponent(final CommandComponent.@NonNull Builder<?, N> builder) {
+        public <N> @NonNull Builder<C, N> withComponent(final CommandComponent.@NonNull Builder<C, N> builder) {
             return this.withComponent(builder.build());
         }
 
@@ -299,8 +291,19 @@ public final class CommandFlag<T> {
          * @return New builder instance
          */
         @API(status = API.Status.STABLE)
-        public @NonNull Builder<T> withPermission(final @NonNull Permission permission) {
+        public @NonNull Builder<C, T> withPermission(final @NonNull Permission permission) {
             return new Builder<>(this.name, this.aliases, this.description, permission, this.commandComponent, this.mode);
+        }
+
+        /**
+         * Create a new builder instance using the given flag permission
+         *
+         * @param permissionString Flag permission
+         * @return New builder instance
+         */
+        @API(status = API.Status.STABLE)
+        public @NonNull Builder<C, T> withPermission(final @NonNull String permissionString) {
+            return this.withPermission(Permission.of(permissionString));
         }
 
         /**
@@ -309,7 +312,7 @@ public final class CommandFlag<T> {
          * @return new builder instance
          */
         @API(status = API.Status.STABLE)
-        public @NonNull Builder<T> asRepeatable() {
+        public @NonNull Builder<C, T> asRepeatable() {
             return new Builder<>(
                     this.name,
                     this.aliases,

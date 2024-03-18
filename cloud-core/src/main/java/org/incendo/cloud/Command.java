@@ -2077,7 +2077,7 @@ public class Command<C> {
          * @param <T>     flag value type
          * @return new builder instance that uses the provided flag
          */
-        public @NonNull <T> Builder<C> flag(final CommandFlag.@NonNull Builder<T> builder) {
+        public @NonNull <T> Builder<C> flag(final CommandFlag.@NonNull Builder<C, T> builder) {
             return this.flag(builder.build());
         }
 

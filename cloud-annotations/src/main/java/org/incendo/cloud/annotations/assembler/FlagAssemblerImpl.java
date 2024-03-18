@@ -71,7 +71,7 @@ public final class FlagAssemblerImpl implements FlagAssembler {
             permission = descriptor.permission();
         }
 
-        CommandFlag.Builder<Void> builder = this.commandManager
+        CommandFlag.Builder<?, Void> builder = this.commandManager
                 .flagBuilder(descriptor.name())
                 .withDescription(description)
                 .withAliases(descriptor.aliases())
