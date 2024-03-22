@@ -61,5 +61,13 @@ public enum ManagerSetting implements Setting {
      * and code inspecting the command tree may need to be adjusted.
      */
     @API(status = API.Status.EXPERIMENTAL)
-    LIBERAL_FLAG_PARSING
+    LIBERAL_FLAG_PARSING,
+
+    /**
+     * When the sender does not have permission for the parsed command, but does have permission for a preceding or following
+     * node, the command tree will return a {@link org.incendo.cloud.exception.InvalidSyntaxException} instead of a
+     * {@link org.incendo.cloud.exception.NoPermissionException}.
+     */
+    @API(status = API.Status.EXPERIMENTAL)
+    HIDE_COMMAND_EXISTENCE
 }

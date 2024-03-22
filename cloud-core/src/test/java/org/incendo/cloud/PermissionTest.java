@@ -24,12 +24,14 @@
 package org.incendo.cloud;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.incendo.cloud.exception.InvalidSyntaxException;
 import org.incendo.cloud.exception.NoPermissionException;
 import org.incendo.cloud.execution.CommandResult;
 import org.incendo.cloud.execution.ExecutionCoordinator;
@@ -37,10 +39,14 @@ import org.incendo.cloud.key.CloudKey;
 import org.incendo.cloud.permission.Permission;
 import org.incendo.cloud.permission.PermissionResult;
 import org.incendo.cloud.permission.PredicatePermission;
+import org.incendo.cloud.setting.ManagerSetting;
 import org.incendo.cloud.suggestion.Suggestion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -54,7 +60,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PermissionTest {
 
-    @Mock(strictness = Mock.Strictness.LENIENT) private Function<String, Boolean> permissionFunction;
+    @Mock(strictness = Mock.Strictness.LENIENT)
+    private Function<String, Boolean> permissionFunction;
 
     private CommandManager<TestCommandSender> manager;
 
@@ -117,9 +124,16 @@ class PermissionTest {
         assertThat(exception).hasCauseThat().isInstanceOf(NoPermissionException.class);
     }
 
-    @Test
-    void testPermittedNodeFollowingNotPermittedNode() {
+    @ParameterizedTest
+    @MethodSource
+    void testPermittedNodeFollowingNotPermittedNode(
+            final Class<? extends Exception> expectedException,
+            final List<ManagerSetting> settings
+    ) {
         // Arrange
+        for (final ManagerSetting setting : settings) {
+            this.manager.settings().set(setting, true);
+        }
         this.manager.command(this.manager.commandBuilder("root")
                 .literal("no")
                 .permission("0"));
@@ -136,8 +150,16 @@ class PermissionTest {
                 .executeCommand(sender, "root no yes");
 
         // Assert
-        assertThat(noPermission).hasFailureThat().isInstanceOf(NoPermissionException.class);
+        assertThat(noPermission).hasFailureThat().isInstanceOf(expectedException);
         assertThat(permitted).hasResult();
+    }
+
+    @SuppressWarnings("unused")
+    private static List<Arguments> testPermittedNodeFollowingNotPermittedNode() {
+        return Arrays.asList(
+                Arguments.of(NoPermissionException.class, Collections.emptyList()),
+                Arguments.of(InvalidSyntaxException.class, Arrays.asList(ManagerSetting.HIDE_COMMAND_EXISTENCE))
+        );
     }
 
     @Test
