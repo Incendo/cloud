@@ -249,17 +249,17 @@ private class KotlinMethodArgumentParser<C : Any, T : Any>(
             .mapResult()
 
     override fun suggestionProvider(): SuggestionProvider<C> = suggestionProvider
-}
 
-@Suppress("UNCHECKED_CAST")
-private fun <T : Any> CompletableFuture<*>.mapResult(): CompletableFuture<ArgumentParseResult<T>> =
-    thenApply {
-        when (it) {
-            null -> ArgumentParseResult.failure(IllegalArgumentException("Result not found"))
-            is ArgumentParseResult<*> -> it as ArgumentParseResult<T>
-            else -> ArgumentParseResult.success(it as T)
+    @Suppress("UNCHECKED_CAST")
+    private fun <T : Any> CompletableFuture<*>.mapResult(): CompletableFuture<ArgumentParseResult<T>> =
+        thenApply {
+            when (it) {
+                null -> ArgumentParseResult.failure(IllegalArgumentException("Result not found"))
+                is ArgumentParseResult<*> -> it as ArgumentParseResult<T>
+                else -> ArgumentParseResult.success(it as T)
+            }
         }
-    }
+}
 
 private fun <C> AnnotatedMethodHandler<C>.executeSuspendFunction(
     coroutineScope: CoroutineScope,
