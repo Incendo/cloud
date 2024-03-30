@@ -251,9 +251,6 @@ private class KotlinMethodArgumentParser<C : Any, T : Any>(
     override fun suggestionProvider(): SuggestionProvider<C> = suggestionProvider
 }
 
-private fun KParameter.hasType(clazz: Class<*>): Boolean =
-    GenericTypeReflector.erase(type.javaType) == clazz
-
 @Suppress("UNCHECKED_CAST")
 private fun <T : Any> CompletableFuture<*>.mapResult(): CompletableFuture<ArgumentParseResult<T>> =
     thenApply {
@@ -322,3 +319,6 @@ private fun <C> AnnotatedMethodHandler<C>.executeSuspendFunction(
         }
     }
 }
+
+private fun KParameter.hasType(clazz: Class<*>): Boolean =
+    GenericTypeReflector.erase(type.javaType) == clazz
