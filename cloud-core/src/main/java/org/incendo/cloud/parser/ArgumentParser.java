@@ -102,7 +102,7 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      */
     @API(status = API.Status.STABLE)
     default @NonNull CompletableFuture<@NonNull ArgumentParseResult<T>> parseFuture(
-            @NonNull CommandContext<@NonNull C> commandContext,
+            @NonNull CommandContext<C> commandContext,
             @NonNull CommandInput commandInput
     ) {
         return CompletableFuture.completedFuture(this.parse(commandContext, commandInput));
@@ -215,7 +215,7 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
 
         @Override
         @NonNull CompletableFuture<@NonNull ArgumentParseResult<T>> parseFuture(
-                @NonNull CommandContext<@NonNull C> commandContext,
+                @NonNull CommandContext<C> commandContext,
                 @NonNull CommandInput commandInput
         );
     }

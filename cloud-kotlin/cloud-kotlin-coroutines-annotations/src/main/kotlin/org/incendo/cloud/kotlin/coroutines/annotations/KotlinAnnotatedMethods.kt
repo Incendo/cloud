@@ -70,7 +70,7 @@ import kotlin.reflect.typeOf
  * @param onlyForSuspending whether the Kotlin execution handler should only be used for suspending functions
  * @return annotation parser
  */
-public fun <C : Any> AnnotationParser<C>.installCoroutineSupport(
+public fun <C> AnnotationParser<C>.installCoroutineSupport(
     scope: CoroutineScope = GlobalScope,
     context: CoroutineContext = EmptyCoroutineContext,
     onlyForSuspending: Boolean = false
@@ -166,7 +166,7 @@ private class KotlinSuggestionProvider<C>(
     }
 }
 
-private class KotlinMethodArgumentParserFactory<C : Any>(
+private class KotlinMethodArgumentParserFactory<C>(
     private val coroutineScope: CoroutineScope,
     private val coroutineContext: CoroutineContext,
     private val parameterInjectorRegistry: ParameterInjectorRegistry<C>
@@ -219,7 +219,7 @@ private class KotlinMethodArgumentParserFactory<C : Any>(
     }
 }
 
-private class KotlinMethodArgumentParser<C : Any, T : Any>(
+private class KotlinMethodArgumentParser<C, T>(
     private val coroutineScope: CoroutineScope,
     private val coroutineContext: CoroutineContext,
     private val kFunction: KFunction<*>,
@@ -251,12 +251,12 @@ private class KotlinMethodArgumentParser<C : Any, T : Any>(
     override fun suggestionProvider(): SuggestionProvider<C> = suggestionProvider
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T : Any> CompletableFuture<*>.mapResult(): CompletableFuture<ArgumentParseResult<T>> =
+    private fun <T> CompletableFuture<*>.mapResult(): CompletableFuture<ArgumentParseResult<T>> =
         thenApply {
             when (it) {
                 null -> ArgumentParseResult.failure(IllegalArgumentException("Result not found"))
                 is ArgumentParseResult<*> -> it as ArgumentParseResult<T>
-                else -> ArgumentParseResult.success(it as T)
+                else -> ArgumentParseResult.success((it as T)!!)
             }
         }
 }
