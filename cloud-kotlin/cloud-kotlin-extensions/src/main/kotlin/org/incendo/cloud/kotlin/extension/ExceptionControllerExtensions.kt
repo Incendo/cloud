@@ -23,6 +23,7 @@
 //
 package org.incendo.cloud.kotlin.extension
 
+import org.checkerframework.checker.units.qual.C
 import org.checkerframework.common.returnsreceiver.qual.This
 import org.incendo.cloud.exception.handling.ExceptionController
 import org.incendo.cloud.exception.handling.ExceptionHandler
@@ -36,7 +37,7 @@ import org.incendo.cloud.exception.handling.ExceptionHandlerRegistration
  *
  * @return [this] exception controller
  */
-public inline fun <C, reified T : Throwable> @This ExceptionController<C>.register(
+public inline fun <reified T : Throwable> @This ExceptionController<C>.register(
     decorator: ExceptionHandlerRegistration.BuilderDecorator<C, T>
 ): ExceptionController<C> = this.register(T::class.java, decorator)
 
@@ -48,6 +49,6 @@ public inline fun <C, reified T : Throwable> @This ExceptionController<C>.regist
  *
  * @return [this] exception controller
  */
-public inline fun <C, reified T : Throwable> @This ExceptionController<C>.registerHandler(
+public inline fun <reified T : Throwable> @This ExceptionController<C>.registerHandler(
     handler: ExceptionHandler<C, T>
 ): ExceptionController<C> = this.registerHandler(T::class.java, handler)
