@@ -31,7 +31,7 @@ import org.incendo.cloud.description.Description;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.internal.CommandRegistrationHandler;
 import org.incendo.cloud.parser.ArgumentParseResult;
-import org.incendo.cloud.parser.compound.ArgumentTriplet;
+import org.incendo.cloud.parser.aggregate.AggregateParser;
 import org.incendo.cloud.parser.standard.IntegerParser;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.setting.ManagerSetting;
@@ -101,11 +101,11 @@ class CommandSuggestionsTest {
         this.manager.command(manager.commandBuilder("flags3")
                 .flag(manager.flagBuilder("compound")
                         .withComponent(
-                                ArgumentTriplet.of(
+                                AggregateParser.tripletBuilder(
                                         manager,
                                         Triplet.of("x", "y", "z"),
                                         Triplet.of(int.class, int.class, int.class)
-                                ).simple()
+                                ).build()
                         )
                 )
                 .flag(manager.flagBuilder("presence").withAliases("p"))

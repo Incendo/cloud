@@ -39,7 +39,7 @@ public class AggregateParserBuilder<C> {
 
     private final List<CommandComponent<C>> components;
 
-    AggregateParserBuilder(final @NonNull List<CommandComponent<C>> components) {
+    AggregateParserBuilder(final @NonNull List<? extends CommandComponent<C>> components) {
         this.components = Collections.unmodifiableList(components);
     }
 
@@ -156,7 +156,7 @@ public class AggregateParserBuilder<C> {
             final @NonNull String name,
             final @NonNull ParserDescriptor<C, T> parserDescriptor,
             final @NonNull SuggestionProvider<C> suggestionProvider
-            ) {
+    ) {
         return this.withComponent(
                 CommandComponent.<C, T>builder()
                         .name(name)

@@ -46,8 +46,7 @@ import org.incendo.cloud.key.CloudKey;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.parser.ParserDescriptor;
 import org.incendo.cloud.parser.ParserRegistry;
-import org.incendo.cloud.parser.compound.ArgumentPair;
-import org.incendo.cloud.parser.compound.ArgumentTriplet;
+import org.incendo.cloud.parser.aggregate.AggregateParser;
 import org.incendo.cloud.parser.flag.CommandFlag;
 import org.incendo.cloud.parser.flag.CommandFlagParser;
 import org.incendo.cloud.parser.standard.LiteralParser;
@@ -1296,7 +1295,7 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    ArgumentPair.of(this.commandManager, names, parserPair).simple(),
+                    AggregateParser.pairBuilder(this.commandManager, names, parserPair).build(),
                     description
             );
         }
@@ -1330,7 +1329,7 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    ArgumentPair.of(this.commandManager, names, parserPair).simple(),
+                    AggregateParser.<C, U, V>pairBuilder(this.commandManager, names, parserPair).build(),
                     description
             );
         }
@@ -1364,7 +1363,7 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    ArgumentPair.of(this.commandManager, names, parserPair).simple(),
+                    AggregateParser.pairBuilder(this.commandManager, names, parserPair).build(),
                     description
             );
         }
@@ -1398,7 +1397,7 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    ArgumentPair.of(this.commandManager, names, parserPair).simple(),
+                    AggregateParser.<C, U, V>pairBuilder(this.commandManager, names, parserPair).build(),
                     description
             );
         }
@@ -1437,7 +1436,8 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    ArgumentPair.of(this.commandManager, names, parserPair).withMapper(outputType, mapper),
+                    AggregateParser.<C, U, V>pairBuilder(this.commandManager, names, parserPair).withMapper(outputType, mapper)
+                            .build(),
                     description
             );
         }
@@ -1476,7 +1476,8 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    ArgumentPair.of(this.commandManager, names, parserPair).withMapper(outputType, mapper),
+                    AggregateParser.<C, U, V>pairBuilder(this.commandManager, names, parserPair).withMapper(outputType, mapper)
+                            .build(),
                     description
             );
         }
@@ -1515,7 +1516,8 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    ArgumentPair.of(this.commandManager, names, parserPair).withMapper(outputType, mapper),
+                    AggregateParser.<C, U, V>pairBuilder(this.commandManager, names, parserPair).withMapper(outputType, mapper)
+                            .build(),
                     description
             );
         }
@@ -1554,7 +1556,8 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    ArgumentPair.of(this.commandManager, names, parserPair).withMapper(outputType, mapper),
+                    AggregateParser.<C, U, V>pairBuilder(this.commandManager, names, parserPair).withMapper(outputType, mapper)
+                            .build(),
                     description
             );
         }
@@ -1589,7 +1592,7 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).simple(),
+                    AggregateParser.tripletBuilder(this.commandManager, names, parserTriplet).build(),
                     description
             );
         }
@@ -1624,7 +1627,7 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).simple(),
+                    AggregateParser.<C, U, V, W>tripletBuilder(this.commandManager, names, parserTriplet).build(),
                     description
             );
         }
@@ -1659,7 +1662,7 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).simple(),
+                    AggregateParser.<C, U, V, W>tripletBuilder(this.commandManager, names, parserTriplet).build(),
                     description
             );
         }
@@ -1694,7 +1697,7 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).simple(),
+                    AggregateParser.<C, U, V, W>tripletBuilder(this.commandManager, names, parserTriplet).build(),
                     description
             );
         }
@@ -1734,7 +1737,9 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).withMapper(outputType, mapper),
+                    AggregateParser.<C, U, V, W>tripletBuilder(this.commandManager, names, parserTriplet)
+                            .withMapper(outputType, mapper)
+                            .build(),
                     description
             );
         }
@@ -1774,7 +1779,9 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).withMapper(outputType, mapper),
+                    AggregateParser.<C, U, V, W>tripletBuilder(this.commandManager, names, parserTriplet)
+                            .withMapper(outputType, mapper)
+                            .build(),
                     description
             );
         }
@@ -1814,7 +1821,9 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).withMapper(outputType, mapper),
+                    AggregateParser.<C, U, V, W>tripletBuilder(this.commandManager, names, parserTriplet)
+                            .withMapper(outputType, mapper)
+                            .build(),
                     description
             );
         }
@@ -1854,7 +1863,9 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    ArgumentTriplet.of(this.commandManager, names, parserTriplet).withMapper(outputType, mapper),
+                    AggregateParser.<C, U, V, W>tripletBuilder(this.commandManager, names, parserTriplet)
+                            .withMapper(outputType, mapper)
+                            .build(),
                     description
             );
         }
