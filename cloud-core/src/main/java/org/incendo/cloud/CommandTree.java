@@ -281,7 +281,6 @@ public final class CommandTree<C> {
                 final CommandInput currentInput = commandInput.copy();
 
                 parsingContext.markStart();
-                commandContext.currentComponent(component);
 
                 return component.parser()
                         .parseFuture(commandContext, commandInput)
@@ -553,8 +552,6 @@ public final class CommandTree<C> {
             return CompletableFuture.completedFuture(preParseResult);
         }
 
-        commandContext.currentComponent(node.component());
-
         // Skip a single space (argument delimiter)
         commandInput.skipWhitespace(1);
         // Copy the current queue so that we can deduce the captured input.
@@ -661,7 +658,6 @@ public final class CommandTree<C> {
                     continue;
                 }
 
-                context.commandContext().currentComponent(childComponent);
                 final ArgumentParseResult<?> result = childComponent.parser().parse(
                         context.commandContext(),
                         commandInput
@@ -725,7 +721,6 @@ public final class CommandTree<C> {
             return CompletableFuture.completedFuture(context);
         }
         final CommandComponent<C> component = Objects.requireNonNull(node.component());
-        context.commandContext().currentComponent(component);
         return component.suggestionProvider()
                 .suggestionsFuture(context.commandContext(), input.copy())
                 .thenApply(suggestionsToAdd -> {
@@ -789,7 +784,6 @@ public final class CommandTree<C> {
             // START: Parsing
             final ParsingContext<C> parsingContext = context.commandContext().createParsingContext(child.component());
             parsingContext.markStart();
-            context.commandContext().currentComponent(child.component());
             final CommandInput preParseInput = commandInput.copy();
 
             parsingFuture = child.component()
@@ -907,7 +901,6 @@ public final class CommandTree<C> {
             final @NonNull CommandInput input,
             final @NonNull Executor executor
     ) {
-        context.commandContext().currentComponent(component);
         return component.suggestionProvider()
                 .suggestionsFuture(context.commandContext(), input.copy())
                 .thenAcceptAsync(context::addSuggestions, executor)
