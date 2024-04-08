@@ -308,11 +308,10 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * Returns the context for the given component.
      *
      * @param component the component
-     * @param <T>       the type of the component
      * @return the context
      */
     @API(status = API.Status.MAINTAINED)
-    public <T> @NonNull ParsingContext<C> parsingContext(final @NonNull CommandComponent<C> component) {
+    public @NonNull ParsingContext<C> parsingContext(final @NonNull CommandComponent<C> component) {
         return this.parsingContexts.stream()
                 .filter(context -> context.component().equals(component))
                 .findFirst()
