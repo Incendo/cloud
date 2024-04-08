@@ -34,7 +34,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.caption.Caption;
 import org.incendo.cloud.caption.CaptionFormatter;
@@ -63,8 +62,6 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
     private final boolean suggestions;
     private final CaptionRegistry<C> captionRegistry;
     private final CommandManager<C> commandManager;
-
-    private CommandComponent<C> currentComponent = null;
 
     /**
      * Creates a new command context instance.
@@ -277,8 +274,10 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
             final @NonNull CloudKey<T> key,
             final @NonNull Function<CloudKey<T>, T> defaultFunction
     ) {
-        @SuppressWarnings("unchecked")
-        final T castedValue = (T) this.internalStorage.computeIfAbsent(key, k -> defaultFunction.apply((CloudKey<T>) k));
+        @SuppressWarnings("unchecked") final T castedValue = (T) this.internalStorage.computeIfAbsent(
+                key,
+                k -> defaultFunction.apply((CloudKey<T>) k)
+        );
         return castedValue;
     }
 
@@ -309,8 +308,8 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      * Returns the context for the given component.
      *
      * @param component the component
+     * @param <T>       the type of the component
      * @return the context
-     * @param <T> the type of the component
      */
     @API(status = API.Status.MAINTAINED)
     public <T> @NonNull ParsingContext<C> parsingContext(final @NonNull CommandComponent<C> component) {
@@ -362,30 +361,6 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      */
     public @NonNull FlagContext flags() {
         return this.flagContext;
-    }
-
-    /**
-     * Returns the component that is currently being parsed for this command context.
-     * This value will be updated whenever the context is used to provide new
-     * suggestions or parse a new command argument.
-     *
-     * @return the {@link CommandComponent} that is currently being parsed, or {@code null}
-     */
-    @API(status = API.Status.STABLE)
-    public @Nullable CommandComponent<C> currentComponent() {
-        return this.currentComponent;
-    }
-
-    /**
-     * Sets the component that is currently being parsed for this command context.
-     * This value should be updated whenever the context is used to provide new
-     * suggestions or parse a new command argument.
-     *
-     * @param component the component that is currently being parsed, or {@code null}
-     */
-    @API(status = API.Status.STABLE)
-    public void currentComponent(final @Nullable CommandComponent<C> component) {
-        this.currentComponent = component;
     }
 
     /**
