@@ -23,10 +23,15 @@
 //
 package org.incendo.cloud.parser.aggregate;
 
+import io.leangen.geantyref.GenericTypeReflector;
+import io.leangen.geantyref.TypeFactory;
+import io.leangen.geantyref.TypeToken;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.caption.CaptionVariable;
 import org.incendo.cloud.caption.StandardCaptionKeys;
 import org.incendo.cloud.component.CommandComponent;
@@ -37,7 +42,11 @@ import org.incendo.cloud.key.CloudKey;
 import org.incendo.cloud.parser.ArgumentParseResult;
 import org.incendo.cloud.parser.ArgumentParser;
 import org.incendo.cloud.parser.ParserDescriptor;
+import org.incendo.cloud.parser.ParserParameters;
+import org.incendo.cloud.parser.ParserRegistry;
 import org.incendo.cloud.suggestion.SuggestionProvider;
+import org.incendo.cloud.type.tuple.Pair;
+import org.incendo.cloud.type.tuple.Triplet;
 
 /**
  * An argument parser that delegates to multiple inner {@link #components()} and transforms the aggregate results into
@@ -69,6 +78,268 @@ public interface AggregateParser<C, O> extends ArgumentParser.FutureArgumentPars
      */
     static <C> @NonNull AggregateParserBuilder<C> builder() {
         return new AggregateParserBuilder<>();
+    }
+
+    /**
+     * Returns a new aggregate pair command parser builder. The builder is immutable, and each method returns
+     * a new builder instance.
+     *
+     * @param firstName    the name of the first component
+     * @param firstParser  the parser for the first component
+     * @param secondName   the name of the second component
+     * @param secondParser the parser for the second component
+     * @param <C>          the command sender type
+     * @param <U>          the type of the first component
+     * @param <V>          the type of the second component
+     * @return the builder
+     */
+    @SuppressWarnings("unchecked")
+    static <C, U, V> @NonNull AggregateParserPairBuilder<C, U, V, Pair<U, V>> pairBuilder(
+            final @NonNull String firstName,
+            final @NonNull ParserDescriptor<C, U> firstParser,
+            final @NonNull String secondName,
+            final @NonNull ParserDescriptor<C, V> secondParser
+    ) {
+        return new AggregateParserPairBuilder<>(
+                CommandComponent.builder(firstName, firstParser).build(),
+                CommandComponent.builder(secondName, secondParser).build(),
+                AggregateParserPairBuilder.defaultMapper(),
+                (TypeToken<Pair<U, V>>) TypeToken.get(TypeFactory.parameterizedClass(
+                        Pair.class,
+                        GenericTypeReflector.box(firstParser.valueType().getType()),
+                        GenericTypeReflector.box(secondParser.valueType().getType())
+                ))
+        );
+    }
+
+    /**
+     * Returns a new aggregate pair command parser builder. The builder is immutable, and each method returns
+     * a new builder instance.
+     *
+     * @param manager    the command manager
+     * @param firstName  the name of the first component
+     * @param firstType  the type of the first component
+     * @param secondName the name of the second component
+     * @param secondType the type of the second component
+     * @param <C>        the command sender type
+     * @param <U>        the type of the first component
+     * @param <V>        the type of the second component
+     * @return the builder
+     */
+    static <C, U, V> @NonNull AggregateParserPairBuilder<C, U, V, Pair<U, V>> pairBuilder(
+            final @NonNull CommandManager<C> manager,
+            final @NonNull String firstName,
+            final @NonNull Class<U> firstType,
+            final @NonNull String secondName,
+            final @NonNull Class<V> secondType
+    ) {
+        return pairBuilder(manager, Pair.of(firstName, secondName), Pair.of(firstType, secondType));
+    }
+
+    /**
+     * Returns a new aggregate pair command parser builder. The builder is immutable, and each method returns
+     * a new builder instance.
+     *
+     * @param manager    the command manager
+     * @param firstName  the name of the first component
+     * @param firstType  the type of the first component
+     * @param secondName the name of the second component
+     * @param secondType the type of the second component
+     * @param <C>        the command sender type
+     * @param <U>        the type of the first component
+     * @param <V>        the type of the second component
+     * @return the builder
+     */
+    static <C, U, V> @NonNull AggregateParserPairBuilder<C, U, V, Pair<U, V>> pairBuilder(
+            final @NonNull CommandManager<C> manager,
+            final @NonNull String firstName,
+            final @NonNull TypeToken<U> firstType,
+            final @NonNull String secondName,
+            final @NonNull TypeToken<V> secondType
+    ) {
+        return pairBuilder(manager, Pair.of(firstName, secondName), Pair.of(firstType.getType(), secondType.getType()));
+    }
+
+    /**
+     * Returns a new aggregate pair command parser builder. The builder is immutable, and each method returns
+     * a new builder instance.
+     *
+     * @param manager the command manager
+     * @param names   the names of the components
+     * @param types   the types of the components
+     * @param <C>     the command sender type
+     * @param <U>     the type of the first component
+     * @param <V>     the type of the second component
+     * @return the builder
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    static <C, U, V> @NonNull AggregateParserPairBuilder<C, U, V, Pair<U, V>> pairBuilder(
+            final @NonNull CommandManager<C> manager,
+            final @NonNull Pair<@NonNull String, @NonNull String> names,
+            final @NonNull Pair<? extends @NonNull Type, ? extends @NonNull Type> types
+    ) {
+        final ParserRegistry<C> parserRegistry = manager.parserRegistry();
+        final ArgumentParser<C, U> firstParser = (ArgumentParser<C, U>) parserRegistry.createParser(
+                TypeToken.get(types.first()),
+                ParserParameters.empty()
+        ).orElseThrow(() -> new IllegalArgumentException("Could not create parser for primary type"));
+        final ArgumentParser<C, V> secondaryParser = (ArgumentParser<C, V>) parserRegistry.createParser(
+                TypeToken.get(types.second()),
+                ParserParameters.empty()
+        ).orElseThrow(() -> new IllegalArgumentException("Could not create parser for secondary type"));
+        return pairBuilder(
+                names.first(),
+                ParserDescriptor.of(firstParser, (TypeToken) TypeToken.get(types.first())),
+                names.second(),
+                ParserDescriptor.of(secondaryParser, (TypeToken) TypeToken.get(types.second()))
+        );
+    }
+
+    /**
+     * Returns a new aggregate triplet command parser builder. The builder is immutable, and each method returns
+     * a new builder instance.
+     *
+     * @param firstName    the name of the first component
+     * @param firstParser  the parser for the first component
+     * @param secondName   the name of the second component
+     * @param secondParser the parser for the second component
+     * @param thirdName    the name of the third component
+     * @param thirdParser  the parser for the third component
+     * @param <C>          the command sender type
+     * @param <U>          the type of the first component
+     * @param <V>          the type of the second component
+     * @param <Z>          the type of the third component
+     * @return the builder
+     */
+    @SuppressWarnings("unchecked")
+    static <C, U, V, Z> @NonNull AggregateParserTripletBuilder<C, U, V, Z, Triplet<U, V, Z>> tripletBuilder(
+            final @NonNull String firstName,
+            final @NonNull ParserDescriptor<C, U> firstParser,
+            final @NonNull String secondName,
+            final @NonNull ParserDescriptor<C, V> secondParser,
+            final @NonNull String thirdName,
+            final @NonNull ParserDescriptor<C, Z> thirdParser
+    ) {
+        return new AggregateParserTripletBuilder<>(
+                CommandComponent.builder(firstName, firstParser).build(),
+                CommandComponent.builder(secondName, secondParser).build(),
+                CommandComponent.builder(thirdName, thirdParser).build(),
+                AggregateParserTripletBuilder.defaultMapper(),
+                (TypeToken<Triplet<U, V, Z>>) TypeToken.get(TypeFactory.parameterizedClass(
+                        Triplet.class,
+                        GenericTypeReflector.box(firstParser.valueType().getType()),
+                        GenericTypeReflector.box(secondParser.valueType().getType()),
+                        GenericTypeReflector.box(thirdParser.valueType().getType())
+                ))
+        );
+    }
+
+    /**
+     * Returns a new aggregate triplet command parser builder. The builder is immutable, and each method returns
+     * a new builder instance.
+     *
+     * @param manager    the command manager
+     * @param firstName  the name of the first component
+     * @param firstType  the type of the first component
+     * @param secondName the name of the second component
+     * @param secondType the type of the second component
+     * @param thirdName  the name of the third component
+     * @param thirdType  the type of the third component
+     * @param <C>        the command sender type
+     * @param <U>        the type of the first component
+     * @param <V>        the type of the second component
+     * @param <Z>        the type of the third component
+     * @return the builder
+     */
+    static <C, U, V, Z> @NonNull AggregateParserTripletBuilder<C, U, V, Z, Triplet<U, V, Z>> tripletBuilder(
+            final @NonNull CommandManager<C> manager,
+            final @NonNull String firstName,
+            final @NonNull Class<U> firstType,
+            final @NonNull String secondName,
+            final @NonNull Class<V> secondType,
+            final @NonNull String thirdName,
+            final @NonNull Class<Z> thirdType
+    ) {
+        return tripletBuilder(
+                manager,
+                Triplet.of(firstName, secondName, thirdName),
+                Triplet.of(firstType, secondType, thirdType)
+        );
+    }
+
+    /**
+     * Returns a new aggregate triplet command parser builder. The builder is immutable, and each method returns
+     * a new builder instance.
+     *
+     * @param manager    the command manager
+     * @param firstName  the name of the first component
+     * @param firstType  the type of the first component
+     * @param secondName the name of the second component
+     * @param secondType the type of the second component
+     * @param thirdName  the name of the third component
+     * @param thirdType  the type of the third component
+     * @param <C>        the command sender type
+     * @param <U>        the type of the first component
+     * @param <V>        the type of the second component
+     * @param <Z>        the type of the third component
+     * @return the builder
+     */
+    static <C, U, V, Z> @NonNull AggregateParserTripletBuilder<C, U, V, Z, Triplet<U, V, Z>> tripletBuilder(
+            final @NonNull CommandManager<C> manager,
+            final @NonNull String firstName,
+            final @NonNull TypeToken<U> firstType,
+            final @NonNull String secondName,
+            final @NonNull TypeToken<V> secondType,
+            final @NonNull String thirdName,
+            final @NonNull TypeToken<Z> thirdType
+    ) {
+        return tripletBuilder(
+                manager,
+                Triplet.of(firstName, secondName, thirdName),
+                Triplet.of(firstType.getType(), secondType.getType(), thirdType.getType())
+        );
+    }
+
+    /**
+     * Returns a new aggregate triplet command parser builder. The builder is immutable, and each method returns
+     * a new builder instance.
+     *
+     * @param manager the command manager
+     * @param names   the names of the components
+     * @param types   the types of the components
+     * @param <C>     the command sender type
+     * @param <U>     the type of the first component
+     * @param <V>     the type of the second component
+     * @param <Z>     the type of the third component
+     * @return the builder
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    static <C, U, V, Z> @NonNull AggregateParserTripletBuilder<C, U, V, Z, Triplet<U, V, Z>> tripletBuilder(
+            final @NonNull CommandManager<C> manager,
+            final @NonNull Triplet<@NonNull String, @NonNull String, @NonNull String> names,
+            final @NonNull Triplet<? extends @NonNull Type, ? extends @NonNull Type, ? extends @NonNull Type> types
+    ) {
+        final ParserRegistry<C> parserRegistry = manager.parserRegistry();
+        final ArgumentParser<C, U> firstParser = (ArgumentParser<C, U>) parserRegistry.createParser(
+                TypeToken.get(types.first()),
+                ParserParameters.empty()
+        ).orElseThrow(() -> new IllegalArgumentException("Could not create parser for primary type"));
+        final ArgumentParser<C, V> secondaryParser = (ArgumentParser<C, V>) parserRegistry.createParser(
+                TypeToken.get(types.second()),
+                ParserParameters.empty()
+        ).orElseThrow(() -> new IllegalArgumentException("Could not create parser for secondary type"));
+        final ArgumentParser<C, Z> tertiaryParser = (ArgumentParser<C, Z>) parserRegistry.createParser(
+                TypeToken.get(types.third()),
+                ParserParameters.empty()
+        ).orElseThrow(() -> new IllegalArgumentException("Could not create parser for tertiary type"));
+        return tripletBuilder(
+                names.first(),
+                ParserDescriptor.of(firstParser, (TypeToken) TypeToken.get(types.first())),
+                names.second(),
+                ParserDescriptor.of(secondaryParser, (TypeToken) TypeToken.get(types.second())),
+                names.third(),
+                ParserDescriptor.of(tertiaryParser, (TypeToken) TypeToken.get(types.third()))
+        );
     }
 
     /**
