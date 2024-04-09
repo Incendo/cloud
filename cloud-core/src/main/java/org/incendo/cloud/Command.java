@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -1183,46 +1182,6 @@ public class Command<C> {
         }
 
         /**
-         * Adds a new required command argument by interacting with a constructed command argument builder.
-         *
-         * @param clazz           argument class
-         * @param name            argument name
-         * @param builderConsumer builder consumer
-         * @param <T>             argument type
-         * @return new builder instance with the command argument inserted into the argument list
-         */
-        @API(status = API.Status.STABLE)
-        public <T> @NonNull Builder<C> required(
-                final @NonNull Class<T> clazz,
-                final @NonNull String name,
-                final @NonNull Consumer<CommandComponent.Builder<C, T>> builderConsumer
-        ) {
-            final CommandComponent.Builder<C, T> builder = CommandComponent.ofType(clazz, name);
-            builderConsumer.accept(builder);
-            return this.argument(builder);
-        }
-
-        /**
-         * Adds a new optional command argument by interacting with a constructed command argument builder.
-         *
-         * @param clazz           argument class
-         * @param name            argument name
-         * @param builderConsumer builder consumer
-         * @param <T>             argument type
-         * @return new builder instance with the command argument inserted into the argument list
-         */
-        @API(status = API.Status.STABLE)
-        public <T> @NonNull Builder<C> optional(
-                final @NonNull Class<T> clazz,
-                final @NonNull String name,
-                final @NonNull Consumer<CommandComponent.Builder<C, T>> builderConsumer
-        ) {
-            final CommandComponent.Builder<C, T> builder = CommandComponent.ofType(clazz, name);
-            builderConsumer.accept(builder);
-            return this.argument(builder.optional());
-        }
-
-        /**
          * Adds the given {@code argument} to the command.
          *
          * @param argument argument to add
@@ -1264,30 +1223,28 @@ public class Command<C> {
             }
         }
 
-        // Compound helper methods
+        // Aggregate helper methods
 
         /**
          * Creates a new argument pair that maps to {@link Pair}.
-         * <p>
-         * For this to work, there must be a {@link CommandManager}
-         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}..
          *
-         * @param name        name of the argument
-         * @param names       pair containing the names of the sub-arguments
-         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link ParserRegistry} used by the
-         *                    {@link CommandManager} attached to this command
-         * @param description description of the argument
-         * @param <U>         first type
-         * @param <V>         second type
+         * @param name         name of the argument
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
          * @return new builder instance with the argument inserted
          */
         @API(status = API.Status.STABLE)
         public <U, V> @NonNull Builder<C> requiredArgumentPair(
                 final @NonNull String name,
-                final @NonNull Pair<@NonNull String, @NonNull String> names,
-                final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
                 final @NonNull Description description
         ) {
             if (this.commandManager == null) {
@@ -1295,33 +1252,31 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    AggregateParser.pairBuilder(this.commandManager, names, parserPair).build(),
+                    AggregateParser.pairBuilder(firstName, firstParser, secondName, secondParser).build(),
                     description
             );
         }
 
         /**
          * Creates a new argument pair that maps to {@link Pair}.
-         * <p>
-         * For this to work, there must be a {@link CommandManager}
-         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}..
          *
-         * @param name        name of the argument
-         * @param names       pair containing the names of the sub-arguments
-         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link ParserRegistry} used by the
-         *                    {@link CommandManager} attached to this command
-         * @param description description of the argument
-         * @param <U>         first type
-         * @param <V>         second type
+         * @param name         name of the argument
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
          * @return new builder instance with the argument inserted
          */
         @API(status = API.Status.STABLE)
         public <U, V> @NonNull Builder<C> requiredArgumentPair(
                 final @NonNull CloudKey<Pair<U, V>> name,
-                final @NonNull Pair<@NonNull String, @NonNull String> names,
-                final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
                 final @NonNull Description description
         ) {
             if (this.commandManager == null) {
@@ -1329,33 +1284,31 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    AggregateParser.<C, U, V>pairBuilder(this.commandManager, names, parserPair).build(),
+                    AggregateParser.pairBuilder(firstName, firstParser, secondName, secondParser).build(),
                     description
             );
         }
 
         /**
          * Creates a new argument pair that maps to {@link Pair}.
-         * <p>
-         * For this to work, there must be a {@link CommandManager}
-         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}..
          *
-         * @param name        name of the argument
-         * @param names       pair containing the names of the sub-arguments
-         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link ParserRegistry} used by the
-         *                    {@link CommandManager} attached to this command
-         * @param description description of the argument
-         * @param <U>         first type
-         * @param <V>         second type
+         * @param name         name of the argument
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
          * @return new builder instance with the argument inserted
          */
         @API(status = API.Status.STABLE)
         public <U, V> @NonNull Builder<C> optionalArgumentPair(
                 final @NonNull String name,
-                final @NonNull Pair<@NonNull String, @NonNull String> names,
-                final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
                 final @NonNull Description description
         ) {
             if (this.commandManager == null) {
@@ -1363,33 +1316,31 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    AggregateParser.pairBuilder(this.commandManager, names, parserPair).build(),
+                    AggregateParser.pairBuilder(firstName, firstParser, secondName, secondParser).build(),
                     description
             );
         }
 
         /**
          * Creates a new argument pair that maps to {@link Pair}.
-         * <p>
-         * For this to work, there must be a {@link CommandManager}
-         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}..
          *
-         * @param name        name of the argument
-         * @param names       pair containing the names of the sub-arguments
-         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link ParserRegistry} used by the
-         *                    {@link CommandManager} attached to this command
-         * @param description description of the argument
-         * @param <U>         first type
-         * @param <V>         second type
+         * @param name         name of the argument
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
          * @return new builder instance with the argument inserted
          */
         @API(status = API.Status.STABLE)
         public <U, V> @NonNull Builder<C> optionalArgumentPair(
                 final @NonNull CloudKey<Pair<U, V>> name,
-                final @NonNull Pair<@NonNull String, @NonNull String> names,
-                final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
                 final @NonNull Description description
         ) {
             if (this.commandManager == null) {
@@ -1397,37 +1348,35 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    AggregateParser.<C, U, V>pairBuilder(this.commandManager, names, parserPair).build(),
+                    AggregateParser.pairBuilder(firstName, firstParser, secondName, secondParser).build(),
                     description
             );
         }
 
         /**
          * Creates a new argument pair that maps to a custom type.
-         * <p>
-         * For this to work, there must be a {@link CommandManager}
-         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}..
          *
-         * @param name        name of the argument
-         * @param outputType  the output type
-         * @param names       pair containing the names of the sub-arguments
-         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link ParserRegistry} used by the
-         *                    {@link CommandManager} attached to this command
-         * @param mapper      mapper that maps from {@link Pair} to the custom type
-         * @param description description of the argument
-         * @param <U>         first type
-         * @param <V>         second type
-         * @param <O>         output type
+         * @param name         name of the argument
+         * @param outputType   the output type
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param mapper       mapper that maps from {@link Pair} to the custom type
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
+         * @param <O>          output type
          * @return new builder instance with the argument inserted
          */
         @API(status = API.Status.STABLE)
         public <U, V, O> @NonNull Builder<C> requiredArgumentPair(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
-                final @NonNull Pair<String, String> names,
-                final @NonNull Pair<Class<U>, Class<V>> parserPair,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
                 final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
                 final @NonNull Description description
         ) {
@@ -1436,7 +1385,8 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    AggregateParser.<C, U, V>pairBuilder(this.commandManager, names, parserPair).withMapper(outputType, mapper)
+                    AggregateParser.pairBuilder(firstName, firstParser, secondName, secondParser)
+                            .withMapper(outputType, mapper)
                             .build(),
                     description
             );
@@ -1444,30 +1394,28 @@ public class Command<C> {
 
         /**
          * Creates a new argument pair that maps to a custom type.
-         * <p>
-         * For this to work, there must be a {@link CommandManager}
-         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}..
          *
-         * @param name        name of the argument
-         * @param outputType  the output type
-         * @param names       pair containing the names of the sub-arguments
-         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link ParserRegistry} used by the
-         *                    {@link CommandManager} attached to this command
-         * @param mapper      mapper that maps from {@link Pair} to the custom type
-         * @param description description of the argument
-         * @param <U>         first type
-         * @param <V>         second type
-         * @param <O>         output type
+         * @param name         name of the argument
+         * @param outputType   the output type
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param mapper       mapper that maps from {@link Pair} to the custom type
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
+         * @param <O>          output type
          * @return new builder instance with the argument inserted
          */
         @API(status = API.Status.STABLE)
         public <U, V, O> @NonNull Builder<C> requiredArgumentPair(
                 final @NonNull CloudKey<O> name,
                 final @NonNull TypeToken<O> outputType,
-                final @NonNull Pair<String, String> names,
-                final @NonNull Pair<Class<U>, Class<V>> parserPair,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
                 final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
                 final @NonNull Description description
         ) {
@@ -1476,7 +1424,8 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    AggregateParser.<C, U, V>pairBuilder(this.commandManager, names, parserPair).withMapper(outputType, mapper)
+                    AggregateParser.pairBuilder(firstName, firstParser, secondName, secondParser)
+                            .withMapper(outputType, mapper)
                             .build(),
                     description
             );
@@ -1484,30 +1433,28 @@ public class Command<C> {
 
         /**
          * Creates a new argument pair that maps to a custom type.
-         * <p>
-         * For this to work, there must be a {@link CommandManager}
-         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name        name of the argument
-         * @param outputType  the output type
-         * @param names       pair containing the names of the sub-arguments
-         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link ParserRegistry} used by the
-         *                    {@link CommandManager} attached to this command
-         * @param mapper      mapper that maps from {@link Pair} to the custom type
-         * @param description description of the argument
-         * @param <U>         first type
-         * @param <V>         second type
-         * @param <O>         output type
+         * @param name         name of the argument
+         * @param outputType   the output type
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param mapper       mapper that maps from {@link Pair} to the custom type
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
+         * @param <O>          output type
          * @return new builder instance with the argument inserted
          */
         @API(status = API.Status.STABLE)
         public <U, V, O> @NonNull Builder<C> optionalArgumentPair(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
-                final @NonNull Pair<String, String> names,
-                final @NonNull Pair<Class<U>, Class<V>> parserPair,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
                 final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
                 final @NonNull Description description
         ) {
@@ -1516,7 +1463,8 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    AggregateParser.<C, U, V>pairBuilder(this.commandManager, names, parserPair).withMapper(outputType, mapper)
+                    AggregateParser.pairBuilder(firstName, firstParser, secondName, secondParser)
+                            .withMapper(outputType, mapper)
                             .build(),
                     description
             );
@@ -1524,30 +1472,28 @@ public class Command<C> {
 
         /**
          * Creates a new argument pair that maps to a custom type.
-         * <p>
-         * For this to work, there must be a {@link CommandManager}
-         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name        name of the argument
-         * @param outputType  the output type
-         * @param names       pair containing the names of the sub-arguments
-         * @param parserPair  pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link ParserRegistry} used by the
-         *                    {@link CommandManager} attached to this command
-         * @param mapper      mapper that maps from {@link Pair} to the custom type
-         * @param description description of the argument
-         * @param <U>         first type
-         * @param <V>         second type
-         * @param <O>         output type
+         * @param name         name of the argument
+         * @param outputType   the output type
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param mapper       mapper that maps from {@link Pair} to the custom type
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
+         * @param <O>          output type
          * @return new builder instance with the argument inserted
          */
         @API(status = API.Status.STABLE)
         public <U, V, O> @NonNull Builder<C> optionalArgumentPair(
                 final @NonNull CloudKey<O> name,
                 final @NonNull TypeToken<O> outputType,
-                final @NonNull Pair<String, String> names,
-                final @NonNull Pair<Class<U>, Class<V>> parserPair,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
                 final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
                 final @NonNull Description description
         ) {
@@ -1556,7 +1502,46 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    AggregateParser.<C, U, V>pairBuilder(this.commandManager, names, parserPair).withMapper(outputType, mapper)
+                    AggregateParser.pairBuilder(firstName, firstParser, secondName, secondParser)
+                            .withMapper(outputType, mapper)
+                            .build(),
+                    description
+            );
+        }
+
+        /**
+         * Create a new argument pair that maps to {@link org.incendo.cloud.type.tuple.Triplet}
+         *
+         * @param name         name of the argument
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param thirdName    name of the third subcomponent
+         * @param thirdParser  parser for the third subcomponent
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
+         * @param <W>          third type
+         * @return new builder instance with the argument inserted
+         */
+        @API(status = API.Status.STABLE)
+        public <U, V, W> @NonNull Builder<C> requiredArgumentTriplet(
+                final @NonNull String name,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
+                final @NonNull String thirdName,
+                final @NonNull ParserDescriptor<C, W> thirdParser,
+                final @NonNull Description description
+        ) {
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.required(
+                    name,
+                    AggregateParser.tripletBuilder(firstName, firstParser, secondName, secondParser, thirdName, thirdParser)
                             .build(),
                     description
             );
@@ -1569,22 +1554,28 @@ public class Command<C> {
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
          * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name          name of the argument
-         * @param names         triplet containing the names of the sub-arguments
-         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link ParserRegistry}
-         *                      used by the {@link CommandManager} attached to this command
-         * @param description   description of the argument
-         * @param <U>           first type
-         * @param <V>           second type
-         * @param <W>           third type
+         * @param name         name of the argument
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param thirdName    name of the third subcomponent
+         * @param thirdParser  parser for the third subcomponent
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
+         * @param <W>          third type
          * @return new builder instance with the argument inserted
          */
         @API(status = API.Status.STABLE)
         public <U, V, W> @NonNull Builder<C> requiredArgumentTriplet(
-                final @NonNull String name,
-                final @NonNull Triplet<String, String, String> names,
-                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                final @NonNull CloudKey<Triplet<U, V, W>> name,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
+                final @NonNull String thirdName,
+                final @NonNull ParserDescriptor<C, W> thirdParser,
                 final @NonNull Description description
         ) {
             if (this.commandManager == null) {
@@ -1592,7 +1583,8 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    AggregateParser.tripletBuilder(this.commandManager, names, parserTriplet).build(),
+                    AggregateParser.tripletBuilder(firstName, firstParser, secondName, secondParser, thirdName, thirdParser)
+                            .build(),
                     description
             );
         }
@@ -1604,57 +1596,28 @@ public class Command<C> {
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
          * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name          name of the argument
-         * @param names         triplet containing the names of the sub-arguments
-         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link ParserRegistry}
-         *                      used by the {@link CommandManager} attached to this command
-         * @param description   description of the argument
-         * @param <U>           first type
-         * @param <V>           second type
-         * @param <W>           third type
-         * @return new builder instance with the argument inserted
-         */
-        @API(status = API.Status.STABLE)
-        public <U, V, W> @NonNull Builder<C> requiredArgumentTriplet(
-                final @NonNull CloudKey<Triplet<U, V, W>> name,
-                final @NonNull Triplet<String, String, String> names,
-                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
-                final @NonNull Description description
-        ) {
-            if (this.commandManager == null) {
-                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
-            }
-            return this.required(
-                    name,
-                    AggregateParser.<C, U, V, W>tripletBuilder(this.commandManager, names, parserTriplet).build(),
-                    description
-            );
-        }
-
-        /**
-         * Create a new argument pair that maps to {@link org.incendo.cloud.type.tuple.Triplet}
-         * <p>
-         * For this to work, there must be a {@link CommandManager}
-         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}.
-         *
-         * @param name          name of the argument
-         * @param names         triplet containing the names of the sub-arguments
-         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link ParserRegistry}
-         *                      used by the {@link CommandManager} attached to this command
-         * @param description   description of the argument
-         * @param <U>           first type
-         * @param <V>           second type
-         * @param <W>           third type
+         * @param name         name of the argument
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param thirdName    name of the third subcomponent
+         * @param thirdParser  parser for the third subcomponent
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
+         * @param <W>          third type
          * @return new builder instance with the argument inserted
          */
         @API(status = API.Status.STABLE)
         public <U, V, W> @NonNull Builder<C> optionalArgumentTriplet(
                 final @NonNull String name,
-                final @NonNull Triplet<String, String, String> names,
-                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
+                final @NonNull String thirdName,
+                final @NonNull ParserDescriptor<C, W> thirdParser,
                 final @NonNull Description description
         ) {
             if (this.commandManager == null) {
@@ -1662,7 +1625,9 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    AggregateParser.<C, U, V, W>tripletBuilder(this.commandManager, names, parserTriplet).build(),
+                    AggregateParser
+                            .tripletBuilder(firstName, firstParser, secondName, secondParser, thirdName, thirdParser)
+                            .build(),
                     description
             );
         }
@@ -1674,22 +1639,28 @@ public class Command<C> {
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
          * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name          name of the argument
-         * @param names         triplet containing the names of the sub-arguments
-         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link ParserRegistry}
-         *                      used by the {@link CommandManager} attached to this command
-         * @param description   description of the argument
-         * @param <U>           first type
-         * @param <V>           second type
-         * @param <W>           third type
+         * @param name         name of the argument
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param thirdName    name of the third subcomponent
+         * @param thirdParser  parser for the third subcomponent
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
+         * @param <W>          third type
          * @return new builder instance with the argument inserted
          */
         @API(status = API.Status.STABLE)
         public <U, V, W> @NonNull Builder<C> optionalArgumentTriplet(
                 final @NonNull CloudKey<Triplet<U, V, W>> name,
-                final @NonNull Triplet<String, String, String> names,
-                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
+                final @NonNull String thirdName,
+                final @NonNull ParserDescriptor<C, W> thirdParser,
                 final @NonNull Description description
         ) {
             if (this.commandManager == null) {
@@ -1697,7 +1668,9 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    AggregateParser.<C, U, V, W>tripletBuilder(this.commandManager, names, parserTriplet).build(),
+                    AggregateParser
+                            .tripletBuilder(firstName, firstParser, secondName, secondParser, thirdName, thirdParser)
+                            .build(),
                     description
             );
         }
@@ -1709,26 +1682,32 @@ public class Command<C> {
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
          * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name          name of the argument
-         * @param outputType    the output type
-         * @param names         triplet containing the names of the sub-arguments
-         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link ParserRegistry} used by
-         *                      the {@link CommandManager} attached to this command
-         * @param mapper        mapper that maps from {@link Triplet} to the custom type
-         * @param description   description of the argument
-         * @param <U>           first type
-         * @param <V>           second type
-         * @param <W>           third type
-         * @param <O>           output type
+         * @param name         name of the argument
+         * @param outputType   the output type
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param thirdName    name of the third subcomponent
+         * @param thirdParser  parser for the third subcomponent
+         * @param mapper       mapper that maps from {@link Triplet} to the custom type
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
+         * @param <W>          third type
+         * @param <O>          output type
          * @return new builder instance with the argument inserted
          */
         @API(status = API.Status.STABLE)
         public <U, V, W, O> @NonNull Builder<C> requiredArgumentTriplet(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
-                final @NonNull Triplet<String, String, String> names,
-                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
+                final @NonNull String thirdName,
+                final @NonNull ParserDescriptor<C, W> thirdParser,
                 final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
                 final @NonNull Description description
         ) {
@@ -1737,7 +1716,7 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    AggregateParser.<C, U, V, W>tripletBuilder(this.commandManager, names, parserTriplet)
+                    AggregateParser.tripletBuilder(firstName, firstParser, secondName, secondParser, thirdName, thirdParser)
                             .withMapper(outputType, mapper)
                             .build(),
                     description
@@ -1751,26 +1730,32 @@ public class Command<C> {
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
          * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name          name of the argument
-         * @param outputType    the output type
-         * @param names         triplet containing the names of the sub-arguments
-         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link ParserRegistry} used by
-         *                      the {@link CommandManager} attached to this command
-         * @param mapper        Mapper that maps from {@link Triplet} to the custom type
-         * @param description   description of the argument
-         * @param <U>           first type
-         * @param <V>           second type
-         * @param <W>           third type
-         * @param <O>           output type
+         * @param name         name of the argument
+         * @param outputType   the output type
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param thirdName    name of the third subcomponent
+         * @param thirdParser  parser for the third subcomponent
+         * @param mapper       Mapper that maps from {@link Triplet} to the custom type
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
+         * @param <W>          third type
+         * @param <O>          output type
          * @return new builder instance with the argument inserted
          */
         @API(status = API.Status.STABLE)
         public <U, V, W, O> @NonNull Builder<C> requiredArgumentTriplet(
                 final @NonNull CloudKey<O> name,
                 final @NonNull TypeToken<O> outputType,
-                final @NonNull Triplet<String, String, String> names,
-                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
+                final @NonNull String thirdName,
+                final @NonNull ParserDescriptor<C, W> thirdParser,
                 final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
                 final @NonNull Description description
         ) {
@@ -1779,7 +1764,7 @@ public class Command<C> {
             }
             return this.required(
                     name,
-                    AggregateParser.<C, U, V, W>tripletBuilder(this.commandManager, names, parserTriplet)
+                    AggregateParser.tripletBuilder(firstName, firstParser, secondName, secondParser, thirdName, thirdParser)
                             .withMapper(outputType, mapper)
                             .build(),
                     description
@@ -1793,26 +1778,32 @@ public class Command<C> {
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
          * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name          name of the argument
-         * @param outputType    the output type
-         * @param names         triplet containing the names of the sub-arguments
-         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link ParserRegistry} used by
-         *                      the {@link CommandManager} attached to this command
-         * @param mapper        mapper that maps from {@link Triplet} to the custom type
-         * @param description   description of the argument
-         * @param <U>           first type
-         * @param <V>           second type
-         * @param <W>           third type
-         * @param <O>           output type
+         * @param name         name of the argument
+         * @param outputType   the output type
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param thirdName    name of the third subcomponent
+         * @param thirdParser  parser for the third subcomponent
+         * @param mapper       mapper that maps from {@link Triplet} to the custom type
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
+         * @param <W>          third type
+         * @param <O>          output type
          * @return new builder instance with the argument inserted
          */
         @API(status = API.Status.STABLE)
         public <U, V, W, O> @NonNull Builder<C> optionalArgumentTriplet(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
-                final @NonNull Triplet<String, String, String> names,
-                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
+                final @NonNull String thirdName,
+                final @NonNull ParserDescriptor<C, W> thirdParser,
                 final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
                 final @NonNull Description description
         ) {
@@ -1821,7 +1812,7 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    AggregateParser.<C, U, V, W>tripletBuilder(this.commandManager, names, parserTriplet)
+                    AggregateParser.tripletBuilder(firstName, firstParser, secondName, secondParser, thirdName, thirdParser)
                             .withMapper(outputType, mapper)
                             .build(),
                     description
@@ -1835,26 +1826,32 @@ public class Command<C> {
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
          * using {@link CommandManager#commandBuilder(String, String...)}.
          *
-         * @param name          name of the argument
-         * @param outputType    the output type
-         * @param names         triplet containing the names of the sub-arguments
-         * @param parserTriplet triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link ParserRegistry} used by
-         *                      the {@link CommandManager} attached to this command
-         * @param mapper        mapper that maps from {@link Triplet} to the custom type
-         * @param description   description of the argument
-         * @param <U>           first type
-         * @param <V>           second type
-         * @param <W>           third type
-         * @param <O>           output type
+         * @param name         name of the argument
+         * @param outputType   the output type
+         * @param firstName    name of the first subcomponent
+         * @param firstParser  parser for the first subcomponent
+         * @param secondName   name of the second subcomponent
+         * @param secondParser parser for the second subcomponent
+         * @param thirdName    name of the third subcomponent
+         * @param thirdParser  parser for the third subcomponent
+         * @param mapper       mapper that maps from {@link Triplet} to the custom type
+         * @param description  description of the argument
+         * @param <U>          first type
+         * @param <V>          second type
+         * @param <W>          third type
+         * @param <O>          output type
          * @return new builder instance with the argument inserted
          */
         @API(status = API.Status.STABLE)
         public <U, V, W, O> @NonNull Builder<C> optionalArgumentTriplet(
                 final @NonNull CloudKey<O> name,
                 final @NonNull TypeToken<O> outputType,
-                final @NonNull Triplet<String, String, String> names,
-                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                final @NonNull String firstName,
+                final @NonNull ParserDescriptor<C, U> firstParser,
+                final @NonNull String secondName,
+                final @NonNull ParserDescriptor<C, V> secondParser,
+                final @NonNull String thirdName,
+                final @NonNull ParserDescriptor<C, W> thirdParser,
                 final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
                 final @NonNull Description description
         ) {
@@ -1863,7 +1860,7 @@ public class Command<C> {
             }
             return this.optional(
                     name,
-                    AggregateParser.<C, U, V, W>tripletBuilder(this.commandManager, names, parserTriplet)
+                    AggregateParser.tripletBuilder(firstName, firstParser, secondName, secondParser, thirdName, thirdParser)
                             .withMapper(outputType, mapper)
                             .build(),
                     description

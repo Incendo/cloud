@@ -38,8 +38,6 @@ import org.incendo.cloud.setting.ManagerSetting;
 import org.incendo.cloud.suggestion.FilteringSuggestionProcessor;
 import org.incendo.cloud.suggestion.Suggestion;
 import org.incendo.cloud.suggestion.SuggestionProvider;
-import org.incendo.cloud.type.tuple.Pair;
-import org.incendo.cloud.type.tuple.Triplet;
 import org.incendo.cloud.util.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -88,23 +86,22 @@ class CommandSuggestionsTest {
                         SuggestionProvider.blocking((c, s) -> suggestionList("3", "33", "333")))));
 
         this.manager.command(manager.commandBuilder("com")
-                .requiredArgumentPair("com", Pair.of("x", "y"), Pair.of(Integer.class, TestEnum.class),
-                        Description.empty()
-                )
+                .requiredArgumentPair("com", "x", integerParser(), "y", enumParser(TestEnum.class), Description.empty())
                 .required("int", integerParser()));
 
         this.manager.command(manager.commandBuilder("com2")
-                .requiredArgumentPair("com", Pair.of("x", "enum"),
-                        Pair.of(Integer.class, TestEnum.class), Description.empty()
-                ));
+                .requiredArgumentPair("com",
+                        "x", integerParser(),
+                        "enum", enumParser(TestEnum.class),
+                        Description.empty()));
 
         this.manager.command(manager.commandBuilder("flags3")
                 .flag(manager.flagBuilder("compound")
                         .withComponent(
                                 AggregateParser.tripletBuilder(
-                                        manager,
-                                        Triplet.of("x", "y", "z"),
-                                        Triplet.of(int.class, int.class, int.class)
+                                        "x", integerParser(),
+                                        "y", integerParser(),
+                                        "z", integerParser()
                                 ).build()
                         )
                 )
