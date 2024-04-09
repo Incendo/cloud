@@ -33,20 +33,24 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.caption.Caption;
 import org.incendo.cloud.caption.CaptionFormatter;
 import org.incendo.cloud.caption.CaptionRegistry;
 import org.incendo.cloud.caption.CaptionVariable;
 import org.incendo.cloud.component.CommandComponent;
+import org.incendo.cloud.execution.postprocessor.CommandPostprocessor;
 import org.incendo.cloud.injection.ParameterInjectorRegistry;
 import org.incendo.cloud.key.CloudKey;
 import org.incendo.cloud.key.MutableCloudKeyContainer;
 import org.incendo.cloud.parser.flag.FlagContext;
 import org.incendo.cloud.permission.Permission;
 import org.incendo.cloud.util.annotation.AnnotationAccessor;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Command context used to assist in the parsing of commands
@@ -63,8 +67,7 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
     private final boolean suggestions;
     private final CaptionRegistry<C> captionRegistry;
     private final CommandManager<C> commandManager;
-
-    private CommandComponent<C> currentComponent = null;
+    private volatile @MonotonicNonNull Command<C> currentCommand = null;
 
     /**
      * Creates a new command context instance.
@@ -277,8 +280,10 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
             final @NonNull CloudKey<T> key,
             final @NonNull Function<CloudKey<T>, T> defaultFunction
     ) {
-        @SuppressWarnings("unchecked")
-        final T castedValue = (T) this.internalStorage.computeIfAbsent(key, k -> defaultFunction.apply((CloudKey<T>) k));
+        @SuppressWarnings("unchecked") final T castedValue = (T) this.internalStorage.computeIfAbsent(
+                key,
+                k -> defaultFunction.apply((CloudKey<T>) k)
+        );
         return castedValue;
     }
 
@@ -310,10 +315,9 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      *
      * @param component the component
      * @return the context
-     * @param <T> the type of the component
      */
     @API(status = API.Status.MAINTAINED)
-    public <T> @NonNull ParsingContext<C> parsingContext(final @NonNull CommandComponent<C> component) {
+    public @NonNull ParsingContext<C> parsingContext(final @NonNull CommandComponent<C> component) {
         return this.parsingContexts.stream()
                 .filter(context -> context.component().equals(component))
                 .findFirst()
@@ -365,27 +369,27 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
     }
 
     /**
-     * Returns the component that is currently being parsed for this command context.
-     * This value will be updated whenever the context is used to provide new
-     * suggestions or parse a new command argument.
+     * Returns the current {@link Command}. This is only available from
+     * {@link org.incendo.cloud.execution.CommandExecutionHandler}s and {@link CommandPostprocessor}s.
      *
-     * @return the {@link CommandComponent} that is currently being parsed, or {@code null}
+     * @return the current command
      */
-    @API(status = API.Status.STABLE)
-    public @Nullable CommandComponent<C> currentComponent() {
-        return this.currentComponent;
+    public @NonNull Command<C> command() {
+        if (this.currentCommand == null) {
+            throw new IllegalStateException("The current command is only available once a command has been parsed. Mainly from "
+                    + "execution handlers and post processors.");
+        }
+        return this.currentCommand;
     }
 
     /**
-     * Sets the component that is currently being parsed for this command context.
-     * This value should be updated whenever the context is used to provide new
-     * suggestions or parse a new command argument.
+     * Sets the current {@link Command}.
      *
-     * @param component the component that is currently being parsed, or {@code null}
+     * @param command the command
      */
-    @API(status = API.Status.STABLE)
-    public void currentComponent(final @Nullable CommandComponent<C> component) {
-        this.currentComponent = component;
+    @API(status = API.Status.INTERNAL)
+    public void command(final @NonNull Command<C> command) {
+        this.currentCommand = requireNonNull(command, "command");
     }
 
     /**
