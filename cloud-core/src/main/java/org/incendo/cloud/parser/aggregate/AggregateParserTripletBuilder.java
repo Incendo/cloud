@@ -26,7 +26,6 @@ package org.incendo.cloud.parser.aggregate;
 import io.leangen.geantyref.TypeToken;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.component.TypedCommandComponent;
 import org.incendo.cloud.context.CommandContext;
@@ -57,10 +56,10 @@ public final class AggregateParserTripletBuilder<C, U, V, Z, O> {
     /**
      * Creates a new {@link AggregateParserTripletBuilder} with the given components and mapper.
      *
-     * @param first the first component
-     * @param second the second component
-     * @param third the third component
-     * @param mapper the mapper
+     * @param first   the first component
+     * @param second  the second component
+     * @param third   the third component
+     * @param mapper  the mapper
      * @param outType the output type
      */
     public AggregateParserTripletBuilder(
@@ -81,8 +80,8 @@ public final class AggregateParserTripletBuilder<C, U, V, Z, O> {
      * Creates a new {@link AggregateParserTripletBuilder} with the given mapper.
      *
      * @param outType the new output type
-     * @param mapper the mapper
-     * @param <O1> the new output type
+     * @param mapper  the mapper
+     * @param <O1>    the new output type
      * @return a new {@link AggregateParserTripletBuilder} with the given mapper
      */
     public <O1> AggregateParserTripletBuilder<C, U, V, Z, O1> withMapper(
@@ -96,21 +95,15 @@ public final class AggregateParserTripletBuilder<C, U, V, Z, O> {
      * Creates a new {@link AggregateParserTripletBuilder} with the given mapper.
      *
      * @param outType the new output type
-     * @param mapper the mapper
-     * @param <O1> the new output type
+     * @param mapper  the mapper
+     * @param <O1>    the new output type
      * @return a new {@link AggregateParserTripletBuilder} with the given mapper
      */
-    public <O1> AggregateParserTripletBuilder<C, U, V, Z, O1> withMapper(
+    public <O1> AggregateParserTripletBuilder<C, U, V, Z, O1> withDirectMapper(
             final @NonNull TypeToken<O1> outType,
-            final @NonNull BiFunction<C, Triplet<U, V, Z>, O1> mapper
+            final Mapper.@NonNull DirectSuccessMapper<C, U, V, Z, O1> mapper
     ) {
-        return this.withMapper(
-                outType,
-                (ctx, u, v, z) -> ArgumentParseResult.successFuture(mapper.apply(
-                        ctx.sender(),
-                        Triplet.of(u, v, z)
-                ))
-        );
+        return this.withMapper(outType, mapper);
     }
 
     /**
@@ -130,15 +123,30 @@ public final class AggregateParserTripletBuilder<C, U, V, Z, O> {
         ).build();
     }
 
+    /**
+     * Helper function to create a direct success mapper.
+     *
+     * @param mapper mapper
+     * @param <C>    command sender type
+     * @param <U>    first component type
+     * @param <V>    second component type
+     * @param <Z>    third component type
+     * @param <O>    output type
+     * @return mapper
+     */
+    static <C, U, V, Z, O> Mapper<C, U, V, Z, O> directMapper(final Mapper.DirectSuccessMapper<C, U, V, Z, O> mapper) {
+        return mapper;
+    }
+
     public interface Mapper<C, U, V, Z, O> {
 
         /**
          * Maps the results of the child parsers to the output type.
          *
          * @param commandContext the command context
-         * @param firstResult the first result
-         * @param secondResult the second result
-         * @param thirdResult the third result
+         * @param firstResult    the first result
+         * @param secondResult   the second result
+         * @param thirdResult    the third result
          * @return the mapped result
          */
         @NonNull CompletableFuture<ArgumentParseResult<O>> map(
@@ -147,5 +155,34 @@ public final class AggregateParserTripletBuilder<C, U, V, Z, O> {
                 @NonNull V secondResult,
                 @NonNull Z thirdResult
         );
+
+        interface DirectSuccessMapper<C, U, V, Z, O> extends Mapper<C, U, V, Z, O> {
+
+            /**
+             * Maps the results of the child parsers to the output type.
+             *
+             * @param commandContext the command context
+             * @param firstResult    the first result
+             * @param secondResult   the second result
+             * @param thirdResult    the third result
+             * @return the mapped result
+             */
+            @NonNull O mapSuccess(
+                    @NonNull CommandContext<C> commandContext,
+                    @NonNull U firstResult,
+                    @NonNull V secondResult,
+                    @NonNull Z thirdResult
+            );
+
+            @Override
+            default @NonNull CompletableFuture<ArgumentParseResult<O>> map(
+                    @NonNull CommandContext<C> commandContext,
+                    @NonNull U firstResult,
+                    @NonNull V secondResult,
+                    @NonNull Z thirdResult
+            ) {
+                return ArgumentParseResult.successFuture(this.mapSuccess(commandContext, firstResult, secondResult, thirdResult));
+            }
+        }
     }
 }

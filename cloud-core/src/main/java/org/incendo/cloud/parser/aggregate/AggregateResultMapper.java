@@ -52,7 +52,7 @@ public interface AggregateResultMapper<C, O> {
 
 
     @API(status = API.Status.STABLE)
-    interface DirectAggregateResultMapper<C, O> extends AggregateResultMapper<C, O> {
+    interface DirectSuccessMapper<C, O> extends AggregateResultMapper<C, O> {
 
         /**
          * Maps the given {@code context} into the output of type {@link O}.
@@ -61,7 +61,7 @@ public interface AggregateResultMapper<C, O> {
          * @param context        the context to map
          * @return the result
          */
-        @NonNull ArgumentParseResult<O> mapImmediately(
+        @NonNull O mapSuccess(
                 @NonNull CommandContext<C> commandContext,
                 @NonNull AggregateParsingContext<C> context
         );
@@ -71,13 +71,7 @@ public interface AggregateResultMapper<C, O> {
                 @NonNull CommandContext<C> commandContext,
                 @NonNull AggregateParsingContext<C> context
         ) {
-            final CompletableFuture<ArgumentParseResult<O>> result = new CompletableFuture<>();
-            try {
-                result.complete(this.mapImmediately(commandContext, context));
-            } catch (final Exception e) {
-                result.completeExceptionally(e);
-            }
-            return result;
+            return ArgumentParseResult.successFuture(this.mapSuccess(commandContext, context));
         }
     }
 }
