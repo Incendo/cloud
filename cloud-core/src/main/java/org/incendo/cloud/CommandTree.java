@@ -174,7 +174,13 @@ public final class CommandTree<C> {
             final @NonNull CommandInput commandInput,
             final @NonNull Executor parsingExecutor
     ) {
-        return CompletableFutures.scheduleOn(parsingExecutor, () -> this.parseDirect(commandContext, commandInput, parsingExecutor));
+        return CompletableFutures.scheduleOn(parsingExecutor, () -> this.parseDirect(commandContext, commandInput, parsingExecutor))
+                .thenApply(command -> {
+                    if (command != null) {
+                        commandContext.command(command);
+                    }
+                    return command;
+                });
     }
 
     private @NonNull CompletableFuture<@Nullable Command<C>> parseDirect(

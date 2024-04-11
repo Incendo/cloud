@@ -33,19 +33,24 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.caption.Caption;
 import org.incendo.cloud.caption.CaptionFormatter;
 import org.incendo.cloud.caption.CaptionRegistry;
 import org.incendo.cloud.caption.CaptionVariable;
 import org.incendo.cloud.component.CommandComponent;
+import org.incendo.cloud.execution.postprocessor.CommandPostprocessor;
 import org.incendo.cloud.injection.ParameterInjectorRegistry;
 import org.incendo.cloud.key.CloudKey;
 import org.incendo.cloud.key.MutableCloudKeyContainer;
 import org.incendo.cloud.parser.flag.FlagContext;
 import org.incendo.cloud.permission.Permission;
 import org.incendo.cloud.util.annotation.AnnotationAccessor;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Command context used to assist in the parsing of commands
@@ -62,6 +67,7 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
     private final boolean suggestions;
     private final CaptionRegistry<C> captionRegistry;
     private final CommandManager<C> commandManager;
+    private volatile @MonotonicNonNull Command<C> currentCommand = null;
 
     /**
      * Creates a new command context instance.
@@ -360,6 +366,30 @@ public class CommandContext<C> implements MutableCloudKeyContainer {
      */
     public @NonNull FlagContext flags() {
         return this.flagContext;
+    }
+
+    /**
+     * Returns the current {@link Command}. This is only available from
+     * {@link org.incendo.cloud.execution.CommandExecutionHandler}s and {@link CommandPostprocessor}s.
+     *
+     * @return the current command
+     */
+    public @NonNull Command<C> command() {
+        if (this.currentCommand == null) {
+            throw new IllegalStateException("The current command is only available once a command has been parsed. Mainly from "
+                    + "execution handlers and post processors.");
+        }
+        return this.currentCommand;
+    }
+
+    /**
+     * Sets the current {@link Command}.
+     *
+     * @param command the command
+     */
+    @API(status = API.Status.INTERNAL)
+    public void command(final @NonNull Command<C> command) {
+        this.currentCommand = requireNonNull(command, "command");
     }
 
     /**
