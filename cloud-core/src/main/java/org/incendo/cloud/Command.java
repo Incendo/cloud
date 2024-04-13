@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -46,6 +45,8 @@ import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.parser.ParserDescriptor;
 import org.incendo.cloud.parser.ParserRegistry;
 import org.incendo.cloud.parser.aggregate.AggregateParser;
+import org.incendo.cloud.parser.aggregate.AggregateParserPairBuilder;
+import org.incendo.cloud.parser.aggregate.AggregateParserTripletBuilder;
 import org.incendo.cloud.parser.flag.CommandFlag;
 import org.incendo.cloud.parser.flag.CommandFlagParser;
 import org.incendo.cloud.parser.standard.LiteralParser;
@@ -1377,7 +1378,7 @@ public class Command<C> {
                 final @NonNull ParserDescriptor<C, U> firstParser,
                 final @NonNull String secondName,
                 final @NonNull ParserDescriptor<C, V> secondParser,
-                final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
+                final AggregateParserPairBuilder.@NonNull Mapper<C, U, V, O> mapper,
                 final @NonNull Description description
         ) {
             if (this.commandManager == null) {
@@ -1416,7 +1417,7 @@ public class Command<C> {
                 final @NonNull ParserDescriptor<C, U> firstParser,
                 final @NonNull String secondName,
                 final @NonNull ParserDescriptor<C, V> secondParser,
-                final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
+                final AggregateParserPairBuilder.@NonNull Mapper<C, U, V, O> mapper,
                 final @NonNull Description description
         ) {
             if (this.commandManager == null) {
@@ -1455,7 +1456,7 @@ public class Command<C> {
                 final @NonNull ParserDescriptor<C, U> firstParser,
                 final @NonNull String secondName,
                 final @NonNull ParserDescriptor<C, V> secondParser,
-                final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
+                final AggregateParserPairBuilder.@NonNull Mapper<C, U, V, O> mapper,
                 final @NonNull Description description
         ) {
             if (this.commandManager == null) {
@@ -1494,7 +1495,7 @@ public class Command<C> {
                 final @NonNull ParserDescriptor<C, U> firstParser,
                 final @NonNull String secondName,
                 final @NonNull ParserDescriptor<C, V> secondParser,
-                final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
+                final AggregateParserPairBuilder.@NonNull Mapper<C, U, V, O> mapper,
                 final @NonNull Description description
         ) {
             if (this.commandManager == null) {
@@ -1708,7 +1709,7 @@ public class Command<C> {
                 final @NonNull ParserDescriptor<C, V> secondParser,
                 final @NonNull String thirdName,
                 final @NonNull ParserDescriptor<C, W> thirdParser,
-                final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
+                final AggregateParserTripletBuilder.@NonNull Mapper<C, U, V, W, O> mapper,
                 final @NonNull Description description
         ) {
             if (this.commandManager == null) {
@@ -1756,7 +1757,7 @@ public class Command<C> {
                 final @NonNull ParserDescriptor<C, V> secondParser,
                 final @NonNull String thirdName,
                 final @NonNull ParserDescriptor<C, W> thirdParser,
-                final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
+                final AggregateParserTripletBuilder.@NonNull Mapper<C, U, V, W, O> mapper,
                 final @NonNull Description description
         ) {
             if (this.commandManager == null) {
@@ -1804,7 +1805,7 @@ public class Command<C> {
                 final @NonNull ParserDescriptor<C, V> secondParser,
                 final @NonNull String thirdName,
                 final @NonNull ParserDescriptor<C, W> thirdParser,
-                final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
+                final AggregateParserTripletBuilder.@NonNull Mapper<C, U, V, W, O> mapper,
                 final @NonNull Description description
         ) {
             if (this.commandManager == null) {
@@ -1852,7 +1853,7 @@ public class Command<C> {
                 final @NonNull ParserDescriptor<C, V> secondParser,
                 final @NonNull String thirdName,
                 final @NonNull ParserDescriptor<C, W> thirdParser,
-                final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
+                final AggregateParserTripletBuilder.@NonNull Mapper<C, U, V, W, O> mapper,
                 final @NonNull Description description
         ) {
             if (this.commandManager == null) {

@@ -64,9 +64,6 @@ public class AggregateParserBuilder<C> {
 
     /**
      * Returns a new builder with the given {@code mapper}.
-     * <p>
-     * Use {@link #withDirectMapper(Class, AggregateResultMapper.DirectAggregateResultMapper)} if you do not want to wrap
-     * the result in a completable future.
      *
      * @param <O>       the type produced by the mapper
      * @param valueType the type produced by the mapper
@@ -92,7 +89,7 @@ public class AggregateParserBuilder<C> {
      */
     public final <O> @NonNull MappedAggregateParserBuilder<C, O> withDirectMapper(
             final @NonNull Class<O> valueType,
-            final AggregateResultMapper.@NonNull DirectAggregateResultMapper<C, O> mapper
+            final AggregateResultMapper.@NonNull DirectSuccessMapper<C, O> mapper
     ) {
         return new MappedAggregateParserBuilder<>(this.components(), TypeToken.get(valueType), mapper);
     }
@@ -109,7 +106,7 @@ public class AggregateParserBuilder<C> {
      */
     public final <O> @NonNull MappedAggregateParserBuilder<C, O> withDirectMapper(
             final @NonNull TypeToken<O> valueType,
-            final AggregateResultMapper.@NonNull DirectAggregateResultMapper<C, O> mapper
+            final AggregateResultMapper.@NonNull DirectSuccessMapper<C, O> mapper
     ) {
         return new MappedAggregateParserBuilder<>(this.components(), valueType, mapper);
     }
