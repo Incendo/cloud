@@ -32,6 +32,8 @@ import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.parser.ArgumentParseResult;
 import org.incendo.cloud.type.tuple.Triplet;
 
+import static java.util.Objects.requireNonNull;
+
 public final class AggregateParserTripletBuilder<C, U, V, Z, O> {
 
     /**
@@ -134,8 +136,9 @@ public final class AggregateParserTripletBuilder<C, U, V, Z, O> {
      * @param <O>    output type
      * @return mapper
      */
-    static <C, U, V, Z, O> Mapper<C, U, V, Z, O> directMapper(final Mapper.DirectSuccessMapper<C, U, V, Z, O> mapper) {
-        return mapper;
+    public static <C, U, V, Z, O> @NonNull Mapper<C, U, V, Z, O> directMapper(
+            final Mapper.@NonNull DirectSuccessMapper<C, U, V, Z, O> mapper) {
+        return requireNonNull(mapper, "mapper");
     }
 
     public interface Mapper<C, U, V, Z, O> {

@@ -32,6 +32,8 @@ import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.parser.ArgumentParseResult;
 import org.incendo.cloud.type.tuple.Pair;
 
+import static java.util.Objects.requireNonNull;
+
 public final class AggregateParserPairBuilder<C, U, V, O> {
 
     /**
@@ -127,8 +129,9 @@ public final class AggregateParserPairBuilder<C, U, V, O> {
      * @param <O>    output type
      * @return mapper
      */
-    static <C, U, V, O> Mapper<C, U, V, O> directMapper(final Mapper.DirectSuccessMapper<C, U, V, O> mapper) {
-        return mapper;
+    public static <C, U, V, O> @NonNull Mapper<C, U, V, O> directMapper(
+            final Mapper.@NonNull DirectSuccessMapper<C, U, V, O> mapper) {
+        return requireNonNull(mapper, "mapper");
     }
 
     public interface Mapper<C, U, V, O> {
