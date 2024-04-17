@@ -232,11 +232,7 @@ public final class CommandTree<C> {
         final PermissionResult permissionResult = this.determinePermissionResult(commandContext.sender(), root);
         if (permissionResult.denied()) {
             return CompletableFutures.failedFuture(
-                    new NoPermissionException(
-                            permissionResult,
-                            commandContext.sender(),
-                            this.getComponentChain(root)
-                    )
+                    this.noPermissionOrSyntax(permissionResult, commandContext.sender(), root)
             );
         }
 
@@ -334,11 +330,7 @@ public final class CommandTree<C> {
                         );
                         if (check.denied()) {
                             return CompletableFutures.failedFuture(
-                                    new NoPermissionException(
-                                            check,
-                                            commandContext.sender(),
-                                            this.getComponentChain(root)
-                                    )
+                                    this.noPermissionOrSyntax(check, commandContext.sender(), root)
                             );
                         }
                         return CompletableFuture.completedFuture(root.command());
@@ -353,6 +345,72 @@ public final class CommandTree<C> {
                             )
                     );
                 });
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private Exception noPermissionOrSyntax(
+            final PermissionResult permissionResult,
+            final C sender,
+            final CommandNode<C> root
+    ) {
+        final boolean convert = this.commandManager.settings().get(ManagerSetting.HIDE_COMMAND_EXISTENCE);
+        if (!convert) {
+            return new NoPermissionException(
+                    permissionResult,
+                    sender,
+                    this.getComponentChain(root)
+            );
+        }
+
+        if (this.childPermitted(root, sender)) {
+            return new InvalidSyntaxException(
+                    this.commandManager.commandSyntaxFormatter().apply(sender, (List) this.getComponentChain(root), root),
+                    sender, this.getComponentChain(root)
+            );
+        }
+
+        final @Nullable List<CommandNode<C>> parentChain = this.permittedParentChain(root, sender);
+        if (parentChain != null) {
+            return new InvalidSyntaxException(
+                    this.commandManager.commandSyntaxFormatter().apply(
+                            sender,
+                            parentChain.stream().map(CommandNode::component)
+                                    .filter(Objects::nonNull).collect(Collectors.toList()),
+                            root
+                    ),
+                    sender, this.getComponentChain(root)
+            );
+        }
+
+        return new NoPermissionException(
+                permissionResult,
+                sender,
+                this.getComponentChain(root)
+        );
+    }
+
+    private boolean childPermitted(final CommandNode<C> node, final C sender) {
+        if (this.determinePermissionResult(sender, node).allowed()) {
+            return true;
+        }
+        for (final CommandNode<C> child : node.children()) {
+            if (this.childPermitted(child, sender)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private @Nullable List<CommandNode<C>> permittedParentChain(final CommandNode<C> node, final C sender) {
+        final @Nullable CommandNode<C> parent = node.parent();
+        if (parent != null) {
+            if (this.determinePermissionResult(sender, parent).allowed()) {
+                return this.getChain(parent);
+            } else {
+                return this.permittedParentChain(parent, sender);
+            }
+        }
+        return null;
     }
 
     private @Nullable CompletableFuture<@Nullable Command<C>> attemptParseUnambiguousChild(
@@ -386,11 +444,7 @@ public final class CommandTree<C> {
         final PermissionResult childCheck = this.determinePermissionResult(sender, child);
         if (!commandInput.isEmpty() && childCheck.denied()) {
             return CompletableFutures.failedFuture(
-                    new NoPermissionException(
-                            childCheck,
-                            sender,
-                            this.getComponentChain(child)
-                    )
+                    this.noPermissionOrSyntax(childCheck, sender, child)
             );
         }
 
@@ -453,11 +507,7 @@ public final class CommandTree<C> {
                     return CompletableFuture.completedFuture(command);
                 }
                 return CompletableFutures.failedFuture(
-                        new NoPermissionException(
-                                check,
-                                sender,
-                                this.getComponentChain(root)
-                        )
+                        this.noPermissionOrSyntax(check, sender, root)
                 );
             } else {
                 // The child is not a leaf, but may have an intermediary executor, attempt to use it
@@ -482,11 +532,7 @@ public final class CommandTree<C> {
                 }
 
                 return CompletableFutures.failedFuture(
-                        new NoPermissionException(
-                                check,
-                                sender,
-                                this.getComponentChain(root)
-                        )
+                        this.noPermissionOrSyntax(check, sender, root)
                 );
             }
         }
