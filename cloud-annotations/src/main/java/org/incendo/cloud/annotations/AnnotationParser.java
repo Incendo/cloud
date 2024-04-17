@@ -70,7 +70,7 @@ import org.incendo.cloud.annotations.extractor.FlagExtractor;
 import org.incendo.cloud.annotations.extractor.FlagExtractorImpl;
 import org.incendo.cloud.annotations.extractor.StandardArgumentExtractor;
 import org.incendo.cloud.annotations.injection.RawArgs;
-import org.incendo.cloud.annotations.parser.MethodArgumentParser;
+import org.incendo.cloud.annotations.parser.MethodArgumentParserFactory;
 import org.incendo.cloud.annotations.parser.Parser;
 import org.incendo.cloud.annotations.processing.CommandContainer;
 import org.incendo.cloud.annotations.processing.CommandContainerProcessor;
@@ -85,7 +85,7 @@ import org.incendo.cloud.execution.CommandExecutionHandler;
 import org.incendo.cloud.internal.CommandInputTokenizer;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.meta.CommandMetaBuilder;
-import org.incendo.cloud.parser.ArgumentParser;
+import org.incendo.cloud.parser.ParserDescriptor;
 import org.incendo.cloud.parser.ParserParameter;
 import org.incendo.cloud.parser.ParserParameters;
 import org.incendo.cloud.parser.flag.CommandFlag;
@@ -133,6 +133,7 @@ public final class AnnotationParser<C> {
     private FlagAssembler flagAssembler;
     private CommandExtractor commandExtractor;
     private SuggestionProviderFactory<C> suggestionProviderFactory;
+    private MethodArgumentParserFactory<C> methodArgumentParserFactory;
     private ExceptionHandlerFactory<C> exceptionHandlerFactory;
     private DescriptionMapper descriptionMapper;
     private DefaultValueRegistry<C> defaultValueRegistry;
@@ -212,6 +213,7 @@ public final class AnnotationParser<C> {
         this.argumentAssembler = new ArgumentAssemblerImpl<>(this);
         this.commandExtractor = new CommandExtractorImpl(this);
         this.suggestionProviderFactory = SuggestionProviderFactory.defaultFactory();
+        this.methodArgumentParserFactory = MethodArgumentParserFactory.defaultFactory();
         this.exceptionHandlerFactory = ExceptionHandlerFactory.defaultFactory();
         this.builderDecorators = new ArrayList<>();
         this.defaultValueRegistry = new DefaultValueRegistryImpl<>();
@@ -571,6 +573,26 @@ public final class AnnotationParser<C> {
     }
 
     /**
+     * Returns the method argument parser factory.
+     *
+     * @return the method argument parser factory
+     */
+    @API(status = API.Status.EXPERIMENTAL)
+    public @NonNull MethodArgumentParserFactory<C> methodArgumentParserFactory() {
+        return this.methodArgumentParserFactory;
+    }
+
+    /**
+     * Sets the method argument parser factory.
+     *
+     * @param methodArgumentParserFactory new method argument parser factory
+     */
+    @API(status = API.Status.EXPERIMENTAL)
+    public void methodArgumentParserFactory(final @NonNull MethodArgumentParserFactory<C> methodArgumentParserFactory) {
+        this.methodArgumentParserFactory = methodArgumentParserFactory;
+    }
+
+    /**
      * Returns the exception provider factory.
      *
      * @return the exception provider factory
@@ -859,25 +881,17 @@ public final class AnnotationParser<C> {
                                     )
                             ));
                 }
-                final MethodArgumentParser<C, ?> methodArgumentParser = new MethodArgumentParser<>(
+                final ParserDescriptor<C, ?> parserDescriptor = this.methodArgumentParserFactory.createArgumentParser(
                         suggestionProvider,
                         instance,
                         method,
                         this.manager.parameterInjectorRegistry()
                 );
-                final Function<ParserParameters, ArgumentParser<C, ?>> parserFunction =
-                        parameters -> methodArgumentParser;
                 final String name = this.processString(parser.name());
                 if (name.isEmpty()) {
-                    this.manager.parserRegistry().registerParserSupplier(
-                            TypeToken.get(method.getGenericReturnType()),
-                            parserFunction
-                    );
+                    this.manager.parserRegistry().registerParser(parserDescriptor);
                 } else {
-                    this.manager.parserRegistry().registerNamedParserSupplier(
-                            name,
-                            parserFunction
-                    );
+                    this.manager.parserRegistry().registerNamedParser(name, parserDescriptor);
                 }
             } catch (final Exception e) {
                 throw new RuntimeException(e);

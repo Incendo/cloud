@@ -23,7 +23,9 @@
 //
 package org.incendo.cloud.kotlin.coroutines.annotations
 
+import com.google.common.primitives.UnsignedBytes.toInt
 import com.google.common.truth.Truth.assertThat
+import io.leangen.geantyref.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
@@ -32,6 +34,7 @@ import org.incendo.cloud.CommandManager
 import org.incendo.cloud.annotations.AnnotationParser
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.parser.Parser
 import org.incendo.cloud.annotations.suggestion.Suggestions
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.context.CommandInput
@@ -39,6 +42,8 @@ import org.incendo.cloud.context.StandardCommandContextFactory
 import org.incendo.cloud.exception.CommandExecutionException
 import org.incendo.cloud.execution.ExecutionCoordinator
 import org.incendo.cloud.internal.CommandRegistrationHandler
+import org.incendo.cloud.parser.ArgumentParseResult
+import org.incendo.cloud.parser.ParserParameters
 import org.incendo.cloud.suggestion.Suggestion
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -131,6 +136,60 @@ class KotlinAnnotatedMethodsTest {
         assertThat(suggestions).containsExactlyElementsIn(1..10)
     }
 
+    @Test
+    fun `test suspending parser method`(): Unit = runBlocking {
+        AnnotationParser(commandManager, TestCommandSender::class.java)
+            .installCoroutineSupport()
+            .parse(ParserMethods())
+
+        val commandContext = StandardCommandContextFactory(commandManager).create(
+            true,
+            TestCommandSender()
+        )
+
+        val parser = commandManager.parserRegistry().createParser(
+            TypeToken.get(ParserResult::class.java),
+            ParserParameters.empty()
+        )
+
+        assert(parser.isPresent) {
+            "Suspending parser cannot be found!"
+        }
+
+        val parsedValue = parser.get().parseFuture(commandContext, CommandInput.of("5")).await().parsedValue()
+
+        assert(parsedValue.isPresent) {
+            "Suspending parser cannot parsed the value!"
+        }
+    }
+
+    @Test
+    fun `test suspending parser method with result`(): Unit = runBlocking {
+        AnnotationParser(commandManager, TestCommandSender::class.java)
+            .installCoroutineSupport()
+            .parse(ParserMethods())
+
+        val commandContext = StandardCommandContextFactory(commandManager).create(
+            true,
+            TestCommandSender()
+        )
+
+        val parser = commandManager.parserRegistry().createParser(
+            TypeToken.get(ParserResult2::class.java),
+            ParserParameters.empty()
+        )
+
+        assert(parser.isPresent) {
+            "Suspending parser cannot be found!"
+        }
+
+        val parsedValue = parser.get().parseFuture(commandContext, CommandInput.of("5")).await().parsedValue()
+
+        assert(parsedValue.isPresent) {
+            "Suspending parser cannot parsed the value!"
+        }
+    }
+
     public class TestCommandSender
 
     private class TestCommandManager : CommandManager<TestCommandSender>(
@@ -171,5 +230,24 @@ class KotlinAnnotatedMethodsTest {
         @Suggestions("non-suspending-suggestions")
         fun suggestions(ctx: CommandContext<TestCommandSender>, input: String): Sequence<Suggestion> =
             (1..10).asSequence().map(Int::toString).map(Suggestion::suggestion)
+    }
+
+    data class ParserResult(val test: Int)
+
+    data class ParserResult2(val test: Int)
+
+    class ParserMethods {
+
+        @Parser
+        suspend fun suspendingParser(input: CommandInput): ParserResult =
+            withContext(Dispatchers.Default) {
+                ParserResult(input.lastRemainingToken().toInt())
+            }
+
+        @Parser
+        suspend fun suspendingParser2(input: CommandInput): ArgumentParseResult<ParserResult2> =
+            withContext(Dispatchers.Default) {
+                ArgumentParseResult.success(ParserResult2(input.lastRemainingToken().toInt()))
+            }
     }
 }
