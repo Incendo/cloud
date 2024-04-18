@@ -404,11 +404,11 @@ class CommandSuggestionsTest {
 
         final String input5 = "flags3 --compound 22 ";
         final List<? extends Suggestion> suggestions5 = this.manager.suggestionFactory().suggestImmediately(new TestCommandSender(), input5).list();
-        Assertions.assertEquals(suggestionList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions5);
+        Assertions.assertEquals(suggestionList("22 0", "22 1", "22 2", "22 3", "22 4", "22 5", "22 6", "22 7", "22 8", "22 9"), suggestions5);
 
         final String input6 = "flags3 --compound 22 1";
         final List<? extends Suggestion> suggestions6 = this.manager.suggestionFactory().suggestImmediately(new TestCommandSender(), input6).list();
-        Assertions.assertEquals(suggestionList("1", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"), suggestions6);
+        Assertions.assertEquals(suggestionList("22 1", "22 10", "22 11", "22 12", "22 13", "22 14", "22 15", "22 16", "22 17", "22 18", "22 19"), suggestions6);
 
         /* We've typed compound already, so that flag should be omitted from the suggestions */
         final String input7 = "flags3 --compound 22 33 44 ";
