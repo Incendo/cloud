@@ -64,6 +64,10 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
      */
     public static final CloudKey<String> FLAG_META_KEY = CloudKey.of("__last_flag__", TypeToken.get(String.class));
     /**
+     * Metadata for the position of the cursor before parsing the last flag's value
+     */
+    public static final CloudKey<Integer> FLAG_CURSOR_KEY = CloudKey.of("__flag_cursor__", TypeToken.get(Integer.class));
+    /**
      * Metadata for the set of parsed flags, used to detect duplicates.
      */
     public static final CloudKey<Set<CommandFlag<?>>> PARSED_FLAGS = CloudKey.of("__parsed_flags__",
@@ -122,20 +126,12 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
             return Optional.empty();
         }
 
-        /* Before parsing, retrieve the last known input of the queue */
-        final String lastInputValue = commandInput.lastRemainingToken();
-
         /* Parse, but ignore the result of parsing */
         final FlagParser parser = new FlagParser();
         parser.parse(commandContext, commandInput);
 
-        /*
-         * If the parser parsed the entire queue, restore the last typed
-         * input obtained earlier.
-         */
-        if (commandInput.isEmpty()) {
-            final int count = lastInputValue.length();
-            commandInput.moveCursor(-count);
+        if (commandContext.contains(FLAG_CURSOR_KEY)) {
+            commandInput.cursor(commandContext.get(FLAG_CURSOR_KEY));
         }
 
         return Optional.ofNullable(parser.lastParsedFlag());
@@ -485,6 +481,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
 
                     // The flag has no argument, so we're done.
                     if (flag.commandComponent() == null) {
+                        commandContext.remove(FLAG_CURSOR_KEY);
                         commandContext.flags().addPresenceFlag(flag);
                         parsedFlags.add(flag);
                         return CompletableFuture.completedFuture(null);
@@ -515,12 +512,15 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
 
                     // We then attempt to parse the flag.
                     final CommandFlag parsingFlag = flag;
+                    final CommandInput commandInputCopy = commandInput.copy();
                     return ((CommandComponent<C>) flag.commandComponent())
                             .parser()
                             .parseFuture(
                                     commandContext,
                                     commandInput
                             ).thenApply(parsedValue -> {
+                                commandContext.store(FLAG_CURSOR_KEY, commandInputCopy.cursor());
+
                                 // Forward parsing errors.
                                 if (parsedValue.failure().isPresent()) {
                                     return (ArgumentParseResult<Object>) parsedValue;

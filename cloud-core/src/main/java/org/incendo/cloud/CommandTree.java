@@ -790,7 +790,8 @@ public final class CommandTree<C> {
         }
 
         if (commandInput.isEmpty() || commandInput.remainingTokens() == 1
-                || (child.isLeaf() && child.component().parser() instanceof AggregateParser)) {
+                || (child.isLeaf() && child.component().parser() instanceof AggregateParser)
+                || (child.component().parser() instanceof CommandFlagParser)) {
             return this.addArgumentSuggestions(context, child, commandInput, executor);
         }
 
