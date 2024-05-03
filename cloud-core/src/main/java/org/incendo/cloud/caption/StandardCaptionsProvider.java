@@ -125,6 +125,11 @@ public final class StandardCaptionsProvider<C> extends DelegatingCaptionProvider
     public static final String EXCEPTION_INVALID_SENDER =
             "<actual> is not allowed to execute that command. Must be of type <expected>";
     /**
+     * Default caption for {@link StandardCaptionKeys#EXCEPTION_INVALID_SENDER}
+     */
+    public static final String EXCEPTION_INVALID_SENDER_LIST =
+            "<actual> is not allowed to execute that command. Must be one of <expected>";
+    /**
      * Default caption for {@link StandardCaptionKeys#EXCEPTION_INVALID_SYNTAX}
      */
     public static final String EXCEPTION_INVALID_SYNTAX = "Invalid command syntax. Correct command syntax is: <syntax>.";
@@ -196,6 +201,9 @@ public final class StandardCaptionsProvider<C> extends DelegatingCaptionProvider
             ).putCaption(
                     StandardCaptionKeys.EXCEPTION_INVALID_SENDER,
                     EXCEPTION_INVALID_SENDER
+            ).putCaption(
+                    StandardCaptionKeys.EXCEPTION_INVALID_SENDER_LIST,
+                    EXCEPTION_INVALID_SENDER_LIST
             ).putCaption(
                     StandardCaptionKeys.EXCEPTION_INVALID_SYNTAX,
                     EXCEPTION_INVALID_SYNTAX

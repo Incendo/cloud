@@ -24,6 +24,7 @@
 package org.incendo.cloud.feature;
 
 import io.leangen.geantyref.TypeToken;
+import java.util.Random;
 import java.util.concurrent.CompletionException;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
@@ -31,12 +32,13 @@ import org.incendo.cloud.TestCommandSender;
 import org.incendo.cloud.component.DefaultValue;
 import org.incendo.cloud.exception.InvalidCommandSenderException;
 import org.incendo.cloud.parser.ParserDescriptor;
-import org.incendo.cloud.suggestion.SuggestionProvider;
+import org.incendo.cloud.permission.PredicatePermission;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.incendo.cloud.parser.standard.IntegerParser.integerParser;
+import static org.incendo.cloud.truth.CompletableFutureSubject.assertThat;
 import static org.incendo.cloud.util.TestUtils.createManager;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -54,7 +56,6 @@ class ChangedCommandSenderTypeTest {
         // Arrange
         final Command.Builder<TestCommandSender> root = commandManager.commandBuilder("root");
         final ParserDescriptor<TestCommandSender, Integer> integerParser = integerParser();
-        final SuggestionProvider<TestCommandSender> suggestionProvider = integerParser.parser().suggestionProvider();
         final DefaultValue<TestCommandSender, Integer> defaultValue = DefaultValue.constant(5);
 
         // Act
@@ -62,13 +63,63 @@ class ChangedCommandSenderTypeTest {
                 root.literal("literal").senderType(SubType.class).optional(
                         "integer",
                         integerParser,
-                        defaultValue,
-                        suggestionProvider
+                        defaultValue
                 )
         );
 
         // Assert
         this.commandManager.commandExecutor().executeCommand(new SubType(), "root literal 10").join();
+    }
+
+    @Test
+    void testDynamicDefaults() {
+        // Arrange
+        final Command.Builder<TestCommandSender> root = commandManager.commandBuilder("root");
+        final ParserDescriptor<TestCommandSender, Integer> integerParser = integerParser();
+        final DefaultValue<SubType, Integer> defaultValue = DefaultValue.dynamic(ctx -> ctx.sender().random);
+
+        // Act
+        this.commandManager.command(
+                root.literal("literal").senderType(SubType.class).optional(
+                        "integer",
+                        integerParser,
+                        defaultValue
+                )
+        );
+
+        // Assert
+
+        // Correct sender works
+        this.commandManager.commandExecutor().executeCommand(new SubType(), "root literal").join();
+
+        // Invalid sender gives correct exception
+        assertThat(this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "root literal"))
+                .hasFailureThat().isInstanceOf(InvalidCommandSenderException.class);
+    }
+
+    @Test
+    void testPredicatePermissions() {
+        // Arrange
+        final Command.Builder<TestCommandSender> root = commandManager.commandBuilder("root");
+        final ParserDescriptor<TestCommandSender, Integer> integerParser = integerParser();
+        final PredicatePermission<SubType> permission = PredicatePermission.of(SubType::yes);
+
+        // Act
+        this.commandManager.command(
+                root.literal("literal").senderType(SubType.class).optional(
+                        "integer",
+                        integerParser
+                ).permission(permission)
+        );
+
+        // Assert
+
+        // Correct sender works
+        this.commandManager.commandExecutor().executeCommand(new SubType(), "root literal 1").join();
+
+        // Invalid sender gives correct exception
+        assertThat(this.commandManager.commandExecutor().executeCommand(new TestCommandSender(), "root literal 1"))
+                .hasFailureThat().isInstanceOf(InvalidCommandSenderException.class);
     }
 
     @Test
@@ -105,7 +156,13 @@ class ChangedCommandSenderTypeTest {
         })).hasCauseThat().isInstanceOf(InvalidCommandSenderException.class);
     }
 
-    public static final class SubType extends TestCommandSender {}
+    public static final class SubType extends TestCommandSender {
+        private final int random = new Random().nextInt();
+
+        public boolean yes() {
+            return true;
+        }
+    }
 
     public static abstract class GenericSender<T> extends TestCommandSender {}
 

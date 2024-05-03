@@ -29,9 +29,12 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -229,11 +232,21 @@ public final class CommandTree<C> {
             final @NonNull CommandNode<C> root,
             final @NonNull Executor executor
     ) {
-        final PermissionResult permissionResult = this.determinePermissionResult(commandContext.sender(), root);
-        if (permissionResult.denied()) {
+        final Optional<PermissionResult> permissionResult = this.determineAccess(commandContext.sender(), root);
+        if (!permissionResult.isPresent()) {
+            return CompletableFutures.failedFuture(
+                    new InvalidCommandSenderException(
+                            commandContext.sender(),
+                            root.nodeMeta().get(CommandNode.META_KEY_SENDER_TYPES),
+                            this.getComponentChain(root),
+                            null
+                    )
+            );
+        }
+        if (permissionResult.get().denied()) {
             return CompletableFutures.failedFuture(
                     new NoPermissionException(
-                            permissionResult,
+                            permissionResult.get(),
                             commandContext.sender(),
                             this.getComponentChain(root)
                     )
@@ -383,11 +396,21 @@ public final class CommandTree<C> {
         final CommandNode<C> child = argumentNodes.get(0);
 
         // Check if we're allowed to execute the child command. If not, exit
-        final PermissionResult childCheck = this.determinePermissionResult(sender, child);
-        if (!commandInput.isEmpty() && childCheck.denied()) {
+        final Optional<PermissionResult> childCheck = this.determineAccess(sender, child);
+        if (!childCheck.isPresent()) {
+            return CompletableFutures.failedFuture(
+                    new InvalidCommandSenderException(
+                            sender,
+                            child.nodeMeta().get(CommandNode.META_KEY_SENDER_TYPES),
+                            this.getComponentChain(child),
+                            null
+                    )
+            );
+        }
+        if (!commandInput.isEmpty() && childCheck.get().denied()) {
             return CompletableFutures.failedFuture(
                     new NoPermissionException(
-                            childCheck,
+                            childCheck.get(),
                             sender,
                             this.getComponentChain(child)
                     )
@@ -640,7 +663,7 @@ public final class CommandTree<C> {
             final @NonNull Executor executor
     ) {
         // If the sender isn't allowed to access the root node, no suggestions are needed
-        if (!this.canAccess(context.commandContext().sender(), root)) {
+        if (!this.determineAccess(context.commandContext().sender(), root).map(PermissionResult::allowed).orElse(false)) {
             return CompletableFuture.completedFuture(context);
         }
 
@@ -723,7 +746,7 @@ public final class CommandTree<C> {
             final @NonNull CommandNode<C> node,
             final @NonNull CommandInput input
     ) {
-        if (!this.canAccess(context.commandContext().sender(), node)) {
+        if (!this.determineAccess(context.commandContext().sender(), node).map(PermissionResult::allowed).orElse(false)) {
             return CompletableFuture.completedFuture(context);
         }
         final CommandComponent<C> component = Objects.requireNonNull(node.component());
@@ -987,44 +1010,38 @@ public final class CommandTree<C> {
     }
 
     /**
-     * Determines the permission result describing whether the given {@code sender} can execute the command attached to the
-     * given {@code node}.
+     * Checks if the sender can access the node.
      *
-     * @param sender command sender
-     * @param node   command node
-     * @return a permission result for the given sender and node
-     */
-    private @NonNull PermissionResult determinePermissionResult(
-            final @NonNull C sender,
-            final @NonNull CommandNode<C> node
-    ) {
-        final Permission permission = (Permission) node.nodeMeta().get(CommandNode.META_KEY_PERMISSION);
-        if (permission != null) {
-            return this.commandManager.testPermission(sender, permission);
-        }
-        throw new IllegalStateException("Expected permissions to be propagated");
-    }
-
-    /**
-     * Returns {@code true} if the sender matches the type requirements for the node, and
-     * {@link #determinePermissionResult(Object, CommandNode)}} returns {@code true}.
+     * <p>Returns {@link Optional#empty} if the sender does not match the type requirements for the node.</p>
+     *
+     * <p>If the sender matches a sender type-permission entry, the success result will be returned.
+     * Otherwise, a failure result with all of the failed permissions wrapped by {@link Permission#anyOf(Permission...)}
+     * will be returned.</p>
      *
      * @param sender command sender
      * @param node   command node
      * @return whether the sender can access the node
      */
-    @SuppressWarnings("unchecked")
-    private boolean canAccess(final @NonNull C sender, final @NonNull CommandNode<C> node) {
-        final Set<Type> types = (Set<Type>) node.nodeMeta().get(CommandNode.META_KEY_SENDER_TYPES);
-        if (types == null) {
-            throw new IllegalStateException("Expected sender type requirements to be propagated");
+    private Optional<PermissionResult> determineAccess(final @NonNull C sender, final @NonNull CommandNode<C> node) {
+        final Map<Type, Permission> accessMap = node.nodeMeta().getOrNull(CommandNode.META_KEY_ACCESS);
+        if (accessMap == null) {
+            throw new IllegalStateException("Expected access requirements to be propagated");
         }
-        for (final Type type : types) {
-            if (GenericTypeReflector.isSuperType(type, sender.getClass())) {
-                return this.determinePermissionResult(sender, node).allowed();
+        final Set<Permission> failed = new HashSet<>();
+        for (final Map.Entry<Type, Permission> entry : accessMap.entrySet()) {
+            if (GenericTypeReflector.isSuperType(entry.getKey(), sender.getClass())) {
+                final PermissionResult result = this.commandManager.testPermission(sender, entry.getValue());
+                if (result.allowed()) {
+                    return Optional.of(result);
+                } else {
+                    failed.add(entry.getValue());
+                }
             }
         }
-        return false;
+        if (failed.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(PermissionResult.denied(Permission.anyOf(failed)));
     }
 
     /**
@@ -1069,7 +1086,6 @@ public final class CommandTree<C> {
      *
      * @param leafNode leafNode
      */
-    @SuppressWarnings("unchecked")
     private void propagateRequirements(final @NonNull CommandNode<C> leafNode) {
         final Permission commandPermission = leafNode.command().commandPermission();
         Type senderType = leafNode.command().senderType().map(TypeToken::getType).orElse(null);
@@ -1080,19 +1096,43 @@ public final class CommandTree<C> {
         List<CommandNode<C>> chain = this.getChain(leafNode);
         Collections.reverse(chain);
         for (final CommandNode<C> commandArgumentNode : chain) {
-            final Permission existingPermission = (Permission) commandArgumentNode.nodeMeta().get(CommandNode.META_KEY_PERMISSION);
-
-            final Permission permission;
-            if (existingPermission != null) {
-                permission = Permission.anyOf(commandPermission, existingPermission);
-            } else {
-                permission = commandPermission;
-            }
-
-            commandArgumentNode.nodeMeta().put(CommandNode.META_KEY_PERMISSION, permission);
-
-            final Set<Type> senderTypes = (Set<Type>) commandArgumentNode.nodeMeta()
+            final Set<Type> senderTypes = commandArgumentNode.nodeMeta()
                     .computeIfAbsent(CommandNode.META_KEY_SENDER_TYPES, $ -> new HashSet<>());
+            updateSenderRequirements(senderTypes, senderType);
+
+            final Map<Type, Permission> accessMap = commandArgumentNode.nodeMeta()
+                    .computeIfAbsent(CommandNode.META_KEY_ACCESS, $ -> new HashMap<>());
+            updateAccess(accessMap, senderType, commandPermission);
+        }
+    }
+
+    private static void updateAccess(
+            final Map<Type, Permission> senderTypes,
+            final Type senderType,
+            final Permission commandPermission
+    ) {
+        senderTypes.compute(senderType, (key, existing) -> {
+           if (existing == null) {
+               return commandPermission;
+           }
+           return Permission.anyOf(existing, commandPermission);
+        });
+    }
+
+    private static void updateSenderRequirements(final Set<Type> senderTypes, final Type senderType) {
+        boolean add = true;
+        for (final Iterator<Type> iterator = senderTypes.iterator(); iterator.hasNext();) {
+            final Type existingType = iterator.next();
+            if (GenericTypeReflector.isSuperType(existingType, senderType)) {
+                add = false;
+                break;
+            }
+            if (GenericTypeReflector.isSuperType(senderType, existingType)) {
+                iterator.remove();
+                break;
+            }
+        }
+        if (add) {
             senderTypes.add(senderType);
         }
     }
