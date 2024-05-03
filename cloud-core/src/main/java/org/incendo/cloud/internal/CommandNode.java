@@ -54,7 +54,7 @@ import static org.incendo.cloud.key.CloudKey.cloudKey;
 public final class CommandNode<C> {
 
     /*
-    Flattened view of the required sender types for a node.
+    Flattened view of the allowed sender types for a node.
 
     For example, with manager sender type Object and structure
       root a does not have executor
@@ -67,7 +67,7 @@ public final class CommandNode<C> {
     when a leaf does not require a specific sender, Object is used as a substitute
      */
     public static final CloudKey<Set<Type>> META_KEY_SENDER_TYPES = cloudKey("senderTypes", new TypeToken<Set<Type>>() {});
-    // Map of flattened sender types from above to the permission required to execute the chain for that type.
+    // Map of allowed sender types (not flattened) to the permission required to execute the chain for that type.
     public static final CloudKey<Map<Type, Permission>> META_KEY_ACCESS = cloudKey(
             "access",
             new TypeToken<Map<Type, Permission>>() {}
