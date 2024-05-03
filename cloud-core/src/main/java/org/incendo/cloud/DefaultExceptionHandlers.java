@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.caption.Caption;
@@ -100,14 +101,19 @@ final class DefaultExceptionHandlers<C> {
                         CaptionVariable.of("permission", context.exception().permissionResult().permission().permissionString())
                 )
         );
-        this.exceptionController.registerHandler(InvalidCommandSenderException.class, context ->
-                this.sendMessage(
-                        context,
-                        StandardCaptionKeys.EXCEPTION_INVALID_SENDER,
-                        CaptionVariable.of("actual", context.context().sender().getClass().getSimpleName()),
-                        CaptionVariable.of("expected", TypeUtils.simpleName(context.exception().requiredSender()))
-                )
-        );
+        this.exceptionController.registerHandler(InvalidCommandSenderException.class, context -> {
+            final boolean multiple = context.exception().requiredSenderTypes().size() != 1;
+            final String expected = multiple
+                    ? context.exception().requiredSenderTypes().stream().map(TypeUtils::simpleName)
+                    .collect(Collectors.joining(", "))
+                    : TypeUtils.simpleName(context.exception().requiredSenderTypes().iterator().next());
+            this.sendMessage(
+                    context,
+                    multiple ? StandardCaptionKeys.EXCEPTION_INVALID_SENDER_LIST : StandardCaptionKeys.EXCEPTION_INVALID_SENDER,
+                    CaptionVariable.of("actual", context.context().sender().getClass().getSimpleName()),
+                    CaptionVariable.of("expected", expected)
+            );
+        });
         this.exceptionController.registerHandler(InvalidSyntaxException.class, context ->
                 this.sendMessage(
                         context,

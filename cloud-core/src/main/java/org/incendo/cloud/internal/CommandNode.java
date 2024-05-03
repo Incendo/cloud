@@ -23,6 +23,8 @@
 //
 package org.incendo.cloud.internal;
 
+import io.leangen.geantyref.TypeToken;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -30,12 +32,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.component.CommandComponent;
+import org.incendo.cloud.key.CloudKey;
+import org.incendo.cloud.key.SimpleMutableCloudKeyContainer;
+import org.incendo.cloud.permission.Permission;
+
+import static org.incendo.cloud.key.CloudKey.cloudKey;
 
 /**
  * Very simple tree structure
@@ -45,10 +53,27 @@ import org.incendo.cloud.component.CommandComponent;
 @API(status = API.Status.INTERNAL, consumers = "org.incendo.cloud.*")
 public final class CommandNode<C> {
 
-    public static final String META_KEY_PERMISSION = "permission";
-    public static final String META_KEY_SENDER_TYPES = "senderTypes";
+    /*
+    Flattened view of the required sender types for a node.
 
-    private final Map<String, Object> nodeMeta = new HashMap<>();
+    For example, with manager sender type Object and structure
+      root a does not have executor
+        child b has executor requires sender A (extends Object)
+        child c has executor requires sender B (extends Object)
+        child d has executor requires sender AA (extends A)
+
+    the root node would have Set.of(A, B)
+
+    when a leaf does not require a specific sender, Object is used as a substitute
+     */
+    public static final CloudKey<Set<Type>> META_KEY_SENDER_TYPES = cloudKey("senderTypes", new TypeToken<Set<Type>>() {});
+    // Map of flattened sender types from above to the permission required to execute the chain for that type.
+    public static final CloudKey<Map<Type, Permission>> META_KEY_ACCESS = cloudKey(
+            "access",
+            new TypeToken<Map<Type, Permission>>() {}
+    );
+
+    private final SimpleMutableCloudKeyContainer nodeMeta = new SimpleMutableCloudKeyContainer(new HashMap<>());
     private final List<CommandNode<C>> children = new LinkedList<>();
     private final CommandComponent<C> component;
     private CommandNode<C> parent;
@@ -123,7 +148,7 @@ public final class CommandNode<C> {
      *
      * @return Node meta
      */
-    public @NonNull Map<@NonNull String, @NonNull Object> nodeMeta() {
+    public @NonNull SimpleMutableCloudKeyContainer nodeMeta() {
         return this.nodeMeta;
     }
 

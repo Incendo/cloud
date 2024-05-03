@@ -28,7 +28,7 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.function.Predicate;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -70,7 +70,6 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     @Override
     public final @NonNull String apply(
             final @Nullable C sender,
@@ -81,20 +80,15 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
             if (sender == null) {
                 return true;
             }
-            final Permission permission = (Permission) n.nodeMeta().getOrDefault(
-                    CommandNode.META_KEY_PERMISSION,
-                    Permission.empty()
+            final Map<Type, Permission> accessMap = n.nodeMeta().getOrDefault(
+                    CommandNode.META_KEY_ACCESS,
+                    Collections.emptyMap()
             );
-            final Set<Type> senderTypes = (Set<Type>) n.nodeMeta().getOrDefault(
-                    CommandNode.META_KEY_SENDER_TYPES,
-                    Collections.emptySet()
-            );
-            if (senderTypes.isEmpty()) {
-                return this.manager.testPermission(sender, permission).allowed();
-            }
-            for (final Type senderType : senderTypes) {
-                if (GenericTypeReflector.isSuperType(senderType, sender.getClass())) {
-                    return this.manager.testPermission(sender, permission).allowed();
+            for (final Map.Entry<Type, Permission> entry : accessMap.entrySet()) {
+                if (GenericTypeReflector.isSuperType(entry.getKey(), sender.getClass())) {
+                    if (this.manager.testPermission(sender, entry.getValue()).allowed()) {
+                        return true;
+                    }
                 }
             }
             return false;

@@ -125,6 +125,10 @@ public final class StandardCaptionKeys {
      */
     public static final Caption EXCEPTION_INVALID_SENDER = of("exception.invalid_sender");
     /**
+     * Variables: {@code <actual>}, {@code <expected>}
+     */
+    public static final Caption EXCEPTION_INVALID_SENDER_LIST = of("exception.invalid_sender_list");
+    /**
      * Variables: {@code <syntax>}
      */
     public static final Caption EXCEPTION_INVALID_SYNTAX = of("exception.invalid_syntax");
