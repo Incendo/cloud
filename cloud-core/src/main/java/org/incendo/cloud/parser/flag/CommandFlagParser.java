@@ -115,6 +115,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
      *
      * @param commandContext Command context
      * @param commandInput   The input arguments
+     * @param completionExecutor The completion executor
      * @return current flag being typed, or {@code empty()} if none is
      */
     @API(status = API.Status.STABLE)
