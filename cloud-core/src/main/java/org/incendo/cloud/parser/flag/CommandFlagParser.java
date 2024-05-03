@@ -34,6 +34,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apiguardian.api.API;
@@ -117,24 +118,26 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
      * @return current flag being typed, or {@code empty()} if none is
      */
     @API(status = API.Status.STABLE)
-    public @NonNull Optional<String> parseCurrentFlag(
+    public @NonNull CompletableFuture<Optional<String>> parseCurrentFlag(
             final @NonNull CommandContext<@NonNull C> commandContext,
-            final @NonNull CommandInput commandInput
+            final @NonNull CommandInput commandInput,
+            final @NonNull Executor completionExecutor
     ) {
         /* If empty, nothing to do */
         if (commandInput.isEmpty()) {
-            return Optional.empty();
+            return CompletableFuture.completedFuture(Optional.empty());
         }
 
         /* Parse, but ignore the result of parsing */
         final FlagParser parser = new FlagParser();
-        parser.parse(commandContext, commandInput);
+        final CompletableFuture<@NonNull ArgumentParseResult<Object>> result = parser.parse(commandContext, commandInput);
 
-        if (commandContext.contains(FLAG_CURSOR_KEY)) {
-            commandInput.cursor(commandContext.get(FLAG_CURSOR_KEY));
-        }
-
-        return Optional.ofNullable(parser.lastParsedFlag());
+        return result.thenApplyAsync(parseResult -> {
+            if (commandContext.contains(FLAG_CURSOR_KEY)) {
+                commandInput.cursor(commandContext.get(FLAG_CURSOR_KEY));
+            }
+            return Optional.ofNullable(parser.lastParsedFlag());
+        }, completionExecutor);
     }
 
     @Override
@@ -548,7 +551,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
         }
 
         private @NonNull CompletableFuture<ArgumentParseResult<Object>> fail(final @NonNull Throwable exception) {
-            return CompletableFuture.completedFuture(ArgumentParseResult.failure(exception));
+            return ArgumentParseResult.failureFuture(exception);
         }
     }
 }
