@@ -1111,28 +1111,12 @@ public final class CommandTree<C> {
             final Type senderType,
             final Permission commandPermission
     ) {
-        boolean add = true;
-        @Nullable Permission existing = null;
-        for (final Iterator<Map.Entry<Type, Permission>> iterator = senderTypes.entrySet().iterator(); iterator.hasNext();) {
-            final Map.Entry<Type, Permission> existingType = iterator.next();
-            if (GenericTypeReflector.isSuperType(existingType.getKey(), senderType)) {
-                existingType.setValue(Permission.anyOf(existingType.getValue(), commandPermission));
-                add = false;
-                break;
-            }
-            if (GenericTypeReflector.isSuperType(senderType, existingType.getKey())) {
-                iterator.remove();
-                existing = existingType.getValue();
-                break;
-            }
-        }
-        if (add) {
-            if (existing == null) {
-                senderTypes.put(senderType, commandPermission);
-            } else {
-                senderTypes.put(senderType, Permission.anyOf(existing, commandPermission));
-            }
-        }
+        senderTypes.compute(senderType, (key, existing) -> {
+           if (existing == null) {
+               return commandPermission;
+           }
+           return Permission.anyOf(existing, commandPermission);
+        });
     }
 
     private static void updateSenderRequirements(final Set<Type> senderTypes, final Type senderType) {
