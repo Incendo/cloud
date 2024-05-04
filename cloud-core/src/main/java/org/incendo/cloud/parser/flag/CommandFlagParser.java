@@ -129,6 +129,8 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
             return CompletableFuture.completedFuture(Optional.empty());
         }
 
+        final String lastInputValue = commandInput.lastRemainingToken();
+
         /* Parse, but ignore the result of parsing */
         final FlagParser parser = new FlagParser();
         final CompletableFuture<@NonNull ArgumentParseResult<Object>> result = parser.parse(commandContext, commandInput);
@@ -136,6 +138,9 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
         return result.thenApplyAsync(parseResult -> {
             if (commandContext.contains(FLAG_CURSOR_KEY)) {
                 commandInput.cursor(commandContext.get(FLAG_CURSOR_KEY));
+            } else if (commandInput.isEmpty()) {
+                final int count = lastInputValue.length();
+                commandInput.moveCursor(-count);
             }
             return Optional.ofNullable(parser.lastParsedFlag());
         }, completionExecutor);
@@ -523,7 +528,9 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                                     commandContext,
                                     commandInput
                             ).thenApply(parsedValue -> {
-                                commandContext.store(FLAG_CURSOR_KEY, commandInputCopy.cursor());
+                                if (parsedValue.failure().isPresent() || commandInput.isEmpty() || commandInput.peek() != ' ') {
+                                    commandContext.store(FLAG_CURSOR_KEY, commandInputCopy.cursor());
+                                }
 
                                 // Forward parsing errors.
                                 if (parsedValue.failure().isPresent()) {
