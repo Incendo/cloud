@@ -113,7 +113,8 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
         final String input = commandInput.readString();
 
         for (final E value : this.acceptedValues) {
-            if (value.name().equalsIgnoreCase(input)) {
+            final EnumParseable<E> enumParseable = EnumParseable.of(value);
+            if (enumParseable.displayName().equalsIgnoreCase(input)) {
                 return ArgumentParseResult.success(value);
             }
         }
@@ -124,7 +125,11 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(final @NonNull CommandContext<C> commandContext,
                                                                 final @NonNull CommandInput input) {
-        return EnumSet.allOf(this.enumClass).stream().map(e -> e.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
+        return EnumSet.allOf(this.enumClass)
+                .stream()
+                .map(EnumParseable::of)
+                .map(EnumParseable::displayName)
+                .collect(Collectors.toList());
     }
 
 
@@ -159,9 +164,10 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
 
         @SuppressWarnings({"unchecked", "rawtypes"})
         private static @NonNull String join(final @NonNull Class<? extends Enum> clazz) {
-            final EnumSet<?> enumSet = EnumSet.allOf(clazz);
+            final EnumSet<? extends Enum<?>> enumSet = EnumSet.allOf(clazz);
             return enumSet.stream()
-                    .map(e -> e.toString().toLowerCase(Locale.ROOT))
+                    .map(o -> EnumParseable.of((Enum) o))
+                    .map(EnumParseable::displayName)
                     .collect(Collectors.joining(", "));
         }
 
@@ -198,6 +204,67 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
         @Override
         public int hashCode() {
             return Objects.hash(this.input, this.enumClass);
+        }
+    }
+
+
+    /**
+     * Interface that allows for the customization of the parsing of an enum when using a {@link EnumParser}.
+     *
+     * @param <E> enum type
+     */
+    public interface EnumParseable<E extends Enum<E>> {
+
+        /**
+         * Returns a wrapping {@link EnumParseable} for the given {@code value}.
+         *
+         * <p>If the {@code value} is an {@link EnumParseable} then {@code value} will be returned.</p>
+         *
+         * @param <E>   enum type
+         * @param value enum value
+         * @return the enum parseable instance
+         */
+        @SuppressWarnings("unchecked")
+        static <E extends Enum<E>> EnumParseable<E> of(final @NonNull E value) {
+            if (value instanceof EnumParseable<?>) {
+                return (EnumParseable<E>) value;
+            }
+            return new DummyEnumParseable<>(value);
+        }
+
+        /**
+         * Returns the enum display name. This will be used in suggestions and is the value that will be accepted by the parser.
+         *
+         * @return display name
+         */
+        @NonNull String displayName();
+
+        @SuppressWarnings("unchecked")
+        default @NonNull E value() {
+            if (this instanceof Enum<?>) {
+                return (E) this;
+            }
+            throw new UnsupportedOperationException("Cannot retrieve value for non-enum, #value() needs to be overridden");
+        }
+
+
+        final class DummyEnumParseable<E extends Enum<E>> implements EnumParseable<E> {
+
+            private final E value;
+
+            private DummyEnumParseable(final @NonNull E value) {
+                this.value = Objects.requireNonNull(value);
+            }
+
+            @Override
+            public @NonNull String displayName() {
+                return this.value.name().toLowerCase(Locale.ROOT);
+            }
+
+            @Override
+            public @NonNull E value() {
+                return this.value;
+            }
         }
     }
 }
