@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
       - uses: gradle/actions/setup-gradle@v3
         with:
           # allow master and *-dev branches to write caches (default is only master/main)

@@ -36,6 +36,7 @@ import org.incendo.cloud.services.State;
  * @param <Context> Context
  */
 @FunctionalInterface
+@SuppressWarnings("overloads")
 public interface ConsumerService<Context>
         extends SideEffectService<Context>, Consumer<Context> {
 

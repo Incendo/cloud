@@ -23,8 +23,14 @@
 //
 package org.incendo.cloud.annotations.processing;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -35,17 +41,21 @@ import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import javax.tools.Diagnostic;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 final class CommandContainerVisitor implements ElementVisitor<Void, Void> {
 
-    private static final Collection<String> PERMITTED_CONSTRUCTOR_PARAMETER_TYPES = Arrays.asList(
-            "org.incendo.cloud.annotations.AnnotationParser"
+    private static final Collection<String> PERMITTED_CONSTRUCTOR_PARAMETER_TYPES = Collections.unmodifiableSet(
+            new HashSet<>(Arrays.asList(
+                    "org.incendo.cloud.annotations.AnnotationParser"
+            ))
     );
 
     private final ProcessingEnvironment processingEnvironment;
     private final Collection<String> validTypes;
+    private final Map<Element, List<String>> errorsByElement = new HashMap<>();
 
     private boolean suitableConstructorFound;
 
@@ -78,9 +88,10 @@ final class CommandContainerVisitor implements ElementVisitor<Void, Void> {
         if (!e.getModifiers().contains(Modifier.PUBLIC)) {
             this.processingEnvironment.getMessager().printMessage(
                     Diagnostic.Kind.ERROR,
-                    String.format("@Command annotated class must be public (%s)", e.getSimpleName()),
+                    String.format("@CommandContainer-annotated class must be public (%s)", e.getSimpleName()),
                     e
             );
+            return null;
         }
 
         for (final Element enclosedElement : e.getEnclosedElements()) {
@@ -103,9 +114,20 @@ final class CommandContainerVisitor implements ElementVisitor<Void, Void> {
         if (!this.suitableConstructorFound) {
             this.processingEnvironment.getMessager().printMessage(
                     Diagnostic.Kind.ERROR,
-                    String.format("@Command must have a suitable constructor (%s)", e.getSimpleName()),
+                    String.format(
+                            "@CommandContainer-annotated class must have a suitable constructor (%s)",
+                            e.getSimpleName()
+                    ),
                     e
             );
+            for (final Map.Entry<Element, List<String>> entry : this.errorsByElement.entrySet()) {
+                this.processingEnvironment.getMessager().printMessage(
+                        Diagnostic.Kind.WARNING,
+                        "Constructor not suitable: " + String.join(", ", entry.getValue()),
+                        entry.getKey()
+                );
+            }
+            return null;
         }
 
         // We know it's valid, so we'll add it to the list of valid types.
@@ -119,24 +141,45 @@ final class CommandContainerVisitor implements ElementVisitor<Void, Void> {
         return null;
     }
 
+    private void logError(final Element element, final String err) {
+        this.errorsByElement.computeIfAbsent(element, $ -> new ArrayList<>()).add(err);
+    }
+
+    private void logInvalidParam(final VariableElement param) {
+        final List<String> errors = this.errorsByElement.computeIfAbsent(param, $ -> new ArrayList<>());
+        final String allowedParams = "Recognized parameter types: " + PERMITTED_CONSTRUCTOR_PARAMETER_TYPES;
+        if (!errors.contains(allowedParams)) {
+            errors.add(allowedParams);
+        }
+        errors.add("Parameter '" + param + "' is not a recognized type");
+    }
+
     @Override
     public Void visitExecutable(final ExecutableElement e, final Void unused) {
         // We only want to process public constructors.
         if (!e.getModifiers().contains(Modifier.PUBLIC)) {
+            this.logError(e, "Is not public.");
             return null;
         }
 
-        // Now we need to verify that the paramters are correct.
-        final boolean containsIllegalParameter = e.getParameters()
-                .stream()
-                .map(parameter -> parameter.asType().toString())
-                // Ignore annotations.
-                .map(typeString -> typeString.split(" "))
-                .map(parts -> parts[parts.length - 1])
-                // Ignore type parameters.
-                .map(part -> part.split("<")[0])
-                .anyMatch(type -> !PERMITTED_CONSTRUCTOR_PARAMETER_TYPES.contains(type));
-        if (containsIllegalParameter) {
+        // Now we need to verify that the parameters are correct.
+        boolean illegalParams = false;
+        for (final VariableElement variableElement : e.getParameters()) {
+            final boolean isDeclared = variableElement.asType() instanceof DeclaredType;
+            if (!isDeclared) {
+                this.logInvalidParam(variableElement);
+                illegalParams = true;
+                continue;
+            }
+            final DeclaredType type = (DeclaredType) variableElement.asType();
+            final Element typeElement = type.asElement();
+            final String typeName = typeElement.asType().toString().split("<")[0];
+            if (!PERMITTED_CONSTRUCTOR_PARAMETER_TYPES.contains(typeName)) {
+                this.logInvalidParam(variableElement);
+                illegalParams = true;
+            }
+        }
+        if (illegalParams) {
             return null;
         }
 

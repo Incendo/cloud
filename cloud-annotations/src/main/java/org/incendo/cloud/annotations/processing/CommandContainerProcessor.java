@@ -80,7 +80,7 @@ public final class CommandContainerProcessor extends AbstractProcessor {
             this.processingEnv.getMessager().printMessage(
                     Diagnostic.Kind.NOTE,
                     String.format(
-                            "Found valid @Command annotated class: %s",
+                            "Found valid @CommandContainer-annotated class: %s",
                             type
                     )
             );
