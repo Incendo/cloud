@@ -97,7 +97,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @param <C> the command sender type used to execute commands
  */
-@SuppressWarnings({"unchecked", "unused"})
+@SuppressWarnings({"unchecked", "unused", "this-escape"})
 @API(status = API.Status.STABLE)
 public abstract class CommandManager<C> implements Stateful<RegistrationState>, CommandBuilderSource<C> {
 
