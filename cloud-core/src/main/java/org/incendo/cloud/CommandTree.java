@@ -1047,7 +1047,7 @@ public final class CommandTree<C> {
     /**
      * Goes through all commands and registers them, then verifies the integrity of the command tree.
      */
-    public void verifyAndRegister() {
+    private void verifyAndRegister() {
         // All top level commands are supposed to be registered in the command manager
         this.internalTree.children().stream().map(CommandNode::component).forEach(component -> {
             if (component.type() != CommandComponent.ComponentType.LITERAL) {
