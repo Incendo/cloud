@@ -783,12 +783,6 @@ public final class CommandTree<C> {
             // be suggested instead.
             final CommandFlagParser<C> parser = (CommandFlagParser<C>) component.parser();
 
-            if (commandInput.remainingTokens() > 1) {
-                while (commandInput.hasRemainingInput() && commandInput.peek() != '-') {
-                    commandInput.readStringSkipWhitespace();
-                }
-            }
-
             return parser.parseCurrentFlag(context.commandContext(), commandInput, executor).thenCompose(lastFlag -> {
                 if (lastFlag.isPresent()) {
                     context.commandContext().store(CommandFlagParser.FLAG_META_KEY, lastFlag.get());
@@ -801,7 +795,7 @@ public final class CommandTree<C> {
 
         if (commandInput.isEmpty() || commandInput.remainingTokens() == 1
                 || (child.isLeaf() && child.component().parser() instanceof AggregateParser)
-                || (child.component().parser() instanceof CommandFlagParser)) {
+                || (child.isLeaf() && child.component().parser() instanceof CommandFlagParser)) {
             return this.addArgumentSuggestions(context, child, commandInput, executor);
         }
 

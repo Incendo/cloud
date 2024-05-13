@@ -727,7 +727,7 @@ class CommandSuggestionsTest {
         assertThat(suggestions3).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
         assertThat(suggestions4).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
         assertThat(suggestions5).containsExactlyElementsIn(suggestionList("--flag2", "--flag", "-f"));
-        assertThat(suggestions6).containsExactlyElementsIn(suggestionList("--flag2", "--flag", "-f"));
+        assertThat(suggestions6).isEmpty();
     }
 
     @Test
@@ -756,7 +756,7 @@ class CommandSuggestionsTest {
         assertThat(suggestions3).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
         assertThat(suggestions4).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
         assertThat(suggestions5).containsExactlyElementsIn(suggestionList("--flag2", "--flag", "-f"));
-        assertThat(suggestions6).containsExactlyElementsIn(suggestionList("--flag2", "--flag", "-f"));
+        assertThat(suggestions6).isEmpty();
     }
 
     @ParameterizedTest
