@@ -727,7 +727,7 @@ public final class CommandTree<C> {
                 continue;
             }
             suggestionFuture = suggestionFuture
-                    .thenCompose(ctx -> this.addSuggestionsForDynamicArgument(context, commandInput, child, executor));
+                    .thenCompose(ctx -> this.addSuggestionsForDynamicArgument(context, commandInput, child, executor, false));
         }
 
         return suggestionFuture;
@@ -769,28 +769,33 @@ public final class CommandTree<C> {
             final @NonNull SuggestionContext<C, ?> context,
             final @NonNull CommandInput commandInput,
             final @NonNull CommandNode<C> child,
-            final @NonNull Executor executor
+            final @NonNull Executor executor,
+            final boolean inFlag
     ) {
         final CommandComponent<C> component = child.component();
         if (component == null) {
             return CompletableFuture.completedFuture(context);
         }
 
-        if (component.parser() instanceof CommandFlagParser) {
+        if (!inFlag && component.parser() instanceof CommandFlagParser) {
             // Use the flag argument parser to deduce what flag is being suggested right now
             // If empty, then no flag value is being typed, and the different flag options should
             // be suggested instead.
             final CommandFlagParser<C> parser = (CommandFlagParser<C>) component.parser();
-            final Optional<String> lastFlag = parser.parseCurrentFlag(context.commandContext(), commandInput);
-            if (lastFlag.isPresent()) {
-                context.commandContext().store(CommandFlagParser.FLAG_META_KEY, lastFlag.get());
-            } else {
-                context.commandContext().remove(CommandFlagParser.FLAG_META_KEY);
-            }
+
+            return parser.parseCurrentFlag(context.commandContext(), commandInput, executor).thenCompose(lastFlag -> {
+                if (lastFlag.isPresent()) {
+                    context.commandContext().store(CommandFlagParser.FLAG_META_KEY, lastFlag.get());
+                } else {
+                    context.commandContext().remove(CommandFlagParser.FLAG_META_KEY);
+                }
+                return this.addSuggestionsForDynamicArgument(context, commandInput, child, executor, true);
+            });
         }
 
         if (commandInput.isEmpty() || commandInput.remainingTokens() == 1
-                || (child.isLeaf() && child.component().parser() instanceof AggregateParser)) {
+                || (child.isLeaf() && child.component().parser() instanceof AggregateParser)
+                || (child.isLeaf() && child.component().parser() instanceof CommandFlagParser)) {
             return this.addArgumentSuggestions(context, child, commandInput, executor);
         }
 
