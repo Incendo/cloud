@@ -138,7 +138,7 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
         return result.thenApplyAsync(parseResult -> {
             if (commandContext.contains(FLAG_CURSOR_KEY)) {
                 commandInput.cursor(commandContext.get(FLAG_CURSOR_KEY));
-            } else if (commandInput.isEmpty()) {
+            } else if (parser.lastParsedFlag() == null && commandInput.isEmpty()) {
                 final int count = lastInputValue.length();
                 commandInput.moveCursor(-count);
             }
@@ -542,8 +542,12 @@ public final class CommandFlagParser<C> implements ArgumentParser.FutureArgument
                                 // At this point we know the flag parsed successfully.
                                 parsedFlags.add(parsingFlag);
 
-                                // We're no longer parsing a flag.
-                                this.lastParsedFlag = null;
+                                if (!commandInput.isEmpty(false)) {
+                                    if (commandInput.peek() == ' ') {
+                                        // We're no longer parsing a flag.
+                                        this.lastParsedFlag = null;
+                                    }
+                                }
 
                                 return null;
                             });
