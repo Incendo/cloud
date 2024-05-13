@@ -125,7 +125,7 @@ public final class StandardCaptionsProvider<C> extends DelegatingCaptionProvider
     public static final String EXCEPTION_INVALID_SENDER =
             "<actual> is not allowed to execute that command. Must be of type <expected>";
     /**
-     * Default caption for {@link StandardCaptionKeys#EXCEPTION_INVALID_SENDER}
+     * Default caption for {@link StandardCaptionKeys#EXCEPTION_INVALID_SENDER_LIST}
      */
     public static final String EXCEPTION_INVALID_SENDER_LIST =
             "<actual> is not allowed to execute that command. Must be one of <expected>";
