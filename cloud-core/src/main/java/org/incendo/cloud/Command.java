@@ -586,15 +586,15 @@ public class Command<C> {
         /**
          * Marks the {@code builder} as required and adds it to the command.
          *
+         * @param <T> value type
          * @param name    the name that will be inserted into the builder
          * @param builder the component builder
          * @return new builder instance with the command argument inserted into the argument list
          */
-        @SuppressWarnings({"rawtypes"})
         @API(status = API.Status.STABLE)
-        public @NonNull Builder<C> required(
+        public <T> @NonNull Builder<C> required(
                 final @NonNull String name,
-                final CommandComponent.@NonNull Builder builder
+                final CommandComponent.@NonNull Builder<? super C, T> builder
         ) {
             return this.argument(builder.name(name).required());
         }
@@ -602,15 +602,15 @@ public class Command<C> {
         /**
          * Marks the {@code builder} as optional and adds it to the command.
          *
+         * @param <T> value type
          * @param name    the name that will be inserted into the builder
          * @param builder the component builder
          * @return new builder instance with the command argument inserted into the argument list
          */
-        @SuppressWarnings({"rawtypes"})
         @API(status = API.Status.STABLE)
-        public @NonNull Builder<C> optional(
+        public <T> @NonNull Builder<C> optional(
                 final @NonNull String name,
-                final CommandComponent.@NonNull Builder builder
+                final CommandComponent.@NonNull Builder<? super C, T> builder
         ) {
             return this.argument(builder.name(name).optional());
         }
@@ -618,13 +618,13 @@ public class Command<C> {
         /**
          * Marks the {@code builder} as required and adds it to the command.
          *
+         * @param <T> value type
          * @param builder the component builder
          * @return new builder instance with the command argument inserted into the argument list
          */
-        @SuppressWarnings({"rawtypes"})
         @API(status = API.Status.STABLE)
-        public @NonNull Builder<C> required(
-                final CommandComponent.@NonNull Builder builder
+        public <T> @NonNull Builder<C> required(
+                final CommandComponent.@NonNull Builder<? super C, T> builder
         ) {
             return this.argument(builder.required());
         }
@@ -632,13 +632,13 @@ public class Command<C> {
         /**
          * Marks the {@code builder} as optional and adds it to the command.
          *
+         * @param <T> value type
          * @param builder the component builder
          * @return new builder instance with the command argument inserted into the argument list
          */
-        @SuppressWarnings({"rawtypes"})
         @API(status = API.Status.STABLE)
-        public @NonNull Builder<C> optional(
-                final CommandComponent.@NonNull Builder builder
+        public <T> @NonNull Builder<C> optional(
+                final CommandComponent.@NonNull Builder<? super C, T> builder
         ) {
             return this.argument(builder.optional());
         }
@@ -1188,12 +1188,13 @@ public class Command<C> {
          * @param argument argument to add
          * @return new builder instance with the command argument inserted into the argument list
          */
+        @SuppressWarnings("unchecked")
         @API(status = API.Status.STABLE)
         public @NonNull Builder<C> argument(
-                final @NonNull CommandComponent<C> argument
+                final @NonNull CommandComponent<? super C> argument
         ) {
             final List<CommandComponent<C>> commandComponents = new ArrayList<>(this.commandComponents);
-            commandComponents.add(argument);
+            commandComponents.add((CommandComponent<C>) argument);
             return new Builder<>(
                     this.commandManager,
                     this.commandMeta,
@@ -1209,16 +1210,17 @@ public class Command<C> {
         /**
          * Adds the given {@code argument} to the command.
          *
+         * @param <T> value type
          * @param builder builder that builds the component to add
          * @return new builder instance with the command argument inserted into the argument list
          */
         @SuppressWarnings({"unchecked", "rawtypes"})
         @API(status = API.Status.STABLE)
-        public @NonNull Builder<C> argument(
-                final CommandComponent.Builder builder
+        public <T> @NonNull Builder<C> argument(
+                final CommandComponent.Builder<? super C, T> builder
         ) {
             if (this.commandManager != null) {
-                return this.argument(builder.commandManager(this.commandManager).build());
+                return this.argument(((CommandComponent.Builder) builder).commandManager(this.commandManager).build());
             } else {
                 return this.argument(builder.build());
             }
