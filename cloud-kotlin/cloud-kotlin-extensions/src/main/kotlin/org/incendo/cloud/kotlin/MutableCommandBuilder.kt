@@ -461,11 +461,12 @@ public class MutableCommandBuilder<C : Any>(
     /**
      * Add a new argument to this command
      *
+     * @param T value type
      * @param componentSupplier supplier of the component
      * @return this mutable builder
      */
-    public fun required(
-        componentSupplier: () -> CommandComponent.Builder<*, *>
+    public fun <T> required(
+        componentSupplier: () -> CommandComponent.Builder<C, T>
     ): MutableCommandBuilder<C> = mutate { it.required(componentSupplier()) }
 
     /**
