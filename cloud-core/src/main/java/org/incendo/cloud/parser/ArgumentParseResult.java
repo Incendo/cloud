@@ -26,8 +26,10 @@ package org.incendo.cloud.parser;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.returnsreceiver.qual.This;
 import org.incendo.cloud.exception.handling.ExceptionController;
 
 /**
@@ -98,12 +100,42 @@ public abstract class ArgumentParseResult<T> {
     public abstract @NonNull Optional<T> parsedValue();
 
     /**
+     * If this result is successful, transform the output value.
+     *
+     * @param mapper the transformation
+     * @param <U>    the result type
+     * @return a new result if successful, otherwise a failure
+     */
+    @API(status = API.Status.STABLE)
+    public abstract <U> @NonNull ArgumentParseResult<U> mapParsedValue(Function<T, U> mapper);
+
+    /**
+     * If this result is successful, transform the output value, returning another parse result.
+     *
+     * @param mapper the transformation
+     * @param <U>    the result type
+     * @return a new result if successful, otherwise a failure
+     */
+    @API(status = API.Status.STABLE)
+    public abstract <U> @NonNull ArgumentParseResult<U> flatMapParsedValue(Function<T, ArgumentParseResult<U>> mapper);
+
+    /**
      * Get the failure reason, if it exists
      *
      * @return Optional containing the failure reason
      */
     @API(status = API.Status.STABLE)
     public abstract @NonNull Optional<Throwable> failure();
+
+    /**
+     * If this result is a failure, transform the exception.
+     *
+     * @param mapper the exception transformation
+     * @return if this is a failure, a transformed result, otherwise this
+     * @since 1.5.0
+     */
+    @API(status = API.Status.STABLE)
+    public abstract @NonNull ArgumentParseResult<T> mapFailure(Function<Throwable, Throwable> mapper);
 
     /**
      * Maps the result to a completable future.
@@ -133,8 +165,23 @@ public abstract class ArgumentParseResult<T> {
         }
 
         @Override
+        public @NonNull <U> ArgumentParseResult<U> mapParsedValue(final Function<T, U> mapper) {
+            return new ParseSuccess<>(mapper.apply(this.value));
+        }
+
+        @Override
+        public @NonNull <U> ArgumentParseResult<U> flatMapParsedValue(final Function<T, ArgumentParseResult<U>> mapper) {
+            return mapper.apply(this.value);
+        }
+
+        @Override
         public @NonNull Optional<Throwable> failure() {
             return Optional.empty();
+        }
+
+        @Override
+        public @This @NonNull ArgumentParseResult<T> mapFailure(final Function<Throwable, Throwable> mapper) {
+            return this;
         }
     }
 
@@ -155,8 +202,25 @@ public abstract class ArgumentParseResult<T> {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
+        public @NonNull <U> @This ArgumentParseResult<U> mapParsedValue(final Function<T, U> mapper) {
+            return (ArgumentParseResult<U>) this;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public @NonNull <U> @This ArgumentParseResult<U> flatMapParsedValue(final Function<T, ArgumentParseResult<U>> mapper) {
+            return (ArgumentParseResult<U>) this;
+        }
+
+        @Override
         public @NonNull Optional<Throwable> failure() {
             return Optional.of(this.failure);
+        }
+
+        @Override
+        public @NonNull ArgumentParseResult<T> mapFailure(final Function<Throwable, Throwable> mapper) {
+            return new ParseFailure<>(mapper.apply(this.failure));
         }
     }
 }
