@@ -526,6 +526,12 @@ public final class CommandTree<C> {
         } else {
             parseResult =
                     this.parseArgument(commandContext, child, commandInput, executor)
+                            .thenApply(result -> {
+                                if (result.failure().isPresent() && !(result.failure().get() instanceof ArgumentParseException)) {
+                                    throw this.argumentParseException(commandContext, child, result);
+                                }
+                                return result;
+                            })
                             .thenApply(ArgumentParseResult::parsedValue)
                             .thenApply(optional -> optional.orElse(null));
         }
