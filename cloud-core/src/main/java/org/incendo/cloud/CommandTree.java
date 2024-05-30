@@ -524,10 +524,8 @@ public final class CommandTree<C> {
                 parseResult = CompletableFutures.failedFuture(this.argumentParseException(commandContext, child, argumentValue));
             }
         } else {
-            parseResult =
-                    this.parseArgument(commandContext, child, commandInput, executor)
-                            .thenApply(ArgumentParseResult::parsedValue)
-                            .thenApply(optional -> optional.orElse(null));
+            parseResult = this.parseArgument(commandContext, child, commandInput, executor)
+                    .thenApply(result -> result.parsedValue().orElse(null));
         }
 
         return parseResult.thenComposeAsync(value -> {
@@ -578,6 +576,11 @@ public final class CommandTree<C> {
         if (preParseResult.failure().isPresent() || !preParseResult.parsedValue().orElse(false)) {
             parsingContext.markEnd();
             parsingContext.success(false);
+            if (preParseResult.failure().isPresent()) {
+                return CompletableFutures.failedFuture(
+                        this.argumentParseException(commandContext, node, preParseResult)
+                );
+            }
             return CompletableFuture.completedFuture(preParseResult);
         }
 
@@ -593,17 +596,14 @@ public final class CommandTree<C> {
                     parsingContext.markEnd();
                     parsingContext.success(false);
 
-                    final CompletableFuture<ArgumentParseResult<?>> resultFuture = new CompletableFuture<>();
-
                     if (result.failure().isPresent()) {
                         commandInput.cursor(currentInput.cursor());
-                        resultFuture.completeExceptionally(
+                        return CompletableFutures.failedFuture(
                                 this.argumentParseException(commandContext, node, result)
                         );
                     } else {
-                        resultFuture.complete(result);
+                        return CompletableFuture.completedFuture(result);
                     }
-                    return resultFuture;
                 }, executor);
     }
 
