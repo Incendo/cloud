@@ -133,12 +133,7 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
             final @NonNull BiFunction<CommandContext<C>, T, CompletableFuture<ArgumentParseResult<O>>> mapper
     ) {
         requireNonNull(mapper, "mapper");
-        return this.flatMap((ctx, orig) -> {
-            if (orig.failure().isPresent()) {
-                return ArgumentParseResult.failureFuture(orig.failure().get());
-            }
-            return mapper.apply(ctx, orig.parsedValue().get());
-        });
+        return this.flatMap((ctx, result) -> result.flatMapSuccessFuture(value -> mapper.apply(ctx, value)));
     }
 
     /**
@@ -154,7 +149,7 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
             final @NonNull BiFunction<CommandContext<C>, T, CompletableFuture<O>> mapper
     ) {
         requireNonNull(mapper, "mapper");
-        return this.flatMapSuccess((ctx, orig) -> mapper.apply(ctx, orig).thenApply(ArgumentParseResult::success));
+        return this.flatMap((ctx, result) -> result.mapSuccessFuture(value -> mapper.apply(ctx, value)));
     }
 
     /**
