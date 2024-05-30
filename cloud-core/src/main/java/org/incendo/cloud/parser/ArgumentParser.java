@@ -117,7 +117,7 @@ public interface ArgumentParser<C, T> extends SuggestionProviderHolder<C> {
      */
     @API(status = API.Status.STABLE)
     default <O> ArgumentParser.@NonNull FutureArgumentParser<C, O> flatMap(final MappedArgumentParser.Mapper<C, T, O> mapper) {
-        return new MappedArgumentParser<>(this, requireNonNull(mapper, "mapper"));
+        return new MappedArgumentParserImpl<>(this, requireNonNull(mapper, "mapper"));
     }
 
     /**
