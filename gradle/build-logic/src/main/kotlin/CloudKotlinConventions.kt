@@ -8,6 +8,7 @@ import org.gradle.kotlin.dsl.kotlin
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
 class CloudKotlinConventions : Plugin<Project> {
@@ -24,13 +25,8 @@ class CloudKotlinConventions : Plugin<Project> {
                 languageVersion.set(JavaLanguageVersion.of(8))
             }
             coreLibrariesVersion = libs.versions.kotlin.get()
-            target {
-                compilations.configureEach {
-                    kotlinOptions {
-                        jvmTarget = "1.8"
-                        languageVersion = libs.versions.kotlin.get().split(".").take(2).joinToString(".")
-                    }
-                }
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_1_8)
             }
         }
 
