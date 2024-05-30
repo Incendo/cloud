@@ -26,6 +26,7 @@ package org.incendo.cloud.parser;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.exception.handling.ExceptionController;
@@ -115,6 +116,49 @@ public abstract class ArgumentParseResult<T> {
         return CompletableFuture.completedFuture(this);
     }
 
+    /**
+     * Returns a future resulting from applying {@code mapper} to the parsed value,
+     * or a completed future with the same failure as this result.
+     *
+     * @param mapper mapper
+     * @param <O>    new result value type
+     * @return new result future
+     */
+    public abstract <O> @NonNull CompletableFuture<ArgumentParseResult<O>> flatMapSuccessFuture(
+            @NonNull Function<T, CompletableFuture<ArgumentParseResult<O>>> mapper
+    );
+
+    /**
+     * Returns a success future resulting from applying {@code mapper} to the parsed value and
+     * wrapping in {@link #success(Object)}, or a completed future with the same failure as this result.
+     *
+     * @param mapper mapper
+     * @param <O>    new result value type
+     * @return new result future
+     */
+    public abstract <O> @NonNull CompletableFuture<ArgumentParseResult<O>> mapSuccessFuture(
+            @NonNull Function<T, CompletableFuture<O>> mapper
+    );
+
+    /**
+     * Returns the result from applying {@code mapper} to the parsed value,
+     * or the same failure as this result.
+     *
+     * @param mapper mapper
+     * @param <O>    new result value type
+     * @return new result
+     */
+    public abstract <O> @NonNull ArgumentParseResult<O> flatMapSuccess(@NonNull Function<T, ArgumentParseResult<O>> mapper);
+
+    /**
+     * Returns the result from applying {@code mapper} to the parsed value and
+     * wrapping in {@link #success(Object)}, or the same failure as this result.
+     *
+     * @param mapper mapper
+     * @param <O>    new result value type
+     * @return new result
+     */
+    public abstract <O> @NonNull ArgumentParseResult<O> mapSuccess(@NonNull Function<T, O> mapper);
 
     private static final class ParseSuccess<T> extends ArgumentParseResult<T> {
 
@@ -135,6 +179,32 @@ public abstract class ArgumentParseResult<T> {
         @Override
         public @NonNull Optional<Throwable> failure() {
             return Optional.empty();
+        }
+
+        @Override
+        public <O> @NonNull CompletableFuture<ArgumentParseResult<O>> flatMapSuccessFuture(
+                final @NonNull Function<T, CompletableFuture<ArgumentParseResult<O>>> mapper
+        ) {
+            return mapper.apply(this.value);
+        }
+
+        @Override
+        public <O> @NonNull CompletableFuture<ArgumentParseResult<O>> mapSuccessFuture(
+                final @NonNull Function<T, CompletableFuture<O>> mapper
+        ) {
+            return mapper.apply(this.value).thenApply(ArgumentParseResult::success);
+        }
+
+        @Override
+        public <O> @NonNull ArgumentParseResult<O> flatMapSuccess(
+                final @NonNull Function<T, ArgumentParseResult<O>> mapper
+        ) {
+            return mapper.apply(this.value);
+        }
+
+        @Override
+        public <O> @NonNull ArgumentParseResult<O> mapSuccess(final @NonNull Function<T, O> mapper) {
+            return ArgumentParseResult.success(mapper.apply(this.value));
         }
     }
 
@@ -157,6 +227,35 @@ public abstract class ArgumentParseResult<T> {
         @Override
         public @NonNull Optional<Throwable> failure() {
             return Optional.of(this.failure);
+        }
+
+        @Override
+        public <O> @NonNull CompletableFuture<ArgumentParseResult<O>> flatMapSuccessFuture(
+                final @NonNull Function<T, CompletableFuture<ArgumentParseResult<O>>> mapper
+        ) {
+            return CompletableFuture.completedFuture(this.self());
+        }
+
+        @Override
+        public <O> @NonNull CompletableFuture<ArgumentParseResult<O>> mapSuccessFuture(
+                final @NonNull Function<T, CompletableFuture<O>> mapper
+        ) {
+            return CompletableFuture.completedFuture(this.self());
+        }
+
+        @Override
+        public <O> @NonNull ArgumentParseResult<O> flatMapSuccess(final @NonNull Function<T, ArgumentParseResult<O>> mapper) {
+            return this.self();
+        }
+
+        @Override
+        public <O> @NonNull ArgumentParseResult<O> mapSuccess(final @NonNull Function<T, O> mapper) {
+            return this.self();
+        }
+
+        @SuppressWarnings("unchecked")
+        private <O> @NonNull ArgumentParseResult<O> self() {
+            return (ArgumentParseResult<O>) this;
         }
     }
 }
