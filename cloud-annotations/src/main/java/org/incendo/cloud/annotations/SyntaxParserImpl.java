@@ -38,8 +38,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public final class SyntaxParserImpl implements SyntaxParser {
 
-    private static final Predicate<String> PATTERN_ARGUMENT_LITERAL = Pattern.compile("([A-Za-z0-9\\-_]+)(|([A-Za-z0-9\\-_]+))*")
-            .asPredicate();
+    private static final Predicate<String> PATTERN_ARGUMENT_LITERAL = Pattern.compile(
+            "([A-Za-z0-9\\-_/]+)(|([A-Za-z0-9\\-_/]+))*"
+    ).asPredicate();
     private static final Predicate<String> PATTERN_ARGUMENT_REQUIRED = Pattern.compile("<([A-Za-z0-9\\-_]+)>")
             .asPredicate();
     private static final Predicate<String> PATTERN_ARGUMENT_OPTIONAL = Pattern.compile("\\[([A-Za-z0-9\\-_]+)]")
