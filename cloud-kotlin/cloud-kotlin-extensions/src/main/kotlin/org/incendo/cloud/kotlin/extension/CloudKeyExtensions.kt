@@ -35,7 +35,7 @@ import org.incendo.cloud.key.CloudKeyHolder
  * @return the value, or `null`
  */
 public fun <T : Any> CloudKeyContainer.getOrNull(key: CloudKey<T>): T? =
-    this.optional(key).orElseGet(null)
+    this.optional(key).orElse(null)
 
 /**
  * Returns the value associated with the given [key], if it exists.
@@ -45,7 +45,7 @@ public fun <T : Any> CloudKeyContainer.getOrNull(key: CloudKey<T>): T? =
  * @return the value, or `null`
  */
 public fun <T : Any> CloudKeyContainer.getOrNull(key: String): T? =
-    this.optional<T>(key).orElseGet(null)
+    this.optional<T>(key).orElse(null)
 
 /**
  * Returns the value associated with the given [keyHolder], if it exists.
@@ -55,7 +55,7 @@ public fun <T : Any> CloudKeyContainer.getOrNull(key: String): T? =
  * @return the value, or `null`
  */
 public fun <T : Any> CloudKeyContainer.getOrNull(keyHolder: CloudKeyHolder<T>): T? =
-    this.optional<T>(keyHolder).orElseGet(null)
+    this.optional<T>(keyHolder).orElse(null)
 
 /**
  * Creates a new key with the given [name].
