@@ -25,7 +25,7 @@ ktlint = "0.50.0"
 
 # testing
 jupiterEngine = "5.10.2"
-mockitoCore = "4.11.0"
+mockitoCore = "5.12.0"
 mockitoKotlin = "4.1.0"
 mockitoJupiter = "4.11.0"
 truth = "1.4.2"
