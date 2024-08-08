@@ -23,6 +23,7 @@
 //
 package org.incendo.cloud.help;
 
+import io.leangen.geantyref.GenericTypeReflector;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -122,8 +123,7 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
                             .map(command -> CommandEntry.of(command, this.commandManager.commandSyntaxFormatter()
                                     .apply(query.sender(), command.components(), null)))
                             .sorted()
-                            .filter(entry -> this.commandManager.testPermission(query.sender(),
-                                    entry.command().commandPermission()).allowed())
+                            .filter(entry -> this.isAllowed(query.sender(), entry.command()))
                             .collect(Collectors.toList())
             );
         }
@@ -143,7 +143,7 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
 
             if (head.component() != null && head.command() != null) {
                 if (head.isLeaf() || index == queryFragments.size()) {
-                    if (this.commandManager.testPermission(query.sender(), head.command().commandPermission()).allowed()) {
+                    if (this.isAllowed(query.sender(), head.command())) {
                         return VerboseCommandResult.of(
                                 query,
                                 CommandEntry.of(
@@ -193,8 +193,7 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
 
                     final List<CommandComponent<C>> traversedNodesSub = new LinkedList<>(traversedNodes);
                     if (child.component() == null || child.command() == null
-                            || this.commandManager.testPermission(query.sender(),
-                            child.command().commandPermission()).allowed()
+                            || this.isAllowed(query.sender(), child.command())
                     ) {
                         traversedNodesSub.add(child.component());
                         childSuggestions.add(this.commandManager.commandSyntaxFormatter()
@@ -221,13 +220,22 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
         return this.commandManager.commands()
                 .stream()
                 .filter(this.commandFilter)
-                .filter(command -> this.commandManager.testPermission(sender, command.commandPermission()).allowed())
+                .filter(command -> this.isAllowed(sender, command))
                 .map(command -> CommandEntry.of(
                         command,
                         this.commandManager.commandSyntaxFormatter()
                                 .apply(sender, command.components(), null))
                 ).sorted()
                 .collect(Collectors.toList());
+    }
+
+    private boolean isAllowed(final C sender, final Command<C> command) {
+        if (command.senderType().isPresent()) {
+            if (!GenericTypeReflector.isSuperType(command.senderType().get().getType(), sender.getClass())) {
+                return false;
+            }
+        }
+        return this.commandManager.testPermission(sender, command.commandPermission()).allowed();
     }
 
     /**

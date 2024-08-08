@@ -95,7 +95,7 @@ class CommandBuildingDSLTest {
 
         Assertions.assertEquals(
             manager.createHelpHandler()
-                .queryRootIndex(TestCommandSender())
+                .queryRootIndex(SpecificCommandSender())
                 .entries()
                 .map(CommandEntry<*>::syntax).sorted(),
             setOf(
