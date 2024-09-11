@@ -87,7 +87,7 @@ public final class MethodSuggestionProvider<C> extends AnnotatedMethodHandler<C>
     @SuppressWarnings("rawtypes")
     public static @NonNull CompletableFuture<Iterable<@NonNull Suggestion>> mapSuggestions(final @NonNull Object input) {
         if (input instanceof CompletableFuture) {
-            return mapSuggestions((CompletableFuture) input);
+            return mapFuture((CompletableFuture) input);
         }
         return CompletableFuture.completedFuture(mapCompleted(input));
     }

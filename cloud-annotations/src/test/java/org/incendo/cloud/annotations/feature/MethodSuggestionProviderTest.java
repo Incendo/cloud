@@ -26,6 +26,7 @@ package org.incendo.cloud.annotations.feature;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.CommandManager;
@@ -94,6 +95,7 @@ class MethodSuggestionProviderTest {
                 named("set source", new TestClassSet()),
                 named("stream source", new TestClassStream()),
                 named("iterable source", new TestClassIterable()),
+                named("list future source", new TestClassFutureList()),
                 named("string list source", new TestClassListString()),
                 named("source with CommandInput injected", new TestClassCommandInput()),
                 named("source with injected value", new TestInjectedValue())
@@ -153,6 +155,17 @@ class MethodSuggestionProviderTest {
                 final @NonNull String input
         ) {
             return Collections.singletonList("foo");
+        }
+    }
+
+    public static final class TestClassFutureList {
+
+        @Suggestions("suggestions")
+        public @NonNull CompletableFuture<@NonNull Iterable<@NonNull Suggestion>> suggestions(
+                final @NonNull CommandContext<TestCommandSender> context,
+                final @NonNull String input
+        ) {
+            return CompletableFuture.completedFuture(Collections.singletonList(Suggestion.suggestion("foo")));
         }
     }
 
