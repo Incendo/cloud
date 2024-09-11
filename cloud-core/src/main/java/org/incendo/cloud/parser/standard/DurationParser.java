@@ -45,6 +45,8 @@ import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 /**
  * Parser for {@link Duration}.
  *
+ * <p>Matches durations in the format of: <code>2d15h7m12s</code>.</p>
+ *
  * @param <C> command sender type
  */
 @API(status = API.Status.STABLE)
