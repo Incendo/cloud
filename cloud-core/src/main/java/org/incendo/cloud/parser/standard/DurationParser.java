@@ -77,7 +77,7 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput
     ) {
-        final String input = commandInput.peekString();
+        final String input = commandInput.readString();
 
         Duration duration = Duration.ofNanos(0);
 
@@ -130,7 +130,6 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
             return ArgumentParseResult.failure(new DurationParseException(input, commandContext));
         }
 
-        commandInput.readString(); // pop read input on success
         return ArgumentParseResult.success(duration);
     }
 
