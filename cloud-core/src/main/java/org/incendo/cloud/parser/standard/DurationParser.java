@@ -98,7 +98,7 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
 
             final long timeValue;
             try {
-                timeValue = Long.parseUnsignedLong(input.substring(rangeStart, cursor));
+                timeValue = Long.parseLong(input.substring(rangeStart, cursor));
             } catch (final NumberFormatException ex) {
                 return ArgumentParseResult.failure(new DurationParseException(ex, input, commandContext));
             }
