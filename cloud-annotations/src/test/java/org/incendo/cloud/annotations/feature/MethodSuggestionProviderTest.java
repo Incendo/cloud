@@ -95,7 +95,7 @@ class MethodSuggestionProviderTest {
                 named("set source", new TestClassSet()),
                 named("stream source", new TestClassStream()),
                 named("iterable source", new TestClassIterable()),
-                named("future list source", new TestClassFutureList()),
+                named("list future source", new TestClassFutureList()),
                 named("string list source", new TestClassListString()),
                 named("source with CommandInput injected", new TestClassCommandInput()),
                 named("source with injected value", new TestInjectedValue())
