@@ -106,21 +106,25 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
             }
 
             final char timeUnit = input.charAt(cursor);
-            switch (timeUnit) {
-                case 'd':
-                    duration = duration.plusDays(timeValue);
-                    break;
-                case 'h':
-                    duration = duration.plusHours(timeValue);
-                    break;
-                case 'm':
-                    duration = duration.plusMinutes(timeValue);
-                    break;
-                case 's':
-                    duration = duration.plusSeconds(timeValue);
-                    break;
-                default:
-                    return ArgumentParseResult.failure(new DurationParseException(input, commandContext));
+            try {
+                switch (timeUnit) {
+                    case 'd':
+                        duration = duration.plusDays(timeValue);
+                        break;
+                    case 'h':
+                        duration = duration.plusHours(timeValue);
+                        break;
+                    case 'm':
+                        duration = duration.plusMinutes(timeValue);
+                        break;
+                    case 's':
+                        duration = duration.plusSeconds(timeValue);
+                        break;
+                    default:
+                        return ArgumentParseResult.failure(new DurationParseException(input, commandContext));
+                }
+            } catch (final ArithmeticException ex) {
+                return ArgumentParseResult.failure(new DurationParseException(ex, input, commandContext));
             }
 
             // skip unit, reset rangeStart to start of next segment
