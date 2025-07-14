@@ -153,6 +153,29 @@ public interface Permission {
      */
     @NonNull String permissionString();
 
+    /**
+     * Returns a new permission by appending the given {@code permission} string to this permission, separated by a dot.
+     *
+     * @param permission the permission string to append
+     * @return the new composed permission
+     */
+    @API(status = API.Status.EXPERIMENTAL)
+    default @NonNull Permission append(final @NonNull String permission) {
+        return Permission.permission(permissionString() + "." + permission);
+    }
+
+    /**
+     * Returns a new permission by appending each of the given {@code permissions} to this permission, separated by dots.
+     *
+     * @param permissions the permission strings to append
+     * @return the new composed permission
+     */
+    @API(status = API.Status.EXPERIMENTAL)
+    default @NonNull Permission append(final @NonNull String @NonNull... permissions) {
+        return Permission.permission(
+                permissionString() + "." + String.join(".", permissions)
+        );
+    }
 
     /**
      * Returns true if a check for this permission should and will always return true.

@@ -271,6 +271,19 @@ class PermissionTest {
         );
     }
 
+    @Test
+    void testAppendedPermission() {
+        final Permission base = Permission.of("one");
+        final Permission two = base.append("two");
+        final Permission three = two.append("three");
+        final Permission six = three.append("four", "five", "six");
+
+        // Assert
+        assertThat("one.two".equals(two.permissionString())).isTrue();
+        assertThat("one.two.three".equals(three.permissionString())).isTrue();
+        assertThat("one.two.three.four.five.six".equals(six.permissionString())).isTrue();
+    }
+
 
     private static final class MockPermissionManager extends CommandManager<TestCommandSender> {
 
