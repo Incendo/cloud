@@ -1,5 +1,5 @@
 [plugins]
-versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
+versions = { id = "com.github.ben-manes.versions", version = "0.52.0" }
 cloud-buildLogic-spotless = { id = "org.incendo.cloud-build-logic.spotless", version.ref = "cloud-build-logic" }
 cloud-buildLogic-rootProject-publishing = { id = "org.incendo.cloud-build-logic.publishing.root-project", version.ref = "cloud-build-logic" }
 cloud-buildLogic-rootProject-spotless = { id = "org.incendo.cloud-build-logic.spotless.root-project", version.ref = "cloud-build-logic" }
@@ -32,7 +32,7 @@ truth = "1.4.2"
 compileTesting = "0.21.0"
 
 # build-logic
-cloud-build-logic = "0.0.15"
+cloud-build-logic = "0.0.17"
 
 [libraries]
 checkerQual = { group = "org.checkerframework", name = "checker-qual", version.ref = "checkerQual" }
