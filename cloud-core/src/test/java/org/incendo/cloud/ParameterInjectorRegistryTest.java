@@ -125,7 +125,7 @@ class ParameterInjectorRegistryTest {
         assertThat(result).isEmpty();
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "UnnecessaryQualifier"})
     private static void testAnnotatedMethod(@TestAnnotation final Integer ignored) {}
 
 
