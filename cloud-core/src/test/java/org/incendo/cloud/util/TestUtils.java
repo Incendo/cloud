@@ -48,6 +48,7 @@ public final class TestUtils {
     private TestUtils() {
     }
 
+    @SuppressWarnings({"ClassInitializationDeadlock", "EffectivelyPrivate"})
     private abstract static class TestCommandSenderCommandManager extends CommandManager<TestCommandSender> {
 
         @SuppressWarnings("unused") // mocked via mockito

@@ -64,6 +64,7 @@ class Issue450 {
         ).join();
     }
 
+    @SuppressWarnings({"ClassInitializationDeadlock", "EffectivelyPrivate"})
     private static class TestCommandClass {
 
         @Command("/command|/cmd")

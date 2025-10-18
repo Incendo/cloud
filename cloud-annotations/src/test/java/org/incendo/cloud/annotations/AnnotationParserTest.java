@@ -261,6 +261,7 @@ class AnnotationParserTest {
         System.out.printf("Injected value: %s\n", injectableValue.toString());
     }
 
+    @SuppressWarnings({"ClassInitializationDeadlock", "EffectivelyPrivate"})
     @Command("class")
     private static class ClassCommandMethod {
 
@@ -278,6 +279,7 @@ class AnnotationParserTest {
     }
 
 
+    @SuppressWarnings({"ClassInitializationDeadlock", "EffectivelyPrivate"})
     @Bad1
     @CommandDescription("Hello World!")
     private static class AnnotatedClass {
@@ -348,6 +350,7 @@ class AnnotationParserTest {
     }
 
 
+    @SuppressWarnings("EffectivelyPrivate")
     private static final class AliasedCommands {
 
         private static final String COMMAND_ALIASES = "acommand|analias|anotheralias";
