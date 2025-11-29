@@ -45,23 +45,27 @@ public final class AmbiguousNodeException extends IllegalStateException {
     private final CommandNode<?> parentNode;
     private final CommandNode<?> ambiguousNode;
     private final List<CommandNode<?>> children;
+    private final String ambiguousName;
 
     /**
      * Construct a new ambiguous node exception
      *
      * @param parentNode    Parent node
      * @param ambiguousNode Node that caused exception
+     * @param ambiguousName Ambiguous name or alias
      * @param children      All children of the parent
      */
     @API(status = API.Status.INTERNAL, consumers = "org.incendo.cloud.*")
     public AmbiguousNodeException(
             final @Nullable CommandNode<?> parentNode,
             final @NonNull CommandNode<?> ambiguousNode,
-            final @NonNull List<@NonNull CommandNode<?>> children
+            final @NonNull List<@NonNull CommandNode<?>> children,
+            final @Nullable String ambiguousName
     ) {
         this.parentNode = parentNode;
         this.ambiguousNode = ambiguousNode;
         this.children = children;
+        this.ambiguousName = ambiguousName;
     }
 
     /**
@@ -91,13 +95,28 @@ public final class AmbiguousNodeException extends IllegalStateException {
         return Collections.unmodifiableList(this.children);
     }
 
+    /**
+     * Returns the ambiguous name or alias of the node.
+     * Might be null if the reason for this exception is not an ambiguous name or alias (e.g. multiple child nodes with a 
+     * variable argument).
+     * 
+     * @return the ambiguous name or alias of the node
+     */
+    public @Nullable String getAmbiguousName() {
+        return this.ambiguousName;
+    }
+
     @Override
     public String getMessage() {
         final StringBuilder stringBuilder = new StringBuilder("Ambiguous Node: ")
                 .append(this.ambiguousNode.component().name())
                 .append(" cannot be added as a child to ")
-                .append(this.parentNode == null ? "<root>" : this.parentNode.component().name())
-                .append(" (All children: ");
+                .append(this.parentNode == null ? "<root>" : this.parentNode.component().name());
+        if (this.ambiguousName != null) {
+            stringBuilder.append(" because of ambiguous name ")
+            .append(this.ambiguousName);
+        }
+        stringBuilder.append(" (All children: ");
         final Iterator<CommandNode<?>> childIterator = this.children.iterator();
         while (childIterator.hasNext()) {
             stringBuilder.append(childIterator.next().component().name());
