@@ -60,6 +60,7 @@ import org.incendo.cloud.exception.NoPermissionException;
 import org.incendo.cloud.exception.NoSuchCommandException;
 import org.incendo.cloud.internal.CommandNode;
 import org.incendo.cloud.internal.SuggestionContext;
+import org.incendo.cloud.internal.SuperTypeCache;
 import org.incendo.cloud.parser.ArgumentParseResult;
 import org.incendo.cloud.parser.aggregate.AggregateParser;
 import org.incendo.cloud.parser.flag.CommandFlagParser;
@@ -1034,7 +1035,7 @@ public final class CommandTree<C> {
         }
         final Set<Permission> failed = new HashSet<>();
         for (final Map.Entry<Type, Permission> entry : accessMap.entrySet()) {
-            if (GenericTypeReflector.isSuperType(entry.getKey(), sender.getClass())) {
+            if (SuperTypeCache.isSuperType(entry.getKey(), sender.getClass())) {
                 final PermissionResult result = this.commandManager.testPermission(sender, entry.getValue());
                 if (result.allowed()) {
                     return Optional.of(result);

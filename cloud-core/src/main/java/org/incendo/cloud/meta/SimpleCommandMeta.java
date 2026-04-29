@@ -23,7 +23,6 @@
 //
 package org.incendo.cloud.meta;
 
-import io.leangen.geantyref.GenericTypeReflector;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +30,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.incendo.cloud.internal.SuperTypeCache;
 import org.incendo.cloud.key.CloudKey;
 
 /**
@@ -53,7 +53,7 @@ public class SimpleCommandMeta extends CommandMeta {
         if (value == null) {
             return Optional.empty();
         }
-        if (!GenericTypeReflector.isSuperType(key.type().getType(), value.getClass())) {
+        if (!SuperTypeCache.isSuperType(key.type().getType(), value.getClass())) {
             throw new IllegalArgumentException("Conflicting argument types between key type of "
                     + key.type().getType().getTypeName() + " and value type of " + value.getClass());
         }
