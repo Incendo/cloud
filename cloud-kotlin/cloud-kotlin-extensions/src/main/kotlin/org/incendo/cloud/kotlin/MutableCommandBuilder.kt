@@ -47,10 +47,7 @@ import kotlin.reflect.KClass
  * @property commandManager the command manager which will own this command
  * @constructor Create a new [MutableCommandBuilder]
  */
-public class MutableCommandBuilder<C : Any>(
-    commandBuilder: Command.Builder<C>,
-    private val commandManager: CommandManager<C>
-) {
+public class MutableCommandBuilder<C : Any>(commandBuilder: Command.Builder<C>, private val commandManager: CommandManager<C>) {
     /**
      * The command builder that is being mutated by this [MutableCommandBuilder] instance.
      *
@@ -118,9 +115,7 @@ public class MutableCommandBuilder<C : Any>(
      * @param mutator mutator function
      * @return this mutable builder
      */
-    public fun mutate(
-        mutator: (Command.Builder<C>) -> Command.Builder<C>
-    ): MutableCommandBuilder<C> {
+    public fun mutate(mutator: (Command.Builder<C>) -> Command.Builder<C>): MutableCommandBuilder<C> {
         this.commandBuilder = mutator(this.commandBuilder)
         return this
     }
@@ -134,8 +129,7 @@ public class MutableCommandBuilder<C : Any>(
      *
      * @return a copy of this mutable builder
      */
-    public fun copy(): MutableCommandBuilder<C> =
-        MutableCommandBuilder(this.commandBuilder, this.commandManager)
+    public fun copy(): MutableCommandBuilder<C> = MutableCommandBuilder(this.commandBuilder, this.commandManager)
 
     /**
      * Make a new copy of this [MutableCommandBuilder] and invoke the provided receiver lambda on it
@@ -143,8 +137,7 @@ public class MutableCommandBuilder<C : Any>(
      * @param lambda receiver lambda which will be invoked on the new builder
      * @return a copy of this mutable builder
      */
-    public fun copy(lambda: MutableCommandBuilder<C>.() -> Unit): MutableCommandBuilder<C> =
-        copy().apply { lambda(this) }
+    public fun copy(lambda: MutableCommandBuilder<C>.() -> Unit): MutableCommandBuilder<C> = copy().apply { lambda(this) }
 
     /**
      * Make a new copy of this [MutableCommandBuilder], append a literal, and invoke the provided
@@ -159,11 +152,10 @@ public class MutableCommandBuilder<C : Any>(
         literal: String,
         description: Description,
         lambda: MutableCommandBuilder<C>.() -> Unit
-    ): MutableCommandBuilder<C> =
-        copy().apply {
-            literal(literal, description)
-            lambda(this)
-        }
+    ): MutableCommandBuilder<C> = copy().apply {
+        literal(literal, description)
+        lambda(this)
+    }
 
     /**
      * Make a new copy of this [MutableCommandBuilder], append a literal, and invoke the provided
@@ -173,14 +165,10 @@ public class MutableCommandBuilder<C : Any>(
      * @param lambda receiver lambda which will be invoked on the new builder
      * @return a copy of this mutable builder
      */
-    public fun copy(
-        literal: String,
-        lambda: MutableCommandBuilder<C>.() -> Unit
-    ): MutableCommandBuilder<C> =
-        copy().apply {
-            literal(literal)
-            lambda(this)
-        }
+    public fun copy(literal: String, lambda: MutableCommandBuilder<C>.() -> Unit): MutableCommandBuilder<C> = copy().apply {
+        literal(literal)
+        lambda(this)
+    }
 
     /**
      * Build and register this command with the owning command manager
@@ -198,8 +186,7 @@ public class MutableCommandBuilder<C : Any>(
      * @return the new mutable builder
      * @see [CommandManager.command]
      */
-    public fun registerCopy(lambda: MutableCommandBuilder<C>.() -> Unit): MutableCommandBuilder<C> =
-        copy(lambda).register()
+    public fun registerCopy(lambda: MutableCommandBuilder<C>.() -> Unit): MutableCommandBuilder<C> = copy(lambda).register()
 
     /**
      * Create a new copy of this mutable builder, append a literal, act on it with a receiver
@@ -210,10 +197,8 @@ public class MutableCommandBuilder<C : Any>(
      * @return the new mutable builder
      * @see [CommandManager.command]
      */
-    public fun registerCopy(
-        literal: String,
-        lambda: MutableCommandBuilder<C>.() -> Unit
-    ): MutableCommandBuilder<C> = copy(literal, lambda).register()
+    public fun registerCopy(literal: String, lambda: MutableCommandBuilder<C>.() -> Unit): MutableCommandBuilder<C> =
+        copy(literal, lambda).register()
 
     /**
      * Create a new copy of this mutable builder, append a literal, act on it with a receiver
@@ -239,10 +224,9 @@ public class MutableCommandBuilder<C : Any>(
      * @param value new value
      * @return this mutable builder
      */
-    public fun <T : Any> meta(key: CloudKey<T>, value: T): MutableCommandBuilder<C> =
-        mutate {
-            it.meta(key, value)
-        }
+    public fun <T : Any> meta(key: CloudKey<T>, value: T): MutableCommandBuilder<C> = mutate {
+        it.meta(key, value)
+    }
 
     /**
      * Set the value for a certain [CloudKey] in the command meta storage for this builder
@@ -251,8 +235,7 @@ public class MutableCommandBuilder<C : Any>(
      * @param value new value
      * @return this mutable builder
      */
-    public infix fun <T : Any> CloudKey<T>.to(value: T): MutableCommandBuilder<C> =
-        meta(this, value)
+    public infix fun <T : Any> CloudKey<T>.to(value: T): MutableCommandBuilder<C> = meta(this, value)
 
     /**
      * Field to get and set the command description for this command builder
@@ -358,9 +341,7 @@ public class MutableCommandBuilder<C : Any>(
      * @param component component to add
      * @return this mutable builder
      */
-    public fun argument(
-        component: CommandComponent<C>
-    ): MutableCommandBuilder<C> = mutate { it.argument(component) }
+    public fun argument(component: CommandComponent<C>): MutableCommandBuilder<C> = mutate { it.argument(component) }
 
     /**
      * Adds a new component to this command
@@ -368,9 +349,8 @@ public class MutableCommandBuilder<C : Any>(
      * @param component component to add
      * @return this mutable builder
      */
-    public fun <T> argument(
-        component: CommandComponent.Builder<C, T>
-    ): MutableCommandBuilder<C> = mutate { it.argument(component) }
+    public fun <T> argument(component: CommandComponent.Builder<C, T>): MutableCommandBuilder<C> =
+        mutate { it.argument(component) }
 
     /**
      * Adds a new component to this command
@@ -378,9 +358,7 @@ public class MutableCommandBuilder<C : Any>(
      * @param component component to add
      * @return this mutable builder
      */
-    public fun required(
-        component: CommandComponent.Builder<C, *>
-    ): MutableCommandBuilder<C> = mutate { it.required(component) }
+    public fun required(component: CommandComponent.Builder<C, *>): MutableCommandBuilder<C> = mutate { it.required(component) }
 
     /**
      * Adds a new component to this command
@@ -388,9 +366,7 @@ public class MutableCommandBuilder<C : Any>(
      * @param component component to add
      * @return this mutable builder
      */
-    public fun optional(
-        component: CommandComponent.Builder<C, *>
-    ): MutableCommandBuilder<C> = mutate { it.optional(component) }
+    public fun optional(component: CommandComponent.Builder<C, *>): MutableCommandBuilder<C> = mutate { it.optional(component) }
 
     /**
      * Adds a new component to this command
@@ -454,9 +430,7 @@ public class MutableCommandBuilder<C : Any>(
      * @param componentSupplier supplier of the component
      * @return this mutable builder
      */
-    public fun argument(
-        componentSupplier: () -> CommandComponent<C>
-    ): MutableCommandBuilder<C> = argument(componentSupplier())
+    public fun argument(componentSupplier: () -> CommandComponent<C>): MutableCommandBuilder<C> = argument(componentSupplier())
 
     /**
      * Add a new argument to this command
@@ -465,9 +439,8 @@ public class MutableCommandBuilder<C : Any>(
      * @param componentSupplier supplier of the component
      * @return this mutable builder
      */
-    public fun <T> required(
-        componentSupplier: () -> CommandComponent.Builder<C, T>
-    ): MutableCommandBuilder<C> = mutate { it.required(componentSupplier()) }
+    public fun <T> required(componentSupplier: () -> CommandComponent.Builder<C, T>): MutableCommandBuilder<C> =
+        mutate { it.required(componentSupplier()) }
 
     /**
      * Add a new argument to this command
@@ -475,9 +448,8 @@ public class MutableCommandBuilder<C : Any>(
      * @param componentSupplier supplier of the component
      * @return this mutable builder
      */
-    public fun optional(
-        componentSupplier: () -> CommandComponent.Builder<C, *>
-    ): MutableCommandBuilder<C> = optional(componentSupplier())
+    public fun optional(componentSupplier: () -> CommandComponent.Builder<C, *>): MutableCommandBuilder<C> =
+        optional(componentSupplier())
 
     /**
      * Add a new literal argument to this command

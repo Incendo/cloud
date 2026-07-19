@@ -39,6 +39,7 @@ import static java.util.Objects.requireNonNull;
 @API(status = API.Status.STABLE)
 public interface Description {
 
+    @SuppressWarnings("ClassInitializationDeadlock")
     Description EMPTY = DescriptionImpl.of("");
 
     /**
