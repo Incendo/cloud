@@ -26,9 +26,9 @@ package org.incendo.cloud.kotlin.coroutines
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.future
-import org.incendo.cloud.CommandManager
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.context.CommandInput
+import org.incendo.cloud.execution.CommandExecutor
 import org.incendo.cloud.execution.ExecutionCoordinator
 import org.incendo.cloud.parser.ArgumentParseResult
 import org.incendo.cloud.parser.ArgumentParser
@@ -50,7 +50,7 @@ public fun interface SuspendingArgumentParser<C : Any, T : Any> {
      * Returns the result of parsing the given [commandInput].
      *
      * This method may be called when a command chain is being parsed for execution
-     * (using [CommandManager.executeCommand])
+     * (using [CommandExecutor.executeCommand])
      * or when a command is being parsed to provide context for suggestions
      * (using [SuggestionFactory.suggest]).
      * It is possible to use [CommandContext.isSuggestions] to see what the purpose of the

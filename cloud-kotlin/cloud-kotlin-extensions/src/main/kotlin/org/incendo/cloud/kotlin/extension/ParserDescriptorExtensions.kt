@@ -43,8 +43,7 @@ public inline fun <C, reified T> ArgumentParser<C, T>.asDescriptor(): ParserDesc
  *
  * @return the descriptor
  */
-public inline fun <C, reified T> parserDescriptor(parser: ArgumentParser<C, T>): ParserDescriptor<C, T> =
-    parser.asDescriptor()
+public inline fun <C, reified T> parserDescriptor(parser: ArgumentParser<C, T>): ParserDescriptor<C, T> = parser.asDescriptor()
 
 /**
  * Creates a descriptor for a flat-mapped parser.
