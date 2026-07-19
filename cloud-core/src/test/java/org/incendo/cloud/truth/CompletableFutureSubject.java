@@ -75,9 +75,9 @@ public final class CompletableFutureSubject<T> extends Subject {
             if (join == null) {
                 this.failWithActual(Fact.simpleFact("expected result to not be null"));
             }
-            return this.check("join() result or null on failure").about(OptionalSubject.optionals()).that(Optional.of(join));
+            return this.check("join() result or null on failure").that(Optional.of(join));
         } catch (final CompletionException e) {
-            return this.check("join() result or null on failure").about(OptionalSubject.optionals()).that(Optional.empty());
+            return this.check("join() result or null on failure").that(Optional.empty());
         }
     }
 
@@ -87,9 +87,9 @@ public final class CompletableFutureSubject<T> extends Subject {
         }
         try {
             this.actual.join();
-            return this.check("cause of CompletionException thrown by join()").about(OptionalSubject.optionals()).that(Optional.empty());
+            return this.check("cause of CompletionException thrown by join()").that(Optional.empty());
         } catch (final CompletionException e) {
-            return this.check("cause of CompletionException thrown by join()").about(OptionalSubject.optionals()).that(Optional.of(e.getCause()));
+            return this.check("cause of CompletionException thrown by join()").that(Optional.of(e.getCause()));
         }
     }
 

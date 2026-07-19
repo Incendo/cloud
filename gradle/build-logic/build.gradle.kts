@@ -5,8 +5,7 @@ plugins {
 
 repositories {
     gradlePluginPortal()
-    maven("https://oss.sonatype.org/content/repositories/snapshots/") {
-        name = "sonatypeOssSnapshots"
+    maven("https://central.sonatype.com/repository/maven-snapshots/") {
         mavenContent { snapshotsOnly() }
     }
 }
