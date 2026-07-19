@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- Add a dependency on the Cloud BOM to published modules for Gradle dependency alignment ([#789](https://github.com/Incendo/cloud/pull/789))
+
+### Fixed
+- Core: Reject invalid input in `DurationParser` ([#772](https://github.com/Incendo/cloud/pull/772))
+- Annotations: Prevent infinite recursion when a `@Suggestions` method returns a `CompletableFuture` ([#771](https://github.com/Incendo/cloud/pull/771))
+- Annotations: Reject sender requirements that do not inherit from the command sender type ([#781](https://github.com/Incendo/cloud/pull/781))
+- Kotlin Coroutines Annotations: Propagate exceptions from suspending parser methods as parse failures ([#783](https://github.com/Incendo/cloud/pull/783))
+- Expose Immutables annotations on consumers' compile classpaths ([#817](https://github.com/Incendo/cloud/pull/817))
+
+## [2.0.0]
+
+Cloud 2 is a complete rewrite and is not compatible with Cloud 1. See the
+[Cloud 2 changelog](https://cloud.incendo.org/cloud-v2/) and
+[GitHub release notes](https://github.com/Incendo/cloud/releases/tag/2.0.0) for details.
+
+### Changed
+- Changed the base package and Maven group ID from `cloud.commandframework` to `org.incendo`
+- Moved platform implementations into separate repositories with independent versioning
+
 ## [1.8.4]
 
 ### Fixed
