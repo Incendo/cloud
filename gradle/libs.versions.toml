@@ -43,7 +43,8 @@ geantyref = { group = "io.leangen.geantyref", name = "geantyref", version.ref = 
 jmhCore = { group = "org.openjdk.jmh", name = "jmh-core", version.ref = "jmh" }
 jmhGeneratorAnnprocess = { group = "org.openjdk.jmh", name = "jmh-generator-annprocess", version.ref = "jmh" }
 apiguardian = { group = "org.apiguardian", name = "apiguardian-api", version.ref = "apiguardian" }
-immutables = { group = "org.immutables", name = "value", version.ref = "immutables" }
+immutablesValue = { group = "org.immutables", name = "value", version.ref = "immutables" }
+immutablesValueAnnotations = { group = "org.immutables", name = "value-annotations", version.ref = "immutables" }
 immutablesAnnotate = { group = "org.immutables", name = "annotate", version.ref = "immutables" }
 
 # integration
@@ -72,7 +73,6 @@ cloud-build-logic = { module = "org.incendo:cloud-build-logic", version.ref = "c
 [bundles]
 coroutines = ["coroutinesCore", "coroutinesJdk8"]
 annotations = ["checkerQual", "apiguardian"]
-immutables = ["immutables", "immutablesAnnotate"]
 baseTestingDependencies = [
     "jupiterEngine",
     "jupiterParams",
