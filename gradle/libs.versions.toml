@@ -18,10 +18,11 @@ immutables = "2.11.6"
 guice = "7.0.0"
 
 # kotlin
-kotlin = "2.0.20"
-dokka = "1.9.20"
+kotlinPlugin = "2.4.10"
+kotlinLibrary = "2.0.20"
+dokka = "2.2.0"
 coroutines = "1.8.1"
-ktlint = "0.50.0"
+ktlint = "1.8.0"
 
 # testing
 jupiterEngine = "5.11.0"
@@ -32,7 +33,7 @@ truth = "1.4.2"
 compileTesting = "0.21.0"
 
 # build-logic
-cloud-build-logic = "0.0.17"
+cloud-build-logic = "0.0.23"
 
 [libraries]
 checkerQual = { group = "org.checkerframework", name = "checker-qual", version.ref = "checkerQual" }
@@ -49,6 +50,7 @@ immutablesAnnotate = { group = "org.immutables", name = "annotate", version.ref 
 guice = { group = "com.google.inject", name = "guice", version.ref = "guice" }
 
 # kotlin
+kotlinStdlibJdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlinLibrary" }
 coroutinesCore = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutinesJdk8 = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk8", version.ref = "coroutines" }
 
@@ -62,7 +64,7 @@ truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
 compileTesting = { group = "com.google.testing.compile", name = "compile-testing", version.ref = "compileTesting" }
 
 # build-logic
-gradleKotlinJvm = { group = "org.jetbrains.kotlin.jvm", name = "org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlin" }
+gradleKotlinJvm = { group = "org.jetbrains.kotlin.jvm", name = "org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlinPlugin" }
 gradleDokka = { group = "org.jetbrains.dokka", name = "dokka-gradle-plugin", version.ref = "dokka" }
 stylecheck = { module = "ca.stellardrift:stylecheck", version.ref = "stylecheck" }
 cloud-build-logic = { module = "org.incendo:cloud-build-logic", version.ref = "cloud-build-logic" }

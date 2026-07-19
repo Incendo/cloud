@@ -219,12 +219,13 @@ class KotlinAnnotatedMethodsTest {
 
     public class TestCommandSender
 
-    private class TestCommandManager : CommandManager<TestCommandSender>(
-        ExecutionCoordinator.builder<TestCommandSender>()
-            .executor(executorService)
-            .build(),
-        CommandRegistrationHandler.nullCommandRegistrationHandler()
-    ) {
+    private class TestCommandManager :
+        CommandManager<TestCommandSender>(
+            ExecutionCoordinator.builder<TestCommandSender>()
+                .executor(executorService)
+                .build(),
+            CommandRegistrationHandler.nullCommandRegistrationHandler()
+        ) {
 
         override fun hasPermission(sender: TestCommandSender, permission: String): Boolean = true
     }
@@ -232,10 +233,9 @@ class KotlinAnnotatedMethodsTest {
     public class CommandMethods {
 
         @Command("test")
-        public suspend fun suspendingCommand(): Unit =
-            withContext(Dispatchers.Default) {
-                println("called from thread: ${Thread.currentThread().name}")
-            }
+        public suspend fun suspendingCommand(): Unit = withContext(Dispatchers.Default) {
+            println("called from thread: ${Thread.currentThread().name}")
+        }
 
         @Command("test-exception")
         public suspend fun suspendingCommandWithException(): Unit = throw IllegalStateException()
@@ -268,10 +268,9 @@ class KotlinAnnotatedMethodsTest {
     class ParserMethods {
 
         @Parser
-        suspend fun suspendingParser(input: CommandInput): ParserResult =
-            withContext(Dispatchers.Default) {
-                ParserResult(input.lastRemainingToken().toInt())
-            }
+        suspend fun suspendingParser(input: CommandInput): ParserResult = withContext(Dispatchers.Default) {
+            ParserResult(input.lastRemainingToken().toInt())
+        }
 
         @Parser
         suspend fun suspendingParser2(input: CommandInput): ArgumentParseResult<ParserResult2> =
@@ -280,9 +279,8 @@ class KotlinAnnotatedMethodsTest {
             }
 
         @Parser
-        suspend fun exceptionParser(input: CommandInput): ParserResult3 =
-            withContext(Dispatchers.Default) {
-                throw IllegalStateException()
-            }
+        suspend fun exceptionParser(input: CommandInput): ParserResult3 = withContext(Dispatchers.Default) {
+            throw IllegalStateException()
+        }
     }
 }

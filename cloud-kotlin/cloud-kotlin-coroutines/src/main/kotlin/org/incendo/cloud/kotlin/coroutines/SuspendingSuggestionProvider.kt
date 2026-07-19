@@ -77,12 +77,11 @@ public fun interface SuspendingSuggestionProvider<C : Any> {
             scope: CoroutineScope = GlobalScope,
             context: CoroutineContext = EmptyCoroutineContext,
             provider: SuspendingSuggestionProvider<C>
-        ): SuggestionProvider<C> =
-            SuggestionProvider { ctx, input ->
-                scope.future(context) {
-                    provider(ctx, input).toList()
-                }
+        ): SuggestionProvider<C> = SuggestionProvider { ctx, input ->
+            scope.future(context) {
+                provider(ctx, input).toList()
             }
+        }
     }
 }
 

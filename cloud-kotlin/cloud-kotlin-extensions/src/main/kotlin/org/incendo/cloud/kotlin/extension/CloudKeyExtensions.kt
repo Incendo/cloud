@@ -34,8 +34,7 @@ import org.incendo.cloud.key.CloudKeyHolder
  * @param key the key
  * @return the value, or `null`
  */
-public fun <T : Any> CloudKeyContainer.getOrNull(key: CloudKey<T>): T? =
-    this.optional(key).orElse(null)
+public fun <T : Any> CloudKeyContainer.getOrNull(key: CloudKey<T>): T? = this.optional(key).orElse(null)
 
 /**
  * Returns the value associated with the given [key], if it exists.
@@ -44,8 +43,7 @@ public fun <T : Any> CloudKeyContainer.getOrNull(key: CloudKey<T>): T? =
  * @param key the key
  * @return the value, or `null`
  */
-public fun <T : Any> CloudKeyContainer.getOrNull(key: String): T? =
-    this.optional<T>(key).orElse(null)
+public fun <T : Any> CloudKeyContainer.getOrNull(key: String): T? = this.optional<T>(key).orElse(null)
 
 /**
  * Returns the value associated with the given [keyHolder], if it exists.
@@ -54,8 +52,7 @@ public fun <T : Any> CloudKeyContainer.getOrNull(key: String): T? =
  * @param keyHolder the holder of the key
  * @return the value, or `null`
  */
-public fun <T : Any> CloudKeyContainer.getOrNull(keyHolder: CloudKeyHolder<T>): T? =
-    this.optional<T>(keyHolder).orElse(null)
+public fun <T : Any> CloudKeyContainer.getOrNull(keyHolder: CloudKeyHolder<T>): T? = this.optional<T>(keyHolder).orElse(null)
 
 /**
  * Creates a new key with the given [name].
@@ -64,5 +61,4 @@ public fun <T : Any> CloudKeyContainer.getOrNull(keyHolder: CloudKeyHolder<T>): 
  * @param name the name of the key
  * @return the created key
  */
-public inline fun <reified T : Any> cloudKey(name: String): CloudKey<T> =
-    CloudKey.of(name, T::class.java)
+public inline fun <reified T : Any> cloudKey(name: String): CloudKey<T> = CloudKey.of(name, T::class.java)

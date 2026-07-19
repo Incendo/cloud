@@ -72,12 +72,13 @@ class SuspendingArgumentParserTest {
 
     private class TestCommandSender
 
-    private class TestCommandManager : CommandManager<TestCommandSender>(
-        ExecutionCoordinator.builder<TestCommandSender>()
-            .executor(executorService)
-            .build(),
-        CommandRegistrationHandler.nullCommandRegistrationHandler()
-    ) {
+    private class TestCommandManager :
+        CommandManager<TestCommandSender>(
+            ExecutionCoordinator.builder<TestCommandSender>()
+                .executor(executorService)
+                .build(),
+            CommandRegistrationHandler.nullCommandRegistrationHandler()
+        ) {
 
         override fun hasPermission(sender: TestCommandSender, permission: String): Boolean = true
     }
