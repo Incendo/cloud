@@ -68,9 +68,8 @@ public fun <C : Any> CommandManager<C>.buildAndRegister(
  * @return the command manager
  * @see [CommandManager.command]
  */
-public fun <C : Any> CommandManager<C>.command(
-    vararg commands: MutableCommandBuilder<C>
-): CommandManager<C> = apply { commands.forEach { command -> this.command(command.build()) } }
+public fun <C : Any> CommandManager<C>.command(vararg commands: MutableCommandBuilder<C>): CommandManager<C> =
+    apply { commands.forEach { command -> this.command(command.build()) } }
 
 /**
  * Specify a required sender type
@@ -78,17 +77,15 @@ public fun <C : Any> CommandManager<C>.command(
  * @param type required sender type
  * @return New builder instance using the required sender type
  */
-public fun <C : Any> Command.Builder<C>.senderType(type: KClass<out C>): Command.Builder<C> =
-    senderType(type.java)
+public fun <C : Any> Command.Builder<C>.senderType(type: KClass<out C>): Command.Builder<C> = senderType(type.java)
 
 /**
  * Create a new [MutableCommandBuilder].
  *
  * @param commandManager the command manager, which will own this command.
  */
-public fun <C : Any> Command.Builder<C>.toMutable(
-    commandManager: CommandManager<C>
-): MutableCommandBuilder<C> = MutableCommandBuilder(this, commandManager)
+public fun <C : Any> Command.Builder<C>.toMutable(commandManager: CommandManager<C>): MutableCommandBuilder<C> =
+    MutableCommandBuilder(this, commandManager)
 
 /**
  * Create a new [MutableCommandBuilder] and invoke the provided receiver lambda on it.

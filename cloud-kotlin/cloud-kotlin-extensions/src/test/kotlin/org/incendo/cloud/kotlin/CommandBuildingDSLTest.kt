@@ -109,14 +109,14 @@ class CommandBuildingDSLTest {
         )
     }
 
-    class TestCommandManager : CommandManager<TestCommandSender>(
-        ExecutionCoordinator.simpleCoordinator(),
-        CommandRegistrationHandler.nullCommandRegistrationHandler()
-    ) {
+    class TestCommandManager :
+        CommandManager<TestCommandSender>(
+            ExecutionCoordinator.simpleCoordinator(),
+            CommandRegistrationHandler.nullCommandRegistrationHandler()
+        ) {
 
-        override fun hasPermission(sender: TestCommandSender, permission: String): Boolean {
-            return !permission.equals("no", ignoreCase = true)
-        }
+        override fun hasPermission(sender: TestCommandSender, permission: String): Boolean =
+            !permission.equals("no", ignoreCase = true)
     }
 
     open class TestCommandSender

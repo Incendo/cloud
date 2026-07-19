@@ -32,7 +32,7 @@ import static org.incendo.cloud.parser.standard.IntegerParser.integerParser;
 
 class CommandTest {
 
-    @Test()
+    @Test
     void noArguments() {
         assertThat(
                 Command

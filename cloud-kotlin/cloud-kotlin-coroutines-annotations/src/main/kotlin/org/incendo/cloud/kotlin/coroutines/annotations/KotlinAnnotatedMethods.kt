@@ -143,8 +143,8 @@ private class KotlinSuggestionProvider<C>(
     private val instance: Any
 ) : SuggestionProvider<C> {
 
-    override fun suggestionsFuture(context: CommandContext<C>, input: CommandInput): CompletableFuture<Iterable<Suggestion>> {
-        return coroutineScope.future(coroutineContext) {
+    override fun suggestionsFuture(context: CommandContext<C>, input: CommandInput): CompletableFuture<Iterable<Suggestion>> =
+        coroutineScope.future(coroutineContext) {
             try {
                 if (kFunction.valueParameters.isEmpty()) {
                     kFunction.callSuspend(instance)
@@ -163,7 +163,6 @@ private class KotlinSuggestionProvider<C>(
                 else -> MethodSuggestionProvider.mapSuggestions(result)
             }
         }
-    }
 }
 
 private class KotlinMethodArgumentParserFactory<C>(
@@ -227,7 +226,8 @@ private class KotlinMethodArgumentParser<C, T>(
     private val suggestionProvider: SuggestionProvider<C>,
     javaMethod: Method,
     parameterInjectorRegistry: ParameterInjectorRegistry<C>
-) : FutureArgumentParser<C, T>, AnnotatedMethodHandler<C>(javaMethod, instance, parameterInjectorRegistry) {
+) : AnnotatedMethodHandler<C>(javaMethod, instance, parameterInjectorRegistry),
+    FutureArgumentParser<C, T> {
 
     private val paramsWithoutContinuation = parameters()
         .filterNot { Continuation::class.java == it.type }
@@ -236,29 +236,31 @@ private class KotlinMethodArgumentParser<C, T>(
     override fun parseFuture(
         commandContext: CommandContext<C>,
         commandInput: CommandInput
-    ): CompletableFuture<ArgumentParseResult<T>> =
-        executeSuspendFunction(
-            coroutineScope,
-            coroutineContext,
-            kFunction,
-            instance,
-            paramsWithoutContinuation,
-            commandContext,
-            listOf(commandInput)
-        )
-            .mapResult()
+    ): CompletableFuture<ArgumentParseResult<T>> = executeSuspendFunction(
+        coroutineScope,
+        coroutineContext,
+        kFunction,
+        instance,
+        paramsWithoutContinuation,
+        commandContext,
+        listOf(commandInput)
+    )
+        .mapResult()
 
     override fun suggestionProvider(): SuggestionProvider<C> = suggestionProvider
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T> CompletableFuture<*>.mapResult(): CompletableFuture<ArgumentParseResult<T>> =
-        thenApply {
-            when (it) {
+    private fun <T> CompletableFuture<*>.mapResult(): CompletableFuture<ArgumentParseResult<T>> = handle { result, exception ->
+        if (exception != null) {
+            ArgumentParseResult.failure(exception)
+        } else {
+            when (result) {
                 null -> ArgumentParseResult.failure(IllegalArgumentException("Result not found"))
-                is ArgumentParseResult<*> -> it as ArgumentParseResult<T>
-                else -> ArgumentParseResult.success((it as T)!!)
+                is ArgumentParseResult<*> -> result as ArgumentParseResult<T>
+                else -> ArgumentParseResult.success((result as T)!!)
             }
         }
+    }
 }
 
 private fun <C> AnnotatedMethodHandler<C>.executeSuspendFunction(
@@ -320,5 +322,4 @@ private fun <C> AnnotatedMethodHandler<C>.executeSuspendFunction(
     }
 }
 
-private fun KParameter.hasType(clazz: Class<*>): Boolean =
-    GenericTypeReflector.erase(type.javaType) == clazz
+private fun KParameter.hasType(clazz: Class<*>): Boolean = GenericTypeReflector.erase(type.javaType) == clazz

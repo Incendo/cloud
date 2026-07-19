@@ -190,14 +190,42 @@ class KotlinAnnotatedMethodsTest {
         }
     }
 
+    @Test
+    fun `test suspending parser method with exception`(): Unit = runBlocking {
+        AnnotationParser(commandManager, TestCommandSender::class.java)
+            .installCoroutineSupport()
+            .parse(ParserMethods())
+
+        val commandContext = StandardCommandContextFactory(commandManager).create(
+            true,
+            TestCommandSender()
+        )
+
+        val parser = commandManager.parserRegistry().createParser(
+            TypeToken.get(ParserResult3::class.java),
+            ParserParameters.empty()
+        )
+
+        assert(parser.isPresent) {
+            "Suspending parser cannot be found!"
+        }
+
+        val result: ArgumentParseResult<*> = parser.get().parseFuture(commandContext, CommandInput.of("5")).await()
+
+        assert(result.failure().orElse(null) is IllegalStateException) {
+            "Suspending parser should fail with IllegalStateException!"
+        }
+    }
+
     public class TestCommandSender
 
-    private class TestCommandManager : CommandManager<TestCommandSender>(
-        ExecutionCoordinator.builder<TestCommandSender>()
-            .executor(executorService)
-            .build(),
-        CommandRegistrationHandler.nullCommandRegistrationHandler()
-    ) {
+    private class TestCommandManager :
+        CommandManager<TestCommandSender>(
+            ExecutionCoordinator.builder<TestCommandSender>()
+                .executor(executorService)
+                .build(),
+            CommandRegistrationHandler.nullCommandRegistrationHandler()
+        ) {
 
         override fun hasPermission(sender: TestCommandSender, permission: String): Boolean = true
     }
@@ -205,10 +233,9 @@ class KotlinAnnotatedMethodsTest {
     public class CommandMethods {
 
         @Command("test")
-        public suspend fun suspendingCommand(): Unit =
-            withContext(Dispatchers.Default) {
-                println("called from thread: ${Thread.currentThread().name}")
-            }
+        public suspend fun suspendingCommand(): Unit = withContext(Dispatchers.Default) {
+            println("called from thread: ${Thread.currentThread().name}")
+        }
 
         @Command("test-exception")
         public suspend fun suspendingCommandWithException(): Unit = throw IllegalStateException()
@@ -236,18 +263,24 @@ class KotlinAnnotatedMethodsTest {
 
     data class ParserResult2(val test: Int)
 
+    data class ParserResult3(val test: Int)
+
     class ParserMethods {
 
         @Parser
-        suspend fun suspendingParser(input: CommandInput): ParserResult =
-            withContext(Dispatchers.Default) {
-                ParserResult(input.lastRemainingToken().toInt())
-            }
+        suspend fun suspendingParser(input: CommandInput): ParserResult = withContext(Dispatchers.Default) {
+            ParserResult(input.lastRemainingToken().toInt())
+        }
 
         @Parser
         suspend fun suspendingParser2(input: CommandInput): ArgumentParseResult<ParserResult2> =
             withContext(Dispatchers.Default) {
                 ArgumentParseResult.success(ParserResult2(input.lastRemainingToken().toInt()))
             }
+
+        @Parser
+        suspend fun exceptionParser(input: CommandInput): ParserResult3 = withContext(Dispatchers.Default) {
+            throw IllegalStateException()
+        }
     }
 }

@@ -1,22 +1,30 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
   "labels": [
     "dependencies"
   ],
   "packageRules": [
     {
-      "matchManagers": ["github-actions", "gradle-wrapper"],
+      "matchManagers": [
+        "github-actions",
+        "gradle-wrapper"
+      ],
       "groupName": "gradle and github actions"
     },
     {
-      "matchDepTypes": ["plugin"],
+      "matchDepTypes": [
+        "plugin"
+      ],
       "groupName": "gradle and github actions"
     },
     {
-      "matchPaths": ["build-logic/*", "buildSrc/*"],
+      "matchFileNames": [
+        "build-logic/*",
+        "buildSrc/*"
+      ],
       "groupName": "gradle and github actions"
     }
   ],

@@ -36,6 +36,7 @@ class CloudBaseConventions : Plugin<Project> {
             "annotationProcessor"(libs.bundles.immutables)
 
             "testImplementation"(libs.bundles.baseTestingDependencies)
+            "testRuntimeOnly"("org.junit.platform:junit-platform-launcher")
 
             "errorprone"(libs.errorproneCore)
             // Silences compiler warnings from guava using errorprone
