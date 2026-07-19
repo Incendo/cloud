@@ -89,7 +89,9 @@ public final class DurationParser<C> implements ArgumentParser<C, Duration>, Blo
 
         while (cursor < input.length()) {
             // advance cursor until time unit or we reach end of input (in which case it's invalid anyway)
-            while (cursor < input.length() && Character.isDigit(input.charAt(cursor))) {
+            while (cursor < input.length()
+                    && input.charAt(cursor) >= '0'
+                    && input.charAt(cursor) <= '9') {
                 cursor += 1;
             }
 

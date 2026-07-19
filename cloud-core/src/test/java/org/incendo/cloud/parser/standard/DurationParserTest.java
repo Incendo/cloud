@@ -121,4 +121,12 @@ class DurationParserTest {
                 () -> manager.commandExecutor().executeCommand(new TestCommandSender(), "duration 1dfoo").join()
         );
     }
+
+    @Test
+    void invalid_format_unicode_digits() {
+        Assertions.assertThrows(
+                CompletionException.class,
+                () -> manager.commandExecutor().executeCommand(new TestCommandSender(), "duration １２h").join()
+        );
+    }
 }
