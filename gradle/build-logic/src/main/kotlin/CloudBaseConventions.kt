@@ -32,8 +32,9 @@ class CloudBaseConventions : Plugin<Project> {
         target.gradle.startParameter.excludedTaskNames.add("checkstyleTest")
 
         target.dependencies {
-            "compileOnly"(libs.bundles.immutables)
-            "annotationProcessor"(libs.bundles.immutables)
+            "compileOnlyApi"(libs.immutablesValueAnnotations)
+            "compileOnlyApi"(libs.immutablesAnnotate)
+            "annotationProcessor"(libs.immutablesValue)
 
             "testImplementation"(libs.bundles.baseTestingDependencies)
             "testRuntimeOnly"("org.junit.platform:junit-platform-launcher")
