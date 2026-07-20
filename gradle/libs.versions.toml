@@ -21,7 +21,7 @@ guice = "7.0.0"
 kotlinPlugin = "2.4.10"
 kotlinLibrary = "2.0.20"
 dokka = "2.2.0"
-coroutines = "1.8.1"
+coroutines = "1.11.0"
 ktlint = "1.8.0"
 
 # testing
