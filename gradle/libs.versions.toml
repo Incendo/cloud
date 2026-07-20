@@ -30,7 +30,7 @@ mockitoCore = "4.11.0"
 mockitoKotlin = "4.1.0"
 mockitoJupiter = "4.11.0"
 truth = "1.4.5"
-compileTesting = "0.21.0"
+compileTesting = "0.23.0"
 
 # build-logic
 cloud-build-logic = "0.0.23"
