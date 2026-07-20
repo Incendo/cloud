@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0]
+
 ### Changed
 - Add a dependency on the Cloud BOM to published modules for Gradle dependency alignment ([#789](https://github.com/Incendo/cloud/pull/789))
 
