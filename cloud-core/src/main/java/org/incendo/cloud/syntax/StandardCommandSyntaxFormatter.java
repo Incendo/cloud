@@ -23,7 +23,6 @@
 //
 package org.incendo.cloud.syntax;
 
-import io.leangen.geantyref.GenericTypeReflector;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Iterator;
@@ -36,6 +35,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.component.CommandComponent;
 import org.incendo.cloud.internal.CommandNode;
+import org.incendo.cloud.internal.SuperTypeCache;
 import org.incendo.cloud.parser.aggregate.AggregateParser;
 import org.incendo.cloud.parser.flag.CommandFlag;
 import org.incendo.cloud.parser.flag.CommandFlagParser;
@@ -85,7 +85,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                     Collections.emptyMap()
             );
             for (final Map.Entry<Type, Permission> entry : accessMap.entrySet()) {
-                if (GenericTypeReflector.isSuperType(entry.getKey(), sender.getClass())) {
+                if (SuperTypeCache.isSuperType(entry.getKey(), sender.getClass())) {
                     if (this.manager.testPermission(sender, entry.getValue()).allowed()) {
                         return true;
                     }

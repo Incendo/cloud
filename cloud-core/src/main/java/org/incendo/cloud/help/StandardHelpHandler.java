@@ -23,7 +23,6 @@
 //
 package org.incendo.cloud.help;
 
-import io.leangen.geantyref.GenericTypeReflector;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -43,6 +42,7 @@ import org.incendo.cloud.help.result.MultipleCommandResult;
 import org.incendo.cloud.help.result.VerboseCommandResult;
 import org.incendo.cloud.internal.CommandInputTokenizer;
 import org.incendo.cloud.internal.CommandNode;
+import org.incendo.cloud.internal.SuperTypeCache;
 
 @API(status = API.Status.STABLE)
 public class StandardHelpHandler<C> implements HelpHandler<C> {
@@ -231,7 +231,7 @@ public class StandardHelpHandler<C> implements HelpHandler<C> {
 
     private boolean isAllowed(final C sender, final Command<C> command) {
         if (command.senderType().isPresent()) {
-            if (!GenericTypeReflector.isSuperType(command.senderType().get().getType(), sender.getClass())) {
+            if (!SuperTypeCache.isSuperType(command.senderType().get().getType(), sender.getClass())) {
                 return false;
             }
         }
