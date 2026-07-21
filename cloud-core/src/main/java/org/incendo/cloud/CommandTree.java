@@ -1170,7 +1170,8 @@ public final class CommandTree<C> {
                     node.children()
                             .stream()
                             .filter(n -> n.component() != null)
-                            .collect(Collectors.toList())
+                            .collect(Collectors.toList()),
+                    null
             );
         }
 
@@ -1194,7 +1195,8 @@ public final class CommandTree<C> {
                             node.children()
                                     .stream()
                                     .filter(n -> n.component() != null)
-                                    .collect(Collectors.toList())
+                                    .collect(Collectors.toList()),
+                            nameOrAlias
                     );
                 }
             }

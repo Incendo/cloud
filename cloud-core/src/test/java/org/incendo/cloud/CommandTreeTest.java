@@ -446,6 +446,14 @@ class CommandTreeTest {
                 this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
                         .literal("literal")));
         this.setup();
+
+        // Two literals with the same alias can not co-exist, causes AmbiguousNodeException
+        this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
+                .literal("literal", "alias"));
+        assertThrows(AmbiguousNodeException.class, () ->
+                this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
+                        .literal("literal2", "alias")));
+        this.setup();
     }
 
     @Test
