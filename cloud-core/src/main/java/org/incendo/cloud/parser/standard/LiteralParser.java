@@ -36,6 +36,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
+import org.incendo.cloud.exception.parsing.LiteralParseException;
 import org.incendo.cloud.parser.ArgumentParseResult;
 import org.incendo.cloud.parser.ArgumentParser;
 import org.incendo.cloud.parser.ParserDescriptor;
@@ -82,7 +83,7 @@ public final class LiteralParser<C> implements ArgumentParser<C, String>, Blocki
             commandInput.readString();
             return ArgumentParseResult.success(this.name);
         }
-        return ArgumentParseResult.failure(new IllegalArgumentException(string));
+        return ArgumentParseResult.failure(new LiteralParseException(string));
     }
 
     @Override
