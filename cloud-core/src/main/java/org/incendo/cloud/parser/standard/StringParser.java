@@ -283,7 +283,7 @@ public final class StringParser<C> implements ArgumentParser<C, String> {
                     context,
                     StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_STRING,
                     CaptionVariable.of("input", input),
-                    CaptionVariable.of("stringMode", stringMode.name())
+                    CaptionVariable.of("string_mode", stringMode.name()) // Adventure 5.x made MiniMessage tags stricter
             );
             this.input = input;
             this.stringMode = stringMode;

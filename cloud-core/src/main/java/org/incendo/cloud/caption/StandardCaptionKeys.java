@@ -50,7 +50,7 @@ public final class StandardCaptionKeys {
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_CHAR = of("argument.parse.failure.char");
     /**
-     * Variables: {@code <input>}, {@code <stringMode>}
+     * Variables: {@code <input>}, {@code <string_mode>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_STRING = of("argument.parse.failure.string");
     /**
@@ -58,7 +58,7 @@ public final class StandardCaptionKeys {
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_UUID = of("argument.parse.failure.uuid");
     /**
-     * Variables: {@code <input>}, {@code <acceptableValues>}
+     * Variables: {@code <input>}, {@code <acceptable_values>}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_ENUM = of("argument.parse.failure.enum");
     /**
