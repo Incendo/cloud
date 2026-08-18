@@ -151,7 +151,7 @@ public final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C,
                     context,
                     StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_ENUM,
                     CaptionVariable.of("input", input),
-                    CaptionVariable.of("acceptableValues", join(enumClass))
+                    CaptionVariable.of("acceptable_values", join(enumClass)) // Adventure 5.x made MiniMessage tags stricter
             );
             this.input = input;
             this.enumClass = enumClass;
